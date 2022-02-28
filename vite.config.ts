@@ -7,16 +7,15 @@ import { visualizer } from "rollup-plugin-visualizer";
 import compressPlugin from "vite-plugin-compression";
 import { createHtmlPlugin } from "vite-plugin-html";
 import WindiCSS from 'vite-plugin-windicss'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import path from 'path'
 
 export default defineConfig({
   plugins: [
     vue(),
     Components({
       resolvers: [
-        // naive ui 的自动引入，只需要这一句
         NaiveUiResolver(),
-        // AntDesign vue 的自动引入，只需要这一句
-        // AntDesignVueResolver()
       ],
     }),
     visualizer({
@@ -53,6 +52,10 @@ export default defineConfig({
       },
     }),
     WindiCSS(),
+    createSvgIconsPlugin({
+        iconDirs: [path.resolve(process.cwd(), 'src/icons')],
+        symbolId: 'icon-[dir]-[name]'
+    }),
   ],
   resolve: {
     alias: [

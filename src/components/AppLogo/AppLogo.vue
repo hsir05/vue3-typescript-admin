@@ -1,6 +1,6 @@
 <template>
   <div class="logo">
-    <img src="../../assets/logo-180x180.png" class="w-25px mr-5" alt="logo" />
+    <img src="../../assets/logo-180x180.png" class="w-25px mr-5px" alt="logo" />
     <span class="logo-title">{{title}}</span>
   </div>
 </template>

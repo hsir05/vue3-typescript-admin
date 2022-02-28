@@ -4,11 +4,11 @@
     <n-layout content-style="height:100vh">
       <LayoutHeader />
       <n-layout-content
-        content-style="padding: 24px;height: calc(100vh - 70px)"
+        content-style="padding: 24px;height: calc(100vh - 100px)"
       >
         <RouterView />
       </n-layout-content>
-      <!-- <n-layout-footer>成府路</n-layout-footer> -->
+      <n-layout-footer >CopyRight © 2022 甘肃诚诚网络技术有限公司 · 技术支持</n-layout-footer>
     </n-layout>
   </n-layout>
 </template>
@@ -28,17 +28,14 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-.n-layout-header,
+
 .n-layout-footer {
-  background: rgba(128, 128, 128, 0.2);
-  padding: 24px;
+  padding: 15px 24px;
 }
 
 .n-layout-sider {
-  background: rgba(128, 128, 128, 0.3);
 }
 
 .n-layout-content {
-  background: rgba(128, 128, 128, 0.4);
 }
 </style>

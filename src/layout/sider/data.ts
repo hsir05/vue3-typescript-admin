@@ -7,32 +7,6 @@ export const menuOptions: MenuOption[] = [
     key: 'dance-dance-dance',
     children: [
       {
-        type: 'group',
-        label: '人物',
-        key: 'people',
-        children: [
-          {
-            label: '叙事者',
-            key: 'narrator'
-          },
-          {
-            label: '羊男',
-            key: 'sheep-man'
-          }
-        ]
-      },
-      {
-        label: '饮品',
-        key: 'beverage',
-        children: [
-          {
-            label: '威士忌',
-            key: 'whisky',
-            href: 'https://baike.baidu.com/item/%E5%A8%81%E5%A3%AB%E5%BF%8C%E9%85%92/2959816?fromtitle=%E5%A8%81%E5%A3%AB%E5%BF%8C&fromid=573&fr=aladdin'
-          }
-        ]
-      },
-      {
         label: '食物',
         key: 'food',
         children: [
