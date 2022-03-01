@@ -62,3 +62,7 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss">
+.n-layout-sider {
+}
+</style>

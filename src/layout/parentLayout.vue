@@ -8,19 +8,21 @@
       >
         <RouterView />
       </n-layout-content>
-      <n-layout-footer >CopyRight © 2022 甘肃诚诚网络技术有限公司 · 技术支持</n-layout-footer>
+      <LayoutFooter />
     </n-layout>
   </n-layout>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-import LayoutSider from "./sider/Sider.vue";
-import LayoutHeader from "./header/Header.vue";
+import LayoutSider from "./Sider/index.vue";
+import LayoutHeader from "./Header/index.vue";
+import LayoutFooter from "./Footer/index.vue"
 export default defineComponent({
   name: "ParentLayout",
   components: {
     LayoutSider,
     LayoutHeader,
+    LayoutFooter,
   },
   setup() {
     return {};
@@ -33,8 +35,7 @@ export default defineComponent({
   padding: 15px 24px;
 }
 
-.n-layout-sider {
-}
+
 
 .n-layout-content {
 }

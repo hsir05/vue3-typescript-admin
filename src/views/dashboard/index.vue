@@ -1,5 +1,5 @@
 <template>
-  <div class="test">welcome</div>
+  <div class="test">主页</div>
   <n-button>naive-ui</n-button>
 </template>
 <script lang="ts">
