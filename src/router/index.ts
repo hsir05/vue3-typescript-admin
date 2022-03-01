@@ -20,6 +20,7 @@ function sortRoute(a:any, b:any) {
 
 routeModuleList.sort(sortRoute);
 
+
 //无需验证权限
 export const constantRouter: RouteRecordRaw[] = [ RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute];
 

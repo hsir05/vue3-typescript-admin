@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import '@/assets/styles/index.scss'
 import App from "./App.vue";
 import 'virtual:windi.css'
 import 'virtual:svg-icons-register'

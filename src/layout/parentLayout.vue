@@ -3,11 +3,7 @@
     <LayoutSider />
     <n-layout content-style="height:100vh">
       <LayoutHeader />
-      <n-layout-content
-        content-style="padding: 24px;height: calc(100vh - 100px)"
-      >
-        <RouterView />
-      </n-layout-content>
+      <LayoutContent />
       <LayoutFooter />
     </n-layout>
   </n-layout>
@@ -16,13 +12,15 @@
 import { defineComponent } from "vue";
 import LayoutSider from "./Sider/index.vue";
 import LayoutHeader from "./Header/index.vue";
-import LayoutFooter from "./Footer/index.vue"
+import LayoutFooter from "./Footer/index.vue";
+import LayoutContent from "./Content/index.vue";
 export default defineComponent({
   name: "ParentLayout",
   components: {
     LayoutSider,
     LayoutHeader,
     LayoutFooter,
+    LayoutContent,
   },
   setup() {
     return {};
@@ -30,13 +28,4 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-
-.n-layout-footer {
-  padding: 15px 24px;
-}
-
-
-
-.n-layout-content {
-}
 </style>

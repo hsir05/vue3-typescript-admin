@@ -14,7 +14,7 @@ export const RootRoute: RouteRecordRaw = {
 export const LoginRoute: RouteRecordRaw = {
   path: '/login',
   name: 'Login',
-  component: () => import('@/views/login/index.vue'),
+  component: () => import('@/views/login/login.vue'),
   meta: {
     title: 'Login', 
   },
@@ -49,11 +49,11 @@ export const RedirectRoute: RouteRecordRaw = {
     title: REDIRECT_NAME,
     hideBreadcrumb: true,
   },
-  children: [
+  children: [ 
     {
       path: "/redirect/:path(.*)",
       name: REDIRECT_NAME,
-      component: () => import("@/views/redirect/index.vue"),
+      component: () => import("@/views/redirect/redirect.vue"),
       meta: {
         title: REDIRECT_NAME,
         hideBreadcrumb: true,

@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
           title: '主页',
           extra: renderNew()
         },
-        component: () => import('@/views/dashboard/index.vue'),
+        component: () => import('@/views/dashboard/dashboard.vue'),
       },
     ],
   },
