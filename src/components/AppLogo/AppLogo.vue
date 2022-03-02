@@ -1,7 +1,7 @@
 <template>
   <div class="app-logo">
     <img
-      src="../../assets/logo-180x180.png"
+      src="../../assets/image/logo-180x180.png"
       class="w-30px mr-10px rounded"
       alt="logo"
     />

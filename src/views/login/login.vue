@@ -4,11 +4,19 @@
       <div class="login-left">
         <div class="login-title">
           <div class="login-title-img">
-            <img src="../../assets/logo.png" alt="logo" style="width: 100%" />
+            <img
+              src="../../assets/image/logo.png"
+              alt="logo"
+              style="width: 100%"
+            />
           </div>
         </div>
         <div class="login-left-img">
-          <img src="../../assets/login-middle.png" style="width: 100%" alt="" />
+          <img
+            src="../../assets/image/login-middle.png"
+            style="width: 100%"
+            alt=""
+          />
         </div>
         <div class="login-info">
           <p>兰州益民出行汽车服务有限公司</p>
@@ -54,7 +62,11 @@
 
           <n-form-item path="captcha">
             <div class="captcha">
-              <img src="../../assets/image.jpeg" style="height: 100%" alt="" />
+              <img
+                src="../../assets/image/image.jpeg"
+                style="height: 100%"
+                alt=""
+              />
             </div>
             <n-input
               v-model:value="formValue.captcha"
@@ -154,7 +166,7 @@ export default defineComponent({
   }
   .login-left {
     width: 45%;
-    background: url("../../assets/login-bg2.png") center no-repeat;
+    background: url("../../assets/image/login-bg2.png") center no-repeat;
     background-size: cover;
     padding: 64px 70px;
     border-top-left-radius: 8px;
