@@ -1,27 +1,40 @@
 <template>
-  <n-drawer v-model:show="isDrawer" :width="502" placement="right">
-    <n-drawer-content title="项目配置">
-      《斯通纳》是美国作家约翰·威廉姆斯在 1965 年出版的小说。
+  <n-drawer v-model:show="isDrawer" :width="width" placement="right">
+    <n-drawer-content :title="title">
+      <n-divider title-placement="center">主题</n-divider>
     </n-drawer-content>
   </n-drawer>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, toRefs, reactive } from "vue";
 export default defineComponent({
   name: "ProjectSetting",
-  setup() {
-    const isDrawer = ref(false);
-
+  props: {
+    title: {
+      type: String,
+      default: "项目配置",
+    },
+    width: {
+      type: Number,
+      default: 280,
+    },
+  },
+  setup(props) {
+    const state = reactive({
+      width: props.width,
+      title: props.title,
+      isDrawer: false,
+    });
     function openDrawer() {
-      isDrawer.value = true;
+      state.isDrawer = true;
     }
 
     function closeDrawer() {
-      isDrawer.value = false;
+      state.isDrawer = false;
     }
 
     return {
-      isDrawer,
+      ...toRefs(state),
       openDrawer,
       closeDrawer,
     };
