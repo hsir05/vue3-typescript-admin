@@ -4,46 +4,44 @@
     collapse-mode="width"
     :collapsed-width="64"
     :width="200"
-    :collapsed="collapsed"
-    show-trigger
+    :collapsed="getCollapsed"
     :inverted="true"
-    @collapse="collapsed = true"
-    @expand="collapsed = false"
   >
     <AppLogo />
     <n-menu
-      :collapsed="collapsed"
+      :collapsed="getCollapsed"
       :collapsed-width="64"
       :collapsed-icon-size="20"
       :indent="24"
       :inverted="true"
       :options="menuOptions"
-      :default-expanded-keys="defaultExpandedKeys"
       accordion
     />
   </n-layout-sider>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { menuOptions } from "./data";
 import AppLogo from "@/components/AppLogo/AppLogo.vue";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
+
 export default defineComponent({
   name: "LayoutSider",
   components: {
     AppLogo,
   },
   setup() {
+    const { getCollapsed } = useProjectSetting();
+
     return {
-      collapsed: ref(false),
+      getCollapsed,
       menuOptions,
-      defaultExpandedKeys: ["fish", "braise"],
     };
   },
 });
 </script>
 <style lang="scss">
 .n-layout-sider {
-    // background-color: #232324;
-    // color: white;
+
 }
 </style>

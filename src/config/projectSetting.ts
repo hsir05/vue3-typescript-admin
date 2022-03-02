@@ -1,5 +1,5 @@
 import { ProjectSettingInter } from "@/interface/projectSetting"
 
 export const projectSetting:ProjectSettingInter = {
-    collapsed: true,
+    collapsed: false,
 }

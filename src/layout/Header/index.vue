@@ -1,9 +1,12 @@
 <template>
   <n-layout-header content-style="height:45px">
     <div class>
-      <span class>
-        <n-icon size="18" class="setting-icon">
-          <ListSharpIcon />
+      <span class @click="handleCollapsed">
+          <n-icon size="18" v-if="getCollapsed" class="setting-icon">
+          <MenuUnfoldOutlined />
+        </n-icon>
+        <n-icon size="18" v-else class="setting-icon">
+          <MenuFoldOutlined />
         </n-icon>
       </span>
     </div>
@@ -34,22 +37,28 @@
   <ProjectSetting ref="drawerSetting" />
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, unref } from "vue";
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
 import ProjectSetting from "./projectSetting/projectSetting.vue";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting"
+import { MenuUnfoldOutlined, MenuFoldOutlined } from "@vicons/antd"
 import {
   PersonCircleOutline as UserIcon,
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
-  ListSharp as ListSharpIcon,
 } from "@vicons/ionicons5";
 
 export default defineComponent({
   name: "Header",
-  components: { setttingIcon, ListSharpIcon, ProjectSetting },
+  components: { setttingIcon, MenuUnfoldOutlined, MenuFoldOutlined, ProjectSetting },
   setup() {
+    const { getCollapsed, setCollapsed } = useProjectSetting()
     const drawerSetting = ref();
+
+    const handleCollapsed = () => {
+        setCollapsed(!unref(getCollapsed))
+    }
     const openSetting = () => {
       const { openDrawer } = drawerSetting.value;
       openDrawer();
@@ -57,6 +66,7 @@ export default defineComponent({
 
     return {
       drawerSetting,
+      getCollapsed,
       options: [
         {
           label: "个人中心",
@@ -76,6 +86,7 @@ export default defineComponent({
       ],
 
       openSetting,
+      handleCollapsed,
     };
   },
 });

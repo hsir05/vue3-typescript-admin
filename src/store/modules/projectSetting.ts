@@ -3,13 +3,13 @@ import { ProjectSettingInter } from "@/interface/projectSetting";
 import { projectSetting } from "@/config/projectSetting";
 import { merge } from "lodash-es";
 
-interface AppState {
+interface ProjectState {
     projectSetting:ProjectSettingInter
 }
 
 export const useAppProjectStore = defineStore({
-  id: "useAppStore",
-  state: (): AppState => ({
+  id: "projectSetting",
+  state: (): ProjectState => ({
     projectSetting: projectSetting
   }),
   getters: {
