@@ -1,0 +1,10 @@
+# 忽略格式化文件 (根据项目需要自行添加)
+node_modules
+dist
+
+README.md
+package-lock.json
+tsconfig.json
+.vscode/extensions.json
+.prettier.js
+.eslintrc.js
