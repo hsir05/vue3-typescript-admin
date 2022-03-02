@@ -1,154 +1,215 @@
 <template>
-  <div class="login-wrap">
-    <div class="logo-title">
-      <img src="../../assets/logo.png" alt="logo" />
-      <span class="ml-20px" style="vertical-align: middle"
-        >益民出行综合管理平台</span
-      >
-    </div>
-    <div class="logo-middle">
-      <img src="../../assets/login-middle.png" class="" alt="" />
-
-      <div class="logo-form ml-150px">
-          <h2>系统登录</h2>
-        <n-form ref="formRef" :model="formValue" :rules="rules">
-          <n-form-item path="account">
+  <div class="login-container">
+    <div class="login">
+      <div class="login-left">
+        <div class="login-title">
+          <div class="login-title-img">
+            <img src="../../assets/logo.png" alt="logo" style="width: 100%" />
+          </div>
+        </div>
+        <div class="login-left-img">
+          <img src="../../assets/login-middle.png" style="width: 100%" alt="" />
+        </div>
+        <div class="login-info">
+          <p>兰州益民出行汽车服务有限公司</p>
+          <p>甘肃省兰州市城关区庆阳路488号万盛商务大厦28楼</p>
+          <p>Copyright © 2022 甘肃诚诚网络技术有限公司 · 技术支持</p>
+        </div>
+      </div>
+      <div class="login-form">
+        <span class="login-form-title">益民出行综合管理平台</span>
+        <n-form
+          ref="formRef"
+          label-placement="left"
+          size="large"
+          :model="formValue"
+          :rules="rules"
+        >
+          <n-form-item path="username">
             <n-input
               v-model:value="formValue.account"
-              placeholder="输入帐号"
-            />
-
-            <!-- <n-input placeholder="搜索">
-                <template #prefix>
-                    <n-icon :component="FlashOutline" />
-                </template>
-            </n-input> -->
+              placeholder="请输入用户名"
+            >
+              <template #prefix>
+                <n-icon size="18" color="#808695">
+                  <PersonOutline />
+                </n-icon>
+              </template>
+            </n-input>
           </n-form-item>
           <n-form-item path="password">
             <n-input
               v-model:value="formValue.password"
-              placeholder="输入密码"
+              type="password"
+              showPasswordOn="click"
+              placeholder="请输入密码"
+            >
+              <template #prefix>
+                <n-icon size="18" color="#808695">
+                  <LockClosedOutline />
+                </n-icon>
+              </template>
+            </n-input>
+          </n-form-item>
+
+          <n-form-item path="captcha">
+            <div class="captcha">
+              <img src="../../assets/image.jpeg" style="height: 100%" alt="" />
+            </div>
+            <n-input
+              v-model:value="formValue.captcha"
+              maxlength="4"
+              placeholder="请输入验证码"
+              style="width: 78%; margin-left: 10px"
             />
           </n-form-item>
+
           <n-form-item>
-            <n-button type="primary" attr-type="button" style="width: 100%;" @click="handleValidateClick">
-              立即登录
+            <n-button
+              type="primary"
+              @click="handleSubmit"
+              size="large"
+              :loading="loading"
+              block
+            >
+              登录
             </n-button>
           </n-form-item>
+          <span class="tips">如果登录遇到问题， 请联系客服</span>
         </n-form>
       </div>
-    </div>
-    <div class="logo-bottom">
-      <p>甘肃省兰州市城关区庆阳路488号万盛商务大厦28楼</p>
-      <p>兰州益民出行汽车服务有限公司</p>
-      <p>Copyright © 2022 甘肃诚诚网络技术有限公司 · 技术支持</p>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-
+import { defineComponent, ref, reactive } from "vue";
+import { FormInst } from "naive-ui";
+import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
 export default defineComponent({
   name: "Login",
-  components: {},
+  components: {
+    PersonOutline,
+    LockClosedOutline,
+  },
   setup() {
     const formRef = ref<FormInst | null>(null);
     // const message = useMessage()
+    const loading = ref(false);
 
-    const handleValidateClick = (e: MouseEvent) => {
+    const rules = {
+      username: { required: true, message: "请输入用户名", trigger: "blur" },
+      password: { required: true, message: "请输入密码", trigger: "blur" },
+      captcha: { required: true, message: "请输入验证码", trigger: "blur" },
+    };
+
+    const autoLogin = ref(true);
+
+    const formValue = reactive({
+      account: "",
+      password: "",
+      captcha: "",
+    });
+
+    const handleSubmit = (e: MouseEvent) => {
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
-          // message.success('Valid')
+          //   message.success('登录成功，即将进入系统');
         } else {
           console.log(errors);
-          // message.error('Invalid')
+          // message.info('登录失败');
         }
       });
     };
     return {
       formRef,
-      formValue: ref({
-          account: "",
-        password: "",
-      }),
-      rules: {
-        user: {
-          name: {
-            required: true,
-            message: "请输入姓名",
-            trigger: "blur",
-          },
-          age: {
-            required: true,
-            message: "请输入年龄",
-            trigger: ["input", "blur"],
-          },
-        },
-        phone: {
-          required: true,
-          message: "请输入电话号码",
-          trigger: ["input"],
-        },
-      },
-      handleValidateClick,
+      rules,
+      autoLogin,
+      formValue,
+      loading,
+
+      handleSubmit,
     };
   },
 });
 </script>
 <style lang="scss">
-.login-wrap {
-  .flex {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  height: 100vh;
-  width: 100vw;
+.login-container {
+  background-color: #edf2f8;
   position: relative;
-  background: url("../../assets/login-bg.png") top no-repeat;
-  background-size: 100% 90%;
-  .logo-title {
-    font-size: 3.65rem;
-    font-weight: 700;
-    color: white;
-    margin: 0 auto;
-    padding-top: 30px;
-    @extend .flex;
-  }
-  .logo-middle {
-    text-align: center;
-    margin-top: 100px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    img {
-      margin-left: -150px;
-    }
-  }
-  .logo-form {
-    background-color: white;
-    width: 320px;
-    height: 400px;
-    border-radius: 3px;
-    text-align: left;
-    display: inline-block;
-    padding: 25px;
-  }
-  .logo-bottom {
-    background-color: #d2d6de;
-    color: #666;
+  width: 100%;
+  height: 100%;
+  .login {
     position: absolute;
-    bottom: 0;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    max-width: 1080px;
+    transform: translate(-50%, -50%);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+  .login-left {
+    width: 45%;
+    background: url("../../assets/login-bg2.png") center no-repeat;
+    background-size: cover;
+    padding: 64px 70px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  .login-title {
+    font-size: 22px;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 33px;
     width: 100%;
     text-align: center;
-    font-size: 14px;
-    padding: 15px 0;
-    p {
-      margin: 0;
-      margin-top: 5px;
-    }
+  }
+  .login-title-img {
+    width: 120px;
+    margin: 0 auto;
+  }
+  .login-left-img {
+    width: 200px;
+    margin: 0 auto;
+    margin-top: 20px;
+  }
+  .login-info {
+    color: #fff;
+    font-size: 12px;
+    line-height: 24px;
+    font-weight: 400;
+    text-align: center;
+    margin-top: 15px;
+  }
+  .login-form {
+    width: 55%;
+    background-color: #ffffff;
+    padding: 70px 115px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  .login-form-title {
+    font-size: 20px;
+    font-family: PingFangSC;
+    font-weight: 500;
+    color: rgba(51, 51, 51, 1);
+    line-height: 23px;
+    display: inline-block;
+    margin-bottom: 30px;
+  }
+  .captcha {
+    height: 35px;
+    width: 22%;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .tips {
+    color: #617288;
   }
 }
 </style>
