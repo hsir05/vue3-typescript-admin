@@ -6,13 +6,11 @@ export function createRouterGuard(router: Router) {
   router.beforeEach((to, from, next) => {
     NProgress.start();
     console.log(to, from);
-
     next();
   });
 
-  router.afterEach((to) => {
+  router.afterEach(() => {
     NProgress.done();
-    console.log(to);
   });
 
   router.onError((error) => {

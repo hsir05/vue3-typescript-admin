@@ -9,18 +9,21 @@
     </div>
     <div class="header-right-set">
       <n-dropdown :options="options">
-        <n-avatar
-          round
-          style="cursor: pointer"
-          size="medium"
-          src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-          >Admin</n-avatar
-        >
+        <div class="header-user">
+          <n-avatar
+            round
+            style="cursor: pointer"
+            size="medium"
+            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+            >Admin</n-avatar
+          >
+          <span class="header-username">Admin</span>
+        </div>
       </n-dropdown>
 
       <n-tooltip trigger="hover">
         <template #trigger>
-          <n-icon size="18" class="setting-icon" @click="activate('right')">
+          <n-icon size="18" class="setting-icon" @click="openSetting">
             <setttingIcon />
           </n-icon>
         </template>
@@ -28,12 +31,13 @@
       </n-tooltip>
     </div>
   </n-layout-header>
+  <ProjectSetting ref="drawerSetting" />
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { DrawerPlacement } from "naive-ui";
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
+import ProjectSetting from "./projectSetting/projectSetting.vue";
 import {
   PersonCircleOutline as UserIcon,
   Pencil as EditIcon,
@@ -43,17 +47,16 @@ import {
 
 export default defineComponent({
   name: "Header",
-  components: { setttingIcon, ListSharpIcon },
+  components: { setttingIcon, ListSharpIcon, ProjectSetting },
   setup() {
-    const active = ref(false);
-    const placement = ref<DrawerPlacement>("right");
-    const activate = (place: DrawerPlacement) => {
-      active.value = true;
-      placement.value = place;
+    const drawerSetting = ref();
+    const openSetting = () => {
+      const { openDrawer } = drawerSetting.value;
+      openDrawer();
     };
 
     return {
-      activate,
+      drawerSetting,
       options: [
         {
           label: "个人中心",
@@ -71,6 +74,8 @@ export default defineComponent({
           icon: renderIcon(LogoutIcon),
         },
       ],
+
+      openSetting,
     };
   },
 });
@@ -86,10 +91,16 @@ export default defineComponent({
   height: 64px;
   box-shadow: 0 1px 4px #00152914;
 
-  //   background-color: orange;
   .header-right-set {
     line-height: 1;
     @extend .flex;
+  }
+  .header-user {
+    @extend .flex;
+  }
+  .header-username {
+    font-size: 14px;
+    margin-left: 10px;
   }
   .setting-icon {
     padding: 20px 25px;

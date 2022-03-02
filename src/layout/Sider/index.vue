@@ -15,7 +15,8 @@
       :collapsed="collapsed"
       :collapsed-width="64"
       :collapsed-icon-size="20"
-     :inverted="true"
+      :indent="24"
+      :inverted="true"
       :options="menuOptions"
       :default-expanded-keys="defaultExpandedKeys"
       accordion

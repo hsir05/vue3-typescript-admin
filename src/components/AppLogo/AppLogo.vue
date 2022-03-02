@@ -14,9 +14,9 @@ const title = import.meta.env.VITE_GLOB_APP_SHORT_TITLE;
 .logo {
   width: 100%;
   height: 64px;
-  @apply flex;
+  display: flex;
   align-items: center;
-  padding-left: 32px;
+  padding-left: 25px;
   box-sizing: border-box;
 
   .logo-title {
