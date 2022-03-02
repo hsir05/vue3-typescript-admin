@@ -11,6 +11,7 @@ specifiers:
   '@vueuse/core': ^7.6.2
   eslint: ^8.9.0
   eslint-config-prettier: ^8.3.0
+  eslint-define-config: ^1.2.5
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-vue: ^8.4.1
   husky: '>=6'
@@ -58,6 +59,7 @@ devDependencies:
   '@vitejs/plugin-vue': 2.2.2_vite@2.8.4+vue@3.2.31
   eslint: 8.9.0
   eslint-config-prettier: 8.4.0_eslint@8.9.0
+  eslint-define-config: 1.2.5
   eslint-plugin-prettier: 4.0.0_9f62b85ce3ce02949dbd2ccffcebe95f
   eslint-plugin-vue: 8.4.1_eslint@8.9.0
   husky: 7.0.4
@@ -1896,6 +1898,11 @@ packages:
       eslint: '>=7.0.0'
     dependencies:
       eslint: 8.9.0
+    dev: true
+
+  /eslint-define-config/1.2.5:
+    resolution: {integrity: sha512-WVvtYiovaQTUVHZmB5xnP6HyBktJIOpL4XWFPaSgA/gKFndnD4o5yRRv2EZXqQAU1kdwD/ZHKGrHJ2C6gdSgCA==}
+    engines: {node: '>= 16.9.0', npm: '>= 7.0.0', pnpm: '>= 6.30.1'}
     dev: true
 
   /eslint-plugin-prettier/4.0.0_9f62b85ce3ce02949dbd2ccffcebe95f:
