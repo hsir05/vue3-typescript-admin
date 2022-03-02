@@ -78,6 +78,7 @@
 
           <n-form-item>
             <n-button
+              style="background-color: #0082fc"
               type="primary"
               @click="handleSubmit"
               size="large"
