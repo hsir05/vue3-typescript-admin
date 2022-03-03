@@ -5,6 +5,7 @@
 declare module 'vue' {
   export interface GlobalComponents {
     AppLogo: typeof import('./src/components/AppLogo/AppLogo.vue')['default']
+    Button: typeof import('./src/components/Button/Button.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NButton: typeof import('naive-ui')['NButton']
     NCheckbox: typeof import('naive-ui')['NCheckbox']

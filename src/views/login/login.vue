@@ -1,5 +1,8 @@
 <template>
   <div class="login-container">
+      <div class="login-mobile-logo">
+          <img src="../../assets/image/logo.png" alt="">
+      </div>
     <div class="login">
       <div class="login-left">
         <div class="login-title">
@@ -78,16 +81,15 @@
 
           <n-form-item>
             <n-button
-              style="background-color: #0082fc"
               type="primary"
-              @click="handleSubmit"
-              size="large"
+              class="login-btn"
               :loading="loading"
-              block
+              @click="handleSubmit"
             >
               登录
             </n-button>
           </n-form-item>
+
           <span class="tips">如果登录遇到问题， 请联系客服</span>
         </n-form>
       </div>
@@ -127,6 +129,7 @@ export default defineComponent({
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
+          loading.value = true;
           //   message.success('登录成功，即将进入系统');
         } else {
           console.log(errors);
@@ -152,6 +155,13 @@ export default defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
+  .login-mobile-logo{
+      display: none;
+  }
+  .login-btn {
+    // background-color: #0082fc;
+    width: 100%;
+  }
   .login {
     position: absolute;
     top: 50%;
@@ -183,7 +193,7 @@ export default defineComponent({
     text-align: center;
   }
   .login-title-img {
-    width: 120px;
+    width: 130px;
     margin: 0 auto;
   }
   .login-left-img {
@@ -223,6 +233,36 @@ export default defineComponent({
   }
   .tips {
     color: #617288;
+  }
+}
+@media screen and (max-width: 768px) {
+  .login-container {
+    background-color: #fff;
+    background: url("../../assets/image/login-bg2-m.png") top no-repeat;
+    background-size: contain;
+    .login-mobile-logo{
+        display: block;
+        text-align: center;
+        padding-top: 70px;
+    }
+    .login {
+    }
+    .login-form-title,
+    .tips {
+      display: block;
+      text-align: center;
+    }
+    .login-left {
+      display: none;
+    }
+    .login-form {
+      border-radius: 0;
+      width: 80%;
+      border-radius: 8px;
+      padding: 40px 25px 16px;
+      margin: 0 auto;
+      box-shadow: 0px 5px 8px 0px rgb(29 77 228 / 15%);
+    }
   }
 }
 </style>
