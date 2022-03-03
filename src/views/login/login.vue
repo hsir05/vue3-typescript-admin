@@ -245,8 +245,6 @@ export default defineComponent({
         text-align: center;
         padding-top: 70px;
     }
-    .login {
-    }
     .login-form-title,
     .tips {
       display: block;
@@ -256,7 +254,6 @@ export default defineComponent({
       display: none;
     }
     .login-form {
-      border-radius: 0;
       width: 80%;
       border-radius: 8px;
       padding: 40px 25px 16px;

@@ -4,12 +4,15 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    Application: typeof import('./src/components/Application/Application.vue')['default']
     AppLogo: typeof import('./src/components/AppLogo/AppLogo.vue')['default']
     Button: typeof import('./src/components/Button/Button.vue')['default']
+    MessageContent: typeof import('./src/components/DialogContent/MessageContent.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NButton: typeof import('naive-ui')['NButton']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
+    NDialogProvider: typeof import('naive-ui')['NDialogProvider']
     NDivider: typeof import('naive-ui')['NDivider']
     NDrawer: typeof import('naive-ui')['NDrawer']
     NDrawerContent: typeof import('naive-ui')['NDrawerContent']
@@ -23,7 +26,10 @@ declare module 'vue' {
     NLayoutFooter: typeof import('naive-ui')['NLayoutFooter']
     NLayoutHeader: typeof import('naive-ui')['NLayoutHeader']
     NLayoutSider: typeof import('naive-ui')['NLayoutSider']
+    NLoadingBarProvider: typeof import('naive-ui')['NLoadingBarProvider']
     NMenu: typeof import('naive-ui')['NMenu']
+    NMessageProvider: typeof import('naive-ui')['NMessageProvider']
+    NNotificationProvider: typeof import('naive-ui')['NNotificationProvider']
     NTooltip: typeof import('naive-ui')['NTooltip']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
   }

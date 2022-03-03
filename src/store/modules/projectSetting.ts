@@ -16,6 +16,12 @@ export const useAppProjectStore = defineStore({
     getCollapsed(): boolean {
       return this.projectSetting.collapsed;
     },
+    getDarkTheme(): boolean{
+        return this.projectSetting.darkTheme
+    },
+    getAppTheme(): string {
+        return this.projectSetting.appTheme
+    }
   },
   actions: {
       setProjectSetting(config: Partial<ProjectSettingInter>): void {
