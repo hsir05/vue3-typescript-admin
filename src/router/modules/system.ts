@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "/system/dict",
-        name: "system_dict",
+         name: `system_dict`,
         meta: {
           title: "字典管理",
         },

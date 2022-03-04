@@ -2,7 +2,7 @@ import type { GlobConfig } from '/#/config';
 
 // import { warn } from '@/utils/log';
 import { getAppEnvConfig } from '@/utils/env';
-
+ 
 export const useGlobSetting = (): Readonly<GlobConfig> => {
   const {
     VITE_GLOB_APP_TITLE,
