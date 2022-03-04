@@ -1,5 +1,6 @@
 import { h, RendererElement } from 'vue';
 import { NIcon, NTag } from 'naive-ui';
+import { isObject } from './is';
 
 /**
  * render 图标
@@ -36,4 +37,34 @@ export function lighten(color: string, amount: number) {
     color.substring(2, 4),
     amount
   )}${addLight(color.substring(4, 6), amount)}`;
+}
+
+export function isUrl(url: string) {
+  return /(^http|https:\/\/)/g.test(url);
+}
+
+export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
+  let key: string;
+  for (key in target) {
+    src[key] = isObject(src[key]) ? deepMerge(src[key], target[key]) : (src[key] = target[key]);
+  }
+  return src;
+}
+
+// @ts-ignore
+export function setObjToUrlParams(baseUrl: string, obj: object): string {
+  let parameters = '';
+  let url = '';
+  for (const key in obj) {
+
+// @ts-ignore
+    parameters += key + '=' + encodeURIComponent(obj[key]) + '&';
+  }
+  parameters = parameters.replace(/&$/, '');
+  if (/\?$/.test(baseUrl)) {
+    url = baseUrl + parameters;
+  } else {
+    url = baseUrl.replace(/\/?$/, '?') + parameters;
+  }
+  return url;
 }
