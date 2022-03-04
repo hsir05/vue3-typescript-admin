@@ -25,6 +25,6 @@ export const projectSetting:ProjectSettingInter = {
     // 主题
     darkTheme: false,
     //系统主题色
-    appTheme: '#3c9bff',
+    appTheme: '#2d8cf0',
     collapsed: false,
-}
+} 

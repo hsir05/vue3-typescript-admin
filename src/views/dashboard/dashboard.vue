@@ -1,10 +1,6 @@
 <template>
   <div class="dashboard">
-    <p class="mt-20px">
-      本项目采用 Vue3 + Vue Route4 + Vite + Typescript + Pinia + Naive UI +
-      Axios + Sass 开发
-    </p>
-    <p class="mt-20px">加密采用Blueimp-md5插件对数据进行加密</p>
+    <n-button type="primary">Primary</n-button>
   </div>
 </template>
 <script lang="ts">
@@ -26,5 +22,6 @@ export default defineComponent({
   padding: 10px;
   font-size: 14px;
   font-weight: 600;
+  box-sizing: border-box;
 }
 </style>

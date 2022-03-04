@@ -13,7 +13,7 @@ export const menuOptions: MenuOption[] = [
     
   },
   {
-    label: '开发人员菜单',
+    label: '系统管理',
     key: 'bear-paw',
     icon: renderIcon(AlbumIcon),
     children: [
