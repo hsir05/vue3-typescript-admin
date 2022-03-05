@@ -17,15 +17,38 @@
             </n-icon>
           </span>
         </div>
+
+        <n-divider title-placement="center">动画</n-divider>
+
+        <div class="drawer-setting-item">
+          <div class="drawer-setting-item-title">禁用动画</div>
+          <div class="drawer-setting-item-action">
+            <n-switch v-model:value="projectStore.isPageAnimate" />
+          </div>
+        </div>
+
+        <div class="drawer-setting-item">
+          <div class="drawer-setting-item-title">动画类型</div>
+          <div class="drawer-setting-item-select">
+            <n-select
+              v-model:value="projectStore.pageAnimateType"
+              :options="animateOptions"
+            />
+          </div>
+        </div>
       </div>
     </n-drawer-content>
   </n-drawer>
 </template>
 <script lang="ts">
 import { defineComponent, toRefs, reactive } from "vue";
-import { appThemeList } from "@/config/projectSetting";
+import {
+  appThemeList,
+  animates as animateOptions,
+} from "@/config/projectSetting";
 import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
+import { useAppProjectStore } from "@/store/modules/projectSetting";
 
 export default defineComponent({
   name: "ProjectSetting",
@@ -46,6 +69,7 @@ export default defineComponent({
       title: props.title,
       isDrawer: false,
     });
+    const projectStore = useAppProjectStore();
     const { appTheme, setAppTheme } = useProjectSetting();
 
     function openDrawer() {
@@ -62,7 +86,9 @@ export default defineComponent({
     return {
       ...toRefs(state),
       appThemeList,
+      animateOptions,
       appTheme,
+      projectStore,
 
       openDrawer,
       closeDrawer,
@@ -78,6 +104,17 @@ export default defineComponent({
     align-items: center;
     padding: 12px 0;
     flex-wrap: wrap;
+    &-title {
+      flex: 1 1;
+      font-size: 14px;
+    }
+
+    &-action {
+      flex: 0 0 auto;
+    }
+    &-select {
+      flex: 1;
+    }
   }
   .align-items-top {
     align-items: flex-start;

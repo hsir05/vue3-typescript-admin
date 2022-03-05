@@ -11,7 +11,7 @@
       </span>
     </div>
     <div class="header-right-set">
-      <!--切换全屏-->
+      <!--全屏-->
       <n-tooltip placement="bottom">
         <template #trigger>
           <n-icon size="18" class="setting-icon">
@@ -20,7 +20,7 @@
         </template>
         <span>全屏</span>
       </n-tooltip>
-
+      <!--用户头像-->
       <n-dropdown :options="options">
         <div class="header-user">
           <n-avatar
@@ -33,7 +33,7 @@
           <span class="header-username">Admin</span>
         </div>
       </n-dropdown>
-
+      <!--项目配置-->
       <n-tooltip trigger="hover">
         <template #trigger>
           <n-icon size="18" class="setting-icon" @click="openSetting">
@@ -55,7 +55,6 @@ import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@vicons/antd";
 import {
   PersonCircleOutline as UserIcon,
-  Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
 } from "@vicons/ionicons5";
 import {
@@ -94,7 +93,6 @@ export default defineComponent({
           ? "FullScreenExitIcon"
           : "FullScreenExitIcon");
 
-    // 监听全屏切换事件
     document.addEventListener("fullscreenchange", toggleFullscreenIcon);
 
     const toggleFullScreen = () => {
@@ -116,11 +114,6 @@ export default defineComponent({
           label: "个人中心",
           key: "profile",
           icon: renderIcon(UserIcon),
-        },
-        {
-          label: "修改密码",
-          key: "editProfile",
-          icon: renderIcon(EditIcon),
         },
         {
           label: "退出登录",

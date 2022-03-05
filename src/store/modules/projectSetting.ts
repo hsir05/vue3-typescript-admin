@@ -3,29 +3,33 @@ import { ProjectSettingInter } from "@/interface/projectSetting";
 import { projectSetting } from "@/config/projectSetting";
 import { merge } from "lodash-es";
 
-interface ProjectState {
-    projectSetting:ProjectSettingInter
-}
+const { collapsed, darkTheme, appTheme, isPageAnimate, pageAnimateType } =
+  projectSetting;
+
 
 export const useAppProjectStore = defineStore({
   id: "projectSetting",
-  state: (): ProjectState => ({
-    projectSetting: projectSetting
+  state: (): ProjectSettingInter => ({
+    collapsed,
+    appTheme,
+    darkTheme,
+    isPageAnimate,
+    pageAnimateType,
   }),
   getters: {
     getCollapsed(): boolean {
-      return this.projectSetting.collapsed;
+      return this.collapsed;
     },
-    getDarkTheme(): boolean{
-        return this.projectSetting.darkTheme
+    getDarkTheme(): boolean {
+      return this.darkTheme;
     },
     getAppTheme(): string {
-        return this.projectSetting.appTheme
-    }
+      return this.appTheme;
+    },
   },
   actions: {
-      setProjectSetting(config: Partial<ProjectSettingInter>): void {
-          this.projectSetting = merge(this.projectSetting || {}, config);
-      }
+    setProjectSetting(config: Partial<ProjectSettingInter>): void {
+      this.$state = merge(this.$state || {}, config);
+    },
   },
 });
