@@ -18,6 +18,14 @@
           </span>
         </div>
 
+        <n-divider title-placement="center">显示</n-divider>
+        <div class="drawer-setting-item">
+          <div class="drawer-setting-item-title">显示面包屑导航</div>
+          <div class="drawer-setting-item-action">
+            <n-switch v-model:value="projectStore.isBreadcrumb" />
+          </div>
+        </div>
+
         <n-divider title-placement="center">动画</n-divider>
 
         <div class="drawer-setting-item">

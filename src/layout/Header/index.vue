@@ -1,7 +1,7 @@
 <template>
   <n-layout-header content-style="height:45px">
-    <div class>
-      <span class @click="handleCollapsed">
+    <div class="header-right-set">
+      <span class="pl-10px" @click="handleCollapsed">
         <n-icon size="18" v-if="getCollapsed" class="setting-icon">
           <MenuUnfoldOutlined />
         </n-icon>
@@ -9,6 +9,7 @@
           <MenuFoldOutlined />
         </n-icon>
       </span>
+      <Breadcrumb v-if="isBreadcrumb" />
     </div>
     <div class="header-right-set">
       <!--全屏-->
@@ -20,6 +21,16 @@
         </template>
         <span>全屏</span>
       </n-tooltip>
+      <!--当前刷新-->
+      <n-tooltip trigger="hover">
+        <template #trigger>
+          <n-icon size="18" class="setting-icon" @click="reloadPage">
+            <ReloadIcon />
+          </n-icon>
+        </template>
+        刷新当前页面
+      </n-tooltip>
+
       <!--用户头像-->
       <n-dropdown :options="options">
         <div class="header-user">
@@ -36,7 +47,12 @@
       <!--项目配置-->
       <n-tooltip trigger="hover">
         <template #trigger>
-          <n-icon size="18" class="setting-icon" @click="openSetting">
+          <n-icon
+            size="18"
+            class="setting-icon"
+            style="padding-right: 20px"
+            @click="openSetting"
+          >
             <setttingIcon />
           </n-icon>
         </template>
@@ -48,23 +64,29 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, unref, reactive, toRefs } from "vue";
-import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
+import { useRouter, useRoute } from "vue-router";
 import { renderIcon } from "@/utils/index";
 import ProjectSetting from "./projectSetting/projectSetting.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
+import Breadcrumb from "../components/Breadcrumb/Breadcrumb.vue";
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@vicons/antd";
+
 import {
   PersonCircleOutline as UserIcon,
   LogOutOutline as LogoutIcon,
+  SettingsOutline as setttingIcon,
 } from "@vicons/ionicons5";
 import {
   FullscreenExitOutlined as FullScreenExitIcon,
   FullscreenOutlined as FullscreenOutIcon,
+  ReloadOutlined as ReloadIcon,
 } from "@vicons/antd";
 
 export default defineComponent({
   name: "Header",
   components: {
+    Breadcrumb,
+    ReloadIcon,
     FullScreenExitIcon,
     FullscreenOutIcon,
     setttingIcon,
@@ -73,10 +95,12 @@ export default defineComponent({
     ProjectSetting,
   },
   setup() {
+    const router = useRouter();
+    const route = useRoute();
     const state = reactive({
       fullscreenIcon: "FullscreenOutIcon",
     });
-    const { getCollapsed, setCollapsed } = useProjectSetting();
+    const { getCollapsed, setCollapsed, isBreadcrumb } = useProjectSetting();
     const drawerSetting = ref();
 
     const handleCollapsed = () => {
@@ -105,10 +129,18 @@ export default defineComponent({
       }
     };
 
+    // 刷新页面
+    const reloadPage = () => {
+      router.push({
+        path: "/redirect" + unref(route).fullPath,
+      });
+    };
+
     return {
       ...toRefs(state),
       drawerSetting,
       getCollapsed,
+      isBreadcrumb,
       options: [
         {
           label: "个人中心",
@@ -123,6 +155,7 @@ export default defineComponent({
       ],
 
       openSetting,
+      reloadPage,
       handleCollapsed,
       toggleFullScreen,
     };
@@ -146,13 +179,14 @@ export default defineComponent({
   }
   .header-user {
     @extend .flex;
+    padding: 10px 15px;
   }
   .header-username {
     font-size: 14px;
     margin-left: 10px;
   }
   .setting-icon {
-    padding: 20px 25px;
+    padding: 20px 10px;
     cursor: pointer;
   }
 }

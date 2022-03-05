@@ -8,4 +8,5 @@ export interface ProjectSettingInter {
     isPageAnimate: boolean;
     pageAnimateType: string;
     collapsed: boolean;
+    isBreadcrumb: boolean;
 }

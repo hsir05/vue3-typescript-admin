@@ -1,7 +1,7 @@
 <template>
   <div class="app-logo">
     <img
-      src="../../assets/image/logo-180x180.png"
+      src="../../../assets/image/logo-180x180.png"
       class="w-30px mr-10px rounded"
       alt="logo"
     />
@@ -18,7 +18,7 @@
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 const { getCollapsed } = useProjectSetting();
 
-const title = import.meta.env.VITE_GLOB_APP_SHORT_NAME;
+const title = import.meta.env.VITE_GLOB_APP_SHORT_TITLE;
 </script>
 <style lang="scss">
 .app-logo {

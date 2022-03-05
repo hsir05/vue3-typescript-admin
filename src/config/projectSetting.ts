@@ -33,7 +33,8 @@ export const animates = [
 export const projectSetting:ProjectSettingInter = {
     darkTheme: false,
     appTheme: '#2d8cf0',
-    isPageAnimate: true,
+    isPageAnimate: false,
     pageAnimateType: 'fade-slide',
     collapsed: false,
+    isBreadcrumb: true,
 } 

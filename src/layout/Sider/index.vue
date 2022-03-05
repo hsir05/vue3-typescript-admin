@@ -22,7 +22,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { menuOptions } from "./data";
-import AppLogo from "@/components/AppLogo/AppLogo.vue";
+import AppLogo from "../components/AppLogo/AppLogo.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 
 export default defineComponent({
@@ -42,6 +42,5 @@ export default defineComponent({
 </script>
 <style lang="scss">
 .n-layout-sider {
-
 }
 </style>
