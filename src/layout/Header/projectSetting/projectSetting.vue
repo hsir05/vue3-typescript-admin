@@ -26,6 +26,13 @@
           </div>
         </div>
 
+        <div class="drawer-setting-item">
+          <div class="drawer-setting-item-title">显示刷新按钮</div>
+          <div class="drawer-setting-item-action">
+            <n-switch v-model:value="projectStore.isRefresh" />
+          </div>
+        </div>
+
         <n-divider title-placement="center">动画</n-divider>
 
         <div class="drawer-setting-item">

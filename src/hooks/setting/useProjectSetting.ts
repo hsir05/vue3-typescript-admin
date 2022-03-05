@@ -25,7 +25,8 @@ export function useProjectSetting() {
 
     const isPageAnimate = computed(() => projectStore.isPageAnimate)
     const pageAnimateType = computed(() => projectStore.pageAnimateType)
-    const isBreadcrumb = computed(() => projectStore.isBreadcrumb)
+    const isBreadcrumb = computed(() => projectStore.isBreadcrumb) 
+    const isRefresh = computed(() => projectStore.isRefresh) 
 
     return {
         getCollapsed,
@@ -34,6 +35,7 @@ export function useProjectSetting() {
         isPageAnimate,
         pageAnimateType,
         isBreadcrumb,
+        isRefresh,
 
         setCollapsed,
         setDarkTheme,

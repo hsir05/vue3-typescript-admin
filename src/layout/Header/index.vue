@@ -22,7 +22,7 @@
         <span>全屏</span>
       </n-tooltip>
       <!--当前刷新-->
-      <n-tooltip trigger="hover">
+      <n-tooltip trigger="hover" v-if="isRefresh">
         <template #trigger>
           <n-icon size="18" class="setting-icon" @click="reloadPage">
             <ReloadIcon />
@@ -100,7 +100,8 @@ export default defineComponent({
     const state = reactive({
       fullscreenIcon: "FullscreenOutIcon",
     });
-    const { getCollapsed, setCollapsed, isBreadcrumb } = useProjectSetting();
+    const { getCollapsed, setCollapsed, isBreadcrumb, isRefresh } =
+      useProjectSetting();
     const drawerSetting = ref();
 
     const handleCollapsed = () => {
@@ -141,6 +142,7 @@ export default defineComponent({
       drawerSetting,
       getCollapsed,
       isBreadcrumb,
+      isRefresh,
       options: [
         {
           label: "个人中心",

@@ -37,4 +37,5 @@ export const projectSetting:ProjectSettingInter = {
     pageAnimateType: 'fade-slide',
     collapsed: false,
     isBreadcrumb: true,
+    isRefresh: true,
 } 
