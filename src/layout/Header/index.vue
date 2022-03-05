@@ -2,7 +2,7 @@
   <n-layout-header content-style="height:45px">
     <div class>
       <span class @click="handleCollapsed">
-          <n-icon size="18" v-if="getCollapsed" class="setting-icon">
+        <n-icon size="18" v-if="getCollapsed" class="setting-icon">
           <MenuUnfoldOutlined />
         </n-icon>
         <n-icon size="18" v-else class="setting-icon">
@@ -11,6 +11,16 @@
       </span>
     </div>
     <div class="header-right-set">
+      <!--切换全屏-->
+      <n-tooltip placement="bottom">
+        <template #trigger>
+          <n-icon size="18" class="setting-icon">
+            <component :is="fullscreenIcon" @click="toggleFullScreen" />
+          </n-icon>
+        </template>
+        <span>全屏</span>
+      </n-tooltip>
+
       <n-dropdown :options="options">
         <div class="header-user">
           <n-avatar
@@ -37,34 +47,68 @@
   <ProjectSetting ref="drawerSetting" />
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
+import { defineComponent, ref, unref, reactive, toRefs } from "vue";
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
 import ProjectSetting from "./projectSetting/projectSetting.vue";
-import { useProjectSetting } from "@/hooks/setting/useProjectSetting"
-import { MenuUnfoldOutlined, MenuFoldOutlined } from "@vicons/antd"
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
+import { MenuUnfoldOutlined, MenuFoldOutlined } from "@vicons/antd";
 import {
   PersonCircleOutline as UserIcon,
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
 } from "@vicons/ionicons5";
+import {
+  FullscreenExitOutlined as FullScreenExitIcon,
+  FullscreenOutlined as FullscreenOutIcon,
+} from "@vicons/antd";
 
 export default defineComponent({
   name: "Header",
-  components: { setttingIcon, MenuUnfoldOutlined, MenuFoldOutlined, ProjectSetting },
+  components: {
+    FullScreenExitIcon,
+    FullscreenOutIcon,
+    setttingIcon,
+    MenuUnfoldOutlined,
+    MenuFoldOutlined,
+    ProjectSetting,
+  },
   setup() {
-    const { getCollapsed, setCollapsed } = useProjectSetting()
+    const state = reactive({
+      fullscreenIcon: "FullscreenOutIcon",
+    });
+    const { getCollapsed, setCollapsed } = useProjectSetting();
     const drawerSetting = ref();
 
     const handleCollapsed = () => {
-        setCollapsed(!unref(getCollapsed))
-    }
+      setCollapsed(!unref(getCollapsed));
+    };
     const openSetting = () => {
       const { openDrawer } = drawerSetting.value;
       openDrawer();
     };
 
+    const toggleFullscreenIcon = () =>
+      (state.fullscreenIcon =
+        document.fullscreenElement !== null
+          ? "FullScreenExitIcon"
+          : "FullScreenExitIcon");
+
+    // 监听全屏切换事件
+    document.addEventListener("fullscreenchange", toggleFullscreenIcon);
+
+    const toggleFullScreen = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    };
+
     return {
+      ...toRefs(state),
       drawerSetting,
       getCollapsed,
       options: [
@@ -87,6 +131,7 @@ export default defineComponent({
 
       openSetting,
       handleCollapsed,
+      toggleFullScreen,
     };
   },
 });

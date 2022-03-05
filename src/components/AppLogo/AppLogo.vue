@@ -18,7 +18,7 @@
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 const { getCollapsed } = useProjectSetting();
 
-const title = import.meta.env.VITE_GLOB_APP_SHORT_TITLE;
+const title = import.meta.env.VITE_GLOB_APP_SHORT_NAME;
 </script>
 <style lang="scss">
 .app-logo {
