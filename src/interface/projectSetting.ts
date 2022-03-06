@@ -10,4 +10,5 @@ export interface ProjectSettingInter {
     collapsed: boolean;
     isBreadcrumb: boolean;
     isRefresh: boolean;
+    navMode: string;
 }

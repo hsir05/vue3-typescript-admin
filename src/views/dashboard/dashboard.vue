@@ -5,20 +5,20 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-// import { getCaptcha } from "@/api/system/dict";
+import { getCaptcha } from "@/api/system/dict";
 export default defineComponent({
   name: "Dashboard",
   components: {},
   setup() {
-    // const getData = () => {
-    //   try {
-    //     let res = getCaptcha();
-    //     console.log(res);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // };
-    // getData();
+    const getData = async () => {
+      try {
+        let res = await getCaptcha();
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getData();
     return {};
   },
 });

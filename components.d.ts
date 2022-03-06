@@ -9,6 +9,7 @@ declare module 'vue' {
     Button: typeof import('./src/components/Button/Button.vue')['default']
     MessageContent: typeof import('./src/components/DialogContent/MessageContent.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']
+    NBadge: typeof import('naive-ui')['NBadge']
     NBreadcrumb: typeof import('naive-ui')['NBreadcrumb']
     NBreadcrumbItem: typeof import('naive-ui')['NBreadcrumbItem']
     NButton: typeof import('naive-ui')['NButton']

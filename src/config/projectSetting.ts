@@ -30,6 +30,12 @@ export const animates = [
   { value: 'fade-scale', label: '缩放消退' },
 ];
 
+export const navModes = [
+    { value: 'vertical', label: '左侧菜单模式', icon: 'nav-theme-dark' },
+    { value: 'horizontal', label: '顶部菜单模式', icon: 'nav-horizontal' },
+    { value: 'horizontal-mix', label: '顶部菜单混合模式', icon: 'nav-horizontal-mix' },
+]
+
 export const projectSetting:ProjectSettingInter = {
     darkTheme: false,
     appTheme: '#2d8cf0',
@@ -38,4 +44,5 @@ export const projectSetting:ProjectSettingInter = {
     collapsed: false,
     isBreadcrumb: true,
     isRefresh: true,
+    navMode: 'vertical'
 } 

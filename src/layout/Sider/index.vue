@@ -5,37 +5,30 @@
     :collapsed-width="64"
     :width="200"
     :collapsed="getCollapsed"
-    :inverted="true"
+    :inverted="false"
+    mode="horizontal"
   >
-    <AppLogo />
-    <n-menu
-      :collapsed="getCollapsed"
-      :collapsed-width="64"
-      :collapsed-icon-size="20"
-      :indent="24"
-      :inverted="true"
-      :options="menuOptions"
-      accordion
-    />
+    <AppLogo v-if="navMode === 'vertical'" />
+    <Menu :collapsed="getCollapsed" :inverted="false" />
   </n-layout-sider>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-import { menuOptions } from "./data";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-
+import Menu from "./Menu.vue";
 export default defineComponent({
   name: "LayoutSider",
   components: {
     AppLogo,
+    Menu,
   },
   setup() {
-    const { getCollapsed } = useProjectSetting();
+    const { getCollapsed, navMode } = useProjectSetting();
 
     return {
       getCollapsed,
-      menuOptions,
+      navMode,
     };
   },
 });

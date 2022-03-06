@@ -36,7 +36,7 @@ export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
     }),
     WindiCSS(),
     createSvgIconsPlugin({
-      iconDirs: [path.resolve(process.cwd(), "src/icons")],
+      iconDirs: [path.resolve(process.cwd(), "src/assets/icons")],
       symbolId: "icon-[dir]-[name]",
     }),
   ];

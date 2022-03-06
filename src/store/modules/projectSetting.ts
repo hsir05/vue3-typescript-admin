@@ -3,7 +3,7 @@ import { ProjectSettingInter } from "@/interface/projectSetting";
 import { projectSetting } from "@/config/projectSetting";
 import { merge } from "lodash-es";
 
-const { collapsed, darkTheme, appTheme, isBreadcrumb, isPageAnimate, pageAnimateType, isRefresh } =
+const { collapsed, darkTheme, appTheme, isBreadcrumb, isPageAnimate, pageAnimateType, isRefresh, navMode } =
   projectSetting;
 
 export const useAppProjectStore = defineStore({
@@ -16,6 +16,7 @@ export const useAppProjectStore = defineStore({
     pageAnimateType,
     isBreadcrumb,
     isRefresh,
+    navMode,
   }),
   getters: {
     getCollapsed(): boolean {

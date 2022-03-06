@@ -2,8 +2,31 @@
   <n-drawer v-model:show="isDrawer" :width="width" placement="right">
     <n-drawer-content :title="title">
       <div class="drawer">
-        <n-divider title-placement="center">系统主题</n-divider>
+        <n-divider title-placement="center">导航栏模式</n-divider>
 
+        <div class="drawer-setting-item align-items-top">
+          <div
+            class="align-items-top"
+            v-for="(item, index) in navModeOptions"
+            :key="index"
+          >
+            <n-tooltip placement="top">
+              <template #trigger>
+                <SvgIcon
+                  :name="item.icon"
+                  size="60"
+                  @click="togNavMode(item.value)"
+                />
+              </template>
+              <span>{{ item.label }}</span>
+            </n-tooltip>
+            <div class="text-center">
+              <n-badge dot color="#19be6b" v-show="navMode === item.value" />
+            </div>
+          </div>
+        </div>
+
+        <n-divider title-placement="center">系统主题</n-divider>
         <div class="drawer-setting-item align-items-top">
           <span
             class="theme-item"
@@ -16,6 +39,7 @@
               <CheckOutlined />
             </n-icon>
           </span>
+          <div class=""></div>
         </div>
 
         <n-divider title-placement="center">显示</n-divider>
@@ -59,15 +83,16 @@
 import { defineComponent, toRefs, reactive } from "vue";
 import {
   appThemeList,
+  navModes as navModeOptions,
   animates as animateOptions,
 } from "@/config/projectSetting";
 import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { useAppProjectStore } from "@/store/modules/projectSetting";
-
+import SvgIcon from "@/components/SvgIcon/SvgIcon.vue";
 export default defineComponent({
   name: "ProjectSetting",
-  components: { CheckOutlined },
+  components: { CheckOutlined, SvgIcon },
   props: {
     title: {
       type: String,
@@ -85,7 +110,7 @@ export default defineComponent({
       isDrawer: false,
     });
     const projectStore = useAppProjectStore();
-    const { appTheme, setAppTheme } = useProjectSetting();
+    const { appTheme, setAppTheme, navMode, setNavMode } = useProjectSetting();
 
     function openDrawer() {
       state.isDrawer = true;
@@ -97,17 +122,23 @@ export default defineComponent({
     function toggleTheme(item: string) {
       setAppTheme(item);
     }
+    function togNavMode(mode: string) {
+      setNavMode(mode);
+    }
 
     return {
       ...toRefs(state),
       appThemeList,
       animateOptions,
       appTheme,
+      navMode,
+      navModeOptions,
       projectStore,
 
       openDrawer,
       closeDrawer,
       toggleTheme,
+      togNavMode,
     };
   },
 });
@@ -119,11 +150,11 @@ export default defineComponent({
     align-items: center;
     padding: 12px 0;
     flex-wrap: wrap;
+    justify-content: space-around;
     &-title {
       flex: 1 1;
       font-size: 14px;
     }
-
     &-action {
       flex: 0 0 auto;
     }
@@ -134,6 +165,7 @@ export default defineComponent({
   .align-items-top {
     align-items: flex-start;
     padding: 2px 0;
+    cursor: pointer;
   }
   .theme-item {
     width: 20px;
@@ -141,8 +173,8 @@ export default defineComponent({
     height: 20px;
     cursor: pointer;
     border: 1px solid #eee;
-    border-radius: 2px;
-    margin: 0 5px 5px 0;
+    border-radius: 4px;
+    margin: 0 5px 10px 0;
     text-align: center;
 
     .n-icon {

@@ -22,14 +22,14 @@ const title = import.meta.env.VITE_GLOB_APP_SHORT_TITLE;
 </script>
 <style lang="scss">
 .app-logo {
-  width: 100%;
+  width: 200px;
   height: 64px;
   display: flex;
   align-items: center;
   padding-left: 20px;
   box-sizing: border-box;
   .logo-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     display: inline-block;
     overflow: hidden;

@@ -25,8 +25,14 @@ export function useProjectSetting() {
 
     const isPageAnimate = computed(() => projectStore.isPageAnimate)
     const pageAnimateType = computed(() => projectStore.pageAnimateType)
-    const isBreadcrumb = computed(() => projectStore.isBreadcrumb) 
+    const isBreadcrumb = computed(() => projectStore.isBreadcrumb)  
     const isRefresh = computed(() => projectStore.isRefresh) 
+    const navMode = computed(() => projectStore.navMode) 
+
+    function setNavMode(value: string) {
+        projectStore.setProjectSetting({ navMode: value });
+    }
+
 
     return {
         getCollapsed,
@@ -36,10 +42,12 @@ export function useProjectSetting() {
         pageAnimateType,
         isBreadcrumb,
         isRefresh,
+        navMode,
 
         setCollapsed,
         setDarkTheme,
-        setAppTheme
+        setAppTheme,
+        setNavMode
     }
 
 }
