@@ -36,7 +36,7 @@ export default defineComponent({
 </script>
 <style lang="scss">
 .n-layout-content {
-  padding: 10px 10px 0;
+  padding: 5px 5px 0;
   height: calc(100vh - 114px);
   background-color: #f2f3f5;
 }

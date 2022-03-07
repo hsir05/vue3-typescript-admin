@@ -37,9 +37,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     server: {
        host: true,
       port: VITE_PORT,
-      proxy: {
-        "/api": "http://localhost:8888/",
-      },
+    //   proxy: {
+    //     "/api": "http://localhost:8888/",
+    //   },
     },
   };
 };

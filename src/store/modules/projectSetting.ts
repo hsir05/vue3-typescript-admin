@@ -2,9 +2,15 @@ import { defineStore } from "pinia";
 import { ProjectSettingInter } from "@/interface/projectSetting";
 import { projectSetting } from "@/config/projectSetting";
 import { merge } from "lodash-es";
+import { PROJECT_CONFIG_KEY } from "@/config/config";
+import { locStorage } from "@/utils/storage";
 
-const { collapsed, darkTheme, appTheme, isBreadcrumb, isPageAnimate, pageAnimateType, isRefresh, navMode } =
-  projectSetting;
+const { 
+    collapsed, 
+    darkTheme, appTheme, 
+    isBreadcrumb, isPageAnimate, 
+    pageAnimateType, isRefresh, navMode 
+} = locStorage.get(PROJECT_CONFIG_KEY) || projectSetting;
 
 export const useAppProjectStore = defineStore({
   id: "projectSetting",
@@ -32,6 +38,7 @@ export const useAppProjectStore = defineStore({
   actions: {
     setProjectSetting(config: Partial<ProjectSettingInter>): void {
       this.$state = merge(this.$state || {}, config);
+      locStorage.set(PROJECT_CONFIG_KEY, this.$state)
     },
   },
 });

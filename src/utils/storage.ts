@@ -1,3 +1,5 @@
+import { STORAGE_KEY } from "@/config/config"
+
 // 默认缓存期限为7天
 const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 7;
 
@@ -122,6 +124,6 @@ export const createStorage = ({ prefixKey = '', storage = localStorage } = {}) =
   return new Storage();
 };
 
-export const storage = createStorage();
+export const locStorage = createStorage({ prefixKey: STORAGE_KEY });
 
 export default Storage;

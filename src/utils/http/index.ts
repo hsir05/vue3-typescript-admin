@@ -21,7 +21,7 @@ const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix || '';
 
 import router from '@/router';
-import { storage } from '@/utils/locStorage';
+import { locStorage } from '@/utils/storage';
 
 /**
  * @description: 数据处理，方便区分多种处理方式
@@ -112,7 +112,7 @@ const transform: AxiosTransform = {
           closable: false,
           maskClosable: false,
           onPositiveClick: () => {
-            storage.clear();
+            locStorage.clear();
             window.location.href = LoginPath;
           },
           onNegativeClick: () => {},
