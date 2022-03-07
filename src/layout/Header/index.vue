@@ -45,7 +45,7 @@
           刷新当前页面
         </n-tooltip>
         <!--用户头像-->
-        <n-dropdown :options="options">
+        <n-dropdown :options="userOptions">
           <div class="header-user">
             <n-avatar
               round
@@ -79,18 +79,13 @@
 <script lang="ts">
 import { defineComponent, ref, unref, computed, reactive, toRefs } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { renderIcon } from "@/utils/index";
 import ProjectSetting from "./projectSetting/projectSetting.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb.vue";
 import Menu from "@/layout/Sider/Menu.vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
-
-import {
-  PersonCircleOutline as UserIcon,
-  LogOutOutline as LogoutIcon,
-  SettingsOutline as setttingIcon,
-} from "@vicons/ionicons5";
+import { userOptions } from "@/config/projectSetting";
+import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -171,18 +166,7 @@ export default defineComponent({
       navMode,
       isRefresh,
       inverted,
-      options: [
-        {
-          label: "个人中心",
-          key: "profile",
-          icon: renderIcon(UserIcon),
-        },
-        {
-          label: "退出登录",
-          key: "logout",
-          icon: renderIcon(LogoutIcon),
-        },
-      ],
+      userOptions,
 
       openSetting,
       reloadPage,
