@@ -21,10 +21,28 @@ export const appThemeList: string[] = [
   '#FC5404',
 ];
 
+export const animates = [
+  { value: 'zoom-fade', label: '渐变' },
+  { value: 'zoom-out', label: '闪现' },
+  { value: 'fade-slide', label: '滑动' },
+  { value: 'fade', label: '消退' },
+  { value: 'fade-bottom', label: '底部消退' },
+  { value: 'fade-scale', label: '缩放消退' },
+];
+
+export const navModes = [
+    { value: 'vertical', label: '左侧菜单模式', icon: 'nav-theme-dark' },
+    { value: 'horizontal', label: '顶部菜单模式', icon: 'nav-horizontal' },
+    { value: 'horizontal-mix', label: '顶部菜单混合模式', icon: 'nav-horizontal-mix' },
+]
+
 export const projectSetting:ProjectSettingInter = {
-    // 主题
     darkTheme: false,
-    //系统主题色
     appTheme: '#2d8cf0',
+    isPageAnimate: false,
+    pageAnimateType: 'fade-slide',
     collapsed: false,
+    isBreadcrumb: true,
+    isRefresh: true,
+    navMode: 'vertical'
 } 

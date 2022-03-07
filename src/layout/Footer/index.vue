@@ -9,5 +9,6 @@
   padding: 15px 24px;
   font-size: 12px;
   background-color: #f2f3f5;
+  text-align: center;
 }
 </style>

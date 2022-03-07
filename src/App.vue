@@ -19,12 +19,12 @@ import { lighten } from "@/utils/index";
 const projectStore = useAppProjectStore();
 
 const getDarkTheme = computed(() =>
-  projectStore.projectSetting.darkTheme ? darkTheme : undefined
+  projectStore.darkTheme ? darkTheme : undefined
 );
 
 const getThemeOverrides = computed(() => {
-  const appTheme = projectStore.projectSetting.appTheme;
-  const lightenStr = lighten(projectStore.projectSetting.appTheme, 6);
+  const appTheme = projectStore.appTheme;
+  const lightenStr = lighten(projectStore.appTheme, 6);
   return {
     common: {
       primaryColor: appTheme,

@@ -40,7 +40,7 @@ export const ErrorPageRoute: RouteRecordRaw = {
     },
   ],
 };
-
+ 
 export const RedirectRoute: RouteRecordRaw = {
   path: "/redirect",
   name: REDIRECT_NAME,

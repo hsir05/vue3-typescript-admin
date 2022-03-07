@@ -10,9 +10,9 @@ export default defineComponent({
   name: "Dashboard",
   components: {},
   setup() {
-    const getData = () => {
+    const getData = async () => {
       try {
-        let res = getCaptcha();
+        let res = await getCaptcha();
         console.log(res);
       } catch (err) {
         console.log(err);
