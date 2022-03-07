@@ -2,37 +2,19 @@
   <n-drawer v-model:show="isDrawer" :width="width" placement="right">
     <n-drawer-content :title="title">
       <div class="drawer">
-        <n-divider title-placement="center">导航栏模式</n-divider>
+        <NavItem
+          title="导航栏模式"
+          :options="navModeOptions"
+          :matchValue="navMode"
+          @toggle-handle="toggleNavMode"
+        />
 
-        <div class="drawer-setting-item align-items-top">
-          <div class="align-items-top" v-for="(item, index) in navModeOptions" :key="index">
-            <n-tooltip placement="top">
-              <template #trigger>
-                <SvgIcon :name="item.icon" size="60" @click="toggleNavMode($event, item.value)" />
-              </template>
-              <span>{{ item.label }}</span>
-            </n-tooltip>
-            <div class="text-center">
-              <n-badge dot color="#19be6b" v-show="navMode === item.value" />
-            </div>
-          </div>
-        </div>
-
-        <n-divider title-placement="center">导航栏风格</n-divider>
-
-        <div class="drawer-setting-item align-items-top">
-          <div class="align-items-top" v-for="(item, index) in navStyleOptons" :key="index">
-            <n-tooltip placement="top">
-              <template #trigger>
-                <SvgIcon :name="item.icon" size="60" @click="toggleNavStyle(item.value)" />
-              </template>
-              <span>{{ item.label }}</span>
-            </n-tooltip>
-            <div class="text-center">
-              <n-badge dot color="#19be6b" v-show="navStyle === item.value" />
-            </div>
-          </div>
-        </div>
+        <NavItem
+          title="导航栏风格"
+          :options="navStyleOptons"
+          :matchValue="navStyle"
+          @toggle-handle="toggleNavStyle"
+        />
 
         <n-divider title-placement="center">系统主题</n-divider>
         <div class="drawer-setting-item align-items-top">
@@ -105,10 +87,10 @@ import {
 import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { useAppProjectStore } from "@/store/modules/projectSetting";
-import SvgIcon from "@/components/SvgIcon/SvgIcon.vue";
+import NavItem from "./navItem.vue";
 export default defineComponent({
   name: "ProjectSetting",
-  components: { CheckOutlined, SvgIcon },
+  components: { CheckOutlined, NavItem },
   props: {
     title: {
       type: String,
@@ -139,9 +121,7 @@ export default defineComponent({
     function toggleTheme(item: string) {
       setAppTheme(item);
     }
-    function toggleNavMode(e: Event, mode: string) {
-      e.preventDefault();
-      e.stopPropagation();
+    function toggleNavMode(mode: string) {
       setNavMode(mode);
     }
 
