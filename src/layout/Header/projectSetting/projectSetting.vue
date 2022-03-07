@@ -15,13 +15,37 @@
                 <SvgIcon
                   :name="item.icon"
                   size="60"
-                  @click="togNavMode(item.value)"
+                  @click="toggleNavMode($event, item.value)"
                 />
               </template>
               <span>{{ item.label }}</span>
             </n-tooltip>
             <div class="text-center">
               <n-badge dot color="#19be6b" v-show="navMode === item.value" />
+            </div>
+          </div>
+        </div>
+
+        <n-divider title-placement="center">导航栏风格</n-divider>
+
+        <div class="drawer-setting-item align-items-top">
+          <div
+            class="align-items-top"
+            v-for="(item, index) in navStyleOptons"
+            :key="index"
+          >
+            <n-tooltip placement="top">
+              <template #trigger>
+                <SvgIcon
+                  :name="item.icon"
+                  size="60"
+                  @click="toggleNavStyle(item.value)"
+                />
+              </template>
+              <span>{{ item.label }}</span>
+            </n-tooltip>
+            <div class="text-center">
+              <n-badge dot color="#19be6b" v-show="navStyle === item.value" />
             </div>
           </div>
         </div>
@@ -46,7 +70,10 @@
         <div class="drawer-setting-item">
           <div class="drawer-setting-item-title">显示面包屑导航</div>
           <div class="drawer-setting-item-action">
-            <n-switch v-model:value="projectStore.isBreadcrumb" />
+            <n-switch
+              v-model:value="projectStore.isBreadcrumb"
+              :disabled="navMode === 'horizontal'"
+            />
           </div>
         </div>
 
@@ -83,6 +110,7 @@
 import { defineComponent, toRefs, reactive } from "vue";
 import {
   appThemeList,
+  navStyles as navStyleOptons,
   navModes as navModeOptions,
   animates as animateOptions,
 } from "@/config/projectSetting";
@@ -110,7 +138,14 @@ export default defineComponent({
       isDrawer: false,
     });
     const projectStore = useAppProjectStore();
-    const { appTheme, setAppTheme, navMode, setNavMode } = useProjectSetting();
+    const {
+      appTheme,
+      setAppTheme,
+      navMode,
+      navStyle,
+      setNavMode,
+      setNavStyle,
+    } = useProjectSetting();
 
     function openDrawer() {
       state.isDrawer = true;
@@ -122,8 +157,14 @@ export default defineComponent({
     function toggleTheme(item: string) {
       setAppTheme(item);
     }
-    function togNavMode(mode: string) {
+    function toggleNavMode(e: Event, mode: string) {
+      e.preventDefault();
+      e.stopPropagation();
       setNavMode(mode);
+    }
+
+    function toggleNavStyle(style: string) {
+      setNavStyle(style);
     }
 
     return {
@@ -132,13 +173,16 @@ export default defineComponent({
       animateOptions,
       appTheme,
       navMode,
+      navStyle,
       navModeOptions,
+      navStyleOptons,
       projectStore,
 
       openDrawer,
       closeDrawer,
       toggleTheme,
-      togNavMode,
+      toggleNavMode,
+      toggleNavStyle,
     };
   },
 });

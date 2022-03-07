@@ -36,6 +36,12 @@ export const navModes = [
     { value: 'horizontal-mix', label: '顶部菜单混合模式', icon: 'nav-horizontal-mix' },
 ]
 
+export const navStyles = [
+    { value: 'dark', label: '暗色侧边栏', icon: 'nav-theme-dark' },
+    { value: 'light', label: '白色侧边栏', icon: 'nav-theme-light' },
+    { value: 'header-dark', label: '暗色顶栏', icon: 'header-theme-dark' },
+]
+
 export const projectSetting:ProjectSettingInter = {
     darkTheme: false,
     appTheme: '#2d8cf0',
@@ -44,5 +50,6 @@ export const projectSetting:ProjectSettingInter = {
     collapsed: false,
     isBreadcrumb: true,
     isRefresh: true,
-    navMode: 'vertical'
+    navMode: 'vertical',
+    navStyle: 'light'
 } 

@@ -11,4 +11,5 @@ export interface ProjectSettingInter {
     isBreadcrumb: boolean;
     isRefresh: boolean;
     navMode: string;
+    navStyle: string;
 }

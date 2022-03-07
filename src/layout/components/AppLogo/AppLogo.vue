@@ -23,7 +23,7 @@ const title = import.meta.env.VITE_GLOB_APP_SHORT_TITLE;
 <style lang="scss">
 .app-logo {
   width: 200px;
-  height: 64px;
+  height: $header-height;
   display: flex;
   align-items: center;
   padding-left: 20px;

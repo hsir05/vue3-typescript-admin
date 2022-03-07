@@ -6,7 +6,7 @@ import { PROJECT_CONFIG_KEY } from "@/config/config";
 import { locStorage } from "@/utils/storage";
 
 const { 
-    collapsed, 
+    collapsed, navStyle,
     darkTheme, appTheme, 
     isBreadcrumb, isPageAnimate, 
     pageAnimateType, isRefresh, navMode 
@@ -23,6 +23,7 @@ export const useAppProjectStore = defineStore({
     isBreadcrumb,
     isRefresh,
     navMode,
+    navStyle,
   }),
   getters: {
     getCollapsed(): boolean {

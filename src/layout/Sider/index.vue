@@ -5,15 +5,14 @@
     :collapsed-width="64"
     :width="200"
     :collapsed="getCollapsed"
-    :inverted="false"
-    mode="horizontal"
+    :inverted="inverted"
   >
     <AppLogo v-if="navMode === 'vertical'" />
-    <Menu :collapsed="getCollapsed" :inverted="false" />
+    <Menu :collapsed="getCollapsed" :inverted="inverted" />
   </n-layout-sider>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, computed, unref } from "vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import Menu from "./Menu.vue";
@@ -24,16 +23,15 @@ export default defineComponent({
     Menu,
   },
   setup() {
-    const { getCollapsed, navMode } = useProjectSetting();
+    const { getCollapsed, navMode, navStyle } = useProjectSetting();
+
+    const inverted = computed(() => unref(navStyle) !== "light");
 
     return {
       getCollapsed,
       navMode,
+      inverted,
     };
   },
 });
 </script>
-<style lang="scss">
-.n-layout-sider {
-}
-</style>

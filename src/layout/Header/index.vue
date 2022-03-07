@@ -1,6 +1,6 @@
 <template>
   <div class="header-wrap">
-    <n-layout-header has-sider content-style="height:45px">
+    <n-layout-header has-sider :inverted="inverted">
       <div
         class="header-right-set"
         v-if="navMode === 'vertical' || navMode === 'horizontal-mix'"
@@ -21,7 +21,7 @@
       <Menu
         mode="horizontal"
         v-if="navMode === 'horizontal'"
-        :inverted="false"
+        :inverted="inverted"
         :collapsed="getCollapsed"
       />
 
@@ -77,7 +77,7 @@
   <ProjectSetting ref="drawerSetting" />
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, reactive, toRefs } from "vue";
+import { defineComponent, ref, unref, computed, reactive, toRefs } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { renderIcon } from "@/utils/index";
 import ProjectSetting from "./projectSetting/projectSetting.vue";
@@ -119,9 +119,17 @@ export default defineComponent({
     const state = reactive({
       fullscreenIcon: "FullscreenOutIcon",
     });
-    const { getCollapsed, setCollapsed, isBreadcrumb, isRefresh, navMode } =
-      useProjectSetting();
+    const {
+      getCollapsed,
+      setCollapsed,
+      isBreadcrumb,
+      isRefresh,
+      navMode,
+      navStyle,
+    } = useProjectSetting();
     const drawerSetting = ref();
+
+    const inverted = computed(() => unref(navStyle) === "header-dark");
 
     const handleCollapsed = () => {
       setCollapsed(!unref(getCollapsed));
@@ -149,7 +157,6 @@ export default defineComponent({
       }
     };
 
-    // 刷新页面
     const reloadPage = () => {
       router.push({
         path: "/redirect" + unref(route).fullPath,
@@ -163,6 +170,7 @@ export default defineComponent({
       isBreadcrumb,
       navMode,
       isRefresh,
+      inverted,
       options: [
         {
           label: "个人中心",
@@ -195,7 +203,7 @@ export default defineComponent({
 }
 .n-layout-header {
   @extend .flex;
-  height: 64px;
+  height: $header-height;
   box-shadow: 0 1px 4px #00152914;
 
   .header-right-set {
