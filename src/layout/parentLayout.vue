@@ -1,22 +1,4 @@
 <template>
-  <!-- <n-layout :has-sider="navMode === 'vertical' " content-style="height:100vh">
-    <LayoutSider v-if="navMode === 'vertical'" />
-    <n-layout content-style="height:100vh">
-      <LayoutHeader />
-      <LayoutContent />
-      <LayoutFooter />
-    </n-layout>
-  </n-layout> -->
-
-  <!-- <n-layout>
-      <LayoutHeader />
-      <n-layout has-sider>
-        <LayoutSider />
-        <LayoutContent />
-      </n-layout>
-      <LayoutFooter />
-    </n-layout> -->
-
   <n-layout :has-sider="navMode === 'vertical'" content-style="height:100vh">
     <LayoutSider v-if="navMode === 'vertical'" />
     <LayoutHeader v-if="navMode === 'horizontal-mix'" />
@@ -26,7 +8,6 @@
       <LayoutContent />
       <LayoutFooter v-if="navMode !== 'horizontal-mix'" />
     </n-layout>
-    <LayoutFooter v-if="navMode === 'horizontal-mix'" />
   </n-layout>
 </template>
 <script lang="ts">

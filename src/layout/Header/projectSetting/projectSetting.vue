@@ -113,7 +113,7 @@ import {
   navStyles as navStyleOptons,
   navModes as navModeOptions,
   animates as animateOptions,
-} from "@/config/projectSetting";
+} from "@/config/setting";
 import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { useAppProjectStore } from "@/store/modules/projectSetting";

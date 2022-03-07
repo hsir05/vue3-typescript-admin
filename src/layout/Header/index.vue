@@ -1,5 +1,5 @@
 <template>
-  <div class="header-wrap">
+  <div :class="{ 'header-wrap': !inverted }">
     <n-layout-header has-sider :inverted="inverted">
       <div
         class="header-right-set"
@@ -84,7 +84,7 @@ import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb.vue";
 import Menu from "@/layout/Sider/Menu.vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
-import { userOptions } from "@/config/projectSetting";
+import { userOptions } from "@/config/setting";
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import {
   MenuUnfoldOutlined,
@@ -116,11 +116,11 @@ export default defineComponent({
     });
     const {
       getCollapsed,
-      setCollapsed,
       isBreadcrumb,
       isRefresh,
       navMode,
       navStyle,
+      setCollapsed,
     } = useProjectSetting();
     const drawerSetting = ref();
 
@@ -191,7 +191,7 @@ export default defineComponent({
   box-shadow: 0 1px 4px #00152914;
 
   .header-right-set {
-    line-height: 1;
+    line-height: 1.5;
     @extend .flex;
   }
   .header-user {
