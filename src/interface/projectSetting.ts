@@ -12,4 +12,5 @@ export interface ProjectSettingInter {
     isRefresh: boolean;
     navMode: string;
     navStyle: string;
+    showFooter: boolean;
 }

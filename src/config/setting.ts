@@ -62,4 +62,5 @@ export const projectSetting: ProjectSettingInter = {
   isRefresh: true,
   navMode: "vertical",
   navStyle: "light",
+  showFooter: true
 };

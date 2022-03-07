@@ -5,18 +5,10 @@
         <n-divider title-placement="center">导航栏模式</n-divider>
 
         <div class="drawer-setting-item align-items-top">
-          <div
-            class="align-items-top"
-            v-for="(item, index) in navModeOptions"
-            :key="index"
-          >
+          <div class="align-items-top" v-for="(item, index) in navModeOptions" :key="index">
             <n-tooltip placement="top">
               <template #trigger>
-                <SvgIcon
-                  :name="item.icon"
-                  size="60"
-                  @click="toggleNavMode($event, item.value)"
-                />
+                <SvgIcon :name="item.icon" size="60" @click="toggleNavMode($event, item.value)" />
               </template>
               <span>{{ item.label }}</span>
             </n-tooltip>
@@ -29,18 +21,10 @@
         <n-divider title-placement="center">导航栏风格</n-divider>
 
         <div class="drawer-setting-item align-items-top">
-          <div
-            class="align-items-top"
-            v-for="(item, index) in navStyleOptons"
-            :key="index"
-          >
+          <div class="align-items-top" v-for="(item, index) in navStyleOptons" :key="index">
             <n-tooltip placement="top">
               <template #trigger>
-                <SvgIcon
-                  :name="item.icon"
-                  size="60"
-                  @click="toggleNavStyle(item.value)"
-                />
+                <SvgIcon :name="item.icon" size="60" @click="toggleNavStyle(item.value)" />
               </template>
               <span>{{ item.label }}</span>
             </n-tooltip>
@@ -84,6 +68,13 @@
           </div>
         </div>
 
+        <div class="drawer-setting-item">
+          <div class="drawer-setting-item-title">显示页脚</div>
+          <div class="drawer-setting-item-action">
+            <n-switch v-model:value="projectStore.showFooter" />
+          </div>
+        </div>
+
         <n-divider title-placement="center">动画</n-divider>
 
         <div class="drawer-setting-item">
@@ -96,10 +87,7 @@
         <div class="drawer-setting-item">
           <div class="drawer-setting-item-title">动画类型</div>
           <div class="drawer-setting-item-select">
-            <n-select
-              v-model:value="projectStore.pageAnimateType"
-              :options="animateOptions"
-            />
+            <n-select v-model:value="projectStore.pageAnimateType" :options="animateOptions" />
           </div>
         </div>
       </div>
@@ -128,7 +116,7 @@ export default defineComponent({
     },
     width: {
       type: Number,
-      default: 291,
+      default: 300,
     },
   },
   setup(props) {
@@ -138,14 +126,8 @@ export default defineComponent({
       isDrawer: false,
     });
     const projectStore = useAppProjectStore();
-    const {
-      appTheme,
-      setAppTheme,
-      navMode,
-      navStyle,
-      setNavMode,
-      setNavStyle,
-    } = useProjectSetting();
+    const { appTheme, setAppTheme, navMode, navStyle, setNavMode, setNavStyle } =
+      useProjectSetting();
 
     function openDrawer() {
       state.isDrawer = true;

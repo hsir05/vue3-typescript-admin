@@ -25,8 +25,9 @@ export function useProjectSetting() {
   const pageAnimateType = computed(() => projectStore.pageAnimateType);
   const isBreadcrumb = computed(() => projectStore.isBreadcrumb);
   const isRefresh = computed(() => projectStore.isRefresh);
-  const navMode = computed(() => projectStore.navMode);
+  const navMode = computed(() => projectStore.navMode); 
   const navStyle = computed(() => projectStore.navStyle);
+  const showFooter = computed(() => projectStore.showFooter);
 
   function setBreadcrumb(bool: boolean) {
     projectStore.setProjectSetting({ isBreadcrumb: bool });
@@ -49,6 +50,7 @@ export function useProjectSetting() {
     isRefresh,
     navMode,
     navStyle,
+    showFooter,
 
     setCollapsed,
     setDarkTheme,

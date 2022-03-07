@@ -9,7 +9,7 @@ const {
     collapsed, navStyle,
     darkTheme, appTheme, 
     isBreadcrumb, isPageAnimate, 
-    pageAnimateType, isRefresh, navMode 
+    pageAnimateType, isRefresh, navMode, showFooter 
 } = locStorage.get(PROJECT_CONFIG_KEY) || projectSetting;
 
 export const useAppProjectStore = defineStore({
@@ -24,6 +24,7 @@ export const useAppProjectStore = defineStore({
     isRefresh,
     navMode,
     navStyle,
+    showFooter
   }),
   getters: {
     getCollapsed(): boolean {

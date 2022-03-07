@@ -7,7 +7,7 @@
       <LayoutSider v-if="navMode === 'horizontal-mix'" />
       <n-layout>
         <LayoutContent />
-        <LayoutFooter />
+        <LayoutFooter v-if="showFooter" />
       </n-layout>
     </n-layout>
   </n-layout>
@@ -28,10 +28,11 @@ export default defineComponent({
     LayoutContent,
   },
   setup() {
-    const { navMode } = useProjectSetting();
+    const { navMode, showFooter } = useProjectSetting();
 
     return {
       navMode,
+      showFooter,
     };
   },
 });

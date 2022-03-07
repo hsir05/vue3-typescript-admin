@@ -1,5 +1,7 @@
 <template>
-  <n-layout-content content-style="height: calc(100vh - 119px)">
+  <n-layout-content
+    :content-style="showFooter ? 'height: calc(100vh - 119px)' : 'height: calc(100vh - 75px)'"
+  >
     <RouterView>
       <template #default="{ Component, route }">
         <transition :name="getTransitionName" mode="out-in" appear>
@@ -18,7 +20,7 @@ import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 export default defineComponent({
   name: "LayoutContent",
   setup() {
-    const { isPageAnimate, pageAnimateType } = useProjectSetting();
+    const { isPageAnimate, pageAnimateType, showFooter } = useProjectSetting();
     //缓存
     const keepAliveComponents: any = [];
 
@@ -29,15 +31,14 @@ export default defineComponent({
     return {
       keepAliveComponents,
       getTransitionName,
+      showFooter,
     };
   },
 });
 </script>
 <style lang="scss">
 .n-layout-content {
-  padding: 5px 5px 0;
-  //   height: calc(100vh - 114px);
-  //   height: calc(100vh - 65px);
+  padding: 5px;
   background-color: #f2f3f5;
 }
 </style>
