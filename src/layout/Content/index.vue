@@ -1,9 +1,5 @@
 <template>
-  <n-layout-content
-    :content-style="
-      isHMActive ? 'height: calc(100vh - 70px)' : 'height: calc(100vh - 114px)'
-    "
-  >
+  <n-layout-content content-style="height: calc(100vh - 119px)">
     <RouterView>
       <template #default="{ Component, route }">
         <transition :name="getTransitionName" mode="out-in" appear>
@@ -14,19 +10,15 @@
         </transition>
       </template>
     </RouterView>
-    <LayoutFooter v-if="isHMActive" />
   </n-layout-content>
 </template>
 <script lang="ts">
 import { defineComponent, computed, unref } from "vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import LayoutFooter from "../Footer/index.vue";
-
 export default defineComponent({
   name: "LayoutContent",
-  components: { LayoutFooter },
   setup() {
-    const { isPageAnimate, pageAnimateType, navMode } = useProjectSetting();
+    const { isPageAnimate, pageAnimateType } = useProjectSetting();
     //缓存
     const keepAliveComponents: any = [];
 
@@ -34,12 +26,8 @@ export default defineComponent({
       return unref(isPageAnimate) ? unref(pageAnimateType) : "";
     });
 
-    const isHMActive = computed(() => unref(navMode) === "horizontal-mix");
-
     return {
       keepAliveComponents,
-      navMode,
-      isHMActive,
       getTransitionName,
     };
   },

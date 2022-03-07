@@ -27,7 +27,7 @@ export default defineComponent({
 .dashboard {
   background-color: #fff;
   width: 100%;
-  //   height: 100%;
+  height: 100%;
   padding: 10px;
   font-size: 14px;
   font-weight: 600;

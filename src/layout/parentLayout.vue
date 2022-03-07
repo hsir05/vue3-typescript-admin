@@ -5,8 +5,10 @@
     <n-layout :has-sider="navMode === 'horizontal-mix'">
       <LayoutHeader v-if="navMode === 'vertical' || navMode === 'horizontal'" />
       <LayoutSider v-if="navMode === 'horizontal-mix'" />
-      <LayoutContent />
-      <LayoutFooter v-if="navMode !== 'horizontal-mix'" />
+      <n-layout>
+        <LayoutContent />
+        <LayoutFooter />
+      </n-layout>
     </n-layout>
   </n-layout>
 </template>

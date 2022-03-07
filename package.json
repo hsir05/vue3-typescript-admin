@@ -1,7 +1,11 @@
 {
-  "name": "my-vue-app",
+  "name": "yiminchuxing-admin",
   "private": true,
   "version": "1.0.0",
+  "author": {
+    "name": "hdq",
+    "email": "haqsir@163.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -30,6 +34,7 @@
   "devDependencies": {
     "@types/node": "^17.0.18",
     "@types/nprogress": "^0.2.0",
+    "@types/qs": "^6.9.7",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "@vicons/ionicons5": "^0.12.0",
@@ -63,8 +68,10 @@
   },
   "lint-staged": {
     "src/**/*.{js,vue}": [
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ]
+  },
+  "engines": {
+    "node": "^12 || >=14"
   }
 }

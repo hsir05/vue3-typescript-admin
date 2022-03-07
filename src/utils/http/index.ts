@@ -16,12 +16,16 @@ import { setObjToUrlParams } from '@/utils';
 import { RequestOptions, Result, CreateAxiosOptions } from './types';
 
 import { useAppUserStore } from '@/store/modules/user';
+import { useMessage, useDialog } from 'naive-ui'
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix || '';
 
 import router from '@/router';
 import { locStorage } from '@/utils/storage';
+
+const naiMessage = useMessage()
+const naiDialog = useDialog()
 
 /**
  * @description: 数据处理，方便区分多种处理方式
@@ -53,9 +57,6 @@ const transform: AxiosTransform = {
 
     const { data } = res;
 
-    const $dialog = window['$dialog'];
-    const $message = window['$message'];
-
     if (!data) {
       // return '[HTTP] Request has no return value';
       throw new Error('请求出错，请稍候重试');
@@ -68,16 +69,16 @@ const transform: AxiosTransform = {
     if (isShowMessage) {
       if (hasSuccess && (successMessageText || isShowSuccessMessage)) {
         // 是否显示自定义信息提示
-        $dialog.success({
+        naiDialog.success({
           type: 'success',
           content: successMessageText || message || '操作成功！',
         });
       } else if (!hasSuccess && (errorMessageText || isShowErrorMessage)) {
         // 是否显示自定义信息提示
-        $message.error(message || errorMessageText || '操作失败！');
+        naiMessage.error(message || errorMessageText || '操作失败！');
       } else if (!hasSuccess && options.errorMessageMode === 'modal') {
         // errorMessageMode=‘custom-modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
-        $dialog.info({
+        naiDialog.info({
           title: '提示',
           content: message,
           positiveText: '确定',
@@ -95,7 +96,7 @@ const transform: AxiosTransform = {
     switch (code) {
       // 请求失败
       case ResultEnum.ERROR:
-        $message.error(errorMsg);
+        naiMessage.error(errorMsg);
         break;
       // 登录超时
       case ResultEnum.TIMEOUT:
@@ -104,7 +105,7 @@ const transform: AxiosTransform = {
         if (router.currentRoute.value?.name === LoginName) return;
         // 到登录页
         errorMsg = '登录超时，请重新登录!';
-        $dialog.warning({
+        naiDialog.warning({
           title: '提示',
           content: '登录身份已失效，请重新登录!',
           positiveText: '确定',
@@ -191,8 +192,6 @@ const transform: AxiosTransform = {
    * @description: 响应错误处理
    */
   responseInterceptorsCatch: (error: any) => {
-    const $dialog = window['$dialog'];
-    const $message = window['$message'];
     const { response, code, message } = error || {};
     // TODO 此处要根据后端接口返回格式修改
     const msg: string =
@@ -200,11 +199,11 @@ const transform: AxiosTransform = {
     const err: string = error.toString();
     try {
       if (code === 'ECONNABORTED' && message.indexOf('timeout') !== -1) {
-        $message.error('接口请求超时，请刷新页面重试!');
+        naiMessage.error('接口请求超时，请刷新页面重试!');
         return;
       }
       if (err && err.includes('Network Error')) {
-        $dialog.info({
+        naiDialog.info({
           title: '网络异常',
           content: '请检查您的网络连接是否正常',
           positiveText: '确定',
