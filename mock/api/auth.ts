@@ -3,7 +3,7 @@ import type { BackendServiceResult } from "../../src//interface/index";
 
 export default [
   {
-    url: "/api/getUser",
+    url: "/api/getDict",
     method: "get",
     response: (): BackendServiceResult => {
       return {
