@@ -1,7 +1,7 @@
 <template>
   <n-drawer v-model:show="isDrawer" :width="width" placement="right">
     <n-drawer-content :title="title">
-      <div class="drawer">
+      <div class="project-drawer">
         <NavItem
           title="导航栏模式"
           :options="navModeOptions"
@@ -17,7 +17,7 @@
         />
 
         <n-divider title-placement="center">系统主题</n-divider>
-        <div class="drawer-setting-item align-items-top">
+        <div class="project-drawer-setting-item align-items-top">
           <span
             class="theme-item"
             v-for="(item, index) in appThemeList"
@@ -51,9 +51,9 @@
           @toggle-handle="togglePageAnimate"
         />
 
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">动画类型</div>
-          <div class="drawer-setting-item-select">
+        <div class="project-drawer-setting-item">
+          <div class="project-drawer-setting-item-title">动画类型</div>
+          <div class="project-drawer-setting-item-select">
             <n-select v-model:value="projectStore.pageAnimateType" :options="animateOptions" />
           </div>
         </div>
@@ -84,7 +84,7 @@ export default defineComponent({
     },
     width: {
       type: Number,
-      default: 300,
+      default: 305,
     },
   },
   setup(props) {
@@ -163,7 +163,7 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
-.drawer {
+.project-drawer {
   &-setting-item {
     display: flex;
     align-items: center;

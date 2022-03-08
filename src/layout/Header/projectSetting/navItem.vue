@@ -1,6 +1,6 @@
 <template>
   <n-divider title-placement="center" v-if="title">{{ title }}</n-divider>
-  <div class="drawer-setting-item align-items-top">
+  <div class="project-drawer-setting-item align-items-top">
     <div class="align-items-top" v-for="(item, index) in options" :key="index">
       <n-tooltip placement="top">
         <template #trigger>
@@ -45,24 +45,3 @@ const toggleNavStyle = (item: string) => {
   emit("toggleHandle", item);
 };
 </script>
-<style lang="scss" scoped>
-.drawer-setting-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  &-title {
-    flex: 1 1;
-    font-size: 14px;
-  }
-  &-action {
-    flex: 0 0 auto;
-  }
-}
-.align-items-top {
-  align-items: flex-start;
-  padding: 2px 0;
-  cursor: pointer;
-}
-</style>
