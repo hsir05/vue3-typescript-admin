@@ -1,7 +1,5 @@
 <template>
-  <n-layout-content
-    :content-style="showFooter ? 'height: calc(100vh - 157px)' : 'height: calc(100vh - 118px)'"
-  >
+  <n-layout-content :content-style="getHeight">
     <RouterView>
       <template #default="{ Component, route }">
         <transition :name="getTransitionName" mode="out-in" appear>
@@ -14,26 +12,26 @@
     </RouterView>
   </n-layout-content>
 </template>
-<script lang="ts">
-import { defineComponent, computed, unref } from "vue";
+<script lang="ts" setup>
+import { computed, unref } from "vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-export default defineComponent({
-  name: "LayoutContent",
-  setup() {
-    const { isPageAnimate, pageAnimateType, showFooter } = useProjectSetting();
-    //缓存
-    const keepAliveComponents: any = [];
 
-    const getTransitionName = computed(() => {
-      return unref(isPageAnimate) ? unref(pageAnimateType) : "";
-    });
+const { isPageAnimate, pageAnimateType, showFooter, isTabs } = useProjectSetting();
+//缓存
+const keepAliveComponents: any = [];
 
-    return {
-      keepAliveComponents,
-      getTransitionName,
-      showFooter,
-    };
-  },
+const getTransitionName = computed(() => {
+  return unref(isPageAnimate) ? unref(pageAnimateType) : "";
+});
+
+const getHeight = computed(() => {
+  if (unref(showFooter) && unref(isTabs)) {
+    return "height: calc(100vh - 155px)";
+  } else if ((unref(showFooter) && !unref(isTabs)) || (!unref(showFooter) && unref(isTabs))) {
+    return "height: calc(100vh - 115px)";
+  } else {
+    return "height: calc(100vh - 75px)";
+  }
 });
 </script>
 <style lang="scss">

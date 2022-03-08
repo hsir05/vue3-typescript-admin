@@ -4,7 +4,8 @@ export interface ProjectSettingState {
     darkTheme: boolean;
     //系统风格
     appTheme: string;
-    // 动画
+
+    isTabs: boolean;
     isPageAnimate: boolean;
     pageAnimateType: string;
     collapsed: boolean;

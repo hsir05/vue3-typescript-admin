@@ -34,6 +34,7 @@
 
         <n-divider title-placement="center">显示</n-divider>
 
+        <SwitchItem title="显示多页签" :matchValue="isTabs" @toggle-handle="toggleTabs" />
         <SwitchItem
           title="显示面包屑导航"
           :disabled="navMode === 'horizontal'"
@@ -100,6 +101,7 @@ export default defineComponent({
       isRefresh,
       showFooter,
       isPageAnimate,
+      isTabs,
       navMode,
       navStyle,
       setProject,
@@ -114,6 +116,9 @@ export default defineComponent({
     }
     function toggleTheme(item: string) {
       setProject({ appTheme: item });
+    }
+    function toggleTabs(bool: boolean) {
+      setProject({ isTabs: bool });
     }
     function toggleRefresh(bool: boolean) {
       setProject({ isRefresh: bool });
@@ -141,6 +146,7 @@ export default defineComponent({
       isBreadcrumb,
       isPageAnimate,
       isRefresh,
+      isTabs,
       showFooter,
       appTheme,
       navMode,
@@ -152,6 +158,7 @@ export default defineComponent({
       openDrawer,
       closeDrawer,
       toggleTheme,
+      toggleTabs,
       toggleRefresh,
       toggleNavMode,
       toggleNavStyle,

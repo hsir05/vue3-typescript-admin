@@ -107,14 +107,14 @@ export default defineComponent({
     const state = reactive({
       fullscreenIcon: "FullscreenOutIcon",
     });
-    const { getCollapsed, isBreadcrumb, isRefresh, navMode, navStyle, setCollapsed } =
+    const { getCollapsed, isBreadcrumb, isRefresh, navMode, navStyle, setProject } =
       useProjectSetting();
     const drawerSetting = ref();
 
     const inverted = computed(() => unref(navStyle) === "header-dark");
 
     const handleCollapsed = () => {
-      setCollapsed(!unref(getCollapsed));
+      setProject({ collapsed: !unref(getCollapsed) });
     };
     const openSetting = () => {
       const { openDrawer } = drawerSetting.value;

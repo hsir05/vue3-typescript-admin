@@ -58,6 +58,7 @@ export const userOptions = [
 export const projectSetting: ProjectSettingState = {
   darkTheme: false,
   appTheme: "#2d8cf0",
+  isTabs: true,
   isPageAnimate: false,
   pageAnimateType: "fade-slide",
   collapsed: false,

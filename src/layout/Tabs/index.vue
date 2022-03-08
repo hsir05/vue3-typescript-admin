@@ -238,7 +238,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .tabs-view {
-  $w: 32px;
+  $w: 35px;
   width: 100%;
   padding: 5px 0 0;
   display: flex;

@@ -7,7 +7,7 @@ import { locStorage } from "@/utils/storage";
 
 const { 
     collapsed, navStyle,
-    darkTheme, appTheme, 
+    darkTheme, appTheme, isTabs,
     isBreadcrumb, isPageAnimate, 
     pageAnimateType, isRefresh, navMode, showFooter 
 } = locStorage.get(PROJECT_CONFIG_KEY) || projectSetting;
@@ -18,6 +18,7 @@ export const useAppProjectStore = defineStore({
     collapsed,
     appTheme,
     darkTheme,
+    isTabs,
     isPageAnimate,
     pageAnimateType,
     isBreadcrumb,

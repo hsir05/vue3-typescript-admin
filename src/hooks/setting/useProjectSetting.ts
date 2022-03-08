@@ -7,28 +7,17 @@ export function useProjectSetting() {
 
   const getCollapsed = computed(() => projectStore.collapsed);
 
-  function setCollapsed(bool: boolean) {
-    projectStore.setProjectSetting({ collapsed: bool });
-  }
-
   const darkTheme = computed(() => projectStore.darkTheme);
   const appTheme = computed(() => projectStore.appTheme);
 
-  function setDarkTheme(bool: boolean) {
-    projectStore.setProjectSetting({ darkTheme: bool });
-  }
-
   const isPageAnimate = computed(() => projectStore.isPageAnimate);
-  const pageAnimateType = computed(() => projectStore.pageAnimateType);
+  const pageAnimateType = computed(() => projectStore.pageAnimateType); 
+  const isTabs = computed(() => projectStore.isTabs);
   const isBreadcrumb = computed(() => projectStore.isBreadcrumb);
   const isRefresh = computed(() => projectStore.isRefresh);
   const navMode = computed(() => projectStore.navMode); 
-  const navStyle = computed(() => projectStore.navStyle);
+  const navStyle = computed(() => projectStore.navStyle); 
   const showFooter = computed(() => projectStore.showFooter);
-
-  function setBreadcrumb(bool: boolean) {
-    projectStore.setProjectSetting({ isBreadcrumb: bool });
-  }
 
   function setProject(config: Partial<ProjectSettingState>){
       projectStore.setProjectSetting(config);
@@ -38,6 +27,7 @@ export function useProjectSetting() {
     getCollapsed,
     darkTheme,
     appTheme,
+    isTabs,
     isPageAnimate,
     pageAnimateType,
     isBreadcrumb,
@@ -46,9 +36,6 @@ export function useProjectSetting() {
     navStyle,
     showFooter,
 
-    setCollapsed,
-    setDarkTheme,
-    setBreadcrumb,
     setProject
   };
 }
