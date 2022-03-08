@@ -1,4 +1,4 @@
-import { ProjectSettingInter } from "@/interface/projectSetting";
+import { ProjectSettingState } from "@/interface/projectSetting";
 import { renderIcon } from "@/utils/index";
 import {
   PersonCircleOutline as UserIcon,
@@ -52,7 +52,7 @@ export const userOptions = [
   { label: "退出登录", key: "logout",  icon: renderIcon(LogoutIcon) }
 ];
 
-export const projectSetting: ProjectSettingInter = {
+export const projectSetting: ProjectSettingState = {
   darkTheme: false,
   appTheme: "#2d8cf0",
   isPageAnimate: false,

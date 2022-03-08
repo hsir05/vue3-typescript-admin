@@ -1,5 +1,6 @@
 import { computed } from "vue";
 import { useAppProjectStore } from "@/store/modules/projectSetting";
+import { ProjectSettingState } from "@/interface/projectSetting";
 
 export function useProjectSetting() {
   const projectStore = useAppProjectStore();
@@ -17,10 +18,6 @@ export function useProjectSetting() {
     projectStore.setProjectSetting({ darkTheme: bool });
   }
 
-  function setAppTheme(value: string) {
-    projectStore.setProjectSetting({ appTheme: value });
-  }
-
   const isPageAnimate = computed(() => projectStore.isPageAnimate);
   const pageAnimateType = computed(() => projectStore.pageAnimateType);
   const isBreadcrumb = computed(() => projectStore.isBreadcrumb);
@@ -32,12 +29,9 @@ export function useProjectSetting() {
   function setBreadcrumb(bool: boolean) {
     projectStore.setProjectSetting({ isBreadcrumb: bool });
   }
-  function setNavMode(value: string) {
-    projectStore.setProjectSetting({ navMode: value });
-  }
 
-  function setNavStyle(value: string) {
-    projectStore.setProjectSetting({ navStyle: value });
+  function setProject(config: Partial<ProjectSettingState>){
+      projectStore.setProjectSetting(config);
   }
 
   return {
@@ -54,9 +48,7 @@ export function useProjectSetting() {
 
     setCollapsed,
     setDarkTheme,
-    setAppTheme,
     setBreadcrumb,
-    setNavMode,
-    setNavStyle,
+    setProject
   };
 }

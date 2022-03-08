@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ProjectSettingInter } from "@/interface/projectSetting";
+import { ProjectSettingState } from "@/interface/projectSetting";
 import { projectSetting } from "@/config/setting";
 import { merge } from "lodash-es";
 import { PROJECT_CONFIG_KEY } from "@/config/config";
@@ -14,7 +14,7 @@ const {
 
 export const useAppProjectStore = defineStore({
   id: "projectSetting",
-  state: (): ProjectSettingInter => ({
+  state: (): ProjectSettingState => ({
     collapsed,
     appTheme,
     darkTheme,
@@ -38,9 +38,9 @@ export const useAppProjectStore = defineStore({
     },
   },
   actions: {
-    setProjectSetting(config: Partial<ProjectSettingInter>): void {
+    setProjectSetting(config: Partial<ProjectSettingState>): void {
       this.$state = merge(this.$state || {}, config);
       locStorage.set(PROJECT_CONFIG_KEY, this.$state)
     },
   },
-});
+}); 

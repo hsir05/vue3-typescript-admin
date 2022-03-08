@@ -1,5 +1,5 @@
 
-export interface ProjectSettingInter {
+export interface ProjectSettingState {
     //深色主题
     darkTheme: boolean;
     //系统风格

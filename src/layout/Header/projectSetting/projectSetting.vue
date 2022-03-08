@@ -33,38 +33,23 @@
         </div>
 
         <n-divider title-placement="center">显示</n-divider>
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">显示面包屑导航</div>
-          <div class="drawer-setting-item-action">
-            <n-switch
-              v-model:value="projectStore.isBreadcrumb"
-              :disabled="navMode === 'horizontal'"
-            />
-          </div>
-        </div>
 
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">显示刷新按钮</div>
-          <div class="drawer-setting-item-action">
-            <n-switch v-model:value="projectStore.isRefresh" />
-          </div>
-        </div>
-
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">显示页脚</div>
-          <div class="drawer-setting-item-action">
-            <n-switch v-model:value="projectStore.showFooter" />
-          </div>
-        </div>
+        <SwitchItem
+          title="显示面包屑导航"
+          :disabled="navMode === 'horizontal'"
+          :matchValue="isBreadcrumb"
+          @toggle-handle="toggleBreadcrumb"
+        />
+        <SwitchItem title="显示刷新按钮" :matchValue="isRefresh" @toggle-handle="toggleRefresh" />
+        <SwitchItem title="显示页脚" :matchValue="showFooter" @toggle-handle="toggleShowFooter" />
 
         <n-divider title-placement="center">动画</n-divider>
 
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">禁用动画</div>
-          <div class="drawer-setting-item-action">
-            <n-switch v-model:value="projectStore.isPageAnimate" />
-          </div>
-        </div>
+        <SwitchItem
+          title="禁用动画"
+          :matchValue="isPageAnimate"
+          @toggle-handle="togglePageAnimate"
+        />
 
         <div class="drawer-setting-item">
           <div class="drawer-setting-item-title">动画类型</div>
@@ -88,9 +73,10 @@ import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { useAppProjectStore } from "@/store/modules/projectSetting";
 import NavItem from "./navItem.vue";
+import SwitchItem from "./switchItem.vue";
 export default defineComponent({
   name: "ProjectSetting",
-  components: { CheckOutlined, NavItem },
+  components: { CheckOutlined, NavItem, SwitchItem },
   props: {
     title: {
       type: String,
@@ -108,8 +94,16 @@ export default defineComponent({
       isDrawer: false,
     });
     const projectStore = useAppProjectStore();
-    const { appTheme, setAppTheme, navMode, navStyle, setNavMode, setNavStyle } =
-      useProjectSetting();
+    const {
+      appTheme,
+      isBreadcrumb,
+      isRefresh,
+      showFooter,
+      isPageAnimate,
+      navMode,
+      navStyle,
+      setProject,
+    } = useProjectSetting();
 
     function openDrawer() {
       state.isDrawer = true;
@@ -119,20 +113,35 @@ export default defineComponent({
       state.isDrawer = false;
     }
     function toggleTheme(item: string) {
-      setAppTheme(item);
+      setProject({ appTheme: item });
+    }
+    function toggleRefresh(bool: boolean) {
+      setProject({ isRefresh: bool });
+    }
+    function toggleShowFooter(bool: boolean) {
+      setProject({ showFooter: bool });
     }
     function toggleNavMode(mode: string) {
-      setNavMode(mode);
+      setProject({ navMode: mode });
     }
-
     function toggleNavStyle(style: string) {
-      setNavStyle(style);
+      setProject({ navStyle: style });
+    }
+    function toggleBreadcrumb(bool: boolean) {
+      setProject({ isBreadcrumb: bool });
+    }
+    function togglePageAnimate(bool: boolean) {
+      setProject({ isPageAnimate: bool });
     }
 
     return {
       ...toRefs(state),
       appThemeList,
       animateOptions,
+      isBreadcrumb,
+      isPageAnimate,
+      isRefresh,
+      showFooter,
       appTheme,
       navMode,
       navStyle,
@@ -143,8 +152,12 @@ export default defineComponent({
       openDrawer,
       closeDrawer,
       toggleTheme,
+      toggleRefresh,
       toggleNavMode,
       toggleNavStyle,
+      toggleShowFooter,
+      toggleBreadcrumb,
+      togglePageAnimate,
     };
   },
 });
