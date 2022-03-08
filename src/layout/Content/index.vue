@@ -1,6 +1,6 @@
 <template>
   <n-layout-content
-    :content-style="showFooter ? 'height: calc(100vh - 119px)' : 'height: calc(100vh - 75px)'"
+    :content-style="showFooter ? 'height: calc(100vh - 157px)' : 'height: calc(100vh - 118px)'"
   >
     <RouterView>
       <template #default="{ Component, route }">

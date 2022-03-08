@@ -1,5 +1,5 @@
 import { computed } from "vue";
-import { useAppProjectStore } from "@/store/modules/projectSetting";
+import { useAppProjectStore } from "@/store/modules/useProjectSettingStore";
 import { ProjectSettingState } from "@/interface/projectSetting";
 
 export function useProjectSetting() {

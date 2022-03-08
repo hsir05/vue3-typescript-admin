@@ -71,7 +71,7 @@ import {
 } from "@/config/setting";
 import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import { useAppProjectStore } from "@/store/modules/projectSetting";
+import { useAppProjectStore } from "@/store/modules/useProjectSettingStore";
 import NavItem from "./navItem.vue";
 import SwitchItem from "./switchItem.vue";
 export default defineComponent({

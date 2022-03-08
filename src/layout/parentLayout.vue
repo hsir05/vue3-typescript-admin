@@ -6,6 +6,7 @@
       <LayoutHeader v-if="navMode === 'vertical' || navMode === 'horizontal'" />
       <LayoutSider v-if="navMode === 'horizontal-mix'" />
       <n-layout>
+        <Tabs />
         <LayoutContent />
         <LayoutFooter v-if="showFooter" />
       </n-layout>
@@ -18,6 +19,7 @@ import LayoutSider from "./Sider/index.vue";
 import LayoutHeader from "./Header/index.vue";
 import LayoutFooter from "./Footer/index.vue";
 import LayoutContent from "./Content/index.vue";
+import Tabs from "./Tabs/index.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 export default defineComponent({
   name: "ParentLayout",
@@ -26,6 +28,7 @@ export default defineComponent({
     LayoutHeader,
     LayoutFooter,
     LayoutContent,
+    Tabs,
   },
   setup() {
     const { navMode, showFooter } = useProjectSetting();

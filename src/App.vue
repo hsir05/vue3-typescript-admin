@@ -14,13 +14,11 @@
 import { computed } from "vue";
 import { zhCN, dateZhCN, darkTheme } from "naive-ui";
 import { AppProvider } from "@/components/Application";
-import { useAppProjectStore } from "@/store/modules/projectSetting";
+import { useAppProjectStore } from "@/store/modules/useProjectSettingStore";
 import { lighten } from "@/utils/index";
 const projectStore = useAppProjectStore();
 
-const getDarkTheme = computed(() =>
-  projectStore.darkTheme ? darkTheme : undefined
-);
+const getDarkTheme = computed(() => (projectStore.darkTheme ? darkTheme : undefined));
 
 const getThemeOverrides = computed(() => {
   const appTheme = projectStore.appTheme;

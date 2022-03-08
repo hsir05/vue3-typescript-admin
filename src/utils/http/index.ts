@@ -15,7 +15,7 @@ import { setObjToUrlParams } from '@/utils';
 
 import { RequestOptions, Result, CreateAxiosOptions } from './types';
 
-import { useAppUserStore } from '@/store/modules/user';
+import { useAppUserStore } from '@/store/modules/useUserStore';
 import { useMessage, useDialog } from 'naive-ui'
 
 const globSetting = useGlobSetting();

@@ -1,10 +1,7 @@
 <template>
   <div :class="{ 'header-wrap': !inverted }">
     <n-layout-header has-sider :inverted="inverted">
-      <div
-        class="header-right-set"
-        v-if="navMode === 'vertical' || navMode === 'horizontal-mix'"
-      >
+      <div class="header-right-set" v-if="navMode === 'vertical' || navMode === 'horizontal-mix'">
         <AppLogo v-if="navMode === 'horizontal-mix'" />
         <span class="pl-10px" @click="handleCollapsed">
           <n-icon size="18" v-if="getCollapsed" class="setting-icon">
@@ -60,12 +57,7 @@
         <!--项目配置-->
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-icon
-              size="18"
-              class="setting-icon"
-              style="padding-right: 20px"
-              @click="openSetting"
-            >
+            <n-icon size="18" class="setting-icon" style="padding-right: 20px" @click="openSetting">
               <setttingIcon />
             </n-icon>
           </template>
@@ -85,6 +77,7 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb.vue";
 import Menu from "@/layout/Sider/Menu.vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
 import { userOptions } from "@/config/setting";
+
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import {
   MenuUnfoldOutlined,
@@ -114,14 +107,8 @@ export default defineComponent({
     const state = reactive({
       fullscreenIcon: "FullscreenOutIcon",
     });
-    const {
-      getCollapsed,
-      isBreadcrumb,
-      isRefresh,
-      navMode,
-      navStyle,
-      setCollapsed,
-    } = useProjectSetting();
+    const { getCollapsed, isBreadcrumb, isRefresh, navMode, navStyle, setCollapsed } =
+      useProjectSetting();
     const drawerSetting = ref();
 
     const inverted = computed(() => unref(navStyle) === "header-dark");
@@ -136,9 +123,7 @@ export default defineComponent({
 
     const toggleFullscreenIcon = () =>
       (state.fullscreenIcon =
-        document.fullscreenElement !== null
-          ? "FullScreenExitIcon"
-          : "FullScreenExitIcon");
+        document.fullscreenElement !== null ? "FullScreenExitIcon" : "FullScreenExitIcon");
 
     document.addEventListener("fullscreenchange", toggleFullscreenIcon);
 

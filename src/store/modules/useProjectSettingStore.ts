@@ -13,7 +13,7 @@ const {
 } = locStorage.get(PROJECT_CONFIG_KEY) || projectSetting;
 
 export const useAppProjectStore = defineStore({
-  id: "projectSetting",
+  id: "app-project-setting",
   state: (): ProjectSettingState => ({
     collapsed,
     appTheme,
