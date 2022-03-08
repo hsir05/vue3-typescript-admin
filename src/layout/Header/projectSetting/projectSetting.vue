@@ -164,28 +164,6 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .project-drawer {
-  &-setting-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    &-title {
-      flex: 1 1;
-      font-size: 14px;
-    }
-    &-action {
-      flex: 0 0 auto;
-    }
-    &-select {
-      flex: 1;
-    }
-  }
-  .align-items-top {
-    align-items: flex-start;
-    padding: 2px 0;
-    cursor: pointer;
-  }
   .theme-item {
     width: 20px;
     min-width: 20px;
