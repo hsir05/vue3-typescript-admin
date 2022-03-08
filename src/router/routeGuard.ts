@@ -5,12 +5,15 @@ import { PageEnum } from '@/enums/pageEnum';
 import { ACCESS_TOKEN_KEY } from "@/config/config";
 // import { ErrorPageRoute } from '@/router/base';
 import { locStorage } from "@/utils/storage";
+import { useAppRouteStore } from "@/store/modules/useRouteStore"
+import { RouteRecordRaw } from 'vue-router';
+
 
 const LOGIN_PATH = PageEnum.BASE_LOGIN;
 const whitePathList = [LOGIN_PATH]; // no redirect whitelist
 
 export function createRouterGuard(router: Router) {
-  router.beforeEach((to, from, next) => {
+  router.beforeEach( async (to, from, next) => {
     NProgress.start();
     if (from.path === LOGIN_PATH && to.name === 'errorPage') {
       next(PageEnum.BASE_HOME);
@@ -37,6 +40,15 @@ export function createRouterGuard(router: Router) {
     //     next(redirectData);
     //     return;
     // }
+    // const routeStore = useAppRouteStore()
+    // const routes = await routeStore.generateRoutes();
+
+    // // 动态添加可访问路由表
+    // routes.forEach((item:any ) => {
+    //     console.log(item);
+    // //   router.addRoute(item as unknown as RouteRecordRaw);
+    // });
+
       next();
   });
 

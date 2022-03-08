@@ -106,8 +106,6 @@ export default defineComponent({
     //   }
     // });
     // 初始化标签页
-    console.log(cacheRoutes);
-
     tabsStore.initTabs(cacheRoutes);
 
     const tabsList = computed(() => tabsStore.getTabList.filter((item) => !item.meta?.hideTab));

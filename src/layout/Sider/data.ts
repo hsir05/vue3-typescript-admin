@@ -9,6 +9,7 @@ export const menuOptions: MenuOption[] = [
   {
     label: '主页',
     key: 'home',
+    path: '/dashboard',
     icon: renderIcon(SpeedomeIcon),
     
   },
@@ -19,6 +20,12 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: '字典管理',
+        path: "/system/dict",
+        key: 'protect-wild-animals-dict'
+      },
+      {
+        label: '菜单管理',
+        path: "/system/menus",
         key: 'protect-wild-animals'
       }
     ]

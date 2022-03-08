@@ -24,8 +24,24 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/system/dict/dict.vue"),
       },
       {
-        path: "/system/menu",
+        path: "/system/menus",
         name: "system_menu",
+        meta: {
+          title: "菜单管理",
+        },
+        component: () => import("@/views/system/menu/menu.vue"),
+      },
+      {
+        path: "/system/dict2",
+         name: `system_dict1`,
+        meta: {
+          title: "字典管理",
+        },
+        component: () => import("@/views/system/dict/dict.vue"),
+      },
+      {
+        path: "/system/menu3",
+        name: "system_menu2",
         meta: {
           title: "菜单管理",
         },
