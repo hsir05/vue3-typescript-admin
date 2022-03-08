@@ -8,6 +8,8 @@
           v-for="(tab, index) in tabsList"
           :key="index"
           :options="tabsOptions"
+          @clickoutside="onClickOutside"
+          @select="closeHandleSelect"
         >
           <div class="tab-card-scroll-item" @click="goPage(tab)">
             <span :class="[activeKey === tab.path ? 'tab-card-scroll-item-active' : '']">{{
@@ -87,7 +89,6 @@ export default defineComponent({
 
     let cacheRoutes: RouteItem[] = [];
     const simpleRoute = getSimpleRoute(route);
-    console.log(simpleRoute);
 
     try {
       const routesStr = locStorage.get(TABS_ROUTES_KEY);
