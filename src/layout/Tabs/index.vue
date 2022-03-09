@@ -108,7 +108,9 @@ export default defineComponent({
     // 初始化标签页
     tabsStore.initTabs(cacheRoutes);
 
-    const tabsList = computed(() => tabsStore.getTabList.filter((item) => !item.meta?.hideTab));
+    const tabsList = computed(() =>
+      tabsStore.getTabsList.filter((item: RouteItem) => !item.meta?.hideTab)
+    );
 
     // 在页面关闭或刷新之前，保存数据
     window.addEventListener("beforeunload", () => {
@@ -167,7 +169,7 @@ export default defineComponent({
     }
     function closeTabItem(e: RouteItem) {
       const { fullPath } = e;
-      const routeInfo = tabsList.value.find((item) => item.fullPath == fullPath);
+      const routeInfo = tabsList.value.find((item: RouteItem) => item.fullPath == fullPath);
       removeTab(routeInfo as RouteItem);
     }
     const removeTab = async (route: RouteItem) => {
@@ -183,8 +185,12 @@ export default defineComponent({
       state.showDropdown = false;
     }
     function closeOther(route: any) {
+      console.log(333);
+
       tabsStore.closeOtherTabs(route);
       state.activeKey = route.fullPath;
+      console.log(route.fullPath);
+
       router.replace(route.fullPath);
     }
     function closeAll(e: RouteItem) {

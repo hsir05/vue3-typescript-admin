@@ -23,13 +23,12 @@
             v-for="(item, index) in appThemeList"
             :key="index"
             :style="{ 'background-color': item }"
-            @click="toggleTheme(item)"
+            @click="setProject({ appTheme: item })"
           >
             <n-icon size="12" v-if="item === appTheme">
               <CheckOutlined />
             </n-icon>
           </span>
-          <div class=""></div>
         </div>
 
         <n-divider title-placement="center">显示</n-divider>
@@ -114,9 +113,6 @@ export default defineComponent({
     function closeDrawer() {
       state.isDrawer = false;
     }
-    function toggleTheme(item: string) {
-      setProject({ appTheme: item });
-    }
     function toggleTabs(bool: boolean) {
       setProject({ isTabs: bool });
     }
@@ -157,7 +153,7 @@ export default defineComponent({
 
       openDrawer,
       closeDrawer,
-      toggleTheme,
+      setProject,
       toggleTabs,
       toggleRefresh,
       toggleNavMode,
@@ -180,7 +176,6 @@ export default defineComponent({
     border-radius: 4px;
     margin: 0 5px 10px 0;
     text-align: center;
-
     .n-icon {
       color: #fff;
     }
