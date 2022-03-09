@@ -6,7 +6,7 @@
       <LayoutHeader v-if="navMode === 'vertical' || navMode === 'horizontal'" />
       <LayoutSider v-if="navMode === 'horizontal-mix'" />
       <n-layout>
-        <Tabs v-if="isTabs" />
+        <Tabs v-if="isTabs" :collapsed="getCollapsed" />
         <LayoutContent />
         <LayoutFooter v-if="showFooter" />
       </n-layout>
@@ -31,10 +31,11 @@ export default defineComponent({
     Tabs,
   },
   setup() {
-    const { isTabs, navMode, showFooter } = useProjectSetting();
+    const { isTabs, getCollapsed, navMode, showFooter } = useProjectSetting();
 
     return {
       isTabs,
+      getCollapsed,
       navMode,
       showFooter,
     };

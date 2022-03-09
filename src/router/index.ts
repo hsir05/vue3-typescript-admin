@@ -30,7 +30,6 @@ const router = createRouter({
   strict: true,
   scrollBehavior: () => ({ left: 0, top: 0 }),
 });
-console.log(router);
 
 export function setupRouter(app: App) {
   app.use(router);
