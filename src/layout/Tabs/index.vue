@@ -76,6 +76,7 @@ export default defineComponent({
     });
     const route = useRoute();
     const router = useRouter();
+    // const { currentRoute } = useRouter()
 
     const tabsStore = useAppTabsStore();
 
@@ -135,6 +136,7 @@ export default defineComponent({
 
     const tabsOptions = computed(() => {
       const isDisabled = unref(tabsList).length <= 1;
+      //   const isDis = unref(tabsList).length === 1 || unref(currentRoute).fullPath === PageEnum.BASE_HOME
       return [
         {
           label: "刷新当前",
@@ -144,7 +146,6 @@ export default defineComponent({
         {
           label: "关闭当前",
           key: "2",
-          disabled: isDisabled,
           icon: renderIcon(RemoveOutIcon),
         },
         {
