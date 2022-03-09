@@ -174,15 +174,11 @@ export default defineComponent({
       removeTab(routeInfo as RouteItem);
     }
     const removeTab = async (route: RouteItem) => {
-      try {
-        await tabsStore.closeCurrentTab(route);
-        if (state.activeKey === route.fullPath) {
-          const currentRoute = tabsList.value[Math.max(0, tabsList.value.length - 1)];
-          state.activeKey = currentRoute.fullPath;
-          router.push(currentRoute.fullPath);
-        }
-      } catch (err) {
-        console.log(err);
+      await tabsStore.closeCurrentTab(route);
+      if (state.activeKey === route.fullPath) {
+        const currentRoute = tabsList.value[Math.max(0, tabsList.value.length - 1)];
+        state.activeKey = currentRoute.fullPath;
+        router.push(currentRoute.fullPath);
       }
     };
 

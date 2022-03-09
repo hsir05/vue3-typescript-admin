@@ -2,7 +2,8 @@ import type { MenuOption } from 'naive-ui'
 import {
   SpeedometerOutline as SpeedomeIcon,
   AlbumsOutline as AlbumIcon,
-  SettingsOutline as SettingsIcon
+  SettingsOutline as SettingsIcon,
+  ReaderOutline as ReaderOutIcon
 } from '@vicons/ionicons5'
 import { renderIcon } from "@/utils/index"
 
@@ -41,6 +42,28 @@ export const menuOptions: MenuOption[] = [
         path: "/setting/profile",
         key: 'protect-wild-animals-setting'
       }
+    ]
+  },
+  {
+    label: '异常页面',
+    key: 'bear-exception',
+    icon: renderIcon(ReaderOutIcon),
+    children: [
+      {
+        label: '403',
+        path: "/exception/403",
+        key: 'protect-wild-animals-403'
+      },
+      {
+        label: '404',
+        path: "/exception/404",
+        key: 'protect-wild-animals-404'
+      },
+      {
+        label: '500',
+        path: "/exception/500",
+        key: 'protect-wild-animals-500'
+      },
     ]
   }
 ]
