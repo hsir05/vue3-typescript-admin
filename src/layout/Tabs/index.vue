@@ -144,6 +144,7 @@ export default defineComponent({
         {
           label: "关闭当前",
           key: "2",
+          disabled: isDisabled,
           icon: renderIcon(RemoveOutIcon),
         },
         {
@@ -173,11 +174,15 @@ export default defineComponent({
       removeTab(routeInfo as RouteItem);
     }
     const removeTab = async (route: RouteItem) => {
-      await tabsStore.closeCurrentTab(route);
-      if (state.activeKey === route.fullPath) {
-        const currentRoute = tabsList.value[Math.max(0, tabsList.value.length - 1)];
-        state.activeKey = currentRoute.fullPath;
-        router.push(currentRoute);
+      try {
+        await tabsStore.closeCurrentTab(route);
+        if (state.activeKey === route.fullPath) {
+          const currentRoute = tabsList.value[Math.max(0, tabsList.value.length - 1)];
+          state.activeKey = currentRoute.fullPath;
+          router.push(currentRoute.fullPath);
+        }
+      } catch (err) {
+        console.log(err);
       }
     };
 
@@ -185,12 +190,8 @@ export default defineComponent({
       state.showDropdown = false;
     }
     function closeOther(route: any) {
-      console.log(333);
-
       tabsStore.closeOtherTabs(route);
       state.activeKey = route.fullPath;
-      console.log(route.fullPath);
-
       router.replace(route.fullPath);
     }
     function closeAll(e: RouteItem) {
