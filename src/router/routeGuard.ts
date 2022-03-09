@@ -55,7 +55,6 @@ export function createRouterGuard(router: Router) {
   router.afterEach((to) => {
     NProgress.done();
     document.title = (to?.meta?.title as string) || document.title;
-
   });
 
   router.onError((error) => {

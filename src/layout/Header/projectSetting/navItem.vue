@@ -15,7 +15,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { defineEmits, toRefs } from "vue";
+import { toRefs } from "vue";
 import SvgIcon from "@/components/SvgIcon/SvgIcon.vue";
 
 interface OptionsItem {

@@ -42,18 +42,7 @@
           刷新当前页面
         </n-tooltip>
         <!--用户头像-->
-        <n-dropdown :options="userOptions">
-          <div class="header-user">
-            <n-avatar
-              round
-              style="cursor: pointer"
-              size="medium"
-              src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-              >Admin</n-avatar
-            >
-            <span class="header-username">Admin</span>
-          </div>
-        </n-dropdown>
+        <Avatar />
         <!--项目配置-->
         <n-tooltip trigger="hover">
           <template #trigger>
@@ -76,7 +65,7 @@ import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import Breadcrumb from "../components/Breadcrumb/Breadcrumb.vue";
 import Menu from "@/layout/Sider/Menu.vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
-import { userOptions } from "@/config/setting";
+import Avatar from "./avatar.vue";
 
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import {
@@ -91,6 +80,7 @@ export default defineComponent({
   name: "Header",
   components: {
     Menu,
+    Avatar,
     AppLogo,
     Breadcrumb,
     ReloadIcon,
@@ -151,7 +141,6 @@ export default defineComponent({
       navMode,
       isRefresh,
       inverted,
-      userOptions,
 
       openSetting,
       reloadPage,
