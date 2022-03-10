@@ -5,6 +5,7 @@
 declare module 'vue' {
   export interface GlobalComponents {
     Application: typeof import('./src/components/Application/Application.vue')['default']
+    BasicDrawer: typeof import('./src/components/BasicDrawer/BasicDrawer.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBadge: typeof import('naive-ui')['NBadge']
@@ -42,7 +43,6 @@ declare module 'vue' {
     NTabs: typeof import('naive-ui')['NTabs']
     NTooltip: typeof import('naive-ui')['NTooltip']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
-    TableAction: typeof import('./src/components/TableAction/TableAction.vue')['default']
     TableActions: typeof import('./src/components/TableActions/TableActions.vue')['default']
     TableTemplate: typeof import('./src/components/TableTemplate/TableTemplate.vue')['default']
   }

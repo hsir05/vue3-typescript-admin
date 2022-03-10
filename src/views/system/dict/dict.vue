@@ -23,7 +23,7 @@
         <n-input v-model:value="queryValue.name" clearable placeholder="输入字典名称" />
       </n-form-item>
       <n-form-item>
-        <n-button attr-type="button" type="primary" @click="searchHandle">搜索</n-button>
+        <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
       </n-form-item>
     </n-form>
@@ -64,7 +64,7 @@
         :columns="columns"
         :scroll-x="1090"
         class="box-border"
-        min-height="400px"
+        min-height="300px"
         flex-height
         :row-key="(row) => row.id"
         :data="data"
@@ -84,12 +84,14 @@
         <template #prefix="{ itemCount }"> 共 {{ itemCount }} 项 </template></n-pagination
       >
     </div>
+    <DiceDrawer ref="dictDrawerRef" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, unref } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import DiceDrawer from "./dictDrawer.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
@@ -99,12 +101,13 @@ import {
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "Dict",
-  components: { AddIcon, RemoveIcon, Reload },
+  components: { AddIcon, RemoveIcon, Reload, DiceDrawer },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
       name: "",
     });
+    const dictDrawerRef = ref();
     const loading = ref(false);
     const checkedRowKeysRef = ref<string[]>([]);
 
@@ -144,6 +147,8 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
+      const { openDrawer } = dictDrawerRef.value;
+      openDrawer();
     }
 
     function handlePositiveClick(record: Recordable) {
@@ -217,6 +222,7 @@ export default defineComponent({
     return {
       formRef,
       queryValue,
+      dictDrawerRef,
       page: ref(1),
       pageSize: ref(20),
       pageSizes,

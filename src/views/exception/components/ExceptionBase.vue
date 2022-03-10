@@ -1,6 +1,6 @@
 <template>
   <div class="text-center err-page h-full">
-    <div class="w-400px h-400px mt-100px">
+    <div class="w-400px h-400px mt-80px">
       <svg-no-permission v-if="type === '403'" />
       <svg-not-found v-if="type === '404'" />
       <svg-service-error v-if="type === '500'" />
