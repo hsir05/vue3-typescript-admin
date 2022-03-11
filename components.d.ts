@@ -42,6 +42,7 @@ declare module 'vue' {
     NTabPane: typeof import('naive-ui')['NTabPane']
     NTabs: typeof import('naive-ui')['NTabs']
     NTooltip: typeof import('naive-ui')['NTooltip']
+    Reload: typeof import('./src/components/Reload/Reload.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
     TableActions: typeof import('./src/components/TableActions/TableActions.vue')['default']
     TableTemplate: typeof import('./src/components/TableTemplate/TableTemplate.vue')['default']

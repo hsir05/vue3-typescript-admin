@@ -45,17 +45,7 @@
         </n-button-group>
 
         <!--当前刷新-->
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <n-icon size="18" class="setting-icon mr-15px cursor-pointer" @click="reloadPage">
-              <Reload />
-            </n-icon>
-          </template>
-          刷新
-        </n-tooltip>
-
-        <!-- <n-button attr-type="button" type="primary" @click="searchHandle">添加</n-button>
-            <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">批量删除</n-button> -->
+        <Reload @reload-data="reloadPage" />
       </div>
       <n-data-table
         :loading="loading"
@@ -92,11 +82,11 @@
 import { defineComponent, ref, h, unref, reactive } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import Reload from "@/components/Reload/Reload.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
   CreateOutline as CreateIcon,
-  Reload,
 } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
 import { data } from "./data";
@@ -106,18 +96,16 @@ export default defineComponent({
   components: { AddIcon, RemoveIcon, Reload },
   setup() {
     const formRef = ref<FormInst | null>(null);
+    const loading = ref(false);
+    const checkedRowKeysRef = ref<string[]>([]);
     const queryValue = ref({
       name: "",
     });
-    const loading = ref(false);
-    const checkedRowKeysRef = ref<string[]>([]);
-
     const pagParam = reactive({
       page: 1,
       pageSize: 10,
     });
     const itemCount = ref(100);
-
     const message = useMessage();
 
     const searchHandle = (e: MouseEvent) => {
