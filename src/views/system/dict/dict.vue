@@ -1,14 +1,5 @@
 <template>
   <div class="dict">
-    <!-- <n-alert title="字典配置说明" type="warning">
-      关于字典的说明
-    字典统一管理本系统中的枚举值，即字典中的词条，词条的名称用来在用户交互界面显示，词条编码为数据库中实际的保存值，参与业务。
-    关于新增词条的说明
-    新增词条时需要规定词条编码，词条编码统一使用两位[三位]大写字母加5位[4位]数字的格式（如：AT00001），编码一经规定不能修改，建议设计词条编码时一定慎重！
-    关于词条编辑的说明
-    编辑词条时，不允许编辑词条编码，以免使数据库中已经保存的词条编码无法对应获取词条名称
-    </n-alert> -->
-
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -44,8 +35,20 @@
           </n-button>
         </n-button-group>
 
-        <!--当前刷新-->
-        <Reload @reload-data="reloadPage" />
+        <div class="">
+          <!--当前刷新-->
+          <Reload @reload-data="reloadPage" />
+          <!-- 提示 -->
+          <Explain title="配置说明">
+            <n-alert title="关于字典的说明" type="warning">
+              字典统一管理本系统中的枚举值，即字典中的词条，词条的名称用来在用户交互界面显示，词条编码为数据库中实际的保存值，参与业务。
+              关于新增词条的说明
+            </n-alert>
+            <n-alert title="关于新增词条的说明" type="warning">
+              新增词条时需要规定词条编码，词条编码统一使用两位[三位]大写字母加5位[4位]数字的格式（如：AT00001），编码一经规定不能修改，建议设计词条编码时一定慎重！
+            </n-alert>
+          </Explain>
+        </div>
       </div>
       <n-data-table
         :loading="loading"
@@ -86,6 +89,7 @@ import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Reload from "@/components/Reload/Reload.vue";
 import DictModal from "./dictModal.vue";
+import Explain from "@/components/Explain/Explain.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
@@ -96,7 +100,7 @@ import { data } from "./data";
 import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "Dict",
-  components: { AddIcon, RemoveIcon, Reload, DictModal },
+  components: { AddIcon, RemoveIcon, Reload, DictModal, Explain },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const loading = ref(false);

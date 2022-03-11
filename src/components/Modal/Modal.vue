@@ -1,5 +1,10 @@
 <template>
-  <n-modal v-model:show="isModal" auto-focus :close-on-esc="false" :mask-closable="false">
+  <n-modal
+    v-model:show="isModal"
+    auto-focus
+    :close-on-esc="closeOnEsc"
+    :mask-closable="maskClosable"
+  >
     <n-card
       :style="{ width: width, height: height }"
       :title="title"
@@ -14,7 +19,8 @@
           <CloseOutIcon />
         </n-icon>
       </template>
-      内容
+      <slot></slot>
+
       <template #footer>
         <n-button @click="cancel">取消</n-button>
         <n-button type="primary" class="ml-10px" @click="ok">确认</n-button>
@@ -40,6 +46,14 @@ export default defineComponent({
     height: {
       type: String,
       default: "auto",
+    },
+    maskClosable: {
+      type: Boolean,
+      defalut: false,
+    },
+    closeOnEsc: {
+      type: Boolean,
+      default: false,
     },
   },
   setup() {

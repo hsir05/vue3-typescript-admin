@@ -5,8 +5,8 @@
 declare module 'vue' {
   export interface GlobalComponents {
     Application: typeof import('./src/components/Application/Application.vue')['default']
-    BasicDrawer: typeof import('./src/components/BasicDrawer/BasicDrawer.vue')['default']
-    ModalTem: typeof import('./src/components/ModalTem/ModalTem.vue')['default']
+    Explain: typeof import('./src/components/Explain/Explain.vue')['default']
+    Modal: typeof import('./src/components/Modal/Modal.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBadge: typeof import('naive-ui')['NBadge']
