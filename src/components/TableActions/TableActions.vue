@@ -23,6 +23,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, toRaw } from "vue";
 import { ActionItem } from "@/interface/table/table";
+import { usePermission } from "@/hooks/web/usePermissions";
 export default defineComponent({
   name: "TableActions",
   props: {
@@ -31,14 +32,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const permissions: string[] = ["dict001", "dict002"];
+    // const permissions: string[] = ["dict001", "dict002"];
 
-    function hasPermission(auth: string[]): boolean {
-      if (!auth || !auth.length) return true;
-      return permissions.some((item) => {
-        return auth.includes(item);
-      });
-    }
+    const { hasPermission } = usePermission();
 
     const getActions = computed(() => {
       return (toRaw(props.actions) || [])

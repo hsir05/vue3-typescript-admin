@@ -5,8 +5,10 @@
 declare module 'vue' {
   export interface GlobalComponents {
     Application: typeof import('./src/components/Application/Application.vue')['default']
+    BaiduMap: typeof import('./src/components/Map/src/BaiduMap.vue')['default']
     Drawer: typeof import('./src/components/Drawer/Drawer.vue')['default']
     Explain: typeof import('./src/components/Explain/Explain.vue')['default']
+    Map: typeof import('./src/components/Map/Map.vue')['default']
     Modal: typeof import('./src/components/Modal/Modal.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
@@ -41,10 +43,7 @@ declare module 'vue' {
     NPagination: typeof import('naive-ui')['NPagination']
     NPopconfirm: typeof import('naive-ui')['NPopconfirm']
     NSelect: typeof import('naive-ui')['NSelect']
-    NSpin: typeof import('naive-ui')['NSpin']
     NSwitch: typeof import('naive-ui')['NSwitch']
-    NTabPane: typeof import('naive-ui')['NTabPane']
-    NTabs: typeof import('naive-ui')['NTabs']
     NTooltip: typeof import('naive-ui')['NTooltip']
     Reload: typeof import('./src/components/Reload/Reload.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']

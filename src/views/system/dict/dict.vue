@@ -69,6 +69,7 @@
         v-model:page="pagParam.page"
         v-model:page-size="pagParam.pageSize"
         v-model:item-count="itemCount"
+        :page-slot="5"
         show-size-picker
         show-quick-jumper
         class="mt-10px justify-end"

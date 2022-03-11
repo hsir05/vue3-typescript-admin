@@ -11,6 +11,7 @@ interface UserState {
   avatar: string;
   role: string;
   info: any;
+  permissions: string[]
 }
 
 export const useAppUserStore = defineStore({
@@ -21,6 +22,7 @@ export const useAppUserStore = defineStore({
     avatar: "https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg",
     role: "",
     info: "",
+    permissions: ["dict001", "dict002"]
   }),
   getters: {
     getToken(): string {
@@ -35,10 +37,16 @@ export const useAppUserStore = defineStore({
     getRole(): string {
       return this.role;
     },
+    getPermissions(): string[] {
+      return this.permissions;
+    },
   },
   actions: {
     setToken(token: string) {
       this.token = token;
+    },
+    setPermissions(permissions: string[]) {
+      this.permissions = permissions;
     },
     setUsername(username: string) {
       this.username = username;
