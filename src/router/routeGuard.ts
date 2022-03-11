@@ -2,11 +2,11 @@ import type { Router } from "vue-router";
 import NProgress from "nprogress"; // 进度条
 import "nprogress/nprogress.css"; //样式必须引入
 import { PageEnum } from '@/enums/pageEnum';
-import { ACCESS_TOKEN_KEY } from "@/config/config";
-// import { ErrorPageRoute } from '@/router/base';
-import { locStorage } from "@/utils/storage";
-import { useAppRouteStore } from "@/store/modules/useRouteStore"
-import { RouteRecordRaw } from 'vue-router';
+// import { ACCESS_TOKEN_KEY } from "@/config/config";
+// // import { ErrorPageRoute } from '@/router/base';
+// import { locStorage } from "@/utils/storage";
+// import { useAppRouteStore } from "@/store/modules/useRouteStore"
+// import { RouteRecordRaw } from 'vue-router';
 
 
 const LOGIN_PATH = PageEnum.BASE_LOGIN;

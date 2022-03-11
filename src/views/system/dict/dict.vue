@@ -59,7 +59,7 @@
         class="box-border"
         min-height="300px"
         flex-height
-        :row-key="(row) => row.id"
+        :row-key="getRowKeyId"
         :data="data"
         :pagination="false"
         @update:checked-row-keys="handleCheck"
@@ -223,6 +223,7 @@ export default defineComponent({
       loading,
       data,
       columns,
+      getRowKeyId: (row: tableDataItem) => row.id,
       searchHandle,
       handleCheck,
       reset,

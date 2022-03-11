@@ -1,63 +1,68 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" title="项目配置">
-    <div class="project-drawer">
-      <NavItem
-        title="导航栏模式"
-        :options="navModeOptions"
-        :matchValue="navMode"
-        @toggle-handle="toggleNavMode"
-      />
+  <n-drawer v-model:show="isDrawer" :width="width" placement="right">
+    <n-drawer-content :title="title">
+      <div class="project-drawer">
+        <NavItem
+          title="导航栏模式"
+          :options="navModeOptions"
+          :matchValue="navMode"
+          @toggle-handle="toggleNavMode"
+        />
 
-      <NavItem
-        title="导航栏风格"
-        :options="navStyleOptons"
-        :matchValue="navStyle"
-        @toggle-handle="toggleNavStyle"
-      />
+        <NavItem
+          title="导航栏风格"
+          :options="navStyleOptons"
+          :matchValue="navStyle"
+          @toggle-handle="toggleNavStyle"
+        />
 
-      <n-divider title-placement="center">系统主题</n-divider>
-      <div class="project-drawer-setting-item align-items-top">
-        <span
-          class="theme-item"
-          v-for="(item, index) in appThemeList"
-          :key="index"
-          :style="{ 'background-color': item }"
-          @click="setProject({ appTheme: item })"
-        >
-          <n-icon size="12" v-if="item === appTheme">
-            <CheckOutlined />
-          </n-icon>
-        </span>
-      </div>
+        <n-divider title-placement="center">系统主题</n-divider>
+        <div class="project-drawer-setting-item align-items-top">
+          <span
+            class="theme-item"
+            v-for="(item, index) in appThemeList"
+            :key="index"
+            :style="{ 'background-color': item }"
+            @click="setProject({ appTheme: item })"
+          >
+            <n-icon size="12" v-if="item === appTheme">
+              <CheckOutlined />
+            </n-icon>
+          </span>
+        </div>
 
-      <n-divider title-placement="center">显示</n-divider>
+        <n-divider title-placement="center">显示</n-divider>
 
-      <SwitchItem title="显示多页签" :matchValue="isTabs" @toggle-handle="toggleTabs" />
-      <SwitchItem
-        title="显示面包屑导航"
-        :disabled="navMode === 'horizontal'"
-        :matchValue="isBreadcrumb"
-        @toggle-handle="toggleBreadcrumb"
-      />
-      <SwitchItem title="显示刷新按钮" :matchValue="isRefresh" @toggle-handle="toggleRefresh" />
-      <SwitchItem title="显示页脚" :matchValue="showFooter" @toggle-handle="toggleShowFooter" />
+        <SwitchItem title="显示多页签" :matchValue="isTabs" @toggle-handle="toggleTabs" />
+        <SwitchItem
+          title="显示面包屑导航"
+          :disabled="navMode === 'horizontal'"
+          :matchValue="isBreadcrumb"
+          @toggle-handle="toggleBreadcrumb"
+        />
+        <SwitchItem title="显示刷新按钮" :matchValue="isRefresh" @toggle-handle="toggleRefresh" />
+        <SwitchItem title="显示页脚" :matchValue="showFooter" @toggle-handle="toggleShowFooter" />
 
-      <n-divider title-placement="center">动画</n-divider>
+        <n-divider title-placement="center">动画</n-divider>
 
-      <SwitchItem title="禁用动画" :matchValue="isPageAnimate" @toggle-handle="togglePageAnimate" />
+        <SwitchItem
+          title="禁用动画"
+          :matchValue="isPageAnimate"
+          @toggle-handle="togglePageAnimate"
+        />
 
-      <div class="project-drawer-setting-item">
-        <div class="project-drawer-setting-item-title">动画类型</div>
-        <div class="project-drawer-setting-item-select">
-          <n-select v-model:value="projectStore.pageAnimateType" :options="animateOptions" />
+        <div class="project-drawer-setting-item">
+          <div class="project-drawer-setting-item-title">动画类型</div>
+          <div class="project-drawer-setting-item-select">
+            <n-select v-model:value="projectStore.pageAnimateType" :options="animateOptions" />
+          </div>
         </div>
       </div>
-    </div>
-  </BasicDrawer>
+    </n-drawer-content>
+  </n-drawer>
 </template>
 <script lang="ts">
 import { defineComponent, toRefs, reactive } from "vue";
-import BasicDrawer from "@/components/Drawer/Drawer.vue";
 import {
   appThemeList,
   navStyles as navStyleOptons,
@@ -71,9 +76,21 @@ import NavItem from "./navItem.vue";
 import SwitchItem from "./switchItem.vue";
 export default defineComponent({
   name: "ProjectSetting",
-  components: { CheckOutlined, NavItem, SwitchItem, BasicDrawer },
-  setup() {
+  components: { CheckOutlined, NavItem, SwitchItem },
+  props: {
+    title: {
+      type: String,
+      default: "项目配置",
+    },
+    width: {
+      type: Number,
+      default: 305,
+    },
+  },
+  setup(props) {
     const state = reactive({
+      width: props.width,
+      title: props.title,
       isDrawer: false,
     });
     const projectStore = useAppProjectStore();
