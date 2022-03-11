@@ -73,25 +73,25 @@
       />
 
       <n-pagination
-        v-model:page="page"
-        v-model:page-size="pageSize"
-        :page-count="5"
+        v-model:page="pagParam.page"
+        v-model:page-size="pagParam.pageSize"
+        v-model:item-count="itemCount"
         show-size-picker
         show-quick-jumper
         class="mt-10px justify-end"
+        :on-update:page="handlePage"
+        :on-update:page-size="handlePageSize"
         :page-sizes="pageSizes"
       >
-        <template #prefix="{ itemCount }"> 共 {{ itemCount }} 项 </template></n-pagination
-      >
+        <template #prefix> 共 {{ itemCount }} 项 </template>
+      </n-pagination>
     </div>
-    <DiceDrawer ref="dictDrawerRef" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref } from "vue";
+import { defineComponent, ref, h, unref, reactive } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import DiceDrawer from "./dictDrawer.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
@@ -99,36 +99,24 @@ import {
   Reload,
 } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
+import { data } from "./data";
+import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "Dict",
-  components: { AddIcon, RemoveIcon, Reload, DiceDrawer },
+  components: { AddIcon, RemoveIcon, Reload },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
       name: "",
     });
-    const dictDrawerRef = ref();
     const loading = ref(false);
     const checkedRowKeysRef = ref<string[]>([]);
 
-    const pageSizes = [
-      {
-        label: "每页10条",
-        value: 10,
-      },
-      {
-        label: "每页20条",
-        value: 20,
-      },
-      {
-        label: "每页30条",
-        value: 30,
-      },
-      {
-        label: "每页50条",
-        value: 50,
-      },
-    ];
+    const pagParam = reactive({
+      page: 1,
+      pageSize: 10,
+    });
+    const itemCount = ref(100);
 
     const message = useMessage();
 
@@ -147,8 +135,6 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = dictDrawerRef.value;
-      openDrawer();
     }
 
     function handlePositiveClick(record: Recordable) {
@@ -160,6 +146,15 @@ export default defineComponent({
       setTimeout(() => {
         loading.value = false;
       }, 1000);
+    }
+
+    function handlePage(page: number) {
+      console.log(page);
+      pagParam.page = page;
+    }
+    function handlePageSize(pageSize: number) {
+      console.log(pageSize);
+      pagParam.pageSize = pageSize;
     }
 
     const columns = [
@@ -222,33 +217,19 @@ export default defineComponent({
     return {
       formRef,
       queryValue,
-      dictDrawerRef,
-      page: ref(1),
-      pageSize: ref(20),
+      checkedRowKeysRef,
+      pagParam,
+      itemCount,
       pageSizes,
       loading,
-      data: [
-        {
-          id: "123qerqwe",
-          name: "附件数据类型",
-          sort: 1,
-          code: "AFT0000",
-          status: 1,
-        },
-        {
-          id: "123qer2222qwe",
-          name: "附件数据类型",
-          sort: 1,
-          code: "AFT0000",
-          status: 1,
-        },
-      ],
+      data,
       columns,
       searchHandle,
       handleCheck,
       reset,
       reloadPage,
-      checkedRowKeysRef,
+      handlePage,
+      handlePageSize,
     };
   },
 });
