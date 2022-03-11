@@ -29,6 +29,16 @@ export const menuOptions: MenuOption[] = [
         label: '菜单管理',
         path: "/system/menus",
         key: 'protect-wild-animals'
+      },
+      {
+        label: '用户管理',
+        path: "/system/user",
+        key: 'protect-wild-animals-user'
+      },
+      {
+        label: '角色管理',
+        path: "/system/role",
+        key: 'protect-wild-role'
       }
     ]
   },
@@ -44,26 +54,26 @@ export const menuOptions: MenuOption[] = [
       }
     ]
   },
-  {
-    label: '异常页面',
-    key: 'bear-exception',
-    icon: renderIcon(ReaderOutIcon),
-    children: [
-      {
-        label: '403',
-        path: "/exception/403",
-        key: 'protect-wild-animals-403'
-      },
-      {
-        label: '404',
-        path: "/exception/404",
-        key: 'protect-wild-animals-404'
-      },
-      {
-        label: '500',
-        path: "/exception/500",
-        key: 'protect-wild-animals-500'
-      },
-    ]
-  }
+//   {
+//     label: '异常页面',
+//     key: 'bear-exception',
+//     icon: renderIcon(ReaderOutIcon),
+//     children: [
+//       {
+//         label: '403',
+//         path: "/exception/403",
+//         key: 'protect-wild-animals-403'
+//       },
+//       {
+//         label: '404',
+//         path: "/exception/404",
+//         key: 'protect-wild-animals-404'
+//       },
+//       {
+//         label: '500',
+//         path: "/exception/500",
+//         key: 'protect-wild-animals-500'
+//       },
+//     ]
+//   }
 ]

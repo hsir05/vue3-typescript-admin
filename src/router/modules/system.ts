@@ -32,20 +32,20 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/system/menu/menu.vue"),
       },
       {
-        path: "/system/dict2",
-         name: `system_dict1`,
+        path: "/system/user",
+         name: `system_user`,
         meta: {
-          title: "字典管理",
+          title: "用户管理",
         },
-        component: () => import("@/views/system/dict/dict.vue"),
+        component: () => import("@/views/system/user/user.vue"),
       },
       {
-        path: "/system/menu3",
-        name: "system_menu2",
+        path: "/system/role",
+        name: `system_role`,
         meta: {
-          title: "菜单管理",
+          title: "角色管理",
         },
-        component: () => import("@/views/system/menu/menu.vue"),
+        component: () => import("@/views/system/role/role.vue"),
       },
     ],
   },
