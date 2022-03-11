@@ -76,6 +76,8 @@
         <template #prefix> 共 {{ itemCount }} 项 </template>
       </n-pagination>
     </div>
+
+    <DictModal ref="dictModalRef" />
   </div>
 </template>
 <script lang="ts">
@@ -83,6 +85,7 @@ import { defineComponent, ref, h, unref, reactive } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Reload from "@/components/Reload/Reload.vue";
+import DictModal from "./dictModal.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
@@ -93,10 +96,11 @@ import { data } from "./data";
 import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "Dict",
-  components: { AddIcon, RemoveIcon, Reload },
+  components: { AddIcon, RemoveIcon, Reload, DictModal },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const loading = ref(false);
+    const dictModalRef = ref();
     const checkedRowKeysRef = ref<string[]>([]);
     const queryValue = ref({
       name: "",
@@ -123,6 +127,8 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
+      const { showModal } = dictModalRef.value;
+      showModal();
     }
 
     function handlePositiveClick(record: Recordable) {
@@ -204,6 +210,7 @@ export default defineComponent({
 
     return {
       formRef,
+      dictModalRef,
       queryValue,
       checkedRowKeysRef,
       pagParam,
