@@ -26,7 +26,7 @@ export const useAppTabsStore = defineStore({
       return this.tabsList;
     },
   },
-  actions: {
+  actions: { 
     initTabs(routes: RouteItem[]) {
       this.tabsList = routes;
     },

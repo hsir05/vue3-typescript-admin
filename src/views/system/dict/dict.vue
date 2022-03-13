@@ -35,9 +35,7 @@
           </n-button>
         </n-button-group>
 
-        <div class="">
-          <!--当前刷新-->
-          <Reload @reload-data="reloadPage" />
+        <div class="flex align-center">
           <!-- 提示 -->
           <Explain title="配置说明">
             <n-alert title="关于字典的说明" type="warning">
@@ -48,6 +46,9 @@
               新增词条时需要规定词条编码，词条编码统一使用两位[三位]大写字母加5位[4位]数字的格式（如：AT00001），编码一经规定不能修改，建议设计词条编码时一定慎重！
             </n-alert>
           </Explain>
+
+          <!--当前刷新-->
+          <Reload @reload-data="reloadPage" />
         </div>
       </div>
       <n-data-table

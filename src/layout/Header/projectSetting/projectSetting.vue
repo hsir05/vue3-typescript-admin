@@ -67,8 +67,11 @@ import {
 import { CheckOutlined } from "@vicons/antd";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { useAppProjectStore } from "@/store/modules/useProjectSettingStore";
+import { useAppTabsStore } from "@/store/modules/useTabsStore";
 import NavItem from "./navItem.vue";
 import SwitchItem from "./switchItem.vue";
+import { locStorage } from "@/utils/storage";
+import { MULTIPLE_TABS_KEY } from "@/config/config";
 export default defineComponent({
   name: "ProjectSetting",
   components: { CheckOutlined, NavItem, SwitchItem, BasicDrawer },
@@ -97,6 +100,10 @@ export default defineComponent({
       state.isDrawer = false;
     }
     function toggleTabs(bool: boolean) {
+      if (!bool) {
+        const tabsStore = useAppTabsStore();
+        locStorage.set(MULTIPLE_TABS_KEY, tabsStore.getTabsList);
+      }
       setProject({ isTabs: bool });
     }
     function toggleRefresh(bool: boolean) {
@@ -150,6 +157,10 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .project-drawer {
+  .n-divider:not(.n-divider--vertical) {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
   .theme-item {
     width: 20px;
     min-width: 20px;

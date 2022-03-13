@@ -1,5 +1,5 @@
 <template>
-  <n-dropdown :options="userOptions" @select="closeHandleSelect">
+  <n-dropdown :options="userOptions" :on-select="closeHandleSelect">
     <div class="header-user">
       <n-avatar round style="cursor: pointer" size="medium" src="">{{
         userStore.getUsername
@@ -16,7 +16,7 @@ import { useAppUserStore } from "@/store/modules/useUserStore";
 const router = useRouter();
 const userStore = useAppUserStore();
 
-const closeHandleSelect = async (key: any) => {
+const closeHandleSelect = async (key: string) => {
   if (key === "profile") {
     router.push({ path: "/setting/profile" });
   } else {

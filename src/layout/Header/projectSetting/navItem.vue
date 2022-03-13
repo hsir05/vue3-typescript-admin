@@ -45,3 +45,9 @@ const toggleNavStyle = (item: string) => {
   emit("toggleHandle", item);
 };
 </script>
+<style lang="scss" scoped>
+.n-divider:not(.n-divider--vertical) {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+</style>

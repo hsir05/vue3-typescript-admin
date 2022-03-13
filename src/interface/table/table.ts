@@ -7,7 +7,6 @@ export interface ActionItem  {
   icon?: string;
   popConfirm?: PopConfirm;
   disabled?: boolean; 
-  divider?: boolean;
   confirm?: boolean;
   auth: string[],
   ifShow?: boolean | ((action: ActionItem) => boolean);
@@ -20,4 +19,13 @@ export interface PopConfirm {
   onPositiveClick: Fn;
   onNegativeClick?: Fn;
   icon?: string;
+}
+
+export interface PaginationProps {
+  page?: number;
+  pageCount?: number;
+  pageSize?: number;
+  pageSizes?: number[];
+  showSizePicker?: boolean;
+  showQuickJumper?: boolean;
 }

@@ -6,6 +6,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Application: typeof import('./src/components/Application/Application.vue')['default']
     BaiduMap: typeof import('./src/components/Map/src/BaiduMap.vue')['default']
+    Density: typeof import('./src/components/Density/Density.vue')['default']
     Drawer: typeof import('./src/components/Drawer/Drawer.vue')['default']
     Explain: typeof import('./src/components/Explain/Explain.vue')['default']
     Map: typeof import('./src/components/Map/Map.vue')['default']
@@ -47,8 +48,9 @@ declare module 'vue' {
     NTooltip: typeof import('naive-ui')['NTooltip']
     Reload: typeof import('./src/components/Reload/Reload.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
+    Table: typeof import('./src/components/Table/Table.vue')['default']
+    'Table copy': typeof import('./src/components/Table/Table copy.vue')['default']
     TableActions: typeof import('./src/components/TableActions/TableActions.vue')['default']
-    TableTemplate: typeof import('./src/components/TableTemplate/TableTemplate.vue')['default']
   }
 }
 
