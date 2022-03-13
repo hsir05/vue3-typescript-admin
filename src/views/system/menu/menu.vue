@@ -26,6 +26,8 @@
       @reload-page="reloadPage"
       @on-checked-row="handleCheckRow"
     />
+
+    <MenuDrawer ref="menuDrawerRef" />
   </div>
 </template>
 <script lang="ts">
@@ -33,18 +35,20 @@ import { defineComponent, h, ref, unref } from "vue";
 import { useMessage } from "naive-ui";
 import BasicTable from "@/components/Table/Table.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import MenuDrawer from "./menuDrawer.vue";
 import { tableDataItem } from "./type";
 import { data } from "./data";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 export default defineComponent({
   name: "Menu",
-  components: { BasicTable },
+  components: { BasicTable, MenuDrawer },
   setup() {
     const loading = ref(false);
     const message = useMessage();
     const queryValue = ref({
       name: "",
     });
+    const menuDrawerRef = ref();
 
     const columns = [
       {
@@ -118,6 +122,8 @@ export default defineComponent({
     }
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
+      const { openDrawer } = menuDrawerRef.value;
+      openDrawer("编辑菜单");
     }
     function handlePositiveClick(record: Recordable) {
       message.info("点击了删除", record);
@@ -142,6 +148,7 @@ export default defineComponent({
       columns,
       data,
       queryValue,
+      menuDrawerRef,
 
       reloadPage,
       searchHandle,

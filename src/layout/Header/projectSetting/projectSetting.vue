@@ -57,7 +57,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, toRefs, reactive } from "vue";
-import BasicDrawer from "@/components/Drawer/Drawer.vue";
 import {
   appThemeList,
   navStyles as navStyleOptons,
@@ -74,7 +73,7 @@ import { locStorage } from "@/utils/storage";
 import { MULTIPLE_TABS_KEY } from "@/config/config";
 export default defineComponent({
   name: "ProjectSetting",
-  components: { CheckOutlined, NavItem, SwitchItem, BasicDrawer },
+  components: { CheckOutlined, NavItem, SwitchItem },
   setup() {
     const state = reactive({
       isDrawer: false,
