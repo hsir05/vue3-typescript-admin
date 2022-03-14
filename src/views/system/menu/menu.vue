@@ -32,7 +32,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, h, ref, unref } from "vue";
-import { useMessage } from "naive-ui";
+// import { useMessage } from "naive-ui";
 import BasicTable from "@/components/Table/Table.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import MenuDrawer from "./menuDrawer.vue";
@@ -44,7 +44,7 @@ export default defineComponent({
   components: { BasicTable, MenuDrawer },
   setup() {
     const loading = ref(false);
-    const message = useMessage();
+    // const message = useMessage();
     const queryValue = ref({
       name: "",
     });
@@ -80,15 +80,9 @@ export default defineComponent({
         align: "center",
       },
       {
-        title: "创建时间",
-        key: "create_time",
-        align: "center",
-      },
-      {
         title: "操作",
         key: "action",
         align: "center",
-        width: "230px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
@@ -126,7 +120,7 @@ export default defineComponent({
       openDrawer("编辑菜单");
     }
     function handlePositiveClick(record: Recordable) {
-      message.info("点击了删除", record);
+      //   message.info("点击了删除", record);
       console.log("点击了删除", record);
     }
     const searchHandle = (e: MouseEvent) => {

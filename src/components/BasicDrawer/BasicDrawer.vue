@@ -12,6 +12,7 @@
 </template>
 <script lang="ts" setup>
 import { toRefs, ref } from "vue";
+import type { Placement } from "naive-ui/lib/drawer/src/DrawerBodyWrapper";
 const props = defineProps({
   title: {
     type: String,
@@ -22,11 +23,12 @@ const props = defineProps({
     default: 305,
   },
   placement: {
-    type: String,
+    type: String as PropType<Placement>,
     defalut: "right",
   },
 });
 const isDrawer = ref(false);
+// 响应式的引用
 const { title, width, placement } = toRefs(props);
 
 // function openDrawer(){

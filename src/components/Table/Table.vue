@@ -64,11 +64,7 @@ import Reload from "@/components/Reload/Reload.vue";
 import Explain from "@/components/Explain/Explain.vue";
 import Density from "@/components/Density/Density.vue";
 import { useTable } from "@/hooks/web/useTable";
-import {
-  Add as AddIcon,
-  TrashOutline as RemoveIcon,
-  //   CreateOutline as CreateIcon,
-} from "@vicons/ionicons5";
+import { Add as AddIcon, TrashOutline as RemoveIcon } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
 import { basicProps } from "./props";

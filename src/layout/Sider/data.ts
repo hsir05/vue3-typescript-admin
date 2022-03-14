@@ -3,7 +3,6 @@ import {
   SpeedometerOutline as SpeedomeIcon,
   AlbumsOutline as AlbumIcon,
   SettingsOutline as SettingsIcon,
-  ReaderOutline as ReaderOutIcon
 } from '@vicons/ionicons5'
 import { renderIcon } from "@/utils/index"
 

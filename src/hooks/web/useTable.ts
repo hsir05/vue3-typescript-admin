@@ -1,4 +1,4 @@
-import { ref, toRaw, unref, reactive, computed, ComputedRef } from "vue";
+import { unref, reactive, computed } from "vue";
 import { PaginationProps } from "@/interface/table/table"
 
 export function useTable (){
@@ -8,9 +8,6 @@ export function useTable (){
      
     });
 
-    // const  showSizeizePicker = true
-    // const  showquickjumper = true
-
     const getPagination = computed(() => {
         return {
             ...unref(pagParam),
@@ -18,9 +15,11 @@ export function useTable (){
     })
 
     function setPagination(info: Partial<PaginationProps>){
-        console.log(unref(getPagination));
-        console.log(info);
-        console.log({...unref(getPagination), ...info});
+       
+        const { page, pageSize } = { ...unref(getPagination), ...info }
+
+        pagParam.page = page
+        pagParam.pageSize = pageSize
     }
 
     return {
