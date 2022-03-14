@@ -18,5 +18,17 @@ export const data = [
     component: '/system/system',
     code: "AFT0330S00",
     status: 1,
+    children: [
+        {
+            id: "11222233333",
+            name: "子典管理",
+            icon: '',
+            sort: 1,
+            auth: 'system_dict',
+            component: '/system/dict',
+            code: "AFT033022S00",
+            status: 1,
+        }
+    ]
   },
 ];

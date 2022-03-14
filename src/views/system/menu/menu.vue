@@ -24,10 +24,12 @@
       :columns="columns"
       :loading="loading"
       @reload-page="reloadPage"
+      @on-add="handleAdd"
+      @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
     />
 
-    <MenuDrawer ref="menuDrawerRef" />
+    <MenuDrawer ref="menuDrawerRef" :width="500" />
   </div>
 </template>
 <script lang="ts">
@@ -44,7 +46,6 @@ export default defineComponent({
   components: { BasicTable, MenuDrawer },
   setup() {
     const loading = ref(false);
-    // const message = useMessage();
     const queryValue = ref({
       name: "",
     });
@@ -119,6 +120,14 @@ export default defineComponent({
       const { openDrawer } = menuDrawerRef.value;
       openDrawer("编辑菜单");
     }
+    function handleBatch() {
+      console.log("点击了批量删除");
+    }
+    function handleAdd() {
+      console.log("点击了新增");
+      const { openDrawer } = menuDrawerRef.value;
+      openDrawer("新增菜单");
+    }
     function handlePositiveClick(record: Recordable) {
       //   message.info("点击了删除", record);
       console.log("点击了删除", record);
@@ -145,6 +154,8 @@ export default defineComponent({
       menuDrawerRef,
 
       reloadPage,
+      handleAdd,
+      handleBatch,
       searchHandle,
       reset,
       handleCheckRow,

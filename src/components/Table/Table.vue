@@ -3,12 +3,17 @@
     <!-- 顶部功能区 -->
     <div class="flex pb-10px">
       <n-button-group>
-        <n-button type="primary">
-          <template #icon>
+        <n-button type="primary" @click="handleAdd"
+          ><template #icon>
             <n-icon><AddIcon /></n-icon> </template
-          >添加
-        </n-button>
-        <n-button secondary :disabled="checkedRowKeysRef.length > 1 ? false : true" type="error">
+          >添加</n-button
+        >
+        <n-button
+          secondary
+          @click="handleBatch"
+          :disabled="checkedRowKeysRef.length > 0 ? false : true"
+          type="error"
+        >
           <template #icon>
             <n-icon><RemoveIcon /></n-icon>
           </template>
@@ -20,7 +25,7 @@
       <div class="flex align-center">
         <slot name="toolbarRight"></slot>
         <!-- 提示 -->
-        <Explain title="配置说明">配置说明</Explain>
+        <!-- <Explain title="配置说明">配置说明</Explain> -->
         <!--密度-->
         <Density :tableSize="tableSize" @handle-density="handleDensity" />
         <!--当前刷新-->
@@ -61,7 +66,7 @@
 <script lang="ts">
 import { defineComponent, ref, toRaw, unref, computed } from "vue";
 import Reload from "@/components/Reload/Reload.vue";
-import Explain from "@/components/Explain/Explain.vue";
+// import Explain from "@/components/Explain/Explain.vue";
 import Density from "@/components/Density/Density.vue";
 import { useTable } from "@/hooks/web/useTable";
 import { Add as AddIcon, TrashOutline as RemoveIcon } from "@vicons/ionicons5";
@@ -70,10 +75,11 @@ import { pageSizes } from "@/config/table";
 import { basicProps } from "./props";
 export default defineComponent({
   name: "Table",
-  components: { AddIcon, RemoveIcon, Reload, Explain, Density },
+  components: { AddIcon, RemoveIcon, Reload, Density },
   props: {
     ...basicProps,
   },
+  emits: ["on-add", "on-batch", "on-checked-row", "reload-page"],
   setup(props, { emit }) {
     const checkedRowKeysRef = ref<string[]>([]);
     const tableSize = ref("medium");
@@ -90,6 +96,13 @@ export default defineComponent({
     const getCount = computed(() => {
       return toRaw(unref(props).data).length;
     });
+    // 新增
+    function handleAdd() {
+      emit("on-add");
+    }
+    function handleBatch() {
+      emit("on-batch");
+    }
     // 表格多选
     function handleCheck(rowKeys: string[]) {
       checkedRowKeysRef.value = rowKeys;
@@ -124,6 +137,8 @@ export default defineComponent({
       item: 15,
       getRowKeyId: (row: tableDataItem) => row.id,
       handleCheck,
+      handleAdd,
+      handleBatch,
       reloadPage,
       handlePage,
       handlePageSize,
