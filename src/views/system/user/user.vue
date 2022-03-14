@@ -5,14 +5,29 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="80"
+      label-width="70"
       class="pt-15px pb-15px bg-white"
       :show-feedback="false"
       :model="queryValue"
     >
+      <n-form-item label="帐号" path="account">
+        <n-input v-model:value="queryValue.account" clearable placeholder="输入帐号" />
+      </n-form-item>
       <n-form-item label="用户名称" path="name">
         <n-input v-model:value="queryValue.name" clearable placeholder="输入用户名称" />
       </n-form-item>
+      <n-form-item label="电话号码" path="phone">
+        <n-input v-model:value="queryValue.phone" clearable placeholder="输入电话号码" />
+      </n-form-item>
+      <n-form-item label="状态" path="radioGroupValue">
+        <n-radio-group v-model:value="queryValue.status" style="width: 150px">
+          <n-radio value=""> 全部 </n-radio>
+          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">
+            {{ item.label }}
+          </n-radio>
+        </n-radio-group>
+      </n-form-item>
+
       <n-form-item>
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
@@ -37,7 +52,7 @@
 import { defineComponent, ref, h, unref } from "vue";
 import { tableDataItem } from "./type";
 import BasicTable from "@/components/Table/Table.vue";
-import { data } from "./data";
+import { data, statusOptions } from "./data";
 import { NTag } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
@@ -50,6 +65,9 @@ export default defineComponent({
     const userDrawerRef = ref();
     const queryValue = ref({
       name: "",
+      account: "",
+      phone: "",
+      status: "",
     });
 
     const columns = [
@@ -182,6 +200,7 @@ export default defineComponent({
       data,
       loading,
       userDrawerRef,
+      statusOptions,
       columns,
 
       reloadPage,
