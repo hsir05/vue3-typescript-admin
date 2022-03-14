@@ -1,14 +1,16 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title">
+  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
       :rules="rules"
+      size="large"
+      :disabled="disabled"
       label-placement="left"
       :style="{
         maxWidth: '400px',
       }"
       require-mark-placement="right-hanging"
-      label-width="90"
+      label-width="100"
       :model="form"
     >
       <n-form-item label="帐号" path="account">
@@ -23,6 +25,9 @@
       <n-form-item label="电话号码" path="phone">
         <n-input v-model:value="form.phone" clearable placeholder="输入电话号码" :maxlength="11" />
       </n-form-item>
+      <n-form-item label="邮箱" path="email">
+        <n-input v-model:value="form.email" clearable placeholder="输入邮箱" />
+      </n-form-item>
       <n-form-item label="状态" path="status">
         <n-radio-group v-model:value="form.status">
           <n-space>
@@ -32,15 +37,24 @@
           </n-space>
         </n-radio-group>
       </n-form-item>
-      <n-form-item>
-        <n-button attr-type="button" type="primary" @click="handleValidate">保存</n-button>
-        <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
-      </n-form-item>
+      <div class="text-center flex-center">
+        <n-button
+          attr-type="button"
+          :loading="loading"
+          size="large"
+          type="primary"
+          @click="handleValidate"
+          >保存</n-button
+        >
+        <n-button attr-type="button" type="warning" size="large" class="ml-10px" @click="reset"
+          >重置</n-button
+        >
+      </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
+import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, FormItemRule } from "naive-ui";
 import { statusOptions, sexOptions } from "./data";
 export default defineComponent({
@@ -48,19 +62,30 @@ export default defineComponent({
   setup() {
     const state = reactive({
       isDrawer: false,
+      loading: false,
+      disabled: false,
     });
     const title = ref("菜单");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
+
     function openDrawer(t: string) {
       title.value = t;
       state.isDrawer = true;
     }
+    const form = ref({
+      name: null,
+      account: null,
+      email: null,
+      sex: null,
+      phone: null,
+      status: 1,
+    });
 
     const rules = {
       account: { required: true, trigger: ["blur", "input"], message: "请输入帐号" },
       name: { required: true, trigger: ["blur", "input"], message: "请输入用户名称" },
-      sex: { required: true, trigger: ["blur", "change"], message: "请选择性别" },
+      sex: { required: true, type: "number", trigger: ["blur", "change"], message: "请选择性别" },
       phone: {
         required: true,
         trigger: ["input"],
@@ -70,12 +95,27 @@ export default defineComponent({
         },
         message: "请输入电话号码",
       },
+      email: {
+        required: true,
+        trigger: ["input"],
+        validator: (rule: FormItemRule, value: string) => {
+          console.log(rule);
+          return /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/.test(
+            value
+          );
+        },
+        message: "请输入正确的邮箱地址",
+      },
     };
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
+          state.loading = true;
+          state.disabled = true;
+          console.log(unref(form));
+
           message.success("验证成功");
         } else {
           console.log(errors);
@@ -84,7 +124,30 @@ export default defineComponent({
       });
     }
 
-    function reset() {}
+    function reset(e: MouseEvent) {
+      e.preventDefault();
+      form.value = {
+        name: null,
+        account: null,
+        email: null,
+        sex: null,
+        phone: null,
+        status: 1,
+      };
+      formRef.value?.restoreValidation();
+    }
+    function onCloseAfter() {
+      state.isDrawer = false;
+      form.value = {
+        name: null,
+        account: null,
+        email: null,
+        sex: null,
+        phone: null,
+        status: 1,
+      };
+      formRef.value?.restoreValidation();
+    }
 
     return {
       ...toRefs(state),
@@ -93,17 +156,11 @@ export default defineComponent({
       rules,
       statusOptions,
       sexOptions,
-      form: ref({
-        name: null,
-        account: null,
-        email: null,
-        sex: null,
-        phone: null,
-        status: 1,
-      }),
+      form,
       openDrawer,
       reset,
       handleValidate,
+      onCloseAfter,
     };
   },
 });

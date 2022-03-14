@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" title="项目配置">
+  <BasicDrawer v-model:show="isDrawer" title="项目配置" @on-close-after="closeDrawer">
     <div class="project-drawer">
       <NavItem
         title="导航栏模式"

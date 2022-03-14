@@ -53,6 +53,11 @@ a{
   justify-content: space-between;
   align-items: center;
 }
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 //  项目配置文件抽屉组件公共样式
 .project-drawer-setting-item {
   display: flex;

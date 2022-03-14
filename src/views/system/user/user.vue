@@ -20,7 +20,7 @@
         <n-input v-model:value="queryValue.phone" clearable placeholder="输入电话号码" />
       </n-form-item>
       <n-form-item label="状态" path="radioGroupValue">
-        <n-radio-group v-model:value="queryValue.status" style="width: 150px">
+        <n-radio-group v-model:value="queryValue.status" style="width: 200px">
           <n-radio value=""> 全部 </n-radio>
           <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">
             {{ item.label }}
