@@ -53,7 +53,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, nextTick, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
@@ -165,10 +165,10 @@ export default defineComponent({
       },
     ];
 
-    nextTick(() => {
-      const { page } = basicTableRef.value;
-      console.log(page);
-    });
+    // nextTick(() => {
+    //   const { page } = basicTableRef.value;
+    //   console.log(page);
+    // });
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
