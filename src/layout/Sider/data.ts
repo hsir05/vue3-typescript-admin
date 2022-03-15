@@ -3,6 +3,7 @@ import {
   SpeedometerOutline as SpeedomeIcon,
   AlbumsOutline as AlbumIcon,
   SettingsOutline as SettingsIcon,
+  EaselOutline,
 } from '@vicons/ionicons5'
 import { renderIcon } from "@/utils/index"
 
@@ -38,6 +39,33 @@ export const menuOptions: MenuOption[] = [
         label: '角色管理',
         path: "/system/role",
         key: 'protect-wild-role'
+      }
+    ]
+  },
+  {
+    label: '运营基础配置',
+    key: 'bear-operate',
+    icon: renderIcon(EaselOutline),
+    children: [
+      {
+        label: '车辆类型管理',
+        path: "/operate/vehicle-type",
+        key: 'operate-vehicle-type'
+      },
+      {
+        label: '开通城市管理',
+        path: "/operate/opening-urban",
+        key: 'operate-opening-urban'
+      },
+      {
+        label: '开通业务管理',
+        path: "/operate/opening-businsess",
+        key: 'operate-opening-businsess'
+      },
+      {
+        label: '开通区域管理',
+        path: "/operate/opening-area",
+        key: 'operate-opening-area'
       }
     ]
   },
