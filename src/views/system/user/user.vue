@@ -120,10 +120,10 @@ export default defineComponent({
           return h(
             NTag,
             {
-              type: row.sex === 1 ? "success" : "error",
+              type: row.status === 1 ? "success" : "error",
             },
             {
-              default: () => (row.sex === 1 ? "正常" : "锁定"),
+              default: () => (row.status === 1 ? "正常" : "锁定"),
             }
           );
         },
