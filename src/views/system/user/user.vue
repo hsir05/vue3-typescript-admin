@@ -49,7 +49,7 @@
       @on-pagination="handlepagSize"
     />
 
-    <UserDrawer ref="userDrawerRef" :width="500" />
+    <UserDrawer ref="userDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -213,6 +213,10 @@ export default defineComponent({
     function handlepagSize(pagination: PaginationProps) {
       console.log(toRaw(pagination));
     }
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+    }
 
     return {
       queryValue,
@@ -231,6 +235,7 @@ export default defineComponent({
       handleCheckRow,
       handlePage,
       handlepagSize,
+      handleSaveAfter,
     };
   },
 });

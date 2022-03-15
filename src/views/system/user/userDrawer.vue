@@ -63,7 +63,7 @@ import { statusOptions, sexOptions, rules } from "./data";
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "UserDrawer",
-  setup() {
+  setup(_, { emit }) {
     const state = reactive({
       isDrawer: false,
       loading: false,
@@ -99,6 +99,8 @@ export default defineComponent({
           state.disabled = true;
           console.log(unref(form));
 
+          handleSaveAfter();
+
           message.success("验证成功");
         } else {
           console.log(errors);
@@ -107,12 +109,18 @@ export default defineComponent({
       });
     }
 
+    function handleSaveAfter() {
+      emit("on-save-after");
+    }
+
     function handleReset() {
       form.value = { name: null, account: null, email: null, sex: null, phone: null, status: 1 };
       formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
       state.isDrawer = false;
+      state.loading = false;
+      state.disabled = false;
       handleReset();
     }
 

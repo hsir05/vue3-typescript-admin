@@ -7,5 +7,5 @@ export const basicProps = {
         type: Array as PropType<BasicColumn[]>,
         default: () => [],
         required: true,
-    },
+    }
 }
