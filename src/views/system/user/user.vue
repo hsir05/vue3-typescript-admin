@@ -19,12 +19,17 @@
       <n-form-item label="电话号码" path="phone">
         <n-input v-model:value="queryValue.phone" clearable placeholder="输入电话号码" />
       </n-form-item>
+
+      <!-- <n-form-item label="状态" path="status">
+                <n-select v-model:value="queryValue.status" placeholder="选择状态" :options="statusOptions" style="min-width: 120px;" />
+            </n-form-item>-->
+
       <n-form-item label="状态" path="radioGroupValue">
         <n-radio-group v-model:value="queryValue.status" style="width: 200px">
-          <n-radio value=""> 全部 </n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">
-            {{ item.label }}
-          </n-radio>
+          <n-radio value>全部</n-radio>
+          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+            item.label
+          }}</n-radio>
         </n-radio-group>
       </n-form-item>
 
@@ -130,6 +135,7 @@ export default defineComponent({
         title: "操作",
         key: "action",
         align: "center",
+        width: "200px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
@@ -145,7 +151,6 @@ export default defineComponent({
                 type: "error",
                 icon: RemoveIcon,
                 secondary: true,
-
                 auth: ["dict002"],
                 popConfirm: {
                   onPositiveClick: handlePositiveClick.bind(null, record),
@@ -165,7 +170,7 @@ export default defineComponent({
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = userDrawerRef.value;
-      openDrawer("编辑用户");
+      openDrawer("编辑用户", record);
     }
     function handleBatch() {
       console.log("点击了批量删除");

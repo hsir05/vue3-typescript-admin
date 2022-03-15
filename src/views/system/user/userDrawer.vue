@@ -6,9 +6,7 @@
       size="large"
       :disabled="disabled"
       label-placement="left"
-      :style="{
-        maxWidth: '400px',
-      }"
+      :style="{ maxWidth: '400px' }"
       require-mark-placement="right-hanging"
       label-width="100"
       :model="form"
@@ -46,7 +44,12 @@
           @click="handleValidate"
           >保存</n-button
         >
-        <n-button attr-type="button" type="warning" size="large" class="ml-10px" @click="reset"
+        <n-button
+          attr-type="button"
+          type="warning"
+          size="large"
+          class="ml-10px"
+          @click="handleReset"
           >重置</n-button
         >
       </div>
@@ -55,8 +58,9 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage, FormItemRule } from "naive-ui";
-import { statusOptions, sexOptions } from "./data";
+import { FormInst, useMessage } from "naive-ui";
+import { statusOptions, sexOptions, rules } from "./data";
+import { tableDataItem } from "./type";
 export default defineComponent({
   name: "UserDrawer",
   setup() {
@@ -68,45 +72,24 @@ export default defineComponent({
     const title = ref("菜单");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-
-    function openDrawer(t: string) {
-      title.value = t;
-      state.isDrawer = true;
-    }
-    const form = ref({
+    const form = ref<tableDataItem>({
       name: null,
       account: null,
       email: null,
       sex: null,
       phone: null,
+      id: null,
       status: 1,
     });
 
-    const rules = {
-      account: { required: true, trigger: ["blur", "input"], message: "请输入帐号" },
-      name: { required: true, trigger: ["blur", "input"], message: "请输入用户名称" },
-      sex: { required: true, type: "number", trigger: ["blur", "change"], message: "请选择性别" },
-      phone: {
-        required: true,
-        trigger: ["input"],
-        validator: (rule: FormItemRule, value: string) => {
-          console.log(rule);
-          return /^1\d{10}$/.test(value);
-        },
-        message: "请输入电话号码",
-      },
-      email: {
-        required: true,
-        trigger: ["input"],
-        validator: (rule: FormItemRule, value: string) => {
-          console.log(rule);
-          return /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/.test(
-            value
-          );
-        },
-        message: "请输入正确的邮箱地址",
-      },
-    };
+    function openDrawer(t: string, record?: tableDataItem) {
+      console.log(record);
+      if (record) {
+        form.value = { ...form.value, ...record };
+      }
+      title.value = t;
+      state.isDrawer = true;
+    }
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
@@ -124,29 +107,13 @@ export default defineComponent({
       });
     }
 
-    function reset(e: MouseEvent) {
-      e.preventDefault();
-      form.value = {
-        name: null,
-        account: null,
-        email: null,
-        sex: null,
-        phone: null,
-        status: 1,
-      };
+    function handleReset() {
+      form.value = { name: null, account: null, email: null, sex: null, phone: null, status: 1 };
       formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
       state.isDrawer = false;
-      form.value = {
-        name: null,
-        account: null,
-        email: null,
-        sex: null,
-        phone: null,
-        status: 1,
-      };
-      formRef.value?.restoreValidation();
+      handleReset();
     }
 
     return {
@@ -158,7 +125,7 @@ export default defineComponent({
       sexOptions,
       form,
       openDrawer,
-      reset,
+      handleReset,
       handleValidate,
       onCloseAfter,
     };

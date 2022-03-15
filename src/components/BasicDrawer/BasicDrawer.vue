@@ -2,6 +2,7 @@
   <n-drawer
     v-model:show="isDrawer"
     :width="width"
+    :auto-focus="false"
     :placement="placement"
     :on-mask-click="onMaskClick"
     :on-update:show="handleCloseAfter"

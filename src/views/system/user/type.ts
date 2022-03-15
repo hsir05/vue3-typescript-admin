@@ -1,11 +1,11 @@
 
 export interface tableDataItem {
-  id: string;
-  name: string;
-  account: string;
-  phone: string;
-  code: string;
-  sex: number;
-  create_time: string;
-  status: number;
+  id?: string | null;
+  name: string | null;
+  account: string | null;
+  phone: string | null;
+  sex: number | null;
+  create_time?: string | null;
+  email: string | null;
+  status: number | null;
 }
