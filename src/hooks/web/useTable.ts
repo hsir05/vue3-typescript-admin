@@ -1,29 +1,39 @@
-import { unref, reactive, computed } from "vue";
+import { unref, toRefs,reactive, ref, toRef, toRaw, computed } from "vue";
 import { PaginationProps } from "@/interface/table/table"
 
-export function useTable (){
-    const pagParam = reactive({
-      page: 1,
-      pageSize: 10,
-     
-    });
+const pagination = {
+    page: 1,
+    pageSize: 10,
+}
 
-    const getPagination = computed(() => {
+export function useTable (){
+    const configRef = ref<PaginationProps>({});
+
+    const getPaginationCon = computed(() => {
         return {
-            ...unref(pagParam),
+            page: pagination.page,
+            pageSize: pagination.pageSize
         }
     })
 
-    function setPagination(info: Partial<PaginationProps>){
-       
-        const { page, pageSize } = { ...unref(getPagination), ...info }
-
-        pagParam.page = page
-        pagParam.pageSize = pageSize
+    const getPagination = computed(() => {
+        console.log({...unref(getPaginationCon), ...toRaw(unref(configRef))});
+        
+        return {...unref(getPaginationCon), ...toRaw(unref(configRef))}
+    })
+    
+    function setPagination(info: Partial<PaginationProps>): Promise<void>{
+       return Promise.resolve().then(() => {
+            configRef.value = {
+                ...unref(getPaginationCon),
+                ...info
+            }
+       })
     }
 
     return {
         getPagination,
+        getPaginationCon,
         setPagination
     }
 }

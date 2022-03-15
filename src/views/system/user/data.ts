@@ -35,27 +35,27 @@ export const sexOptions = [
 ];
 
 export const rules = {
-      account: { required: true, trigger: ["blur", "input"], message: "请输入帐号" },
-      name: { required: true, trigger: ["blur", "input"], message: "请输入用户名称" },
-      sex: { required: true, type: "number", trigger: ["blur", "change"], message: "请选择性别" },
-      phone: {
-        required: true,
-        trigger: ["input"],
-        validator: (rule: FormItemRule, value: string) => {
-          console.log(rule);
-          return /^1\d{10}$/.test(value);
-        },
-        message: "请输入电话号码",
-      },
-      email: {
-        required: true,
-        trigger: ["input"],
-        validator: (rule: FormItemRule, value: string) => {
-          console.log(rule);
-          return /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/.test(
-            value
-          );
-        },
-        message: "请输入正确的邮箱地址",
-      },
-    };
+  account: { required: true, trigger: ["blur", "input"], message: "请输入帐号" },
+  name: { required: true, trigger: ["blur", "input"], message: "请输入用户名称" },
+  sex: { required: true, type: "number", trigger: ["blur", "change"], message: "请选择性别" },
+  phone: {
+    required: true,
+    trigger: ["input"],
+    validator: (rule: FormItemRule, value: string) => {
+      console.log(rule);
+      return /^1\d{10}$/.test(value);
+    },
+    message: "请输入电话号码",
+  },
+  email: {
+    required: true,
+    trigger: ["input"],
+    validator: (rule: FormItemRule, value: string) => {
+      console.log(rule);
+      return /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/.test(
+        value
+      );
+    },
+    message: "请输入正确的邮箱地址",
+  },
+};

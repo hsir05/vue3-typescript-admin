@@ -48,8 +48,8 @@
     />
     <!-- 分页 -->
     <n-pagination
-      v-model:page="getPagination.page"
-      v-model:page-size="getPagination.pageSize"
+      v-model:page="page"
+      v-model:page-size="pageSize"
       v-model:item-count="item"
       :page-slot="5"
       :show-size-picker="true"
@@ -64,11 +64,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, toRaw, unref, computed } from "vue";
+import { defineComponent, ref, toRaw, unref, computed, reactive, toRefs } from "vue";
 import Reload from "@/components/Reload/Reload.vue";
-// import Explain from "@/components/Explain/Explain.vue";
 import Density from "@/components/Density/Density.vue";
-import { useTable } from "@/hooks/web/useTable";
 import { Add as AddIcon, TrashOutline as RemoveIcon } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
@@ -79,12 +77,15 @@ export default defineComponent({
   props: {
     ...basicProps,
   },
-  emits: ["on-add", "on-batch", "on-checked-row", "reload-page"],
+  emits: ["on-add", "on-batch", "on-checked-row", "reload-page", "on-page", "on-pagSize"],
   setup(props, { emit }) {
     const checkedRowKeysRef = ref<string[]>([]);
     const tableSize = ref("medium");
 
-    const { getPagination, setPagination } = useTable();
+    const pagination = reactive({
+      page: 1,
+      pageSize: 10,
+    });
 
     const getBindValues = computed(() => {
       return {
@@ -118,18 +119,18 @@ export default defineComponent({
     }
     // 分页
     function handlePage(page: number) {
-      console.log(page);
-      setPagination({ page });
+      pagination.page = page;
+      emit("on-page", unref(pagination));
     }
     // 每页显示
     function handlePageSize(pageSize: number) {
-      console.log(pageSize);
-      setPagination({ pageSize });
+      pagination.pageSize = pageSize;
+      emit("on-pagSize", unref(pagination));
     }
 
     return {
       checkedRowKeysRef,
-      getPagination,
+      ...toRefs(pagination),
       getCount,
       pageSizes,
       tableSize,

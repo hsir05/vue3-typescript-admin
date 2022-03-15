@@ -23,9 +23,9 @@ export interface PopConfirm {
 
 export interface PaginationProps {
   page?: number;
-  pageCount?: number;
+//   pageCount?: number;
   pageSize?: number;
-  pageSizes?: number[];
-  showSizePicker?: boolean;
-  showQuickJumper?: boolean;
+//   pageSizes?: number[];
+//   showSizePicker?: boolean;
+//   showQuickJumper?: boolean;
 }

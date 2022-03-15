@@ -20,10 +20,6 @@
         <n-input v-model:value="queryValue.phone" clearable placeholder="输入电话号码" />
       </n-form-item>
 
-      <!-- <n-form-item label="状态" path="status">
-                <n-select v-model:value="queryValue.status" placeholder="选择状态" :options="statusOptions" style="min-width: 120px;" />
-            </n-form-item>-->
-
       <n-form-item label="状态" path="radioGroupValue">
         <n-radio-group v-model:value="queryValue.status" style="width: 200px">
           <n-radio value>全部</n-radio>
@@ -42,32 +38,38 @@
     <!-- 表格 -->
     <BasicTable
       :data="data"
+      ref="basicTableRef"
       :columns="columns"
       :loading="loading"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
+      @on-page="handlePage"
+      @on-pagination="handlepagSize"
     />
 
     <UserDrawer ref="userDrawerRef" :width="500" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref } from "vue";
-import { tableDataItem } from "./type";
-import BasicTable from "@/components/Table/Table.vue";
-import { data, statusOptions } from "./data";
-import { NTag } from "naive-ui";
-import UserDrawer from "./userDrawer.vue";
+import { defineComponent, ref, h, nextTick, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import BasicTable from "@/components/Table/Table.vue";
+import { NTag } from "naive-ui";
+import UserDrawer from "./userDrawer.vue";
+import { tableDataItem } from "./type";
+import { PaginationProps } from "@/interface/table/table";
+import { data, statusOptions } from "./data";
+
 export default defineComponent({
   name: "User",
   components: { BasicTable, UserDrawer },
   setup() {
     const loading = ref(false);
     const userDrawerRef = ref();
+    const basicTableRef = ref();
     const queryValue = ref({
       name: "",
       account: "",
@@ -153,7 +155,7 @@ export default defineComponent({
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
-                  onPositiveClick: handlePositiveClick.bind(null, record),
+                  onPositiveClick: handleRemove.bind(null, record),
                   title: "您确定删除?",
                 },
               },
@@ -162,6 +164,11 @@ export default defineComponent({
         },
       },
     ];
+
+    nextTick(() => {
+      const { page } = basicTableRef.value;
+      console.log(page);
+    });
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
@@ -180,7 +187,7 @@ export default defineComponent({
       const { openDrawer } = userDrawerRef.value;
       openDrawer("新增用户");
     }
-    function handlePositiveClick(record: Recordable) {
+    function handleRemove(record: Recordable) {
       //   message.info("点击了删除", record);
       console.log("点击了删除", record);
     }
@@ -190,7 +197,7 @@ export default defineComponent({
       console.log(queryValue.value);
     };
     const reset = () => {
-      unref(queryValue).name = "";
+      queryValue.value = { name: "", account: "", phone: "", status: "" };
     };
 
     function reloadPage() {
@@ -200,11 +207,19 @@ export default defineComponent({
       }, 1000);
     }
 
+    function handlePage(pagination: PaginationProps) {
+      console.log(toRaw(pagination));
+    }
+    function handlepagSize(pagination: PaginationProps) {
+      console.log(toRaw(pagination));
+    }
+
     return {
       queryValue,
       data,
       loading,
       userDrawerRef,
+      basicTableRef,
       statusOptions,
       columns,
 
@@ -214,6 +229,8 @@ export default defineComponent({
       searchHandle,
       reset,
       handleCheckRow,
+      handlePage,
+      handlepagSize,
     };
   },
 });
