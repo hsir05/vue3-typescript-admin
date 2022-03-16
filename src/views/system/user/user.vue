@@ -241,13 +241,11 @@ export default defineComponent({
     };
     const reset = () => {
       queryValue.value = { name: "", account: "", phone: "", status: null };
+      getData({ page: 1, pageSize: 10 });
     };
 
     function reloadPage() {
-      loading.value = true;
-      setTimeout(() => {
-        loading.value = false;
-      }, 1000);
+      getData({ page: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {

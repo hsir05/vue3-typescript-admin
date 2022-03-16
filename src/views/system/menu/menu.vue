@@ -29,7 +29,7 @@
       @on-checked-row="handleCheckRow"
     />
 
-    <MenuDrawer ref="menuDrawerRef" :width="500" />
+    <MenuDrawer ref="menuDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -154,6 +154,11 @@ export default defineComponent({
       }, 1000);
     }
 
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+    }
+
     return {
       loading,
       columns,
@@ -167,6 +172,7 @@ export default defineComponent({
       searchHandle,
       reset,
       handleCheckRow,
+      handleSaveAfter,
     };
   },
 });
