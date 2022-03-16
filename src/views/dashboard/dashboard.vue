@@ -4,21 +4,20 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
-// import { getCaptcha } from "@/api/system/dict";
+import { defineComponent, onMounted } from "vue";
+import { getMenus } from "@/api/system/menus";
 export default defineComponent({
   name: "Dashboard",
   components: {},
   setup() {
-    // const getData = async () => {
-    //   try {
-    //     let res = await getCaptcha();
-    //     console.log(res);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // };
-    // getData();
+    onMounted(async () => {
+      try {
+        let res = await getMenus();
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    });
     return {};
   },
 });
