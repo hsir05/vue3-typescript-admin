@@ -22,12 +22,17 @@
     <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
       <div class="flex pb-10px">
         <n-button-group>
-          <n-button type="primary">
+          <n-button type="primary" @click="handleAdd">
             <template #icon>
               <n-icon><AddIcon /></n-icon> </template
             >添加
           </n-button>
-          <n-button secondary :disabled="checkedRowKeysRef.length > 1 ? false : true" type="error">
+          <n-button
+            secondary
+            :disabled="checkedRowKeysRef.length > 1 ? false : true"
+            @click="handleBatch"
+            type="error"
+          >
             <template #icon>
               <n-icon><RemoveIcon /></n-icon>
             </template>
@@ -56,8 +61,8 @@
       />
 
       <n-pagination
-        v-model:page="pageination.page"
-        v-model:page-size="pageination.pageSize"
+        v-model:page="pagination.page"
+        v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
         show-size-picker
@@ -75,7 +80,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, reactive } from "vue";
+import { defineComponent, ref, h, unref, reactive, toRaw, onMounted } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Reload from "@/components/Reload/Reload.vue";
@@ -88,8 +93,11 @@ import {
   AddOutline as Add,
 } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
-import { data } from "./data";
+// import { data } from "./data";
 import { pageSizes } from "@/config/table";
+import { getDict } from "@/api/system/dict";
+import { PaginationState } from "@/api/type";
+
 export default defineComponent({
   name: "Dict",
   components: { AddIcon, RemoveIcon, Reload, DictModal },
@@ -101,19 +109,37 @@ export default defineComponent({
     const queryValue = ref({
       name: "",
     });
-    const pageination = reactive({
+    const pagination = reactive({
       page: 1,
       pageSize: 10,
     });
-    const itemCount = ref(100);
+    const itemCount = ref(null);
+    const data = ref<tableDataItem[]>([]);
     const message = useMessage();
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
+      getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
       unref(queryValue).name = "";
+      getData({ page: 1, pageSize: 10 });
+    };
+
+    onMounted(() => {
+      getData({ page: 1, pageSize: 10 });
+    });
+
+    const getData = async (pagination: PaginationState) => {
+      loading.value = true;
+      try {
+        let res = await getDict({ ...pagination, ...queryValue.value });
+        data.value = res.data;
+        itemCount.value = res.itemCount;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+      }
     };
 
     function handleCheck(rowKeys: string[]) {
@@ -121,10 +147,19 @@ export default defineComponent({
       checkedRowKeysRef.value = rowKeys;
     }
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleBatch() {
+      console.log("点击了批量删除");
+    }
+
+    function handleAdd() {
+      console.log("点击了新增");
       const { showModal } = dictModalRef.value;
-      showModal();
+      showModal("新增用户");
+    }
+
+    function handleEdit(record: Recordable) {
+      const { showModal } = dictModalRef.value;
+      showModal("编辑字典", record);
     }
 
     function handlePositiveClick(record: Recordable) {
@@ -140,11 +175,13 @@ export default defineComponent({
 
     function handlePage(page: number) {
       console.log(page);
-      pageination.page = page;
+      pagination.page = page;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
       console.log(pageSize);
-      pageination.pageSize = pageSize;
+      pagination.pageSize = pageSize;
+      getData(toRaw(pagination));
     }
 
     const columns = [
@@ -222,7 +259,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ page: 1, pageSize: 10 });
     }
 
     return {
@@ -230,7 +267,7 @@ export default defineComponent({
       dictModalRef,
       queryValue,
       checkedRowKeysRef,
-      pageination,
+      pagination,
       itemCount,
       pageSizes,
       loading,
@@ -243,7 +280,9 @@ export default defineComponent({
       reloadPage,
       handlePage,
       handlePageSize,
+      handleAdd,
       handleSaveAfter,
+      handleBatch,
     };
   },
 });

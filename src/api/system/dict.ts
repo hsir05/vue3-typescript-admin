@@ -1,9 +1,10 @@
 import { http } from '@/utils/http';
+import { getDictState } from "../type"
 
-//获取验证码
-export function getCaptcha() {
+export function getDict(data: getDictState) {
   return http.request({
-    url: '/getDict',
+    url: '/dict',
     method: 'post',
+    data
   });
 }

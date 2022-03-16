@@ -50,7 +50,7 @@
     <n-pagination
       v-model:page="page"
       v-model:page-size="pageSize"
-      v-model:item-count="item"
+      v-model:item-count="getItemCount"
       :page-slot="5"
       :show-size-picker="true"
       :show-quick-jumper="true"
@@ -59,7 +59,7 @@
       :on-update:page-size="handlePageSize"
       :page-sizes="pageSizes"
     >
-      <template #prefix> 共 {{ getCount }} 项 </template>
+      <template #prefix> 共 {{ getItemCount }} 项 </template>
     </n-pagination>
   </div>
 </template>
@@ -96,8 +96,8 @@ export default defineComponent({
         data: toRaw(unref(props).data),
       };
     });
-    const getCount = computed(() => {
-      return toRaw(unref(props).data).length;
+    const getItemCount = computed(() => {
+      return toRaw(unref(props).itemCount);
     });
     // 新增
     function handleAdd() {
@@ -130,10 +130,15 @@ export default defineComponent({
       emit("on-pagSize", unref(pagination));
     }
 
+    function resetPagination() {
+      pagination.page = 1;
+      pagination.pageSize = 10;
+    }
+
     return {
       checkedRowKeysRef,
       ...toRefs(pagination),
-      getCount,
+      getItemCount,
       pageSizes,
       tableSize,
       getBindValues,
@@ -147,6 +152,7 @@ export default defineComponent({
       handlePage,
       handlePageSize,
       handleDensity,
+      resetPagination,
     };
   },
 });

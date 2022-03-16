@@ -56,6 +56,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-batch="handleBatch"
@@ -85,6 +86,7 @@ export default defineComponent({
     const loading = ref(true);
     const userDrawerRef = ref();
     const basicTableRef = ref();
+    const itemCount = ref(null);
     const queryValue = ref({
       name: "",
       account: "",
@@ -103,6 +105,7 @@ export default defineComponent({
         title: "序号",
         key: "index",
         align: "center",
+        width: 70,
         render(_: tableDataItem, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
@@ -200,6 +203,7 @@ export default defineComponent({
       try {
         let res = await getUsers({ ...pagination, ...queryValue.value });
         data.value = res.data;
+        itemCount.value = res.itemCount;
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -237,14 +241,20 @@ export default defineComponent({
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       console.log(queryValue.value);
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
       getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = { name: "", account: "", phone: "", status: null };
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
       getData({ page: 1, pageSize: 10 });
     };
 
     function reloadPage() {
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
       getData({ page: 1, pageSize: 10 });
     }
 
@@ -270,6 +280,7 @@ export default defineComponent({
       basicTableRef,
       statusOptions,
       columns,
+      itemCount,
 
       reloadPage,
       handleAdd,

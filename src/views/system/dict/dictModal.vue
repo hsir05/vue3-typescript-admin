@@ -62,10 +62,6 @@ export default defineComponent({
   name: "DictTem",
   components: { CloseOutIcon },
   props: {
-    title: {
-      type: String,
-      default: "编辑",
-    },
     width: {
       type: String,
       default: "600px",
@@ -85,17 +81,22 @@ export default defineComponent({
       name: null,
       code: null,
       sort: null,
-      isChild: 0,
+      isChild: 1,
     });
     const formRef = ref<FormInst | null>(null);
     const message = useMessage();
+    const title = ref("字典");
 
-    const showModal = () => {
+    const showModal = (t: string, record?: tableDataItem) => {
+      if (record) {
+        form.value = { ...form.value, ...record };
+      }
+      title.value = t;
       state.isModal = true;
     };
 
     function handleReset() {
-      form.value = { name: null, code: null, sort: null, isChild: null };
+      form.value = { name: null, code: null, sort: null, isChild: 1 };
       formRef.value?.restoreValidation();
       state.isModal = false;
     }
@@ -120,6 +121,8 @@ export default defineComponent({
       ...toRefs(state),
       rules,
       form,
+      title,
+      formRef,
       showModal,
       handleReset,
       handleValidate,
