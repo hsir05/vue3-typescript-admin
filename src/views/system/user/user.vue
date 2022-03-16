@@ -11,17 +11,32 @@
       :model="queryValue"
     >
       <n-form-item label="帐号" path="account">
-        <n-input v-model:value="queryValue.account" clearable placeholder="输入帐号" />
+        <n-input
+          v-model:value="queryValue.account"
+          clearable
+          placeholder="输入帐号"
+          style="width: 150px"
+        />
       </n-form-item>
       <n-form-item label="用户名称" path="name">
-        <n-input v-model:value="queryValue.name" clearable placeholder="输入用户名称" />
+        <n-input
+          v-model:value="queryValue.name"
+          clearable
+          placeholder="输入用户名称"
+          style="width: 150px"
+        />
       </n-form-item>
       <n-form-item label="电话号码" path="phone">
-        <n-input v-model:value="queryValue.phone" clearable placeholder="输入电话号码" />
+        <n-input
+          v-model:value="queryValue.phone"
+          clearable
+          placeholder="输入电话号码"
+          style="width: 150px"
+        />
       </n-form-item>
 
       <n-form-item label="状态" path="radioGroupValue">
-        <n-radio-group v-model:value="queryValue.status" style="width: 200px">
+        <n-radio-group v-model:value="queryValue.status">
           <n-radio value>全部</n-radio>
           <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
             item.label
@@ -53,7 +68,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
@@ -61,13 +76,13 @@ import { NTag } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
 import { tableDataItem } from "./type";
 import { PaginationProps } from "@/interface/table/table";
-import { data, statusOptions } from "./data";
-
+import { statusOptions } from "./data";
+import { getUsers } from "@/api/system/user";
 export default defineComponent({
   name: "User",
   components: { BasicTable, UserDrawer },
   setup() {
-    const loading = ref(false);
+    const loading = ref(true);
     const userDrawerRef = ref();
     const basicTableRef = ref();
     const queryValue = ref({
@@ -76,6 +91,8 @@ export default defineComponent({
       phone: "",
       status: "",
     });
+
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -164,6 +181,17 @@ export default defineComponent({
         },
       },
     ];
+
+    onMounted(async () => {
+      try {
+        let res = await getUsers();
+        data.value = res.data;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    });
 
     // nextTick(() => {
     //   const { page } = basicTableRef.value;

@@ -38,13 +38,13 @@ const transform: AxiosTransform = {
     const {
       isShowMessage = true,
       isShowErrorMessage,
-      isShowSuccessMessage,
+      isShowSuccessMessage, 
       successMessageText,
       errorMessageText,
       isTransformResponse,
       isReturnNativeResponse,
     } = options;
-
+   
     // 是否返回原生响应头 比如：需要获取响应头时使用该属性
     if (isReturnNativeResponse) {
       return res;
@@ -65,6 +65,7 @@ const transform: AxiosTransform = {
     const { code, result, message } = data;
     // 请求成功
     const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS;
+
     // 是否显示提示信息
     if (isShowMessage) {
       if (hasSuccess && (successMessageText || isShowSuccessMessage)) {
@@ -120,6 +121,7 @@ const transform: AxiosTransform = {
         });
         break;
     }
+   
     throw new Error(errorMsg);
   },
 
