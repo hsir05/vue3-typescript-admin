@@ -36,17 +36,6 @@
         </n-button-group>
 
         <div class="flex align-center">
-          <!-- 提示 -->
-          <Explain title="配置说明">
-            <n-alert title="关于字典的说明" type="warning">
-              字典统一管理本系统中的枚举值，即字典中的词条，词条的名称用来在用户交互界面显示，词条编码为数据库中实际的保存值，参与业务。
-              关于新增词条的说明
-            </n-alert>
-            <n-alert title="关于新增词条的说明" type="warning">
-              新增词条时需要规定词条编码，词条编码统一使用两位[三位]大写字母加5位[4位]数字的格式（如：AT00001），编码一经规定不能修改，建议设计词条编码时一定慎重！
-            </n-alert>
-          </Explain>
-
           <!--当前刷新-->
           <Reload @reload-data="reloadPage" />
         </div>
@@ -67,8 +56,8 @@
       />
 
       <n-pagination
-        v-model:page="pagParam.page"
-        v-model:page-size="pagParam.pageSize"
+        v-model:page="pageination.page"
+        v-model:page-size="pageination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
         show-size-picker
@@ -82,7 +71,7 @@
       </n-pagination>
     </div>
 
-    <DictModal ref="dictModalRef" />
+    <DictModal ref="dictModalRef" width="700px" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -91,18 +80,19 @@ import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Reload from "@/components/Reload/Reload.vue";
 import DictModal from "./dictModal.vue";
-import Explain from "@/components/Explain/Explain.vue";
+// import Explain from "@/components/Explain/Explain.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
   CreateOutline as CreateIcon,
+  AddOutline as Add,
 } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
 import { data } from "./data";
 import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "Dict",
-  components: { AddIcon, RemoveIcon, Reload, DictModal, Explain },
+  components: { AddIcon, RemoveIcon, Reload, DictModal },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const loading = ref(false);
@@ -111,7 +101,7 @@ export default defineComponent({
     const queryValue = ref({
       name: "",
     });
-    const pagParam = reactive({
+    const pageination = reactive({
       page: 1,
       pageSize: 10,
     });
@@ -150,16 +140,24 @@ export default defineComponent({
 
     function handlePage(page: number) {
       console.log(page);
-      pagParam.page = page;
+      pageination.page = page;
     }
     function handlePageSize(pageSize: number) {
       console.log(pageSize);
-      pagParam.pageSize = pageSize;
+      pageination.pageSize = pageSize;
     }
 
     const columns = [
       {
         type: "selection",
+      },
+      {
+        title: "序号",
+        key: "index",
+        align: "center",
+        render(_: tableDataItem, rowIndex: number) {
+          return h("span", `${rowIndex + 1}`);
+        },
       },
       {
         title: "字典名称",
@@ -185,7 +183,7 @@ export default defineComponent({
         title: "操作",
         key: "actions",
         align: "center",
-        width: "230px",
+        width: "330px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
@@ -193,6 +191,13 @@ export default defineComponent({
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
+                onClick: handleEdit.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "添加子词条",
+                type: "primary",
+                icon: Add,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
@@ -214,12 +219,18 @@ export default defineComponent({
       },
     ];
 
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+      //   getData({ page: 1, pageSize: 10 });
+    }
+
     return {
       formRef,
       dictModalRef,
       queryValue,
       checkedRowKeysRef,
-      pagParam,
+      pageination,
       itemCount,
       pageSizes,
       loading,
@@ -232,6 +243,7 @@ export default defineComponent({
       reloadPage,
       handlePage,
       handlePageSize,
+      handleSaveAfter,
     };
   },
 });
