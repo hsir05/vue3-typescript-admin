@@ -75,9 +75,9 @@ import BasicTable from "@/components/Table/Table.vue";
 import { NTag } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
 import { tableDataItem } from "./type";
-import { PaginationProps } from "@/interface/table/table";
 import { statusOptions } from "./data";
 import { getUsers } from "@/api/system/user";
+import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "User",
   components: { BasicTable, UserDrawer },
@@ -192,13 +192,13 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData();
+      getData({ page: 1, pageSize: 10 });
     });
 
-    const getData = async () => {
+    const getData = async (pagination: PaginationState) => {
       loading.value = true;
       try {
-        let res = await getUsers({ page: 1, pageSize: 10, ...queryValue.value });
+        let res = await getUsers({ ...pagination, ...queryValue.value });
         data.value = res.data;
         loading.value = false;
       } catch (err) {
@@ -237,6 +237,7 @@ export default defineComponent({
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       console.log(queryValue.value);
+      getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = { name: "", account: "", phone: "", status: null };
@@ -249,18 +250,18 @@ export default defineComponent({
       }, 1000);
     }
 
-    function handlePage(pagination: PaginationProps) {
+    function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      getData();
+      getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationProps) {
+    function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      getData();
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData();
+      getData({ page: 1, pageSize: 10 });
     }
 
     return {
