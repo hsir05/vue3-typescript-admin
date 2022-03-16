@@ -59,6 +59,7 @@ export default defineComponent({
         title: "序号",
         key: "index",
         align: "center",
+        width: 70,
         render(_: tableDataItem, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },

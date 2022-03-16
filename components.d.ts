@@ -50,6 +50,7 @@ declare module 'vue' {
     NSwitch: typeof import('naive-ui')['NSwitch']
     NTooltip: typeof import('naive-ui')['NTooltip']
     Reload: typeof import('./src/components/Reload/Reload.vue')['default']
+    SimpleTable: typeof import('./src/components/Table/SimpleTable.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
     Table: typeof import('./src/components/Table/Table.vue')['default']
     'Table copy': typeof import('./src/components/Table/Table copy.vue')['default']
