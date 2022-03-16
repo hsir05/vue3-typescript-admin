@@ -56,6 +56,14 @@ export default defineComponent({
         type: "selection",
       },
       {
+        title: "序号",
+        key: "index",
+        align: "center",
+        render(_: tableDataItem, rowIndex: number) {
+          return h("span", `${rowIndex + 1}`);
+        },
+      },
+      {
         title: "菜单名称",
         key: "name",
         align: "center",

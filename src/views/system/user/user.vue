@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full box-border">
+  <div class="h-full overflow-hidden box-border">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -37,7 +37,7 @@
 
       <n-form-item label="状态" path="radioGroupValue">
         <n-radio-group v-model:value="queryValue.status">
-          <n-radio value>全部</n-radio>
+          <n-radio :value="null">全部</n-radio>
           <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
             item.label
           }}</n-radio>
@@ -89,7 +89,7 @@ export default defineComponent({
       name: "",
       account: "",
       phone: "",
-      status: "",
+      status: null,
     });
 
     const data = ref<tableDataItem[]>([]);
@@ -97,6 +97,15 @@ export default defineComponent({
     const columns = [
       {
         type: "selection",
+        align: "center",
+      },
+      {
+        title: "序号",
+        key: "index",
+        align: "center",
+        render(_: tableDataItem, rowIndex: number) {
+          return h("span", `${rowIndex + 1}`);
+        },
       },
       {
         title: "帐号",
@@ -182,16 +191,21 @@ export default defineComponent({
       },
     ];
 
-    onMounted(async () => {
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      loading.value = true;
       try {
-        let res = await getUsers();
+        let res = await getUsers({ page: 1, pageSize: 10, ...queryValue.value });
         data.value = res.data;
         loading.value = false;
       } catch (err) {
         console.log(err);
         loading.value = false;
       }
-    });
+    };
 
     // nextTick(() => {
     //   const { page } = basicTableRef.value;
@@ -225,7 +239,7 @@ export default defineComponent({
       console.log(queryValue.value);
     };
     const reset = () => {
-      queryValue.value = { name: "", account: "", phone: "", status: "" };
+      queryValue.value = { name: "", account: "", phone: "", status: null };
     };
 
     function reloadPage() {
@@ -237,13 +251,16 @@ export default defineComponent({
 
     function handlePage(pagination: PaginationProps) {
       console.log(toRaw(pagination));
+      getData();
     }
     function handlepagSize(pagination: PaginationProps) {
       console.log(toRaw(pagination));
+      getData();
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
+      getData();
     }
 
     return {

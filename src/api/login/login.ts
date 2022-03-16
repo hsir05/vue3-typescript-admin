@@ -1,5 +1,5 @@
 import { http } from '@/utils/http';
-import { loginState } from "../interface"
+import { loginState } from "../type"
 
 //获取验证码
 export function getConsoleInfo() {

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white mt-10px p-10px" :style="{ height: getComputedHeight }">
+  <div class="bg-white mt-10px p-10px" style="calc(100% - 95px)">
     <!-- 顶部功能区 -->
     <div class="flex pb-10px">
       <n-button-group>
@@ -87,8 +87,7 @@ export default defineComponent({
       pageSize: 10,
     });
 
-    const getComputedHeight = computed(() => "calc(100% - 95px)");
-    const getTableHeight = computed(() => "calc(100% - 95px - 100px)");
+    const getTableHeight = computed(() => "calc(100vh - 95px - 280px)");
 
     const getBindValues = computed(() => {
       return {
@@ -139,7 +138,6 @@ export default defineComponent({
       tableSize,
       getBindValues,
       item: 15,
-      getComputedHeight,
       getTableHeight,
       getRowKeyId: (row: tableDataItem) => row.id,
       handleCheck,
