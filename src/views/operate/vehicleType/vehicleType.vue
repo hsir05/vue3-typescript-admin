@@ -295,6 +295,7 @@ export default defineComponent({
   .table-edit {
     width: calc(100% - 550px - 15px);
     height: auto;
+    overflow: scroll;
     background-color: $white;
   }
 }
