@@ -50,9 +50,8 @@
         ref="table"
         striped
         :columns="columns"
-        :scroll-x="1090"
         class="box-border"
-        min-height="300px"
+        min-height="calc(100vh - 95px - 280px)"
         flex-height
         :row-key="getRowKeyId"
         :data="data"
@@ -191,6 +190,7 @@ export default defineComponent({
       {
         title: "序号",
         key: "index",
+        width: 70,
         align: "center",
         render(_: tableDataItem, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
@@ -209,18 +209,20 @@ export default defineComponent({
       {
         title: "排序",
         key: "sort",
+        width: 80,
         align: "center",
       },
       {
         title: "是否有子词条",
         key: "status",
+        width: 110,
         align: "center",
       },
       {
         title: "操作",
         key: "actions",
         align: "center",
-        width: "330px",
+        width: "350px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [

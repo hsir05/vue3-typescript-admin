@@ -28,4 +28,12 @@ export interface getUsersDataState extends PaginationState {
     phone: null | string;
     status: number | null;
 }
-
+// 系统管理 - 角色管理
+export interface getRolesState {
+    id?: null | string | number;
+    // parentId: null | string;
+    name: null | string;
+    status: null | string;
+    // create_time: string | null;
+    // descript: null | string;
+}

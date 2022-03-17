@@ -6,7 +6,6 @@ export const data = [
     sort: 1,
     isChild: 1,
     code: "AFT0000",
-    status: 1,
   },
   {
     id: "123qer2222qwe",
@@ -14,7 +13,6 @@ export const data = [
     sort: 1,
     isChild: 1,
     code: "AFT0000",
-    status: 1,
   },
 ];
 

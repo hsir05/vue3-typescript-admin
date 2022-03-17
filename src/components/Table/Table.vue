@@ -38,7 +38,6 @@
       :size="tableSize"
       striped
       v-bind="getBindValues"
-      :scroll-x="1090"
       class="box-border"
       :min-height="getTableHeight"
       flex-height
@@ -48,6 +47,7 @@
     />
     <!-- 分页 -->
     <n-pagination
+      v-if="getItemCount"
       v-model:page="page"
       v-model:page-size="pageSize"
       v-model:item-count="getItemCount"
@@ -87,7 +87,9 @@ export default defineComponent({
       pageSize: 10,
     });
 
-    const getTableHeight = computed(() => "calc(100vh - 95px - 280px)");
+    const getTableHeight = computed(
+      () => `calc(100vh - 95px - ${unref(props).itemCount ? "280px" : "245px"})`
+    );
 
     const getBindValues = computed(() => {
       return {

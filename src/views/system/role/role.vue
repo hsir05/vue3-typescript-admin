@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full box-border">
+  <div class="h-full box-border overflow-hidden">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -35,6 +35,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-batch="handleBatch"
@@ -47,15 +48,16 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { PaginationProps } from "@/interface/table/table";
 import BasicTable from "@/components/Table/Table.vue";
 import RoleDrawer from "./roleDrawer.vue";
 import { NTag } from "naive-ui";
-import { data, statusOptions } from "./data";
+import { statusOptions } from "./data";
 import { tableDataItem } from "./type";
+import { getRoles } from "@/api/system/roles";
 export default defineComponent({
   name: "Role",
   components: { BasicTable, RoleDrawer },
@@ -63,10 +65,12 @@ export default defineComponent({
     const loading = ref(false);
     const roleDrawerRef = ref();
     const basicTableRef = ref();
+    const itemCount = ref(null);
     const queryValue = ref({
       name: "",
       status: "",
     });
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -75,6 +79,7 @@ export default defineComponent({
       {
         title: "序号",
         key: "index",
+        width: 70,
         align: "center",
         render(_: tableDataItem, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
@@ -148,6 +153,22 @@ export default defineComponent({
       },
     ];
 
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      loading.value = true;
+      try {
+        let res = await getRoles({ ...queryValue.value });
+        data.value = res.data;
+        itemCount.value = res.itemCount;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
@@ -194,6 +215,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
+      getData();
     }
 
     return {
@@ -203,6 +225,7 @@ export default defineComponent({
       roleDrawerRef,
       basicTableRef,
       statusOptions,
+      itemCount,
       columns,
 
       reloadPage,
