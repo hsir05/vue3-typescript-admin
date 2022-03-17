@@ -1,5 +1,10 @@
 <template>
-  <n-modal v-model:show="isModal" :close-on-esc="false" :mask-closable="false">
+  <n-modal
+    v-model:show="isModal"
+    :close-on-esc="false"
+    :mask-closable="false"
+    :on-after-leave="handleAfterLeave"
+  >
     <n-card
       :style="{ width: width, height: height }"
       :title="title"
@@ -32,7 +37,7 @@
           <n-input v-model:value="form.code" clearable placeholder="输入词条编码" />
         </n-form-item>
         <n-form-item label="排序" path="sort">
-          <n-input v-model:value="form.sort" clearable placeholder="输入词条排序" />
+          <n-input-number v-model:value="form.sort" clearable placeholder="输入词条排序" />
         </n-form-item>
 
         <n-form-item label="是否拥有子词条" path="isChild">
@@ -44,10 +49,12 @@
       </n-form>
 
       <template #footer>
-        <n-button @click="handleReset">取消</n-button>
-        <n-button type="primary" :loading="loading" class="ml-10px" @click="handleValidate"
-          >确认</n-button
-        >
+        <div class="flex-end">
+          <n-button @click="handleReset">取消</n-button>
+          <n-button type="primary" :loading="loading" class="ml-10px" @click="handleValidate"
+            >确认</n-button
+          >
+        </div>
       </template>
     </n-card>
   </n-modal>
@@ -89,6 +96,8 @@ export default defineComponent({
 
     const showModal = (t: string, record?: tableDataItem) => {
       if (record) {
+        console.log(record);
+
         form.value = { ...form.value, ...record };
       }
       title.value = t;
@@ -99,6 +108,8 @@ export default defineComponent({
       form.value = { name: null, code: null, sort: null, isChild: 1 };
       formRef.value?.restoreValidation();
       state.isModal = false;
+      state.loading = false;
+      state.disabled = false;
     }
 
     function handleValidate(e: MouseEvent) {
@@ -117,6 +128,10 @@ export default defineComponent({
       });
     }
 
+    function handleAfterLeave() {
+      handleReset();
+    }
+
     return {
       ...toRefs(state),
       rules,
@@ -126,6 +141,7 @@ export default defineComponent({
       showModal,
       handleReset,
       handleValidate,
+      handleAfterLeave,
     };
   },
 });
