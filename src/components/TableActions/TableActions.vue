@@ -2,10 +2,19 @@
   <div class="table-action">
     <div class="table-action-content">
       <template v-for="action in getActions" :key="action.label">
-        <n-button v-bind="action" class="mx-2" v-if="!action.popConfirm">
-          <template #icon v-if="action.icon"><n-icon :component="action.icon" /> </template
-          >{{ action.label }}</n-button
-        >
+        <n-tooltip trigger="hover" v-if="action.isIconBtn">
+          <template #trigger>
+            <n-button type="primary" size="tiny" style="font-size: 16px" class="mr-10px">
+              <n-icon :component="action.icon" />
+            </n-button>
+          </template>
+          {{ action.label }}
+        </n-tooltip>
+
+        <n-button v-bind="action" class="mx-2" v-else-if="!action.popConfirm">
+          <template #icon v-if="action.icon"><n-icon :component="action.icon" /></template>
+          {{ action.label }}
+        </n-button>
 
         <n-popconfirm v-else v-bind="action.popConfirm">
           <template #trigger>
@@ -17,6 +26,7 @@
           {{ action.popConfirm?.title }}
         </n-popconfirm>
       </template>
+
       <n-dropdown
         v-if="dropDownActions && getDropdownList.length"
         trigger="hover"

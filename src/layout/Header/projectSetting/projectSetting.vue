@@ -70,7 +70,7 @@ import { useAppTabsStore } from "@/store/modules/useTabsStore";
 import NavItem from "./navItem.vue";
 import SwitchItem from "./switchItem.vue";
 import { locStorage } from "@/utils/storage";
-import { MULTIPLE_TABS_KEY } from "@/config/config";
+import { MULTIPLE_TABS_KEY } from "@/config/constant";
 export default defineComponent({
   name: "ProjectSetting",
   components: { CheckOutlined, NavItem, SwitchItem },

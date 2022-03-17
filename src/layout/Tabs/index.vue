@@ -91,7 +91,7 @@ import { useAppTabsStore } from "@/store/modules/useTabsStore";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { RouteItem } from "@/store/modules/useTabsStore";
 import { locStorage } from "@/utils/storage";
-import { TABS_ROUTES_KEY } from "@/config/config";
+import { TABS_ROUTES_KEY } from "@/config/constant";
 import { PageEnum } from "@/enums/pageEnum";
 import elementResizeDetectorMaker from "element-resize-detector";
 import {

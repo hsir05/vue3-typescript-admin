@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { locStorage } from "@/utils/storage";
-import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/config";
+import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
 // import { login } from "@/api/login/login";
 // import { loginState } from "@/api/interface";
 // import { ResultEnum } from "@/enums/httpEnum";

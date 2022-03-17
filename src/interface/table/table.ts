@@ -9,6 +9,7 @@ export interface ActionItem  {
   disabled?: boolean; 
   confirm?: boolean;
   auth: string[],
+  isIconBtn?: boolean,
   ifShow?: boolean | ((action: ActionItem) => boolean);
 }
 

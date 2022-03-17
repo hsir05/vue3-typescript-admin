@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { RouteLocationNormalized } from "vue-router";
 import { locStorage } from "@/utils/storage";
-import { MULTIPLE_TABS_KEY } from "@/config/config";
+import { MULTIPLE_TABS_KEY } from "@/config/constant";
 import { PageEnum } from "@/enums/pageEnum";
 
 export type RouteItem = Partial<RouteLocationNormalized> & {

@@ -57,6 +57,8 @@ declare global {
     __: unknown;
   }
 
+
+
   declare interface ViteEnv {
     VITE_PORT: number;
     VITE_USE_MOCK: boolean;

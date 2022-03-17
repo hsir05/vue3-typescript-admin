@@ -1,4 +1,4 @@
-import { STORAGE_KEY } from "@/config/config"
+import { STORAGE_KEY } from "@/config/constant"
 
 // 默认缓存期限为7天
 const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 7;

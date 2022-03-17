@@ -49,13 +49,17 @@ declare module 'vue' {
     NSelect: typeof import('naive-ui')['NSelect']
     NSpace: typeof import('naive-ui')['NSpace']
     NSwitch: typeof import('naive-ui')['NSwitch']
+    NText: typeof import('naive-ui')['NText']
     NTooltip: typeof import('naive-ui')['NTooltip']
+    NUpload: typeof import('naive-ui')['NUpload']
+    NUploadDragger: typeof import('naive-ui')['NUploadDragger']
     Reload: typeof import('./src/components/Reload/Reload.vue')['default']
     SimpleTable: typeof import('./src/components/Table/SimpleTable.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
     Table: typeof import('./src/components/Table/Table.vue')['default']
     'Table copy': typeof import('./src/components/Table/Table copy.vue')['default']
     TableActions: typeof import('./src/components/TableActions/TableActions.vue')['default']
+    Upload: typeof import('./src/components/Upload/Upload.vue')['default']
   }
 }
 

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ProjectSettingState } from "@/interface/projectSetting";
 import { projectSetting } from "@/config/setting";
 import { merge } from "lodash-es";
-import { PROJECT_CONFIG_KEY } from "@/config/config";
+import { PROJECT_CONFIG_KEY } from "@/config/constant";
 import { locStorage } from "@/utils/storage";
 
 const { 

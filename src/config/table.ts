@@ -11,3 +11,9 @@ export const densityOptions = [
     { type: 'menu', label: '默认', key: 'medium' },
     { type: 'menu', label: '宽松', key: 'large' },
 ];
+
+export const uploadConfig = {
+    fileType: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/svg+xml'],
+    maxSize: 1,
+    file: 'file'
+}
