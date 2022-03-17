@@ -286,7 +286,6 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: space-between;
-  // background-color: $white;
   padding: 5px;
   .simple-table {
     width: 550px;
