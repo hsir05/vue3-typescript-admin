@@ -1,67 +1,47 @@
 <template>
-  <BasicModal title="添加开通城市" ref="ModalRef">
+  <BasicModal
+    width="650px"
+    title="添加开通城市"
+    ref="ModalRef"
+    :maskClosable="true"
+    @on-cancel="handleReset"
+    @on-ok="handleValidate"
+  >
     <n-form
       ref="formRef"
       :rules="rules"
       label-placement="left"
-      :style="{ maxWidth: '560px' }"
+      :style="{ maxWidth: '520px' }"
       require-mark-placement="right-hanging"
-      label-width="150"
+      label-width="100"
       :model="form"
     >
-      <n-form-item label="开通城市" path="city">
-        <!-- <n-input v-model:value="form.city" clearable placeholder="输入开通城市" /> -->
+      <n-form-item label="开通城市" path="code">
         <n-select
-          v-model:value="form.city"
-          value="cityCode"
-          :render-label="renderLabel"
           clearable
-          placeholder="选择性别"
+          v-model:value="form.code"
+          placeholder="选择开通城市"
           @update:value="handleUpdateValue"
           :options="cityData.result"
         />
       </n-form-item>
-      <n-form-item label="城市编码" path="code">
-        <n-input v-model:value="form.code" clearable placeholder="输入城市编码" />
+      <n-form-item label="城市编码">
+        <n-input v-model:value="form.code" disabled clearable placeholder="输入城市编码" />
       </n-form-item>
       <n-form-item label="经度" path="lng">
-        <n-input-number
-          v-model:value="form.lng"
-          :disable="true"
-          clearable
-          placeholder="输入词条排序"
-        />
+        <n-input-number v-model:value="form.lng" :disable="true" clearable placeholder="输入经度" />
       </n-form-item>
 
-      <n-form-item label="纬度" path="sort">
-        <n-input-number v-model:value="form.lat" clearable placeholder="输入词条排序" />
+      <n-form-item label="纬度" path="lat">
+        <n-input-number v-model:value="form.lat" clearable placeholder="输入纬度" />
       </n-form-item>
-
-      <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
-          >保存</n-button
-        >
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
-          >重置</n-button
-        >
-      </div>
     </n-form>
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref } from "vue";
+import { defineComponent, ref, unref, toRaw } from "vue";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { FormInst, useMessage, SelectOption, SelectRenderLabel } from "naive-ui";
+import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { tableDataItem } from "./type";
 import cityData from "@/config/cityData.json";
 export default defineComponent({
@@ -85,8 +65,7 @@ export default defineComponent({
       showModal();
     };
 
-    function handleValidate(e: MouseEvent) {
-      e.preventDefault();
+    function handleValidate() {
       formRef.value?.validate((errors) => {
         if (!errors) {
           console.log(unref(form));
@@ -104,36 +83,34 @@ export default defineComponent({
       formRef.value?.restoreValidation();
     }
 
-    function handleUpdateValue(value: string, option: SelectOption) {
-      message.info("value: " + JSON.stringify(value));
-      message.info("option: " + JSON.stringify(option));
-      //  form.value.code =
-    }
+    function handleUpdateValue(_: string, option: SelectOption) {
+      console.log(option);
+      // console.log(toRaw(form.value));
+      form.value = {
+        ...toRaw(form.value),
+        city: option.label as string,
+        code: option.value as string,
+      };
+      console.log(form.value);
 
-    const renderLabel: SelectRenderLabel = (option) => {
-      return h(
-        "span",
-        {
-          value: `${option.cityCode}`,
-        },
-        `${option.cityName}`
-      );
-    };
+      //    form.value.city = unref(option).label
+      //    form.value.code = option.value
+    }
 
     return {
       ModalRef,
+      formRef,
       form,
       loading,
       cityData,
       rules: {
-        city: { required: true, trigger: ["blur", "change"], message: "请选择开通城市" },
+        code: { required: true, trigger: ["blur", "change"], message: "请选择开通城市" },
         lng: { required: true, type: "number", trigger: ["blur", "input"], message: "请输入经度" },
         lat: { required: true, type: "number", trigger: ["blur", "input"], message: "请输入纬度" },
       },
 
       handleModal,
       handleUpdateValue,
-      renderLabel,
       handleValidate,
       handleReset,
     };

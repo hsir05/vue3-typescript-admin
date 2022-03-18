@@ -1,13 +1,15 @@
 <template>
   <div class="h-full box-border opening-urban">
     <div class="simple-table">
-      <div class="mt-10px mb-10px text-right">
+      <div class="mt-10px mb-10px text-right flex">
         <n-button attr-type="button" type="primary" @click="handleAddCity">
           <template #icon>
             <n-icon> <AddIcon /> </n-icon>
           </template>
           添加开通城市</n-button
         >
+
+        <n-button attr-type="button" type="primary">当前选中城市：{{ label }}</n-button>
       </div>
 
       <n-data-table
@@ -45,6 +47,7 @@ export default defineComponent({
   setup() {
     const baiduMapRef = ref();
     const ModalRef = ref();
+    const label = ref("北京");
     const data = ref([
       {
         id: "1123123",
@@ -127,6 +130,7 @@ export default defineComponent({
 
     function handleEdit(record: tableDataItem, index: number) {
       console.log(toRaw(record), index);
+      label.value = toRaw(record).city as string;
       const { renderBaiduMap } = baiduMapRef.value;
       renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
     }
@@ -144,6 +148,7 @@ export default defineComponent({
       ModalRef,
       data,
       columns,
+      label,
       getRowKeyId: (row: tableItemProps) => row.id,
       handleAddCity,
     };
@@ -155,7 +160,6 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: space-between;
-  padding: 5px;
 
   .simple-table {
     width: 400px;
@@ -163,19 +167,13 @@ export default defineComponent({
     background-color: $white;
   }
   .map {
-    width: calc(100% - 400px - 15px);
+    width: calc(100% - 400px - 10px);
     height: auto;
     overflow: scroll;
     background-color: $white;
+    box-sizing: border-box;
+    padding-top: 5px;
+    padding-left: 5px;
   }
 }
-// :deep(.active-row td) {
-//   font-weight: 600;
-//   background-color: v-bind(lightAppTheme);
-//   color: $white;
-//   cursor: pointer;
-//   &:hover{
-//       background-color: v-bind(hoverAppTheme);
-//   }
-// }
 </style>

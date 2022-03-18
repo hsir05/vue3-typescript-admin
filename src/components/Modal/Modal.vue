@@ -32,7 +32,7 @@
 import { defineComponent, ref } from "vue";
 import { CloseOutline as CloseOutIcon } from "@vicons/ionicons5";
 export default defineComponent({
-  name: "DictTem",
+  name: "Modal",
   components: { CloseOutIcon },
   props: {
     title: {
@@ -53,10 +53,11 @@ export default defineComponent({
     },
     closeOnEsc: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
-  setup() {
+  emits: ["on-ok", "on-cancel"],
+  setup(_, { emit }) {
     const isModal = ref(false);
 
     const showModal = () => {
@@ -64,9 +65,11 @@ export default defineComponent({
     };
     const ok = () => {
       console.log("ok");
+      emit("on-ok");
     };
     const cancel = () => {
       isModal.value = false;
+      emit("on-cancel");
     };
 
     return {
