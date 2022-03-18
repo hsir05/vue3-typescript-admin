@@ -26,6 +26,12 @@ async function renderBaiduMap(lng: number, lat: number) {
   var marker = new BMap.Marker(point); // 创建标注
   //@ts-ignore
   map.addOverlay(marker);
+
+  //拖拽标注
+  marker.enableDragging();
+  marker.addEventListener("dragend", function (e) {
+    console.log("当前位置：" + e.point.lng + ", " + e.point.lat);
+  });
 }
 // 通过 defineExpose 把方法暴露出去，然后父组件调用
 defineExpose({

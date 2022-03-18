@@ -1,6 +1,15 @@
 <template>
   <div class="h-full box-border opening-urban">
     <div class="simple-table">
+      <div class="mt-10px mb-10px text-right">
+        <n-button attr-type="button" type="primary" @click="handleAddCity">
+          <template #icon>
+            <n-icon> <AddIcon /> </n-icon>
+          </template>
+          添加开通城市</n-button
+        >
+      </div>
+
       <n-data-table
         ref="table"
         :data="data"
@@ -15,6 +24,8 @@
     <div class="map">
       <Map ref="baiduMapRef" />
     </div>
+
+    <OpeningUrbanModal ref="ModalRef" />
   </div>
 </template>
 <script lang="ts">
@@ -22,12 +33,18 @@ import { defineComponent, h, ref, onMounted, toRaw } from "vue";
 import { tableItemProps, tableDataItem } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Map from "@/components/Map/BaiduMap.vue";
-import { LocationOutline as LocationIcon, TrashOutline as TrashIcon } from "@vicons/ionicons5";
+import {
+  LocationOutline as LocationIcon,
+  TrashOutline as TrashIcon,
+  Add as AddIcon,
+} from "@vicons/ionicons5";
+import OpeningUrbanModal from "./openingUrbanModal.vue";
 export default defineComponent({
   name: "OpeningUrban",
-  components: { Map },
+  components: { Map, AddIcon, OpeningUrbanModal },
   setup() {
     const baiduMapRef = ref();
+    const ModalRef = ref();
     const data = ref([
       {
         id: "1123123",
@@ -117,11 +134,18 @@ export default defineComponent({
       console.log(record);
     }
 
+    function handleAddCity() {
+      const { handleModal } = ModalRef.value;
+      handleModal();
+    }
+
     return {
       baiduMapRef,
+      ModalRef,
       data,
       columns,
       getRowKeyId: (row: tableItemProps) => row.id,
+      handleAddCity,
     };
   },
 });
