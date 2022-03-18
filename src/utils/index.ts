@@ -10,6 +10,7 @@ export function renderIcon(icon:RendererElement) {
 }
 
 const newTagColors = { color: '#f90', textColor: '#fff', borderColor: '#f90' };
+
 export function renderNew(type = 'warning', text = 'New', color: object = newTagColors) {
   return () =>
     h(

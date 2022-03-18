@@ -4,7 +4,13 @@
       <template v-for="action in getActions" :key="action.label">
         <n-tooltip trigger="hover" v-if="action.isIconBtn">
           <template #trigger>
-            <n-button type="primary" size="tiny" style="font-size: 16px" class="mr-10px">
+            <n-button
+              type="primary"
+              size="tiny"
+              v-bind="action"
+              style="font-size: 16px"
+              class="mr-10px"
+            >
               <n-icon :component="action.icon" />
             </n-button>
           </template>

@@ -26,6 +26,7 @@ const props = defineProps({
 const { title } = toRefs(props);
 
 const emit = defineEmits(["reloadData"]);
+
 const reloadPage = () => {
   emit("reloadData");
 };
