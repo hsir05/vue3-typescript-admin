@@ -55,6 +55,22 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operate/virtualVehicle/virtualVehicle.vue"),
       },
+      {
+        path: "/operate/order-reserve-time",
+        name: `operate_order-reserve-time`,
+        meta: {
+          title: "接单预留时间管理",
+        },
+        component: () => import("@/views/operate/orderReserveTime/orderReserveTime.vue"),
+      },
+      {
+        path: "/operate/emergency-contac",
+        name: `operate_emergency-contac`,
+        meta: {
+          title: "平台紧急联系人管理",
+        },
+        component: () => import("@/views/operate/emergencyContac/emergencyContac.vue"),
+      },
     ],
   },
 ];

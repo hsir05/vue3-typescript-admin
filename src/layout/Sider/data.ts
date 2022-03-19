@@ -71,6 +71,16 @@ export const menuOptions: MenuOption[] = [
         label: '虚拟车头管理',
         path: "/operate/virtual-vehicle",
         key: 'operate-virtual-vehicle'
+      },
+      {
+        label: '接单预留时间管理',
+        path: "/operate/order-reserve-time",
+        key: 'operate-order-reserve-time'
+      },
+      {
+        label: '平台紧急联系人管理',
+        path: "/operate/emergency-contac",
+        key: 'operate-emergency-contac'
       }
     ]
   },
