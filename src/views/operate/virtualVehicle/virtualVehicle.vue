@@ -9,8 +9,8 @@
       <n-form
         ref="queryFormRef"
         :rules="queryRules"
-        label-placement="left"
-        :style="{ maxWidth: '280px', margin: '0 auto' }"
+        label-placement="top"
+        :style="{ maxWidth: '320px', marginLeft: '10px' }"
         require-mark-placement="right-hanging"
         label-width="80"
         :model="queryForm"
@@ -20,20 +20,33 @@
             clearable
             filterable
             v-model:value="queryForm.influxCode"
-            placeholder="选择开通城市"
+            placeholder="选择流量方"
             :options="influxList.result"
           />
         </n-form-item>
-        <n-form-item label="开通城市" path="cityCode">
-          <n-select
-            clearable
-            filterable
-            v-model:value="queryForm.cityCode"
-            placeholder="选择开通城市"
-            :options="cityData.result"
-          />
-        </n-form-item>
-        <div class="text-center">
+
+        <div class="flex-center">
+          <n-form-item label="开通城市" path="cityCode">
+            <n-select
+              clearable
+              style="width: 250px"
+              filterable
+              v-model:value="queryForm.cityCode"
+              placeholder="选择开通城市"
+              :options="cityData.result"
+            />
+          </n-form-item>
+
+          <n-button
+            attr-type="button"
+            :loading="loading"
+            class="ml-10px"
+            type="primary"
+            @click="query"
+            >查找</n-button
+          >
+        </div>
+        <!-- <div class="text-center">
           <n-button
             attr-type="button"
             :loading="loading"
@@ -42,20 +55,12 @@
             @click="handleReset"
             >重置</n-button
           >
-          <n-button
-            attr-type="button"
-            :loading="loading"
-            class="w-1/3 ml-5px"
-            type="primary"
-            @click="query"
-            >查找</n-button
-          >
-        </div>
+        </div> -->
       </n-form>
 
       <!-- 左侧表格 -->
       <div class="mt-10px mb-10px text-right flex">
-        <span>虚拟车头列表</span>
+        <!-- <span>虚拟车头列表</span> -->
 
         <n-button attr-type="button" type="primary" @click="handleAddVirtual">
           <template #icon>
@@ -70,6 +75,7 @@
         striped
         :columns="columns"
         class="box-border mt-10px"
+        min-height="250px"
         flex-height
         :row-key="getRowKeyId"
         :data="data"
@@ -254,23 +260,26 @@ export default defineComponent({
       {
         title: "司机姓名",
         key: "name",
+        width: 80,
         align: "center",
       },
       {
         title: "车牌号",
-        key: "code",
+        key: "plateNumber",
+        width: 85,
         align: "center",
       },
       {
         title: "车辆类型",
-        key: "sort",
-        width: 80,
+        key: "carType",
+        width: 90,
         align: "center",
       },
       {
         title: "操作",
         key: "actions",
         align: "center",
+        width: 110,
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
@@ -295,7 +304,7 @@ export default defineComponent({
                 type: "error",
                 icon: RemoveIcon,
                 secondary: true,
-
+                isIconBtn: true,
                 auth: ["dict002"],
                 popConfirm: {
                   onPositiveClick: handleRemove.bind(null, record),
@@ -307,7 +316,19 @@ export default defineComponent({
         },
       },
     ];
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<tableVirtualDataItem[]>([
+      {
+        name: "章三",
+        phone: null,
+        plateNumber: "GA00195",
+        brand: null,
+        carSeies: null,
+        color: null,
+        carType: "专车-经济型",
+        avatar: null,
+        id: "123123",
+      },
+    ]);
 
     function query(e: MouseEvent) {
       e.preventDefault();
@@ -420,11 +441,11 @@ export default defineComponent({
   justify-content: end;
   align-content: flex-start;
   &-left {
-    width: 300px;
+    width: 350px;
     background-color: $white;
   }
   &-right {
-    width: calc(100% - 300px - 10px);
+    width: calc(100% - 350px - 10px);
     background-color: $white;
   }
 }
