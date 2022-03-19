@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "开通业务管理",
         },
-        component: () => import("@/views/operate/openingBusinsess/openingBusinsess.vue"),
+        component: () => import("@/views/operate/openingBusiness/openingBusiness.vue"),
       },
       {
         path: "/operate/opening-area",
@@ -46,6 +46,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "开通区域管理",
         },
         component: () => import("@/views/operate/openingArea/openingArea.vue"),
+      },
+      {
+        path: "/operate/virtual-vehicle",
+        name: `operate_virtual-vehicle`,
+        meta: {
+          title: "虚拟车头管理",
+        },
+        component: () => import("@/views/operate/virtualVehicle/virtualVehicle.vue"),
       },
     ],
   },

@@ -58,7 +58,7 @@ export const menuOptions: MenuOption[] = [
         key: 'operate-opening-urban'
       },
       {
-        label: '开通业务管理',
+        label: '开通业务管理', 
         path: "/operate/opening-businsess",
         key: 'operate-opening-businsess'
       },
@@ -66,6 +66,11 @@ export const menuOptions: MenuOption[] = [
         label: '开通区域管理',
         path: "/operate/opening-area",
         key: 'operate-opening-area'
+      },
+      {
+        label: '虚拟车头管理',
+        path: "/operate/virtual-vehicle",
+        key: 'operate-virtual-vehicle'
       }
     ]
   },
