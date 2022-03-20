@@ -84,7 +84,6 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: space-between;
-
   &-left {
     width: 300px;
   }
