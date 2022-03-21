@@ -3,7 +3,7 @@ import {
   SpeedometerOutline as SpeedomeIcon,
   AlbumsOutline as AlbumIcon,
   SettingsOutline as SettingsIcon,
-  EaselOutline,
+  EaselOutline, CafeOutline as CafeIcon
 } from '@vicons/ionicons5'
 import { renderIcon } from "@/utils/index"
 
@@ -82,6 +82,18 @@ export const menuOptions: MenuOption[] = [
         path: "/operate/emergency-contac",
         key: 'operate-emergency-contac'
       }
+    ]
+  },
+  {
+    label: '运力管理',
+    key: 'bear-capacity',
+    icon: renderIcon(CafeIcon),
+    children: [
+        {
+        label: '运营企业管理',
+        path: "/capacity/operateing-company",
+        key: 'capacity-operateing-company'
+      },
     ]
   },
    {

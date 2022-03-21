@@ -5,43 +5,26 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="70"
+      label-width="100"
       class="pt-15px pb-15px bg-white"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="帐号" path="account">
+      <n-form-item label="运营企业名称" path="companyName">
         <n-input
-          v-model:value="queryValue.account"
+          v-model:value="queryValue.companyName"
           clearable
-          placeholder="输入帐号"
-          style="width: 150px"
+          placeholder="输入运营企业名称"
+          style="width: 200px"
         />
       </n-form-item>
-      <n-form-item label="用户名称" path="name">
+      <n-form-item label="运营企业编码" path="socityCode">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.companyCode"
           clearable
-          placeholder="输入用户名称"
-          style="width: 150px"
+          placeholder="输入运营企业编码"
+          style="width: 200px"
         />
-      </n-form-item>
-      <n-form-item label="电话号码" path="phone">
-        <n-input
-          v-model:value="queryValue.phone"
-          clearable
-          placeholder="输入电话号码"
-          style="width: 150px"
-        />
-      </n-form-item>
-
-      <n-form-item label="状态" path="radioGroupValue">
-        <n-radio-group v-model:value="queryValue.status">
-          <n-radio :value="null">全部</n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
-            item.label
-          }}</n-radio>
-        </n-radio-group>
       </n-form-item>
 
       <n-form-item>
@@ -64,36 +47,33 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <UserDrawer ref="userDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <OprComDrawer ref="OprComDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw, onMounted } from "vue";
+import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import { NTag } from "naive-ui";
-import UserDrawer from "./userDrawer.vue";
+import OprComDrawer from "./oprComDrawer.vue";
 import { tableDataItem } from "./type";
-import { statusOptions } from "./data";
-import { getUsers } from "@/api/system/user";
+import { statusOptions, data } from "./data";
+// import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
-  name: "User",
-  components: { BasicTable, UserDrawer },
+  name: "OperateingCompany",
+  components: { BasicTable, OprComDrawer },
   setup() {
-    const loading = ref(true);
-    const userDrawerRef = ref();
+    const loading = ref(false);
+    const OprComDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      name: "",
-      account: "",
-      phone: "",
-      status: null,
+      companyName: "",
+      companyCode: "",
     });
 
-    const data = ref<tableDataItem[]>([]);
+    // const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -110,55 +90,36 @@ export default defineComponent({
         },
       },
       {
-        title: "帐号",
-        key: "account",
+        title: "运营企业名称",
+        key: "companyName",
         align: "center",
       },
       {
-        title: "名称",
-        key: "name",
+        title: "运营企业编号",
+        key: "companyCode",
         align: "center",
       },
       {
-        title: "性别",
-        key: "sex",
-        align: "center",
-        render(row: tableDataItem) {
-          return h(
-            NTag,
-            {
-              type: "info",
-            },
-            {
-              default: () => (row.sex === 1 ? "男" : "女"),
-            }
-          );
-        },
-      },
-      {
-        title: "电话",
-        key: "phone",
+        title: "社会统一信用代码",
+        key: "socityCode",
         align: "center",
       },
+
       {
-        title: "状态",
-        key: "status",
+        title: "代理商",
+        key: "agent",
         align: "center",
-        render(row: tableDataItem) {
-          return h(
-            NTag,
-            {
-              type: row.status === 1 ? "success" : "error",
-            },
-            {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
-            }
-          );
-        },
       },
+
       {
-        title: "创建时间",
-        key: "create_time",
+        title: "运营城市",
+        key: "cityName",
+        align: "center",
+      },
+
+      {
+        title: "运营城市编码",
+        key: "cityCode",
         align: "center",
       },
       {
@@ -193,22 +154,22 @@ export default defineComponent({
       },
     ];
 
-    onMounted(() => {
-      getData({ page: 1, pageSize: 10 });
-    });
+    // onMounted(() => {
+    //   getData({ page: 1, pageSize: 10 });
+    // });
 
-    const getData = async (pagination: PaginationState) => {
-      loading.value = true;
-      try {
-        let res = await getUsers({ ...pagination, ...queryValue.value });
-        data.value = res.data;
-        itemCount.value = res.itemCount;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    };
+    // const getData = async (pagination: PaginationState) => {
+    //   loading.value = true;
+    //   try {
+    //     let res = await getUsers({ ...pagination, ...queryValue.value });
+    //     // data.value = res.data;
+    //     itemCount.value = res.itemCount;
+    //     loading.value = false;
+    //   } catch (err) {
+    //     console.log(err);
+    //     loading.value = false;
+    //   }
+    // };
 
     // nextTick(() => {
     //   const { page } = basicTableRef.value;
@@ -221,7 +182,7 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = userDrawerRef.value;
+      const { openDrawer } = OprComDrawerRef.value;
       openDrawer("编辑用户", record);
     }
     function handleBatch() {
@@ -229,7 +190,7 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = userDrawerRef.value;
+      const { openDrawer } = OprComDrawerRef.value;
       openDrawer("新增用户");
     }
     function handleRemove(record: Recordable) {
@@ -242,40 +203,40 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      getData({ page: 1, pageSize: 10 });
+      //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", account: "", phone: "", status: null };
+      queryValue.value = { companyName: "", companyCode: "" };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      getData({ page: 1, pageSize: 10 });
+      //   getData({ page: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      getData({ page: 1, pageSize: 10 });
+      //   getData({ page: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      getData(toRaw(pagination));
+      //   getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      getData(toRaw(pagination));
+      //   getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData({ page: 1, pageSize: 10 });
+      //   getData({ page: 1, pageSize: 10 });
     }
 
     return {
       queryValue,
       data,
       loading,
-      userDrawerRef,
+      OprComDrawerRef,
       basicTableRef,
       statusOptions,
       columns,
