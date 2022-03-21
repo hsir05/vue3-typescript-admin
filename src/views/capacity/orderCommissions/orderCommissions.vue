@@ -4,18 +4,32 @@
     <n-form
       ref="formRef"
       inline
+      :rule="rule"
       label-placement="left"
       label-width="100"
       class="pt-15px pb-15px bg-white"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="代理商名称" path="agent">
-        <n-input
-          v-model:value="queryValue.agent"
+      <n-form-item label="运营企业名称" path="companyName">
+        <n-select
           clearable
-          placeholder="输入代理商名称"
-          style="width: 200px"
+          style="width: 150px"
+          v-model:value="queryValue.companyName"
+          placeholder="选择运营企业名称"
+          @update:value="handleUpdateValue"
+          :options="options"
+        />
+      </n-form-item>
+
+      <n-form-item label="开通区域" path="openArea">
+        <n-select
+          clearable
+          style="width: 150px"
+          v-model:value="queryValue.openArea"
+          placeholder="选择开通区域"
+          @update:value="handleUpdateValue"
+          :options="options"
         />
       </n-form-item>
 
@@ -39,35 +53,31 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <AgentDrawer ref="agentDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <OrderComDrawer ref="orderComDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 
-import {
-  TrashOutline as RemoveIcon,
-  CreateOutline as CreateIcon,
-  EyeOutline as EyeIcon,
-} from "@vicons/ionicons5";
+import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import AgentDrawer from "./agentDrawer.vue";
-import { NTag } from "naive-ui";
+import OrderComDrawer from "./orderComDrawer.vue";
 import { tableDataItem } from "./type";
-import { statusOptions, data } from "./data";
+import { data } from "./data";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
-  name: "Agent",
-  components: { BasicTable, AgentDrawer },
+  name: "OrderCommissions",
+  components: { BasicTable, OrderComDrawer },
   setup() {
     const loading = ref(false);
-    const agentDrawerRef = ref();
+    const orderComDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      agent: "",
+      companyName: null,
+      openArea: null,
     });
 
     // const data = ref<tableDataItem[]>([]);
@@ -87,65 +97,60 @@ export default defineComponent({
         },
       },
       {
-        title: "代理商",
+        title: "流量方",
         key: "agent",
         align: "center",
       },
       {
-        title: "登录账号",
+        title: "订单业务类型",
         key: "account",
         align: "center",
       },
       {
-        title: "联系人",
+        title: "订单类型",
         key: "contacts",
         align: "center",
       },
       {
-        title: "联系人性别",
+        title: "流量方比率",
         key: "sex",
         width: 100,
         align: "center",
       },
 
       {
-        title: "联系人电话",
+        title: "平台比率",
         key: "phone",
         width: 110,
         align: "center",
       },
       {
-        title: "状态",
-        key: "status",
+        title: "代理商比率",
+        key: "phone",
+        width: 110,
         align: "center",
-        render(row: tableDataItem) {
-          return h(
-            NTag,
-            {
-              type: row.status === 1 ? "success" : "error",
-            },
-            {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
-            }
-          );
-        },
       },
+      {
+        title: "企业比例",
+        key: "phone",
+        width: 110,
+        align: "center",
+      },
+      {
+        title: "司机比率",
+        key: "phone",
+        width: 110,
+        align: "center",
+      },
+
       {
         title: "操作",
         key: "action",
         align: "center",
-        width: "130px",
+        width: "100px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
-              {
-                label: "查看",
-                type: "primary",
-                icon: EyeIcon,
-                isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
-                auth: ["dict001"],
-              },
               {
                 label: "编辑",
                 type: "primary",
@@ -153,18 +158,6 @@ export default defineComponent({
                 isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
-              },
-              {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                isIconBtn: true,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
               },
             ],
           });
@@ -200,7 +193,7 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = agentDrawerRef.value;
+      const { openDrawer } = orderComDrawerRef.value;
       openDrawer("编辑用户", record);
     }
     function handleBatch() {
@@ -208,12 +201,8 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = agentDrawerRef.value;
+      const { openDrawer } = orderComDrawerRef.value;
       openDrawer("新增用户");
-    }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -224,7 +213,7 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { agent: "" };
+      queryValue.value = { companyName: null, openArea: null };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });
@@ -250,15 +239,21 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     }
 
+    function handleUpdateValue() {}
+
     return {
       queryValue,
       data,
       loading,
-      agentDrawerRef,
+      orderComDrawerRef,
       basicTableRef,
-      statusOptions,
       columns,
       itemCount,
+      rule: {
+        companyName: { required: true, trigger: ["blur", "input"], message: "请选择运营企业名称" },
+        openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
+      },
+      options: [],
 
       reloadPage,
       handleAdd,
@@ -269,6 +264,7 @@ export default defineComponent({
       handlePage,
       handlepagSize,
       handleSaveAfter,
+      handleUpdateValue,
     };
   },
 });

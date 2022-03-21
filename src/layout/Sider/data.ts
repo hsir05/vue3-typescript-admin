@@ -99,6 +99,11 @@ export const menuOptions: MenuOption[] = [
         path: "/capacity/agent",
         key: "capacity-agent",
       },
+      {
+        label: "订单抽成比率",
+        path: "/capacity/order-commissions",
+        key: "capacity-order-commissions",
+      },
     ],
   },
   {
