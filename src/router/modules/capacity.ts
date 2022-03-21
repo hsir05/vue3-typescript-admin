@@ -15,13 +15,21 @@ const routes: Array<RouteRecordRaw> = [
       sort: 1,
     },
     children: [
-           {
+      {
         path: "/capacity/operateing-company",
-         name: `capacity_operateing-company`,
+        name: `capacity_operateing-company`,
         meta: {
           title: "运营企业管理",
         },
         component: () => import("@/views/capacity/operateingCompany/operateingCompany.vue"),
+      },
+      {
+        path: "/capacity/agent",
+        name: `capacity_agent`,
+        meta: {
+          title: "代理商管理",
+        },
+        component: () => import("@/views/capacity/agent/agent.vue"),
       },
     ],
   },

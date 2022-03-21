@@ -11,46 +11,50 @@
       label-width="140"
       :model="form"
     >
-      <n-form-item label="运营企业名称" path="companyName">
-        <n-input v-model:value="form.companyName" clearable placeholder="输入运营企业名称" />
-      </n-form-item>
-      <n-form-item label="运营企业编号" path="companyCode">
-        <n-input v-model:value="form.companyCode" clearable placeholder="输入运营企业编号" />
-      </n-form-item>
-      <n-form-item label="社会统一信用代码" path="socityCode">
-        <n-input v-model:value="form.socityCode" clearable placeholder="输入社会统一信用代码" />
-      </n-form-item>
       <n-form-item label="代理商" path="agent">
         <n-input v-model:value="form.agent" clearable placeholder="输入代理商" />
       </n-form-item>
+      <n-form-item label="运营企业编号" path="contacts">
+        <n-input v-model:value="form.contacts" clearable placeholder="输入运营企业编号" />
+      </n-form-item>
+      <n-form-item label="代理商登录账号" path="account">
+        <n-input v-model:value="form.account" clearable placeholder="输入代理商登录账号" />
+      </n-form-item>
 
-      <n-form-item label="运营城市名称" path="cityCode">
+      <n-form-item label="代理商联系人" path="contacts">
+        <n-input v-model:value="form.contacts" clearable placeholder="输入代理商联系人" />
+      </n-form-item>
+
+      <n-form-item label="代理运营企业" path="operateCity">
         <n-select
           clearable
-          v-model:value="form.cityCode"
-          placeholder="选择运营城市"
+          v-model:value="form.operateCity"
+          placeholder="选择代理运营企业"
           @update:value="handleUpdateValue"
           :options="cityData.result"
         />
       </n-form-item>
 
-      <n-form-item label="运营城市编码">
+      <n-form-item label="联系人性别" path="sex">
+        <n-select v-model:value="form.sex" placeholder="选择联系人性别" :options="sexOptions" />
+      </n-form-item>
+      <n-form-item label="联系人电话" path="phone">
         <n-input
-          v-model:value="form.cityCode"
+          v-model:value="form.phone"
           clearable
-          :disabled="true"
-          placeholder="输入运营城市编码"
+          placeholder="输入联系人电话"
+          :maxlength="11"
         />
       </n-form-item>
 
-      <n-form-item label="管理员姓名" path="adminName">
-        <n-input v-model:value="form.adminName" clearable placeholder="输入管理员姓名" />
-      </n-form-item>
-      <n-form-item label="管理员性别" path="sex">
-        <n-select v-model:value="form.sex" placeholder="选择性别" :options="sexOptions" />
-      </n-form-item>
-      <n-form-item label="管理员电话号码" path="phone">
-        <n-input v-model:value="form.phone" clearable placeholder="输入电话号码" :maxlength="11" />
+      <n-form-item label="状态" path="status">
+        <n-radio-group v-model:value="form.status">
+          <n-space>
+            <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+              item.label
+            }}</n-radio>
+          </n-space>
+        </n-radio-group>
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -75,14 +79,14 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRaw, toRefs, ref, unref } from "vue";
+import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { statusOptions, sexOptions, rules } from "./data";
 import { tableDataItem } from "./type";
 import cityData from "@/config/cityData.json";
 
 export default defineComponent({
-  name: "OprComDrawer",
+  name: "AgentDrawer",
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const state = reactive({
@@ -94,12 +98,14 @@ export default defineComponent({
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<tableDataItem>({
-      companyName: null,
-      companyCode: null,
-      socityCode: null,
       agent: null,
-      cityCode: null,
-      cityName: null,
+      contacts: null,
+      phone: null,
+      account: null,
+      operateCity: null,
+      sex: null,
+      create_time: null,
+      status: null,
     });
 
     function openDrawer(t: string, record?: tableDataItem) {
@@ -132,12 +138,6 @@ export default defineComponent({
     function handleUpdateValue(_: string, option: SelectOption) {
       console.log(option);
       // console.log(toRaw(form.value));
-      form.value = {
-        ...toRaw(form.value),
-        cityName: option.label as string,
-        cityCode: option.value as string,
-      };
-      console.log(form.value);
 
       //    form.value.city = unref(option).label
       //    form.value.code = option.value
@@ -149,12 +149,14 @@ export default defineComponent({
 
     function handleReset() {
       form.value = {
-        companyName: null,
-        companyCode: null,
-        socityCode: null,
         agent: null,
-        cityCode: null,
-        cityName: null,
+        contacts: null,
+        phone: null,
+        account: null,
+        operateCity: null,
+        sex: null,
+        create_time: null,
+        status: null,
       };
       formRef.value?.restoreValidation();
     }

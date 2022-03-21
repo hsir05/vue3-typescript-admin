@@ -10,19 +10,11 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="运营企业名称" path="companyName">
+      <n-form-item label="代理商名称" path="agent">
         <n-input
-          v-model:value="queryValue.companyName"
+          v-model:value="queryValue.agent"
           clearable
-          placeholder="输入运营企业名称"
-          style="width: 200px"
-        />
-      </n-form-item>
-      <n-form-item label="运营企业编码" path="socityCode">
-        <n-input
-          v-model:value="queryValue.companyCode"
-          clearable
-          placeholder="输入运营企业编码"
+          placeholder="输入代理商名称"
           style="width: 200px"
         />
       </n-form-item>
@@ -47,30 +39,35 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <OprComDrawer ref="OprComDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <AgentDrawer ref="agentDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+
+import {
+  TrashOutline as RemoveIcon,
+  CreateOutline as CreateIcon,
+  EyeOutline as EyeIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import OprComDrawer from "./oprComDrawer.vue";
+import AgentDrawer from "./agentDrawer.vue";
+import { NTag } from "naive-ui";
 import { tableDataItem } from "./type";
 import { statusOptions, data } from "./data";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "OperateingCompany",
-  components: { BasicTable, OprComDrawer },
+  components: { BasicTable, AgentDrawer },
   setup() {
     const loading = ref(false);
-    const OprComDrawerRef = ref();
+    const agentDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      companyName: "",
-      companyCode: "",
+      agent: "",
     });
 
     // const data = ref<tableDataItem[]>([]);
@@ -90,53 +87,62 @@ export default defineComponent({
         },
       },
       {
-        title: "运营企业名称",
-        key: "companyName",
-        align: "center",
-      },
-      {
-        title: "运营企业编号",
-        key: "companyCode",
-        width: 110,
-        align: "center",
-      },
-      {
-        title: "社会统一信用代码",
-        key: "socityCode",
-        align: "center",
-      },
-
-      {
         title: "代理商",
         key: "agent",
         align: "center",
       },
-
       {
-        title: "运营城市",
-        key: "cityName",
+        title: "登录账号",
+        key: "account",
+        align: "center",
+      },
+      {
+        title: "联系人",
+        key: "contacts",
+        align: "center",
+      },
+      {
+        title: "联系人性别",
+        key: "sex",
         width: 100,
         align: "center",
       },
 
       {
-        title: "运营城市编码",
-        key: "cityCode",
+        title: "联系人电话",
+        key: "phone",
         width: 110,
         align: "center",
+      },
+      {
+        title: "状态",
+        key: "status",
+        align: "center",
+        render(row: tableDataItem) {
+          return h(
+            NTag,
+            {
+              type: row.status === 1 ? "success" : "error",
+            },
+            {
+              default: () => (row.status === 1 ? "正常" : "锁定"),
+            }
+          );
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
-        width: "260px",
+        width: "130px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "查看",
                 type: "primary",
-                icon: CreateIcon,
+                icon: EyeIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
@@ -144,6 +150,7 @@ export default defineComponent({
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
@@ -151,6 +158,7 @@ export default defineComponent({
                 label: "删除",
                 type: "error",
                 icon: RemoveIcon,
+                isIconBtn: true,
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
@@ -192,7 +200,7 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = OprComDrawerRef.value;
+      const { openDrawer } = agentDrawerRef.value;
       openDrawer("编辑用户", record);
     }
     function handleBatch() {
@@ -200,7 +208,7 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = OprComDrawerRef.value;
+      const { openDrawer } = agentDrawerRef.value;
       openDrawer("新增用户");
     }
     function handleRemove(record: Recordable) {
@@ -216,7 +224,7 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { companyName: "", companyCode: "" };
+      queryValue.value = { agent: "" };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });
@@ -246,7 +254,7 @@ export default defineComponent({
       queryValue,
       data,
       loading,
-      OprComDrawerRef,
+      agentDrawerRef,
       basicTableRef,
       statusOptions,
       columns,
