@@ -59,7 +59,8 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { statusOptions, sexOptions, rules } from "./data";
+import { rules } from "./data";
+import { statusOptions, sexOptions } from "@/config/form";
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "UserDrawer",

@@ -62,6 +62,12 @@ a{
   justify-content: end;
   align-items: center;
 }
+
+.flex-align-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
 //  项目配置文件抽屉组件公共样式
 .project-drawer-setting-item {
   display: flex;

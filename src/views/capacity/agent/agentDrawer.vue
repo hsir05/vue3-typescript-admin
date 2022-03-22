@@ -28,6 +28,7 @@
       <n-form-item label="代理运营企业" path="operateCity">
         <n-select
           clearable
+          filterable
           v-model:value="form.operateCity"
           placeholder="选择代理运营企业"
           @update:value="handleUpdateValue"
@@ -81,7 +82,8 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
-import { statusOptions, sexOptions, rules } from "./data";
+import { rules } from "./data";
+import { statusOptions, sexOptions } from "@/config/form";
 import { tableDataItem } from "./type";
 import cityData from "@/config/cityData.json";
 

@@ -8,7 +8,6 @@
           </template>
           添加开通城市</n-button
         >
-
         <n-button attr-type="button" type="primary">当前选中城市：{{ label }}</n-button>
       </div>
 

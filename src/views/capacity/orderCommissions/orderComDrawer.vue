@@ -28,6 +28,7 @@
       <n-form-item label="代理运营企业" path="operateCity">
         <n-select
           clearable
+          filterable
           v-model:value="form.operateCity"
           placeholder="选择代理运营企业"
           @update:value="handleUpdateValue"

@@ -75,7 +75,7 @@ import BasicTable from "@/components/Table/Table.vue";
 import { NTag } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
 import { tableDataItem } from "./type";
-import { statusOptions } from "./data";
+import { statusOptions } from "@/config/form";
 import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({

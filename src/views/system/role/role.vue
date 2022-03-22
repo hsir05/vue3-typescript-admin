@@ -55,7 +55,7 @@ import { PaginationProps } from "@/interface/table/table";
 import BasicTable from "@/components/Table/Table.vue";
 import RoleDrawer from "./roleDrawer.vue";
 import { NTag } from "naive-ui";
-import { statusOptions } from "./data";
+import { statusOptions } from "@/config/form";
 import { tableDataItem } from "./type";
 import { getRoles } from "@/api/system/roles";
 export default defineComponent({

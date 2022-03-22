@@ -15,7 +15,12 @@
         <n-input v-model:value="form.name" clearable placeholder="输角色名称" />
       </n-form-item>
       <n-form-item label="父级" path="parentId">
-        <n-select v-model:value="form.parentId" placeholder="选择父级" :options="parentOptions" />
+        <n-select
+          v-model:value="form.parentId"
+          filterable
+          placeholder="选择父级"
+          :options="parentOptions"
+        />
       </n-form-item>
       <n-form-item label="状态" path="status">
         <n-radio-group v-model:value="form.status">
@@ -62,8 +67,8 @@
 import { defineComponent, reactive, unref, toRefs, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
-import { statusOptions, rules, parentOptions } from "./data";
-
+import { rules, parentOptions } from "./data";
+import { statusOptions } from "@/config/form";
 export default defineComponent({
   name: "RoleDrawer",
   setup(_, { emit }) {

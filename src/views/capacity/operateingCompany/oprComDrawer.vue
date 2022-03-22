@@ -27,6 +27,7 @@
       <n-form-item label="运营城市名称" path="cityCode">
         <n-select
           clearable
+          filterable
           v-model:value="form.cityCode"
           placeholder="选择运营城市"
           @update:value="handleUpdateValue"
@@ -77,7 +78,8 @@
 <script lang="ts">
 import { defineComponent, reactive, toRaw, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
-import { statusOptions, sexOptions, rules } from "./data";
+import { rules } from "./data";
+import { statusOptions, sexOptions } from "@/config/form";
 import { tableDataItem } from "./type";
 import cityData from "@/config/cityData.json";
 

@@ -25,6 +25,7 @@
       <n-form-item label="开通区域" path="openArea">
         <n-select
           clearable
+          filterable
           style="width: 150px"
           v-model:value="queryValue.openArea"
           placeholder="选择开通区域"
