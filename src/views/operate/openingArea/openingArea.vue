@@ -272,14 +272,14 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(103.841521, 36.067212);
+      const { lMap } = baiduMapRef.value;
+      lMap(103.841521, 36.067212);
     });
 
     function handleEdit(record: tableDataItem) {
       console.log(record);
-      const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(103.841521, 36.067212);
+      const { lMap } = baiduMapRef.value;
+      lMap(103.841521, 36.067212);
     }
     function handleDelete() {}
     function handleAddArea() {}

@@ -14,7 +14,6 @@ async function renderBaiduMap(lng: number, lat: number) {
   await load(true);
   //@ts-ignore
   const map = new BMap.Map(domRef.value!);
-
   //初始化，BMap.Map.centerAndZoom()方法要求设置中心点坐标和地图级别
   //@ts-ignore
   const point = new BMap.Point(lng, lat);
@@ -29,13 +28,37 @@ async function renderBaiduMap(lng: number, lat: number) {
 
   //拖拽标注
   marker.enableDragging();
+  //@ts-ignore
   marker.addEventListener("dragend", function (e) {
     console.log("当前位置：" + e.point.lng + ", " + e.point.lat);
   });
 }
+
+async function lMap(lng: number, lat: number) {
+  await load(true);
+  //@ts-ignore
+  const map = new BMap.Map(domRef.value!); // 创建地图实例
+  //@ts-ignore
+  const point = new BMap.Point(lng, lat);
+  //   const point = new BMap.Point(lng, lat); // 创建点坐标
+  //@ts-ignore
+  map.centerAndZoom(point, 15); // 初始化地图，设置中心点坐标和地图级别
+  //@ts-ignore
+  map.disableScrollWheelZoom();
+  //@ts-ignore
+  map.disableDoubleClickZoom();
+  //   const tilelayer = new BMap.TileLayer(); // 创建地图层实例
+  //   tilelayer.getTilesUrl = function () {
+  //     // 设置图块路径
+  //     return "layer.gif";
+  //   };
+  //    //@ts-ignore
+  //   map.addTileLayer(tilelayer);
+}
 // 通过 defineExpose 把方法暴露出去，然后父组件调用
 defineExpose({
   renderBaiduMap,
+  lMap,
 });
 
 onMounted(() => {
