@@ -44,7 +44,7 @@
         :data="data"
         :columns="columns"
         class="box-border"
-        min-height="500px"
+        min-height="400px"
         flex-height
         :row-key="getRowKeyId"
         :pagination="false"
@@ -62,8 +62,8 @@
           <span class="ml-5px">新增或编辑区域时：</span>
         </div>
         <div class="ml-30px">
-          <p class="mt-5px">地图中<span class="bg-yellow-400">黄色区块</span>为不可编辑区块；</p>
-          <p class="mt-5px">地图中<span class="bg-green-300">绿色区块</span>为已选择区块；</p>
+          <p class="mt-5px">地图中<span class="color-yellow-400">黄色区块</span>为不可编辑区块；</p>
+          <p class="mt-5px">地图中<span class="color-green-300">绿色区块</span>为已选择区块；</p>
           <p class="mt-5px">地图中空白区块为可选择区块。</p>
         </div>
         <n-form
@@ -235,7 +235,7 @@ export default defineComponent({
         title: "操作",
         key: "actions",
         align: "center",
-        width: 110,
+        width: 100,
         render(record: tableDataItem, index: number) {
           return h(TableActions as any, {
             actions: [
@@ -272,14 +272,14 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      const { lMap } = baiduMapRef.value;
-      lMap(103.841521, 36.067212);
+      const { renderBaiduMap } = baiduMapRef.value;
+      renderBaiduMap(103.841521, 36.067212);
     });
 
     function handleEdit(record: tableDataItem) {
       console.log(record);
-      const { lMap } = baiduMapRef.value;
-      lMap(103.841521, 36.067212);
+      const { renderBaiduMap } = baiduMapRef.value;
+      renderBaiduMap(103.841521, 36.067212);
     }
     function handleDelete() {}
     function handleAddArea() {}
@@ -325,7 +325,7 @@ export default defineComponent({
   align-content: flex-start;
   justify-content: space-between;
   .open-area-left {
-    width: 400px;
+    width: 300px;
     background-color: $white;
   }
   .btn-bg {
@@ -333,7 +333,7 @@ export default defineComponent({
   }
 
   .map {
-    width: calc(100% - 400px - 10px);
+    width: calc(100% - 300px - 10px);
     height: auto;
     overflow: scroll;
     background-color: $white;
@@ -346,7 +346,7 @@ export default defineComponent({
       padding: 10px;
       left: 10px;
       top: 10px;
-      width: 350px;
+      width: 300px;
       height: 270px;
       background-color: $white;
       border-radius: 4px;
