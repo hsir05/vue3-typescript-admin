@@ -1,0 +1,21 @@
+export interface tableDataItem {
+  id?: string | null;
+  plageNumber: null | string;
+  brand: null | string;
+  carSeies: null | string;
+  color: null | string;
+  carType: null | string;
+  companyName: null | string;
+  create_time: null | string;
+  distance: null | string;
+  plate: null | string;
+  vehiclesType: null | string;
+  lock: null | number;
+  remark: null | string;
+  fuelType: null | string;
+  engineNumber: null | string;
+  vin: null | string;
+  engineDisplacement: null | string;
+  drivingPermitType: null | string;
+  vehiclesDate: null | string;
+}

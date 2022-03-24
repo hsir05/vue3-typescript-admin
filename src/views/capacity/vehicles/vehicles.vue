@@ -4,26 +4,42 @@
     <n-form
       ref="formRef"
       inline
+      :rule="rule"
       label-placement="left"
       label-width="100"
       class="pt-15px pb-15px bg-white"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="运营企业名称" path="companyName">
+      <n-form-item label="车牌号" path="plageNumber">
         <n-input
-          v-model:value="queryValue.companyName"
+          v-model:value="queryValue.plageNumber"
           clearable
-          placeholder="输入运营企业名称"
+          placeholder="输入车牌号"
           style="width: 200px"
         />
       </n-form-item>
-      <n-form-item label="运营企业编码" path="socityCode">
-        <n-input
-          v-model:value="queryValue.companyCode"
+
+      <n-form-item label="运营企业" path="companyName">
+        <n-select
           clearable
-          placeholder="输入运营企业编码"
-          style="width: 200px"
+          style="width: 150px"
+          v-model:value="queryValue.companyName"
+          placeholder="选择运营企业"
+          @update:value="handleUpdateValue"
+          :options="options"
+        />
+      </n-form-item>
+
+      <n-form-item label="车辆类型" path="vehicleType">
+        <n-select
+          clearable
+          filterable
+          style="width: 150px"
+          v-model:value="queryValue.vehicleType"
+          placeholder="选择车辆类型"
+          @update:value="handleUpdateValue"
+          :options="vehicleTypeList.result.vehicleTypeList"
         />
       </n-form-item>
 
@@ -39,6 +55,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :scroll-x="1090"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -47,30 +64,40 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <OprComDrawer ref="OprComDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <VehiclesDrawer ref="vehiclesDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+
+import {
+  CreateOutline as CreateIcon,
+  EyeOutline as EyeIcon,
+  SyncCircleOutline as SyncCirIcon,
+  GitCompareOutline as GitCompareIcon,
+  ImageOutline as ImageIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import OprComDrawer from "./oprComDrawer.vue";
+import VehiclesDrawer from "./vehiclesDrawer.vue";
 import { tableDataItem } from "./type";
 import { data } from "./data";
+import { NTag } from "naive-ui";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
+import vehicleTypeList from "@/config/vehicleTypeList.json";
 export default defineComponent({
-  name: "OperateingCompany",
-  components: { BasicTable, OprComDrawer },
+  name: "Vehicles",
+  components: { BasicTable, VehiclesDrawer },
   setup() {
     const loading = ref(false);
-    const OprComDrawerRef = ref();
+    const vehiclesDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      companyName: "",
-      companyCode: "",
+      plageNumber: null,
+      companyName: null,
+      vehicleType: null,
     });
 
     // const data = ref<tableDataItem[]>([]);
@@ -90,73 +117,121 @@ export default defineComponent({
         },
       },
       {
-        title: "运营企业名称",
-        key: "companyName",
+        title: "车牌号",
+        key: "plageNumber",
         align: "center",
       },
       {
-        title: "运营企业编号",
-        key: "companyCode",
-        width: 110,
+        title: "车辆品牌",
+        key: "brand",
         align: "center",
       },
       {
-        title: "社会统一信用代码",
-        key: "socityCode",
+        title: "车系",
+        key: "carSeies",
         align: "center",
       },
-
       {
-        title: "代理商",
-        key: "agent",
-        align: "center",
-      },
-
-      {
-        title: "运营城市",
-        key: "cityName",
+        title: "车辆型号",
+        key: "carType",
         width: 100,
         align: "center",
       },
 
       {
-        title: "运营城市编码",
-        key: "cityCode",
+        title: "车辆颜色",
+        key: "color",
         width: 110,
         align: "center",
       },
       {
+        title: "核定载客位",
+        key: "plate",
+        width: 110,
+        align: "center",
+      },
+      {
+        title: "运营企业",
+        key: "companyName",
+        width: 110,
+        align: "center",
+      },
+      {
+        title: "车辆类型",
+        key: "vehiclesType",
+        width: 110,
+        align: "center",
+      },
+      {
+        title: "状态",
+        key: "lock",
+        align: "center",
+        render(row: tableDataItem) {
+          return h(
+            NTag,
+            {
+              type: row.lock === 1 ? "success" : "error",
+            },
+            {
+              default: () => (row.lock === 1 ? "正常" : "锁定"),
+            }
+          );
+        },
+      },
+      {
+        title: "添加时间",
+        key: "create_time",
+        width: 95,
+        align: "center",
+      },
+
+      {
         title: "操作",
         key: "action",
         align: "center",
-        width: "260px",
+        width: "220px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "查看",
                 type: "primary",
-                icon: CreateIcon,
+                icon: EyeIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
               {
-                label: "编辑",
+                label: "编辑基本信息",
                 type: "primary",
                 icon: CreateIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
               {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
+                label: "编辑运输证照片信息",
+                type: "primary",
+                icon: ImageIcon,
+                isIconBtn: true,
+                onClick: handleEdit.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "里程清零",
+                type: "primary",
+                icon: SyncCirIcon,
+                isIconBtn: true,
+                onClick: handleEdit.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "车辆转移",
+                type: "primary",
+                icon: GitCompareIcon,
+                isIconBtn: true,
+                onClick: handleEdit.bind(null, record),
+                auth: ["dict001"],
               },
             ],
           });
@@ -192,7 +267,7 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = OprComDrawerRef.value;
+      const { openDrawer } = vehiclesDrawerRef.value;
       openDrawer("编辑用户", record);
     }
     function handleBatch() {
@@ -200,12 +275,8 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = OprComDrawerRef.value;
+      const { openDrawer } = vehiclesDrawerRef.value;
       openDrawer("新增用户");
-    }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -216,7 +287,7 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { companyName: "", companyCode: "" };
+      queryValue.value = { plageNumber: null, companyName: null, vehicleType: null };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });
@@ -242,14 +313,22 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     }
 
+    function handleUpdateValue() {}
+
     return {
       queryValue,
       data,
       loading,
-      OprComDrawerRef,
+      vehiclesDrawerRef,
       basicTableRef,
       columns,
       itemCount,
+      rule: {
+        companyName: { required: true, trigger: ["blur", "input"], message: "请选择运营企业名称" },
+        openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
+      },
+      options: [],
+      vehicleTypeList,
 
       reloadPage,
       handleAdd,
@@ -260,6 +339,7 @@ export default defineComponent({
       handlePage,
       handlepagSize,
       handleSaveAfter,
+      handleUpdateValue,
     };
   },
 });

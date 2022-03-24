@@ -39,6 +39,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/capacity/orderCommissions/orderCommissions.vue"),
       },
+       {
+        path: "/capacity/vehicles",
+        name: `capacity_vehicles`,
+        meta: {
+          title: "车辆管理",
+        },
+        component: () => import("@/views/capacity/vehicles/vehicles.vue"),
+      },
     ],
   },
 ];

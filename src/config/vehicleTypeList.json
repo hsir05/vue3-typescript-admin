@@ -3,8 +3,8 @@
         "vehicleTypeList": [
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260001",
-                "orderBusinessType": "OBT0001",
-                "vehicleTypeName": "专车-经济型",
+                "value": "OBT0001",
+                "label": "专车-经济型",
                 "vehicleTypeDesc": "专车--5座紧凑型",
                 "vehicleTypeImage": {
                     "fileId": "c220bb940cd7463eb2a91270786b3852",
@@ -51,8 +51,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260002",
-                "orderBusinessType": "OBT0001",
-                "vehicleTypeName": "专车-舒适型",
+                "value": "OBT0001",
+                "label": "专车-舒适型",
                 "vehicleTypeDesc": "专车--5座舒适型",
                 "vehicleTypeImage": {
                     "fileId": "883eb9d793f446d48f1a263f6c684e85",
@@ -99,8 +99,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260003",
-                "orderBusinessType": "OBT0001",
-                "vehicleTypeName": "专车-商务型",
+                "value": "OBT0001",
+                "label": "专车-商务型",
                 "vehicleTypeDesc": "专车--7座商务型",
                 "vehicleTypeImage": {
                     "fileId": "8a80808766a926240166a9268cb10003",
@@ -147,8 +147,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260004",
-                "orderBusinessType": "OBT0001",
-                "vehicleTypeName": "专车-豪华型",
+                "value": "OBT0001",
+                "label": "专车-豪华型",
                 "vehicleTypeDesc": "专车--5座豪华型",
                 "vehicleTypeImage": {
                     "fileId": "8a80808766a926240166a9268cb10004",
@@ -195,8 +195,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260011",
-                "orderBusinessType": "OBT0002",
-                "vehicleTypeName": "快车-经济型",
+                "value": "OBT0002",
+                "label": "快车-经济型",
                 "vehicleTypeDesc": "快车--5座紧凑型",
                 "vehicleTypeImage": {
                     "fileId": "8a80808766a926240166a9268cb10005",
@@ -243,8 +243,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260012",
-                "orderBusinessType": "OBT0002",
-                "vehicleTypeName": "快车-舒适型",
+                "value": "OBT0002",
+                "label": "快车-舒适型",
                 "vehicleTypeDesc": "快车--5座舒适型",
                 "vehicleTypeImage": {
                     "fileId": "8a80808766a926240166a9268cb10006",
@@ -291,8 +291,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260013",
-                "orderBusinessType": "OBT0002",
-                "vehicleTypeName": "快车-商务型",
+                "value": "OBT0002",
+                "label": "快车-商务型",
                 "vehicleTypeDesc": "快车--7座商务型",
                 "vehicleTypeImage": {
                     "fileId": "8a80808766a926240166a9268cb10007",
@@ -339,8 +339,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260014",
-                "orderBusinessType": "OBT0002",
-                "vehicleTypeName": "快车-豪华型",
+                "value": "OBT0002",
+                "label": "快车-豪华型",
                 "vehicleTypeDesc": "快车--5座豪华型",
                 "vehicleTypeImage": {
                     "fileId": "8a80808766a926240166a9268cb10008",
@@ -387,8 +387,8 @@
             },
             {
                 "vehicleTypeId": "8a80808763af1ab00163af1aea260021",
-                "orderBusinessType": "OBT0003",
-                "vehicleTypeName": "出租车",
+                "value": "OBT0003",
+                "label": "出租车",
                 "vehicleTypeDesc": "5座出租车",
                 "vehicleTypeImage": {
                     "fileId": "c9acc219e68742c9968b919a508ad640",
@@ -434,7 +434,7 @@
                 "createTime": 1541749712000
             }
         ],
-        "orderBusinessTypeList": [
+        "valueList": [
             {
                 "entryId": "2c9820216348116d0163481fa1a00009",
                 "entryName": "专车业务",

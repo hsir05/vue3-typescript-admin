@@ -92,7 +92,10 @@ export default defineComponent({
     );
 
     const getBindValues = computed(() => {
+      console.log({ ...unref(props) });
+
       return {
+        ...unref(props),
         columns: toRaw(unref(props).columns),
         loading: toRaw(unref(props).loading),
         data: toRaw(unref(props).data),

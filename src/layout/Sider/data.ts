@@ -98,11 +98,16 @@ export const menuOptions: MenuOption[] = [
         label: "代理商管理",
         path: "/capacity/agent",
         key: "capacity-agent",
-      },
+      }, 
       {
         label: "订单抽成比率",
         path: "/capacity/order-commissions",
         key: "capacity-order-commissions",
+      },
+      {
+        label: "车辆管理",
+        path: "/capacity/vehicles",
+        key: "capacity-vehicles",
       },
     ],
   },

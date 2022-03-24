@@ -55,7 +55,7 @@ import BasicTable from "@/components/Table/Table.vue";
 import AgentDrawer from "./agentDrawer.vue";
 import { NTag } from "naive-ui";
 import { tableDataItem } from "./type";
-import { statusOptions, data } from "./data";
+import { data } from "./data";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
@@ -256,7 +256,6 @@ export default defineComponent({
       loading,
       agentDrawerRef,
       basicTableRef,
-      statusOptions,
       columns,
       itemCount,
 
