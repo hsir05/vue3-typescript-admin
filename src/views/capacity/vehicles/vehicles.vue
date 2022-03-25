@@ -55,7 +55,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
-      :scroll-x="1090"
+      :scroll-x="1200"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -65,6 +65,7 @@
       @on-pagination="handlepagSize"
     />
     <VehiclesDrawer ref="vehiclesDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <TraCerDrawer ref="traCerDrawerRef" :width="500" @on-save-after="handleTraSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -80,6 +81,7 @@ import {
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import VehiclesDrawer from "./vehiclesDrawer.vue";
+import TraCerDrawer from "./traCerDrawer.vue";
 import { tableDataItem } from "./type";
 import { data } from "./data";
 import { NTag } from "naive-ui";
@@ -88,10 +90,11 @@ import { PaginationState } from "@/api/type";
 import vehicleTypeList from "@/config/vehicleTypeList.json";
 export default defineComponent({
   name: "Vehicles",
-  components: { BasicTable, VehiclesDrawer },
+  components: { BasicTable, VehiclesDrawer, TraCerDrawer },
   setup() {
     const loading = ref(false);
     const vehiclesDrawerRef = ref();
+    const traCerDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
@@ -103,32 +106,27 @@ export default defineComponent({
     // const data = ref<tableDataItem[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
+      { type: "selection", align: "center" },
       {
         title: "序号",
         key: "index",
         align: "center",
-        width: 70,
+        width: 60,
         render(_: tableDataItem, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
-      {
-        title: "车牌号",
-        key: "plageNumber",
-        align: "center",
-      },
+      { title: "车牌号", key: "plageNumber", width: 100, align: "center" },
       {
         title: "车辆品牌",
         key: "brand",
+        width: 100,
         align: "center",
       },
       {
         title: "车系",
         key: "carSeies",
+        width: 100,
         align: "center",
       },
       {
@@ -147,7 +145,7 @@ export default defineComponent({
       {
         title: "核定载客位",
         key: "plate",
-        width: 110,
+        width: 100,
         align: "center",
       },
       {
@@ -165,6 +163,7 @@ export default defineComponent({
       {
         title: "状态",
         key: "lock",
+        width: 70,
         align: "center",
         render(row: tableDataItem) {
           return h(
@@ -198,7 +197,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: hanldleSee.bind(null, record),
                 auth: ["dict001"],
               },
               {
@@ -214,7 +213,7 @@ export default defineComponent({
                 type: "primary",
                 icon: ImageIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleTraCert.bind(null, record),
                 auth: ["dict001"],
               },
               {
@@ -265,10 +264,20 @@ export default defineComponent({
       console.log("选择了", rowKeys);
     }
 
+    function hanldleSee(record: Recordable) {
+      console.log(record);
+      const { openDrawer } = vehiclesDrawerRef.value;
+      openDrawer("查看", "see");
+    }
+
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = vehiclesDrawerRef.value;
       openDrawer("编辑用户", record);
+    }
+    function handleTraCert(record: Recordable) {
+      const { openDrawer } = traCerDrawerRef.value;
+      openDrawer("编辑运输证照片信息", record);
     }
     function handleBatch() {
       console.log("点击了批量删除");
@@ -312,6 +321,9 @@ export default defineComponent({
       console.log("抽屉组件保存后处理");
       //   getData({ page: 1, pageSize: 10 });
     }
+    function handleTraSaveAfter() {
+      console.log("运输证处理");
+    }
 
     function handleUpdateValue() {}
 
@@ -320,6 +332,7 @@ export default defineComponent({
       data,
       loading,
       vehiclesDrawerRef,
+      traCerDrawerRef,
       basicTableRef,
       columns,
       itemCount,
@@ -339,6 +352,7 @@ export default defineComponent({
       handlePage,
       handlepagSize,
       handleSaveAfter,
+      handleTraSaveAfter,
       handleUpdateValue,
     };
   },

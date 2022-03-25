@@ -7,57 +7,60 @@
       label-placement="left"
       :style="{ maxWidth: '460px' }"
       require-mark-placement="right-hanging"
-      label-width="160"
+      label-width="120"
       :model="form"
     >
-      <n-form-item label="车牌号" path="plageNumber">
-        <n-input v-model:value="form.plageNumber" clearable placeholder="输入车牌号" />
+      <n-form-item label="运输证字号" path="plageNumber">
+        <n-input
+          v-model:value="form.plageNumber"
+          clearable
+          placeholder="请输入运输证字号，如X交运管许可XX字XXX号"
+        />
       </n-form-item>
-      <n-form-item label="车牌颜色" path="color">
-        <n-input v-model:value="form.color" clearable placeholder="输入车牌颜色" />
+      <n-form-item label="运输证发证机关" path="color">
+        <n-input
+          v-model:value="form.color"
+          clearable
+          placeholder="请输入运输证发证机关，如XX交通运输管理处"
+        />
       </n-form-item>
       <n-form-item label="车辆品牌" path="brand">
         <n-input v-model:value="form.brand" clearable placeholder="输入车辆品牌" />
       </n-form-item>
-      <n-form-item label="车系" path="carSeies">
-        <n-input v-model:value="form.carSeies" clearable placeholder="输入车系" />
-      </n-form-item>
 
-      <n-form-item label="核定载客位(位)" path="plate">
-        <n-input v-model:value="form.plate" clearable placeholder="输入核定载客位" />
-      </n-form-item>
-      <n-form-item label="发动机号" path="engineNumber">
-        <n-input v-model:value="form.engineNumber" clearable placeholder="输入发动机号" />
-      </n-form-item>
-      <n-form-item label="车辆VIN码" path="vin">
-        <n-input v-model:value="form.vin" clearable placeholder="输入车辆VIN码" />
-      </n-form-item>
-      <n-form-item label="燃料类型" path="fuelType">
-        <n-input v-model:value="form.fuelType" clearable placeholder="输入燃料类型" />
-      </n-form-item>
-
-      <n-form-item label="发动机排量(毫升/千瓦)" path="engineDisplacement">
-        <n-input
-          v-model:value="form.engineDisplacement"
-          clearable
-          placeholder="输入发动机排量（毫升/千瓦）"
-        />
-      </n-form-item>
-      <n-form-item label="行驶证类型" path="drivingPermitType">
-        <n-input v-model:value="form.drivingPermitType" clearable placeholder="输入行驶证类型" />
-      </n-form-item>
-      <n-form-item label="车辆注册日期" path="vehiclesDate">
+      <n-form-item label="运输证有效期始" path="vehiclesDate">
         <n-date-picker v-model:value="form.vehiclesDate" type="date" clearable />
       </n-form-item>
 
-      <n-form-item label="车辆类型" path="operateCity">
-        <n-select
-          clearable
-          filterable
-          v-model:value="form.vehiclesType"
-          placeholder="选择车辆类型"
-          @update:value="handleUpdateValue"
-          :options="cityData.result"
+      <n-form-item label="运输证有效期止" path="vehiclesDate">
+        <n-date-picker v-model:value="form.vehiclesDate" type="date" clearable />
+      </n-form-item>
+
+      <n-form-item label="车辆照片" path="lock">
+        <BasicUpload
+          :action="uploadUrl"
+          :headers="uploadHeaders"
+          :data="{}"
+          name="files"
+          :width="310"
+          :height="130"
+          @upload-change="uploadChange"
+          v-model:value="uploadList"
+          helpText="单个文件不超过2MB，最多只能上传1个文件"
+        />
+      </n-form-item>
+
+      <n-form-item label="运输证" path="lock">
+        <BasicUpload
+          :action="uploadUrl"
+          :headers="uploadHeaders"
+          :data="{}"
+          name="files"
+          :width="310"
+          :height="130"
+          @upload-change="uploadChange"
+          v-model:value="uploadList"
+          helpText="单个文件不超过2MB，最多只能上传1个文件"
         />
       </n-form-item>
 
@@ -90,9 +93,11 @@ import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { rules } from "./data";
 import { tableDataItem } from "./type";
 import cityData from "@/config/cityData.json";
-
+import BasicUpload from "@/components/Upload/Upload.vue";
+import { uploadUrl } from "@/config/config";
 export default defineComponent({
-  name: "VehiclesDrawer",
+  name: "TraCerDrawer",
+  components: { BasicUpload },
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const state = reactive({
@@ -124,6 +129,15 @@ export default defineComponent({
       vehiclesDate: null,
     });
 
+    const uploadHeaders = reactive({
+      platform: "miniPrograms",
+      timestamp: new Date().getTime(),
+      token: "Q6fFCuhc1vkKn5JNFWaCLf6gRAc5n0LQHd08dSnG4qo=",
+    });
+    const uploadList = ref([
+      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+    ]);
+
     function openDrawer(t: string, item?: tableDataItem | String) {
       console.log(item);
       if (item === "see") {
@@ -133,6 +147,10 @@ export default defineComponent({
       }
       title.value = t;
       state.isDrawer = true;
+    }
+
+    function uploadChange(list: string[]) {
+      console.log(list);
     }
 
     function handleValidate(e: MouseEvent) {
@@ -201,9 +219,13 @@ export default defineComponent({
       title,
       rules,
       cityData,
+      uploadUrl,
       form,
+      uploadHeaders,
+      uploadList,
       openDrawer,
       handleUpdateValue,
+      uploadChange,
       handleReset,
       handleValidate,
       onCloseAfter,
