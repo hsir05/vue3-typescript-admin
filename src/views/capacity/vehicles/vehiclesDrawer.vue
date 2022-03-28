@@ -122,9 +122,9 @@ export default defineComponent({
       vehiclesDate: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
-      console.log(record);
-      if (record) {
+    function openDrawer(t: string, record?: tableDataItem | String) {
+      if (typeof record === "string") {
+      } else if (record) {
         form.value = { ...form.value, ...record };
       }
       title.value = t;

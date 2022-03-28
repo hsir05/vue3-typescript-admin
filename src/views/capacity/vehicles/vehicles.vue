@@ -198,7 +198,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleSee.bind(null, record),
                 auth: ["dict001"],
               },
               {
@@ -264,11 +264,15 @@ export default defineComponent({
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
+    function handleSee() {
+      const { openDrawer } = vehiclesDrawerRef.value;
+      openDrawer("查看车辆");
+    }
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = vehiclesDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer("编辑车辆", record);
     }
     function handleBatch() {
       console.log("点击了批量删除");
