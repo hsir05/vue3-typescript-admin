@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white mt-10px p-10px" style="calc(100% - 95px)">
+  <div class="bg-white p-10px" style="calc(100% - 95px)">
     <!-- 顶部功能区 -->
     <div class="flex pb-10px">
       <n-button-group>

@@ -71,6 +71,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operate/emergencyContac/emergencyContac.vue"),
       },
+      {
+        path: "/operate/charge-rule",
+        name: `operate_charge-rule`,
+        meta: {
+          title: "计费规则管理",
+        },
+        component: () => import("@/views/operate/chargeRule/chargeRule.vue"),
+      },
     ],
   },
 ];

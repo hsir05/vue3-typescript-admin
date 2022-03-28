@@ -68,6 +68,11 @@ export const menuOptions: MenuOption[] = [
         key: "operate-opening-area",
       },
       {
+        label: "计费规则管理",
+        path: "/operate/charge-rule", 
+        key: "operate-charge-rule",
+      },
+      {
         label: "虚拟车头管理",
         path: "/operate/virtual-vehicle",
         key: "operate-virtual-vehicle",
