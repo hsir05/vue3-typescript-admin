@@ -114,6 +114,11 @@ export const menuOptions: MenuOption[] = [
         path: "/capacity/vehicles",
         key: "capacity-vehicles",
       },
+      {
+        label: "司机会员产品管理",
+        path: "/capacity/driver-member",
+        key: "capacity-driver-member",
+      },
     ],
   },
   {

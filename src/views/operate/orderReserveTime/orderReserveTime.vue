@@ -13,7 +13,7 @@
       />
     </div>
     <div class="order-reserve-time-right ml-10px">
-      <n-alert title="Warning 类型" type="warning" class="mb-10px">
+      <n-alert title="提示" type="warning" class="mb-10px">
         接单预留时间指为了不影响后续订单服务而预留出的时间,
         在这段预留出的时间内，不会再接到立即订单。 <br />
         如：专车业务预约订单的接单预留时间设置为60分钟， 则司机的待服务订单中有一个该类型订单，
