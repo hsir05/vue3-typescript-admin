@@ -1,5 +1,3 @@
-
-
 export interface tableDataItem {
   id?: string | null;
   label: string | null;
@@ -7,5 +5,17 @@ export interface tableDataItem {
 }
 
 export interface tableItemProps {
-    id: string | number
+  id: string | number;
+}
+
+export interface tableEditDataItem {
+  id?: string | null;
+  orderBusinessType: null | string;
+  orderType: null | string;
+  reserveTime: null | number;
+  majorBus: null | number ;
+  fastBus: null | number;
+  taxiBus: null | number;
+  cityCode: "110000";
+  acceptOrderReserveTimeSettingId: "";
 }
