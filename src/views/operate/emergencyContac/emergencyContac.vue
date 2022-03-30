@@ -3,7 +3,6 @@
     <div class="emergency-contac-left">
       <div class="mt-10px mb-10px text-right">
         <!-- <span>虚拟车头列表</span> -->
-
         <n-button attr-type="button" type="primary" @click="handleAddContact">
           <template #icon>
             <n-icon> <AddIcon /> </n-icon>

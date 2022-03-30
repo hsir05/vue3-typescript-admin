@@ -6,7 +6,7 @@
         :data="cityData.result"
         :columns="columns"
         class="box-border"
-        min-height="560px"
+        min-height="calc(100vh - 204px)"
         flex-height
         :row-key="getRowKeyId"
         :pagination="false"
