@@ -43,7 +43,7 @@
     </div>
     <!-- 中间 -->
     <div class="opening-business-right">
-      <div class="flex-align-start striped">
+      <div class="busy-type-item striped">
         <span class="vehicle-type-item">#</span>
         <div class="n-checkbox-group">
           <span class="n-checkbox">立即</span>

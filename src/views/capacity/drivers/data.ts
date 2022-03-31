@@ -3,8 +3,8 @@
 export const data = [
   {
     id: 131123,
-    plageNumber: "司机工号",
-    brand: "司机姓名",
+    plageNumber: "京A00002",
+    brand: "丰田",
     carSeies: "雷凌",
     color: '黑色',
     carType: "专车-舒适型",

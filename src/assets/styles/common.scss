@@ -91,15 +91,15 @@ a{
     cursor: pointer;
   }
 }
-
+.striped {
+    background-color: #fafafc;
+  }
 .busy-type-item {
   display: flex;
   align-content: center;
   border: 1px solid #efeff5;
   margin-top: -1px;
-  .striped {
-    background-color: #fafafc;
-  }
+  
   .vehicle-type-item {
     padding: 10px;
     display: inline-block;
