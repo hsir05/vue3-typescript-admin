@@ -15,8 +15,6 @@
 </template>
 <script lang="ts" setup>
 import { toRefs } from "vue";
-// import { Reload as ReloadIcon } from "@vicons/ionicons5";
-
 const props = defineProps({
   title: {
     type: String,

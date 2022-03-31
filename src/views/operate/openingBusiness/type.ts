@@ -1,5 +1,5 @@
 export interface tableItemProps {
-    id: string | number
+  id: string | number;
 }
 
 export interface tableDataItem {
@@ -9,6 +9,18 @@ export interface tableDataItem {
   lock?: number | null;
 }
 
-export interface formState{
-    operateCity: null | string
+export interface formState {
+  operateCity: null | string;
+}
+
+export interface busTypeState {
+  specialEconomic: number[];
+  specialComfort: number[];
+  specialBus: number[];
+  specialPremium: number[];
+  faseEconomic: number[];
+  faseComfort: number[];
+  faseBus: number[];
+  fasePremium: number[];
+  taxi: number[];
 }
