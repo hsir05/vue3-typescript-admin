@@ -1,21 +1,35 @@
 export interface tableDataItem {
   id?: string | null;
-  plageNumber: null | string;
-  brand: null | string;
-  carSeies: null | string;
-  color: null | string;
-  carType: null | string;
+  number: null | string;
+  firstName?: null;
+  secondName?: null;
+  name?: null | string;
+  sex: null | number;
+  phone: null | string;
+  nation: null | string;
+  education: null | string;
   companyName: null | string;
-  create_time: null | string;
-  distance: null | string;
-  plate: null | string;
-  vehiclesType: null | string;
   lock: null | number;
-  remark: null | string;
-  fuelType: null | string;
-  engineNumber: null | string;
-  vin: null | string;
-  engineDisplacement: null | string;
-  drivingPermitType: null | string;
-  vehiclesDate: null | string;
+  status: null | string;
+  create_time?: null | string;
+  address?: null | string;
+  contacts?: null | string;
+  maritalStatus?: null | string;
+  birthDay?: null | string
+}
+
+export interface addressState {
+    address: null;
+    lat: null | number;
+    lng: null | number;
+}
+export interface certificatesState {
+    bareheadedPhoto: null | string;
+    takePhotos: null | string;
+    frontPhoto: null | string;
+    reversePhoto: null | string;
+    frontPage: null | string;
+    reversePage: null | string;
+    frontCer: null | string;
+    reverseCer: null | string;
 }

@@ -6,16 +6,34 @@
       inline
       :rule="rule"
       label-placement="left"
-      label-width="100"
-      class="pt-15px pb-15px bg-white"
-      :show-feedback="false"
+      label-width="80"
+      class="pt-15px pb-15px bg-white mb-5px flex-wrap"
       :model="queryValue"
     >
-      <n-form-item label="车牌号" path="plageNumber">
+      <n-form-item label="司机工号" path="number">
         <n-input
-          v-model:value="queryValue.plageNumber"
+          v-model:value="queryValue.number"
           clearable
-          placeholder="输入车牌号"
+          placeholder="输入司机工号"
+          style="width: 200px"
+        />
+      </n-form-item>
+
+      <n-form-item label="司机姓名" path="name">
+        <n-input
+          v-model:value="queryValue.name"
+          clearable
+          placeholder="输入司机姓名"
+          style="width: 200px"
+        />
+      </n-form-item>
+
+      <n-form-item label="司机手机号" path="phone">
+        <n-input
+          v-model:value="queryValue.phone"
+          clearable
+          :maxlength="11"
+          placeholder="输入司机手机号"
           style="width: 200px"
         />
       </n-form-item>
@@ -23,7 +41,7 @@
       <n-form-item label="运营企业" path="companyName">
         <n-select
           clearable
-          style="width: 150px"
+          style="width: 200px"
           v-model:value="queryValue.companyName"
           placeholder="选择运营企业"
           @update:value="handleUpdateValue"
@@ -31,16 +49,26 @@
         />
       </n-form-item>
 
-      <n-form-item label="车辆类型" path="vehicleType">
+      <n-form-item label="司机状态" path="status">
         <n-select
           clearable
           filterable
-          style="width: 150px"
-          v-model:value="queryValue.vehicleType"
-          placeholder="选择车辆类型"
+          style="width: 200px"
+          v-model:value="queryValue.status"
+          placeholder="选择司机状态"
           @update:value="handleUpdateValue"
           :options="vehicleTypeList.result.vehicleTypeList"
         />
+      </n-form-item>
+
+      <n-form-item label="是否锁定" path="lock">
+        <n-radio-group v-model:value="queryValue.lock">
+          <n-space>
+            <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+              item.label
+            }}</n-radio>
+          </n-space>
+        </n-radio-group>
       </n-form-item>
 
       <n-form-item>
@@ -65,7 +93,8 @@
       @on-pagination="handlepagSize"
     />
     <DriversDrawer ref="driversDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
-    <TraCerDrawer ref="traCerDrawerRef" :width="500" @on-save-after="handleTraSaveAfter" />
+    <DriverCerDrawer ref="driverCerDrawerRef" :width="500" @on-save-after="handleTraSaveAfter" />
+    <AddressDrawer ref="addressDrawerRef" @on-save-after="handleTraSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -75,13 +104,15 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import {
   CreateOutline as CreateIcon,
   EyeOutline as EyeIcon,
-  SyncCircleOutline as SyncCirIcon,
-  GitCompareOutline as GitCompareIcon,
+  LocationOutline as LocationIcon,
   ImageOutline as ImageIcon,
+  RefreshCircleOutline as RefreshIcon,
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DriversDrawer from "./driversDrawer.vue";
-import TraCerDrawer from "./traCerDrawer.vue";
+import AddressDrawer from "./addressDrawer.vue";
+import DriverCerDrawer from "./driverCerDrawer.vue";
+import { statusOptions } from "@/config/form";
 import { tableDataItem } from "./type";
 import { data } from "./data";
 import { NTag } from "naive-ui";
@@ -90,17 +121,21 @@ import { PaginationState } from "@/api/type";
 import vehicleTypeList from "@/config/vehicleTypeList.json";
 export default defineComponent({
   name: "Drivers",
-  components: { BasicTable, DriversDrawer, TraCerDrawer },
+  components: { BasicTable, DriversDrawer, AddressDrawer, DriverCerDrawer },
   setup() {
     const loading = ref(false);
-    const vehiclesDrawerRef = ref();
-    const traCerDrawerRef = ref();
+    const driversDrawerRef = ref();
     const basicTableRef = ref();
+    const addressDrawerRef = ref();
+    const driverCerDrawerRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      plageNumber: null,
+      number: null,
       companyName: null,
-      vehicleType: null,
+      phone: null,
+      name: null,
+      status: null,
+      lock: 1,
     });
 
     // const data = ref<tableDataItem[]>([]);
@@ -116,35 +151,35 @@ export default defineComponent({
           return h("span", `${rowIndex + 1}`);
         },
       },
-      { title: "车牌号", key: "plageNumber", width: 100, align: "center" },
+      { title: "司机工号", key: "number", width: 100, align: "center" },
       {
-        title: "车辆品牌",
-        key: "brand",
+        title: "司机姓名",
+        key: "name",
         width: 100,
         align: "center",
       },
       {
-        title: "车系",
-        key: "carSeies",
+        title: "司机性别",
+        key: "sex",
         width: 100,
         align: "center",
       },
       {
-        title: "车辆型号",
-        key: "carType",
+        title: "司机手机号",
+        key: "phone",
         width: 100,
         align: "center",
       },
 
       {
-        title: "车辆颜色",
-        key: "color",
+        title: "司机民族",
+        key: "nation",
         width: 110,
         align: "center",
       },
       {
-        title: "核定载客位",
-        key: "plate",
+        title: "司机学历",
+        key: "education",
         width: 100,
         align: "center",
       },
@@ -155,15 +190,9 @@ export default defineComponent({
         align: "center",
       },
       {
-        title: "车辆类型",
-        key: "vehiclesType",
-        width: 110,
-        align: "center",
-      },
-      {
-        title: "状态",
+        title: "是否锁定",
         key: "lock",
-        width: 70,
+        width: 110,
         align: "center",
         render(row: tableDataItem) {
           return h(
@@ -176,6 +205,12 @@ export default defineComponent({
             }
           );
         },
+      },
+      {
+        title: "司机状态",
+        key: "status",
+        width: 80,
+        align: "center",
       },
       {
         title: "添加时间",
@@ -193,7 +228,7 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
-                label: "查看",
+                label: "详情",
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
@@ -209,27 +244,27 @@ export default defineComponent({
                 auth: ["dict001"],
               },
               {
-                label: "编辑运输证照片信息",
+                label: "编辑司机家庭地址",
+                type: "primary",
+                icon: LocationIcon,
+                isIconBtn: true,
+                onClick: handleAddress.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "证件照片信息",
                 type: "primary",
                 icon: ImageIcon,
                 isIconBtn: true,
-                onClick: handleTraCert.bind(null, record),
+                onClick: handleCert.bind(null, record),
                 auth: ["dict001"],
               },
               {
-                label: "里程清零",
+                label: "还原密码",
                 type: "primary",
-                icon: SyncCirIcon,
+                icon: RefreshIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
-                auth: ["dict001"],
-              },
-              {
-                label: "车辆转移",
-                type: "primary",
-                icon: GitCompareIcon,
-                isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: resetPassword.bind(null, record),
                 auth: ["dict001"],
               },
             ],
@@ -265,27 +300,34 @@ export default defineComponent({
     }
     function hanldleSee(record: Recordable) {
       console.log(record);
-      const { openDrawer } = vehiclesDrawerRef.value;
+      const { openDrawer } = driversDrawerRef.value;
       openDrawer("查看", "see");
     }
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = vehiclesDrawerRef.value;
-      openDrawer("编辑车辆", record);
+      const { openDrawer } = driversDrawerRef.value;
+      openDrawer("编辑司机信息", record);
     }
-    function handleTraCert(record: Recordable) {
-      const { openDrawer } = traCerDrawerRef.value;
-      openDrawer("编辑运输证照片信息", record);
+    function handleCert(record: Recordable) {
+      console.log("点击了证件", record.id);
+      const { openDrawer } = driverCerDrawerRef.value;
+      openDrawer("编辑司机证件信息", record);
+    }
+    function handleAddress(record: Recordable) {
+      const { openDrawer } = addressDrawerRef.value;
+      openDrawer("司机家庭地址编辑", record);
     }
     function handleBatch() {
       console.log("点击了批量删除");
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = vehiclesDrawerRef.value;
-      openDrawer("新增用户");
+      const { openDrawer } = driversDrawerRef.value;
+      openDrawer("添加司机");
     }
+
+    function resetPassword() {}
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
@@ -295,7 +337,14 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { plageNumber: null, companyName: null, vehicleType: null };
+      queryValue.value = {
+        number: null,
+        phone: null,
+        companyName: null,
+        status: null,
+        name: null,
+        lock: 1,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });
@@ -330,8 +379,9 @@ export default defineComponent({
       queryValue,
       data,
       loading,
-      vehiclesDrawerRef,
-      traCerDrawerRef,
+      driversDrawerRef,
+      driverCerDrawerRef,
+      addressDrawerRef,
       basicTableRef,
       columns,
       itemCount,
@@ -340,6 +390,7 @@ export default defineComponent({
         openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
       options: [],
+      statusOptions,
       vehicleTypeList,
 
       reloadPage,
@@ -350,6 +401,7 @@ export default defineComponent({
       handleCheckRow,
       handlePage,
       handlepagSize,
+      resetPassword,
       handleSaveAfter,
       handleTraSaveAfter,
       handleUpdateValue,

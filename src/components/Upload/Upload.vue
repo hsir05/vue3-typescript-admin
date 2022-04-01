@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full">
+  <div class="w-fulls">
     <div class="upload">
       <div class="upload-card">
         <!--图片列表-->
@@ -177,7 +177,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .upload {
-  width: 400px;
+  min-width: 150px;
   overflow: hidden;
 
   &-card {
