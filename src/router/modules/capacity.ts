@@ -55,6 +55,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/capacity/drivers/drivers.vue"),
       },
+       {
+        path: "/capacity/vehicle-allocation",
+        name: `capacity_vehicle-allocation`,
+        meta: {
+          title: "车辆分配",
+        },
+        component: () => import("@/views/capacity/vehicleAllocation/vehicleAllocation.vue"),
+      },
       {
         path: "/capacity/driver-member",
         name: `capacity_driver-member`,
