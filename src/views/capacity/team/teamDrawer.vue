@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" :width="1000" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" :title="title" :width="900" @on-close-after="onCloseAfter">
     <n-descriptions label-placement="left" bordered title="班级信息">
       <n-descriptions-item>
         <template #label> 早餐 </template>
@@ -17,6 +17,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, toRefs, reactive } from "vue";
+import { tableDataItem } from "./type";
 export default defineComponent({
   name: "TeamDrawer",
   setup() {
@@ -26,6 +27,11 @@ export default defineComponent({
       loading: false,
     });
 
+    function openDrawer(record?: tableDataItem) {
+      console.log(record);
+      state.isDrawer = true;
+    }
+
     function onCloseAfter() {
       state.isDrawer = false;
       state.loading = false;
@@ -34,6 +40,7 @@ export default defineComponent({
     return {
       title,
       ...toRefs(state),
+      openDrawer,
 
       onCloseAfter,
     };

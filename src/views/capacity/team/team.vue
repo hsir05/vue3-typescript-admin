@@ -54,6 +54,8 @@
           createTiem: '2020-04-24 08:51',
           avatar: 'http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png',
         }"
+        @on-member="handleMember"
+        @on-see="handleSee"
       />
     </div>
 
@@ -72,6 +74,7 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false);
+    const teamDrawerRef = ref();
     const queryValue = ref({
       teamCode: null,
       teamName: null,
@@ -81,6 +84,12 @@ export default defineComponent({
     function searchHandle() {}
     function reset() {}
 
+    function handleMember() {
+      const { openDrawer } = teamDrawerRef.value;
+      openDrawer();
+    }
+    function handleSee() {}
+
     return {
       loading,
       rule: {},
@@ -89,6 +98,9 @@ export default defineComponent({
 
       searchHandle,
       reset,
+      teamDrawerRef,
+      handleMember,
+      handleSee,
     };
   },
 });
