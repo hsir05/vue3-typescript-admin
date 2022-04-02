@@ -6,9 +6,8 @@
       inline
       label-placement="left"
       label-width="80"
-      :style="{ flexWrap: 'wrap', justifyContent: 'space-around' }"
-      class="pt-15px pb-15px bg-white"
-      :show-feedback="false"
+      :style="{ flexWrap: 'wrap', justifyContent: 'flex-start' }"
+      class="pt-15px pb-15px bg-white mb-5px"
       :model="queryValue"
     >
       <n-form-item label="车牌号" path="plate">
@@ -59,6 +58,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -137,7 +137,7 @@ export default defineComponent({
       {
         title: "车辆类型",
         key: "phone",
-        width: 110,
+        width: 100,
         align: "center",
       },
       {
@@ -172,7 +172,7 @@ export default defineComponent({
         title: "操作",
         key: "action",
         align: "center",
-        width: "130px",
+        width: "90px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
@@ -269,6 +269,7 @@ export default defineComponent({
       data,
       loading,
       agentDrawerRef,
+      getRowKeyId: (row: tableDataItem) => row.id,
       options: [],
       basicTableRef,
       columns,
