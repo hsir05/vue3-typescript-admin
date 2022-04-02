@@ -124,6 +124,11 @@ export const menuOptions: MenuOption[] = [
         path: "/capacity/vehicle-allocation",
         key: "capacity-vehicle-allocation",
       },
+       {
+        label: "班级管理",
+        path: "/capacity/team",
+        key: "capacity-team",
+      },
       {
         label: "司机会员产品管理",
         path: "/capacity/driver-member",

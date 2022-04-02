@@ -63,6 +63,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/capacity/vehicleAllocation/vehicleAllocation.vue"),
       },
+       {
+        path: "/capacity/team",
+        name: `capacity_team`,
+        meta: {
+          title: "班级管理",
+        },
+        component: () => import("@/views/capacity/team/team.vue"),
+      },
       {
         path: "/capacity/driver-member",
         name: `capacity_driver-member`,
