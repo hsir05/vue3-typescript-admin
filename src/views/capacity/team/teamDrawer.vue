@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" width="1000" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" :title="title" :width="1000" @on-close-after="onCloseAfter">
     <n-descriptions label-placement="left" bordered title="班级信息">
       <n-descriptions-item>
         <template #label> 早餐 </template>
