@@ -147,6 +147,18 @@ export const menuOptions: MenuOption[] = [
     ],
   },
   {
+    label: "个人客户会员关系管理",
+    key: "individual-customer-member",
+    icon: renderIcon(CafeIcon),
+    children: [
+      {
+        label: "个人客户会员关系管理",
+        path: "/individual-customer/member",
+        key: "individual-customer-member",
+      },
+    ]
+},
+  {
     label: "设置管理",
     key: "bear-setting",
     icon: renderIcon(SettingsIcon),
