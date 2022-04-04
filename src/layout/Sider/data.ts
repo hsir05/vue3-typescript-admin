@@ -84,8 +84,8 @@ export const menuOptions: MenuOption[] = [
       },
       {
         label: "平台紧急联系人管理",
-        path: "/operate/emergency-contac",
-        key: "operate-emergency-contac",
+        path: "/operate/plat-eme-contact",
+        key: "operate-plat-eme-contact",
       },
     ],
   },
@@ -128,6 +128,11 @@ export const menuOptions: MenuOption[] = [
         label: "班级管理",
         path: "/capacity/team",
         key: "capacity-team",
+      },
+      {
+        label: "企业紧急联系人",
+        path: "/capacity/ente-eme-contact",
+        key: "capacity-ente-eme-contact",
       },
       {
         label: "司机会员产品管理",

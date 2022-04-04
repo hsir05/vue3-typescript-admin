@@ -70,7 +70,7 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
-    const title = ref("菜单");
+    const title = ref("");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<tableDataItem>({

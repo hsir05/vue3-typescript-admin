@@ -64,12 +64,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/operate/orderReserveTime/orderReserveTime.vue"),
       },
       {
-        path: "/operate/emergency-contac",
-        name: `operate_emergency-contac`,
+        path: "/operate/plat-eme-contact",
+        name: `operate_plat-eme-contact`,
         meta: {
           title: "平台紧急联系人管理",
         },
-        component: () => import("@/views/operate/emergencyContac/emergencyContac.vue"),
+        component: () => import("@/views/operate/platEmeContact/platEmeContact.vue"),
       },
       {
         path: "/operate/charge-rule",

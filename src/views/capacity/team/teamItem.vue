@@ -81,8 +81,9 @@ const handleMember = () => {
 <style lang="scss" scoped>
 .team-info-wrap {
   border: 1px solid #efeff5;
-  width: 400px;
-  margin: 5px 15px;
+  width: 375px;
+  max-width: 33%;
+  margin: 5px 7px;
   .team-info-item {
     border: 1px solid #efeff5;
     margin: -1px;
@@ -91,8 +92,8 @@ const handleMember = () => {
   }
   .item {
     display: inline-block;
-    padding: 5px 10px;
-    min-width: 90px;
+    padding: 5px;
+    min-width: 80px;
     text-align: center;
   }
   .team-info-item-label {

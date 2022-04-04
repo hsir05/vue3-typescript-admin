@@ -71,6 +71,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/capacity/team/team.vue"),
       },
+       {
+        path: "/capacity/ente-eme-contact",
+        name: `capacity_ente-eme-contact`,
+        meta: {
+          title: "企业紧急联系人",
+        },
+        component: () => import("@/views/capacity/enteEmeContact/enteEmeContact.vue"),
+      },
       {
         path: "/capacity/driver-member",
         name: `capacity_driver-member`,
