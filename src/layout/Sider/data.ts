@@ -135,6 +135,11 @@ export const menuOptions: MenuOption[] = [
         key: "capacity-ente-eme-contact",
       },
       {
+        label: "值班调度人",
+        path: "/capacity/dispatcher",
+        key: "capacity-dispatcher",
+      },
+      {
         label: "司机会员产品管理",
         path: "/capacity/driver-member",
         key: "capacity-driver-member",

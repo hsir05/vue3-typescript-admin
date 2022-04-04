@@ -80,6 +80,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/capacity/enteEmeContact/enteEmeContact.vue"),
       },
       {
+        path: "/capacity/dispatcher",
+        name: `capacity_dispatcher`,
+        meta: {
+          title: "企业值班调度人",
+        },
+        component: () => import("@/views/capacity/dispatcher/dispatcher.vue"),
+      },
+      {
         path: "/capacity/driver-member",
         name: `capacity_driver-member`,
         meta: {

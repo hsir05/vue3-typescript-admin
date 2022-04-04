@@ -55,11 +55,7 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <EnteEmeContactDrawer
-      ref="enteEmeContactDrawerRef"
-      :width="500"
-      @on-save-after="handleSaveAfter"
-    />
+    <DispatcherDrawer ref="dispatcherDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -67,18 +63,18 @@ import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import EnteEmeContactDrawer from "./enteEmeContactDrawer.vue";
+import DispatcherDrawer from "./dispatcherDrawer.vue";
 import { tableDataItem } from "./type";
 import { data } from "./data";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
-  name: "EnteEmeContact",
-  components: { BasicTable, EnteEmeContactDrawer },
+  name: "Dispatcher",
+  components: { BasicTable, DispatcherDrawer },
   setup() {
     const loading = ref(false);
-    const enteEmeContactDrawerRef = ref();
+    const dispatcherDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
@@ -109,32 +105,32 @@ export default defineComponent({
         align: "center",
       },
       {
-        title: "紧急联系人姓名",
+        title: "值班调度人姓名",
         key: "name",
         align: "center",
       },
       {
-        title: "紧急联系人手机号",
+        title: "值班调度人手机号",
         key: "phone",
         align: "center",
       },
       {
-        title: "紧急联系人邮箱",
+        title: "值班调度人邮箱",
         key: "email",
         align: "center",
       },
       {
-        title: "值班时间开始",
+        title: "值班开始时间",
         key: "time_start",
         align: "center",
       },
       {
-        title: "值班时间结束",
+        title: "	值班结束时间",
         key: "time_end",
         align: "center",
       },
       {
-        title: "添加时间",
+        title: "创建时间",
         key: "create_time",
         align: "center",
       },
@@ -200,7 +196,7 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = enteEmeContactDrawerRef.value;
+      const { openDrawer } = dispatcherDrawerRef.value;
       openDrawer("编辑企业紧急联系人", record);
     }
     function handleBatch() {
@@ -208,7 +204,7 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = enteEmeContactDrawerRef.value;
+      const { openDrawer } = dispatcherDrawerRef.value;
       openDrawer("新增企业紧急联系人");
     }
     function handleRemove(record: Recordable) {
@@ -254,7 +250,7 @@ export default defineComponent({
       queryValue,
       data,
       loading,
-      enteEmeContactDrawerRef,
+      dispatcherDrawerRef,
       basicTableRef,
       statusOptions,
       columns,
