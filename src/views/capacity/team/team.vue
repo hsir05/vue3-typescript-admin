@@ -46,26 +46,41 @@
     </n-form>
 
     <div class="team-box">
-      <TeamItem
-        :item="{
-          code: 'AT300',
-          name: '里斯',
-          number: 13123,
-          createTiem: '2020-04-24 08:51',
-          avatar: 'http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png',
-        }"
-        @on-member="handleMember"
-        @on-see="handleSee"
-      />
+      <div class="team-content">
+        <TeamItem
+          v-for="item in data"
+          :key="item.id"
+          :item="item"
+          @on-member="handleMember"
+          @on-see="handleSee"
+        />
+      </div>
+      <!-- 分页 -->
+      <n-pagination
+        v-if="itemCount"
+        v-model:page="page"
+        v-model:page-size="pageSize"
+        v-model:item-count="itemCount"
+        :page-slot="5"
+        :show-size-picker="true"
+        :show-quick-jumper="true"
+        class="mt-10px justify-end mr-10px"
+        :on-update:page="handlePage"
+        :on-update:page-size="handlePageSize"
+        :page-sizes="pageSizes"
+      >
+        <template #prefix> 共 {{ itemCount }} 项 </template>
+      </n-pagination>
     </div>
 
     <TeamDrawer ref="teamDrawerRef" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, reactive, toRefs } from "vue";
 import TeamItem from "./teamItem.vue";
 import TeamDrawer from "./teamDrawer.vue";
+import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "Team",
   components: {
@@ -81,6 +96,12 @@ export default defineComponent({
       companyName: null,
     });
 
+    const itemCount = ref(null);
+    const pagination = reactive({
+      page: 1,
+      pageSize: 10,
+    });
+
     function searchHandle() {}
     function reset() {}
 
@@ -90,17 +111,72 @@ export default defineComponent({
     }
     function handleSee() {}
 
+    function handlePage(page: number) {
+      pagination.page = page;
+    }
+    // 每页显示
+    function handlePageSize(pageSize: number) {
+      pagination.pageSize = pageSize;
+    }
+
     return {
       loading,
+      pageSizes,
+      ...toRefs(pagination),
+      itemCount,
       rule: {},
       options: [],
       queryValue,
+      data: [
+        {
+          code: "AT300",
+          name: "里斯",
+          id: "wrwer23423",
+          number: 13123,
+          createTiem: "2020-04-24 08:51",
+          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
+        },
+        {
+          code: "AT300",
+          name: "里斯22",
+          id: "wrwer23423",
+          number: 13144423,
+          createTiem: "2020-04-24 08:51",
+          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
+        },
+        {
+          code: "AT300",
+          name: "里斯33",
+          id: "wrwer23423",
+          number: 1313333344423,
+          createTiem: "2020-04-24 08:51",
+          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
+        },
+        {
+          code: "AT300",
+          name: "里斯444",
+          id: "wrwer23423",
+          number: 1314455555423,
+          createTiem: "2020-04-24 08:51",
+          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
+        },
+        {
+          code: "AT300",
+          name: "阿法纳西.阿法纳西耶维奇",
+          id: "wrwer23423",
+          number: 13144466666623,
+          createTiem: "2020-04-24 08:51",
+          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
+        },
+      ],
 
       searchHandle,
       reset,
       teamDrawerRef,
       handleMember,
       handleSee,
+      handlePage,
+      handlePageSize,
     };
   },
 });
@@ -110,5 +186,11 @@ export default defineComponent({
   width: 100%;
   background-color: $white;
   padding: 5px;
+}
+.team-content {
+  display: flex;
+  align-content: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 </style>
