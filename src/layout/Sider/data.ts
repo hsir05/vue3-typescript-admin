@@ -166,6 +166,11 @@ export const menuOptions: MenuOption[] = [
         path: "/individual-customer/transaction-list",
         key: "individual-customer-transaction-list",
       },
+      {
+        label: "个人客户发票申请列表",
+        path: "/individual-customer/invoice-list",
+        key: "individual-customer-invoice-list",
+      },
     ]
 },
   {

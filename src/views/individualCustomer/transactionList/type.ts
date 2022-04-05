@@ -6,6 +6,7 @@ export interface tableDataItem{
     rechargeAmount: null | string 
     giveAmount: null | string
     transactionBlance: null | string
+    transactionTotalAmount: null | string
     currentAmount: null | string
     walletType: null | string
     remark: null | string

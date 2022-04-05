@@ -39,6 +39,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/individualCustomer/transactionList/transactionList.vue"),
       },
+       {
+        path: "/individual-customer/invoice-list",
+        name: `individual-invoice-list`,
+        meta: {
+          title: "个人客户发票申请列表",
+        },
+        component: () => import("@/views/individualCustomer/invoiceApplicationList/invoiceApplicationList.vue"),
+      },
     ]
     },
 ];

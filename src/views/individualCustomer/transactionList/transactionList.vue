@@ -7,9 +7,19 @@
       label-placement="left"
       label-width="120"
       class="pt-15px pb-15px bg-white mb-5px"
+      style="flex-wrap: wrap"
       :show-feedback="false"
       :model="queryValue"
     >
+      <n-form-item label="交易类型" path="status">
+        <n-radio-group v-model:value="queryValue.type">
+          <n-space>
+            <n-radio :value="null">全部</n-radio>
+            <n-radio :value="0">入账</n-radio>
+            <n-radio :value="1">出账</n-radio>
+          </n-space>
+        </n-radio-group>
+      </n-form-item>
       <n-form-item label="交易流水号" path="transactionCode">
         <n-input
           v-model:value="queryValue.transactionCode"
@@ -18,10 +28,20 @@
         />
       </n-form-item>
       <n-form-item label="交易时间(起始)" path="transaction_start">
-        <n-date-picker v-model:value="queryValue.transaction_start" type="date" clearable />
+        <n-date-picker
+          v-model:value="queryValue.transaction_start"
+          style="width: 120px"
+          type="date"
+          clearable
+        />
       </n-form-item>
       <n-form-item label="交易时间(结束)" path="transaction_end">
-        <n-date-picker v-model:value="queryValue.transaction_end" type="date" clearable />
+        <n-date-picker
+          v-model:value="queryValue.transaction_end"
+          style="width: 120px"
+          type="date"
+          clearable
+        />
       </n-form-item>
       <n-form-item>
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
@@ -70,6 +90,7 @@ export default defineComponent({
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
+      type: 1,
       transactionCode: null,
       transaction_start: null,
       transaction_end: null,
@@ -184,6 +205,7 @@ export default defineComponent({
 
     const reset = () => {
       queryValue.value = {
+        type: 1,
         transactionCode: null,
         transaction_start: null,
         transaction_end: null,
