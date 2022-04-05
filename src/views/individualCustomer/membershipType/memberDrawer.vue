@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" :width="750" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
       :rules="rules"

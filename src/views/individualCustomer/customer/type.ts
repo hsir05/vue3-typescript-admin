@@ -6,3 +6,7 @@ export interface tableDataItem{
     membershipType: string | null
     descript: string | null
 }
+
+export interface formState{
+    membershipType: null | string
+}

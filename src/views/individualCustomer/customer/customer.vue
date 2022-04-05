@@ -49,25 +49,32 @@
       @on-pagination="handlepagSize"
     />
     <DetailDrawer ref="detailDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <TypeModal ref="typeModalRef" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import {
+  EyeOutline as EyeIcon,
+  CreateOutline as CreateIcon,
+  LockClosedOutline as LockClosedIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { NTag } from "naive-ui";
 import DetailDrawer from "./detailDrawer.vue";
+import TypeModal from "./typeModal.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "Customer",
-  components: { BasicTable, DetailDrawer },
+  components: { BasicTable, DetailDrawer, TypeModal },
   setup() {
     const loading = ref(false);
     const detailDrawerRef = ref();
+    const typeModalRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
@@ -143,13 +150,23 @@ export default defineComponent({
                 label: "详情",
                 type: "primary",
                 icon: EyeIcon,
+                isIconBtn: true,
                 onClick: handleSee.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "锁定",
+                type: "primary",
+                icon: LockClosedIcon,
+                isIconBtn: true,
+                onClick: handleLock.bind(null, record),
                 auth: ["dict001"],
               },
               {
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
@@ -187,13 +204,16 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = detailDrawerRef.value;
-      openDrawer("编辑会员", record);
+      const { handleModal } = typeModalRef.value;
+      handleModal(record);
     }
     function handleSee(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = detailDrawerRef.value;
-      openDrawer("会员详情", record);
+      openDrawer("编辑会员", record);
+    }
+    function handleLock(record: Recordable) {
+      console.log("点击了编辑", record.id);
     }
     function handleBatch() {
       console.log("点击了批量删除");
@@ -250,6 +270,7 @@ export default defineComponent({
 
       reloadPage,
       handleAdd,
+      typeModalRef,
       handleBatch,
       searchHandle,
       reset,
