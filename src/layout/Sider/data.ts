@@ -156,6 +156,11 @@ export const menuOptions: MenuOption[] = [
         path: "/individual-customer/member",
         key: "individual-customer-member",
       },
+      {
+        label: "已注销个人客户",
+        path: "/individual-customer/cancel-customer",
+        key: "individual-customer-cancel-customer",
+      },
     ]
 },
   {

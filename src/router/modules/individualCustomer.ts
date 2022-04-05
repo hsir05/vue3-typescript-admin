@@ -23,6 +23,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/individualCustomer/member/member.vue"),
       },
+      {
+        path: "/individual-customer/cancel-customer",
+        name: `individual-cancel-customer`,
+        meta: {
+          title: "已注销个人客户",
+        },
+        component: () => import("@/views/individualCustomer/cancelCustomer/cancelCustomer.vue"),
+      },
     ]
     },
 ];
