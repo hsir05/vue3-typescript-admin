@@ -161,6 +161,11 @@ export const menuOptions: MenuOption[] = [
         path: "/individual-customer/cancel-customer",
         key: "individual-customer-cancel-customer",
       },
+      {
+        label: "个人钱包交易记录总览",
+        path: "/individual-customer/transaction-list",
+        key: "individual-customer-transaction-list",
+      },
     ]
 },
   {

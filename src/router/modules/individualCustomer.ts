@@ -31,6 +31,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/individualCustomer/cancelCustomer/cancelCustomer.vue"),
       },
+       {
+        path: "/individual-customer/transaction-list",
+        name: `individual-transaction-list`,
+        meta: {
+          title: "个人钱包交易记录总览",
+        },
+        component: () => import("@/views/individualCustomer/transactionList/transactionList.vue"),
+      },
     ]
     },
 ];
