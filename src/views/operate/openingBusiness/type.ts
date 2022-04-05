@@ -18,9 +18,9 @@ export interface busTypeState {
   specialComfort: number[];
   specialBus: number[];
   specialPremium: number[];
-  faseEconomic: number[];
-  faseComfort: number[];
-  faseBus: number[];
-  fasePremium: number[];
+  fastEconomic: number[];
+  fastComfort: number[];
+  fastBus: number[];
+  fastPremium: number[];
   taxi: number[];
 }

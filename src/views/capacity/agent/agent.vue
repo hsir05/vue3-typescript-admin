@@ -6,7 +6,7 @@
       inline
       label-placement="left"
       label-width="100"
-      class="pt-15px pb-15px bg-white"
+      class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
     >

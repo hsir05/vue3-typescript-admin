@@ -6,7 +6,7 @@
       inline
       label-placement="left"
       label-width="70"
-      class="pt-15px pb-15px bg-white"
+      class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
     >
@@ -19,7 +19,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="会员状态" path="radioGroupValue">
+      <n-form-item label="会员状态" path="status">
         <n-radio-group v-model:value="queryValue.status">
           <n-radio :value="null">全部</n-radio>
           <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
@@ -40,6 +40,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :rowKey="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -72,12 +73,24 @@ export default defineComponent({
     const itemCount = ref(null);
     const queryValue = ref({
       name: "",
-      account: "",
-      phone: "",
-      status: null,
+      status: 1,
     });
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<tableDataItem[]>([
+      {
+        id: "3123123123",
+        name: "普通客户",
+        specialDiscount: 1.0,
+        specialLimit: 100,
+        fastlDiscount: null,
+        fastlLimit: null,
+        taxilDiscount: null,
+        taxilLimit: null,
+        status: 1,
+        type: "其他会员",
+        descript: "普通客户",
+      },
+    ]);
 
     const columns = [
       {
@@ -208,7 +221,7 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", account: "", phone: "", status: null };
+      queryValue.value = { name: "", status: 1 };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });
@@ -243,6 +256,7 @@ export default defineComponent({
       statusOptions,
       columns,
       itemCount,
+      getRowKeyId: (row: tableDataItem) => row.id,
 
       reloadPage,
       handleAdd,

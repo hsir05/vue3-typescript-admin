@@ -70,17 +70,17 @@
         :striped="true"
       />
 
-      <BusTypeItem title="快车-经济型" :list="faseEconomic" @on-update-value="handleFastEco" />
+      <BusTypeItem title="快车-经济型" :list="fastEconomic" @on-update-value="handleFastEco" />
       <BusTypeItem
         title="快车-舒适型"
-        :list="faseComfort"
+        :list="fastComfort"
         @on-update-value="handleFastCom"
         :striped="true"
       />
-      <BusTypeItem title="快车-商务型" :list="faseBus" @on-update-value="handleFastBus" />
+      <BusTypeItem title="快车-商务型" :list="fastBus" @on-update-value="handleFastBus" />
       <BusTypeItem
         title="快车-豪华型"
-        :list="fasePremium"
+        :list="fastPremium"
         @on-update-value="handleFastPre"
         :striped="true"
       />
@@ -127,10 +127,10 @@ export default defineComponent({
       specialComfort: [],
       specialBus: [],
       specialPremium: [],
-      faseEconomic: [],
-      faseComfort: [],
-      faseBus: [],
-      fasePremium: [],
+      fastEconomic: [],
+      fastComfort: [],
+      fastBus: [],
+      fastPremium: [],
       taxi: [],
     });
 
@@ -198,19 +198,19 @@ export default defineComponent({
       console.log(value);
     }
     function handleFastEco(value: number[]) {
-      state.faseEconomic = value;
+      state.fastEconomic = value;
       console.log(value);
     }
     function handleFastCom(value: number[]) {
-      state.faseComfort = value;
+      state.fastComfort = value;
       console.log(value);
     }
     function handleFastBus(value: number[]) {
-      state.faseBus = value;
+      state.fastBus = value;
       console.log(value);
     }
     function handleFastPre(value: number[]) {
-      state.fasePremium = value;
+      state.fastPremium = value;
       console.log(value);
     }
     function handleTaxi(value: number[]) {

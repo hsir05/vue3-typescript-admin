@@ -1,9 +1,16 @@
 export interface tableDataItem {
-    name: null | string;
-    discount: number | null;
-    descript: null | string;
-    status: number | null;
-    limit: number | null;
-    type: number | null;
-    remark: string | null;
+  id?: string;
+  name: null | string;
+
+  specialDiscount: number | null;
+  specialLimit: number | null;
+
+  fastlDiscount: number | null;
+  fastlLimit: number | null;
+
+  taxilDiscount: number | null;
+  taxilLimit: number | null;
+  descript: null | string;
+  status: number | null;
+  type: string | null;
 }
