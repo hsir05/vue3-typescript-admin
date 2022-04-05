@@ -69,7 +69,7 @@ export const menuOptions: MenuOption[] = [
       },
       {
         label: "计费规则管理",
-        path: "/operate/charge-rule", 
+        path: "/operate/charge-rule",
         key: "operate-charge-rule",
       },
       {
@@ -87,7 +87,6 @@ export const menuOptions: MenuOption[] = [
         path: "/operate/plat-eme-contact",
         key: "operate-plat-eme-contact",
       },
-      
     ],
   },
   {
@@ -104,7 +103,7 @@ export const menuOptions: MenuOption[] = [
         label: "代理商管理",
         path: "/capacity/agent",
         key: "capacity-agent",
-      }, 
+      },
       {
         label: "订单抽成比率",
         path: "/capacity/order-commissions",
@@ -125,7 +124,7 @@ export const menuOptions: MenuOption[] = [
         path: "/capacity/vehicle-allocation",
         key: "capacity-vehicle-allocation",
       },
-       {
+      {
         label: "班级管理",
         path: "/capacity/team",
         key: "capacity-team",
@@ -155,7 +154,7 @@ export const menuOptions: MenuOption[] = [
       {
         label: "个人客户会员类型管理",
         path: "/individual-customer/membership-type",
-        key: "individual-customer-membership-type", 
+        key: "individual-customer-membership-type",
       },
       {
         label: "个人客户管理",
@@ -167,7 +166,7 @@ export const menuOptions: MenuOption[] = [
         path: "/individual-customer/cancel-customer",
         key: "individual-customer-cancel-customer",
       },
-       {
+      {
         label: "个人客户钱包管理",
         path: "/individual-customer/wallet",
         key: "individual-customer-wallet",
@@ -187,8 +186,8 @@ export const menuOptions: MenuOption[] = [
         path: "/individual-customer/wallet-refund-application",
         key: "individual-individual-customer/wallet-refund-application",
       },
-    ]
-},
+    ],
+  },
   {
     label: "设置管理",
     key: "bear-setting",

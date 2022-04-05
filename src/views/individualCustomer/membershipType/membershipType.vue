@@ -65,7 +65,7 @@ import { statusOptions } from "@/config/form";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "MembershipType",
-  components: { BasicTable, MemberDrawer },
+  components: { MemberDrawer, BasicTable },
   setup() {
     const loading = ref(false);
     const memberDrawerRef = ref();

@@ -48,7 +48,7 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <UserDrawer ref="userDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <DetailDrawer ref="detailDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -57,17 +57,17 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { NTag } from "naive-ui";
-import UserDrawer from "./userDrawer.vue";
+import DetailDrawer from "./detailDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "Customer",
-  components: { BasicTable, UserDrawer },
+  components: { BasicTable, DetailDrawer },
   setup() {
-    const loading = ref(true);
-    const userDrawerRef = ref();
+    const loading = ref(false);
+    const detailDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
@@ -187,12 +187,12 @@ export default defineComponent({
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = userDrawerRef.value;
+      const { openDrawer } = detailDrawerRef.value;
       openDrawer("编辑会员", record);
     }
     function handleSee(record: Recordable) {
       console.log("点击了编辑", record.id);
-      const { openDrawer } = userDrawerRef.value;
+      const { openDrawer } = detailDrawerRef.value;
       openDrawer("会员详情", record);
     }
     function handleBatch() {
@@ -200,7 +200,7 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = userDrawerRef.value;
+      const { openDrawer } = detailDrawerRef.value;
       openDrawer("新增用户");
     }
 
@@ -242,7 +242,7 @@ export default defineComponent({
       queryValue,
       data,
       loading,
-      userDrawerRef,
+      detailDrawerRef,
       basicTableRef,
       statusOptions,
       columns,
