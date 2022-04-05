@@ -125,7 +125,7 @@ import { FormInst, useMessage } from "naive-ui";
 import { statusOptions } from "@/config/form";
 import { tableDataItem } from "./type";
 export default defineComponent({
-  name: "UserDrawer",
+  name: "MemberDrawer",
   setup(_, { emit }) {
     const state = reactive({
       isDrawer: false,

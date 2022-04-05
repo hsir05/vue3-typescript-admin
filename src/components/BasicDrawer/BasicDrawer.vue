@@ -32,8 +32,6 @@ const props = defineProps({
 const isDrawer = ref(false);
 // 响应式的引用
 const { title, width, placement } = toRefs(props);
-console.log(width.value);
-
 // @ts-ignore
 // function openDrawer(){
 //   isDrawer.value = true;

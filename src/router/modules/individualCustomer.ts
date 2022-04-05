@@ -5,23 +5,31 @@ import { renderIcon } from "@/utils/index";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/individual-customer",
     name: "individual-customer",
-    redirect: "/individual-customer/member",
+    redirect: "/individual-customer/membership-type",
     component: PARENTLAYOUT,
     meta: {
       title: "个人客户关系管理",
       icon: renderIcon(CafeIcon),
       sort: 1,
-    },
+    }, 
      children: [
       {
-        path: "/individual-customer/member",
+        path: "/individual-customer/membership-type",
         name: `individual-customer`,
         meta: {
           title: "个人客户会员类型管理",
         },
-        component: () => import("@/views/individualCustomer/member/member.vue"),
+        component: () => import("@/views/individualCustomer/membershipType/membershipType.vue"),
+      },
+      {
+        path: "/individual-customer/customer",
+        name: `individual-customer`,
+        meta: {
+          title: "个人客户管理",
+        },
+        component: () => import("@/views/individualCustomer/customer/customer.vue"),
       },
       {
         path: "/individual-customer/cancel-customer",
@@ -32,10 +40,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/individualCustomer/cancelCustomer/cancelCustomer.vue"),
       },
        {
+        path: "/individual-customer/wallet",
+        name: `individual-wallet`,
+        meta: {
+          title: "个人客户钱包管理",
+        },
+        component: () => import("@/views/individualCustomer/wallet/wallet.vue"),
+      },
+       {
         path: "/individual-customer/transaction-list",
         name: `individual-transaction-list`,
         meta: {
-          title: "个人钱包交易记录总览",
+          title: "个人客户钱包交易总览",
         },
         component: () => import("@/views/individualCustomer/transactionList/transactionList.vue"),
       },
@@ -43,9 +59,17 @@ const routes: Array<RouteRecordRaw> = [
         path: "/individual-customer/invoice-list",
         name: `individual-invoice-list`,
         meta: {
-          title: "个人客户发票申请列表",
+          title: "个人客户发票申请管理",
         },
         component: () => import("@/views/individualCustomer/invoiceApplicationList/invoiceApplicationList.vue"),
+      },
+      {
+        path: "/individual-customer/wallet-refund-application",
+        name: `individual-wallet-refund-application`,
+        meta: {
+          title: "钱包退款申请管理",
+        },
+        component: () => import("@/views/individualCustomer/walletRefundApplication/walletRefundApplication.vue"),
       },
     ]
     },

@@ -87,6 +87,7 @@ export const menuOptions: MenuOption[] = [
         path: "/operate/plat-eme-contact",
         key: "operate-plat-eme-contact",
       },
+      
     ],
   },
   {
@@ -152,24 +153,39 @@ export const menuOptions: MenuOption[] = [
     icon: renderIcon(CafeIcon),
     children: [
       {
-        label: "个人客户会员关系管理",
-        path: "/individual-customer/member",
-        key: "individual-customer-member",
+        label: "个人客户会员类型管理",
+        path: "/individual-customer/membership-type",
+        key: "individual-customer-membership-type", 
+      },
+      {
+        label: "个人客户管理",
+        path: "/individual-customer/customer",
+        key: "individual-customer-customer",
       },
       {
         label: "已注销个人客户",
         path: "/individual-customer/cancel-customer",
         key: "individual-customer-cancel-customer",
       },
+       {
+        label: "个人客户钱包管理",
+        path: "/individual-customer/wallet",
+        key: "individual-customer-wallet",
+      },
       {
-        label: "个人钱包交易记录总览",
+        label: "个人客户钱包交易总览",
         path: "/individual-customer/transaction-list",
         key: "individual-customer-transaction-list",
       },
       {
-        label: "个人客户发票申请列表",
+        label: "个人客户发票申请管理",
         path: "/individual-customer/invoice-list",
         key: "individual-customer-invoice-list",
+      },
+      {
+        label: "钱包退款申请管理",
+        path: "/individual-customer/wallet-refund-application",
+        key: "individual-individual-customer/wallet-refund-application",
       },
     ]
 },

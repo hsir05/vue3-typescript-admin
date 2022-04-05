@@ -64,7 +64,7 @@ import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
-  name: "Member",
+  name: "MembershipType",
   components: { BasicTable, MemberDrawer },
   setup() {
     const loading = ref(false);
@@ -80,7 +80,7 @@ export default defineComponent({
       {
         id: "3123123123",
         name: "普通客户",
-        specialDiscount: 1.0,
+        specialDiscount: 1,
         specialLimit: 100,
         fastlDiscount: null,
         fastlLimit: null,
