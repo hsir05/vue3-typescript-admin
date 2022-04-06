@@ -12,6 +12,7 @@ declare module 'vue' {
     Explain: typeof import('./src/components/Explain/Explain.vue')['default']
     Map: typeof import('./src/components/Map/Map.vue')['default']
     'Map copy': typeof import('./src/components/Map/Map copy.vue')['default']
+    MemberDetailDrawer: typeof import('./src/components/memberDetail/memberDetailDrawer.vue')['default']
     Modal: typeof import('./src/components/Modal/Modal.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']

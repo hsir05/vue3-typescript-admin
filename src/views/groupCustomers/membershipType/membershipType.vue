@@ -50,26 +50,31 @@
       @on-pagination="handlepagSize"
     />
     <MemberDrawer ref="memberDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+
+    <DetailDrawer ref="detailDrawerRef" :width="650" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { NTag } from "naive-ui";
 import MemberDrawer from "./memberDrawer.vue";
+import DetailDrawer from "@/components/memberDetail/memberDetailDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "MembershipType",
-  components: { MemberDrawer, BasicTable },
+  components: { MemberDrawer, BasicTable, DetailDrawer },
   setup() {
     const loading = ref(false);
     const memberDrawerRef = ref();
     const basicTableRef = ref();
+    const detailDrawerRef = ref();
+
     const itemCount = ref(null);
     const queryValue = ref({
       name: "",
@@ -146,22 +151,18 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
+                label: "详情",
+                type: "primary",
+                icon: EyeIcon,
+                onClick: handleSee.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
-              },
-              {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
               },
             ],
           });
@@ -208,9 +209,10 @@ export default defineComponent({
       const { openDrawer } = memberDrawerRef.value;
       openDrawer("新增用户");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    function handleSee(record: Recordable) {
+      console.log("点击了编辑", record.id);
+      const { openDrawer } = detailDrawerRef.value;
+      openDrawer("会员详情", record);
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -252,6 +254,7 @@ export default defineComponent({
       data,
       loading,
       memberDrawerRef,
+      detailDrawerRef,
       basicTableRef,
       statusOptions,
       columns,
