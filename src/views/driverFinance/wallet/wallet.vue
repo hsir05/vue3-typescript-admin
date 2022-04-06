@@ -50,9 +50,7 @@
     </div>
 
     <TransactionRecord ref="transactionRecordRef" :width="800" @on-save-after="handleSaveAfter" />
-    <Recharge ref="rechargeRef" :width="700" @on-save-after="handleSaveAfter" />
-    <Refund ref="refundRef" :width="700" @on-save-after="handleSaveAfter" />
-    <Transfer ref="transferRef" :width="700" @on-save-after="handleSaveAfter" />
+    <ThresholdModal ref="thresholdModalRef" />
   </div>
 </template>
 <script lang="ts">
@@ -60,16 +58,14 @@ import { defineComponent, ref, h, unref, reactive } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import TransactionRecord from "./transactionRecordDrawer.vue";
-import Refund from "./refundDrawer.vue";
-import Transfer from "./transferDrawer.vue";
-import Recharge from "./rechargeDrawer.vue";
+import ThresholdModal from "./thresholdModal.vue";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
 import { ReaderOutline as ReaderIcon } from "@vicons/ionicons5";
 import { PayCircleOutlined as PayCircleIcon } from "@vicons/antd";
 export default defineComponent({
   name: "Wallet",
-  components: { TransactionRecord, Recharge, Refund, Transfer },
+  components: { TransactionRecord, ThresholdModal },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
@@ -78,9 +74,7 @@ export default defineComponent({
     const loading = ref(false);
     const itemCount = ref(null);
     const transactionRecordRef = ref();
-    const rechargeRef = ref();
-    const refundRef = ref();
-    const transferRef = ref();
+    const thresholdModalRef = ref();
     const pagination = reactive({
       page: 1,
       pageSize: 10,
@@ -171,7 +165,7 @@ export default defineComponent({
                 type: "primary",
                 icon: PayCircleIcon,
                 isIconBtn: true,
-                onClick: handleRecharge.bind(null, record),
+                onClick: handleThreshold.bind(null, record),
                 auth: ["dict001"],
               },
             ],
@@ -212,10 +206,10 @@ export default defineComponent({
       const { openDrawer } = transactionRecordRef.value;
       openDrawer();
     }
-    function handleRecharge(record: Recordable) {
+    function handleThreshold(record: Recordable) {
       console.log(record);
-      const { openDrawer } = rechargeRef.value;
-      openDrawer();
+      const { handleModal } = thresholdModalRef.value;
+      handleModal();
     }
     function handlePage(page: number) {
       console.log(page);
@@ -237,9 +231,7 @@ export default defineComponent({
       queryValue,
       pagination,
       transactionRecordRef,
-      refundRef,
-      rechargeRef,
-      transferRef,
+      thresholdModalRef,
       formRef,
       columns,
       loading,
