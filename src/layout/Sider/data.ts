@@ -5,6 +5,8 @@ import {
   SettingsOutline as SettingsIcon,
   EaselOutline,
   CafeOutline as CafeIcon,
+  PeopleOutline as PeopleIcon,
+  PersonOutline as PersonIcon,
 } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
 
@@ -149,7 +151,7 @@ export const menuOptions: MenuOption[] = [
   {
     label: "个人客户会员关系管理",
     key: "individual-customers-member",
-    icon: renderIcon(CafeIcon),
+    icon: renderIcon(PersonIcon),
     children: [
       {
         label: "个人客户会员类型管理",
@@ -188,6 +190,24 @@ export const menuOptions: MenuOption[] = [
       },
     ],
   },
+
+    {
+    label: "集团客户会员关系管理",
+    key: "group-customers-member",
+    icon: renderIcon(PeopleIcon),
+    children: [
+      {
+        label: "集团客户会员类型管理",
+        path: "/group-customers/membership-type",
+        key: "group-customers-membership-type",
+      },
+      {
+        label: "集团客户管理",
+        path: "/group-customers/customer",
+        key: "group-customers-customer",
+      },
+    ]
+},
   {
     label: "设置管理",
     key: "bear-setting",
