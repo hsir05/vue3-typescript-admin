@@ -206,6 +206,21 @@ export const menuOptions: MenuOption[] = [
         path: "/group-customers/customer",
         key: "group-customers-customer",
       },
+       {
+        label: "集团客户钱包管理",
+        path: "/group-customers/wallet",
+        key: "group-customers-wallet",
+      },
+      {
+        label: "集团客户钱包交易总览",
+        path: "/group-customers/transaction-list",
+        key: "group-customers-transaction-list",
+      },
+      {
+        label: "集团客户发票申请管理",
+        path: "/group-customers/invoice-list",
+        key: "group-customers-invoice-list",
+      },
     ]
 },
   {
