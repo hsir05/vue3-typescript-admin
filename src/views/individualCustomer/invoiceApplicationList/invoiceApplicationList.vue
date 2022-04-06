@@ -231,7 +231,7 @@ export default defineComponent({
     function handleSee(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = invoiceDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer(record);
     }
     function handleBatch() {
       console.log("点击了批量删除");
@@ -239,7 +239,7 @@ export default defineComponent({
     function handleAdd() {
       console.log("点击了新增");
       const { openDrawer } = invoiceDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer();
     }
     function handleRemove(record: Recordable) {
       //   message.info("点击了删除", record);

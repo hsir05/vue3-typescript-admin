@@ -39,23 +39,21 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
+import { defineComponent, reactive, toRefs } from "vue";
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "InvoiceDrawer",
   setup() {
-    const title = ref("");
     const state = reactive({
       isDrawer: false,
       loading: false,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    function openDrawer(record?: tableDataItem) {
       console.log(record);
       if (record) {
         console.log(record);
       }
-      title.value = t;
       state.isDrawer = true;
     }
 
@@ -66,7 +64,6 @@ export default defineComponent({
 
     return {
       ...toRefs(state),
-      title,
       openDrawer,
       onCloseAfter,
     };

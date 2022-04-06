@@ -48,18 +48,32 @@
         <template #prefix> 共 {{ itemCount }} 项 </template>
       </n-pagination>
     </div>
+
+    <TransactionRecord ref="transactionRecordRef" :width="800" @on-save-after="handleSaveAfter" />
+    <Recharge ref="rechargeRef" :width="700" @on-save-after="handleSaveAfter" />
+    <Refund ref="refundRef" :width="700" @on-save-after="handleSaveAfter" />
+    <Transfer ref="transferRef" :width="700" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, unref, reactive } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import TransactionRecord from "./transactionRecordDrawer.vue";
+import Refund from "./refundDrawer.vue";
+import Transfer from "./transferDrawer.vue";
+import Recharge from "./rechargeDrawer.vue";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
 import { ReaderOutline as ReaderIcon } from "@vicons/ionicons5";
-import { PayCircleOutlined as PayCircleIcon } from "@vicons/antd";
+import {
+  PayCircleOutlined as PayCircleIcon,
+  TransactionOutlined as TransactionIcon,
+  RedEnvelopeOutlined as RedEnvelopeIcon,
+} from "@vicons/antd";
 export default defineComponent({
   name: "Wallet",
+  components: { TransactionRecord, Recharge, Refund, Transfer },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
@@ -67,6 +81,10 @@ export default defineComponent({
     });
     const loading = ref(false);
     const itemCount = ref(null);
+    const transactionRecordRef = ref();
+    const rechargeRef = ref();
+    const refundRef = ref();
+    const transferRef = ref();
     const pagination = reactive({
       page: 1,
       pageSize: 10,
@@ -163,7 +181,7 @@ export default defineComponent({
               {
                 label: "退款",
                 type: "primary",
-                icon: ReaderIcon,
+                icon: RedEnvelopeIcon,
                 isIconBtn: true,
                 onClick: handleRefund.bind(null, record),
                 auth: ["dict001"],
@@ -171,7 +189,7 @@ export default defineComponent({
               {
                 label: "转账",
                 type: "primary",
-                icon: ReaderIcon,
+                icon: TransactionIcon,
                 isIconBtn: true,
                 onClick: handleTransfer.bind(null, record),
                 auth: ["dict001"],
@@ -187,13 +205,14 @@ export default defineComponent({
         id: "12313123",
         nickname: "string",
         name: "string",
-        sex: 1,
-        birthday: "string",
-        email: "string",
         phone: "1809798797",
-        memberName: "string",
+        actualAmount: "string",
+        giveAmount: "string",
+        frozenAmount: "string",
+        availableAmount: "string",
+        totalAmount: "string",
+        amountCreatetime: "string",
         create_time: "string",
-        cancelTime: "string",
       },
     ]);
 
@@ -210,16 +229,24 @@ export default defineComponent({
 
     function handleRecord(record: Recordable) {
       console.log(record);
+      const { openDrawer } = transactionRecordRef.value;
+      openDrawer();
     }
     function handleRecharge(record: Recordable) {
       console.log(record);
+      const { openDrawer } = rechargeRef.value;
+      openDrawer();
     }
 
     function handleRefund(record: Recordable) {
       console.log(record);
+      const { openDrawer } = refundRef.value;
+      openDrawer();
     }
     function handleTransfer(record: Recordable) {
       console.log(record);
+      const { openDrawer } = transferRef.value;
+      openDrawer();
     }
 
     function handlePage(page: number) {
@@ -233,9 +260,18 @@ export default defineComponent({
       //   getData(toRaw(pagination));
     }
 
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+      //   getData({ page: 1, pageSize: 10 });
+    }
+
     return {
       queryValue,
       pagination,
+      transactionRecordRef,
+      refundRef,
+      rechargeRef,
+      transferRef,
       formRef,
       columns,
       loading,
@@ -248,6 +284,7 @@ export default defineComponent({
       handlePageSize,
       handlePage,
       reset,
+      handleSaveAfter,
     };
   },
 });
