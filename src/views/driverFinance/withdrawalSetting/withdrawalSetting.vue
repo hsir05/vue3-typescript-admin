@@ -4,7 +4,6 @@
       ref="formRef"
       :rules="rules"
       label-placement="left"
-      class="mt-20px"
       :style="{ maxWidth: '500px', margin: '20px auto' }"
       require-mark-placement="right-hanging"
       label-width="140"
@@ -76,7 +75,7 @@ import { defineComponent, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
 export default defineComponent({
-  name: "Withdrawal",
+  name: "WithdrawalSetting",
   setup() {
     const formRef = ref<FormInst | null>(null);
     const loading = ref(false);

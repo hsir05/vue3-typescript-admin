@@ -9,8 +9,8 @@
       <n-form
         ref="queryFormRef"
         :rules="queryRules"
-        label-placement="top"
-        :style="{ maxWidth: '320px', marginLeft: '10px' }"
+        label-placement="left"
+        :style="{ maxWidth: '360px', marginLeft: '10px' }"
         require-mark-placement="right-hanging"
         label-width="80"
         :model="queryForm"
@@ -92,8 +92,7 @@
       <n-form
         ref="formRef"
         :rules="rules"
-        size="large"
-        style="display: flex; flex-wrap: wrap; width: 900px; margin: 0 auto"
+        style="display: flex; flex-wrap: wrap; width: 850px; margin: 0 auto"
         :disabled="disabled"
         label-placement="left"
         require-mark-placement="right-hanging"
@@ -210,7 +209,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, unref } from "vue";
-import { Search as SearchIcon } from "@vicons/ionicons5";
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
@@ -220,6 +218,7 @@ import { uploadUrl } from "@/config/config";
 import vehicleTypeList from "@/config/vehicleTypeList.json";
 import {
   Add as AddIcon,
+  Search as SearchIcon,
   CarOutline as CarIcon,
   EyeOutline as EyeIcon,
   TrashOutline as RemoveIcon,
@@ -441,11 +440,11 @@ export default defineComponent({
   justify-content: end;
   align-content: flex-start;
   &-left {
-    width: 350px;
+    width: 400px;
     background-color: $white;
   }
   &-right {
-    width: calc(100% - 350px - 10px);
+    width: calc(100% - 400px - 10px);
     background-color: $white;
   }
 }

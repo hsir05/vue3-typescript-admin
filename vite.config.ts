@@ -52,7 +52,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       host: true,
       port: VITE_PORT,
         proxy: {
-          "/api": "http://localhost:8888/",
+        //   "/api": "http://localhost:8888/",
+          "/api": "http://192.168.1.1:8080/", 
         },
     },
     optimizeDeps: { //在预构建中强制排除的依赖项。

@@ -235,8 +235,13 @@ export const menuOptions: MenuOption[] = [
       },
       { 
         label: "司机提现设置",
-        path: "/driver-finance/withdrawal",
-        key: "driver-finance",
+        path: "/driver-finance/withdrawal-setting",
+        key: "driver-finance-withdrawal-setting",
+      },
+      { 
+        label: "司机提现统计",
+        path: "/driver-finance/withdrawal-statistics",
+        key: "driver-finance-withdrawal-statistics",
       },
     ],
   },

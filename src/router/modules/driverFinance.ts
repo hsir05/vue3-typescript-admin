@@ -24,12 +24,20 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/driverFinance/wallet/wallet.vue"),
       },
       {
-        path: "/driver-finance/withdrawal",
-        name: `driver-finance_withdrawal`,
+        path: "/driver-finance/withdrawal-setting",
+        name: `driver-finance_withdrawal-setting`,
         meta: {
-          title: "司机提现管理",
+          title: "司机提现设置",
         },
-        component: () => import("@/views/driverFinance/withdrawal/withdrawal.vue"),
+        component: () => import("@/views/driverFinance/withdrawalSetting/withdrawalSetting.vue"),
+      },
+      {
+        path: "/driver-finance/withdrawal-statistics",
+        name: `driver-finance_withdrawal-statistics`,
+        meta: {
+          title: "司机提现统计",
+        },
+        component: () => import("@/views/driverFinance/withdrawalStatistics/withdrawalStatistics.vue"),
       },
 
     ],
