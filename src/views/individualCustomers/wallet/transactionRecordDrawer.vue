@@ -8,7 +8,7 @@
       inline
       label-placement="top"
       label-width="120"
-      class="pt-15px pb-15px bg-white mb-5px"
+      class="mb-10px"
       :show-feedback="false"
       :model="queryValue"
     >

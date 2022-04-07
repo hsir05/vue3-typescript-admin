@@ -65,7 +65,7 @@ import Transfer from "./transferDrawer.vue";
 import Recharge from "./rechargeDrawer.vue";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
-import { ReaderOutline as ReaderIcon } from "@vicons/ionicons5";
+import { ReaderOutline as ReaderIcon, WalletOutline as WalletIcon } from "@vicons/ionicons5";
 import {
   PayCircleOutlined as PayCircleIcon,
   TransactionOutlined as TransactionIcon,
@@ -162,6 +162,14 @@ export default defineComponent({
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
+              {
+                label: "员工钱包",
+                type: "primary",
+                icon: WalletIcon,
+                isIconBtn: true,
+                onClick: handleRecord.bind(null, record),
+                auth: ["dict001"],
+              },
               {
                 label: "交易记录",
                 type: "primary",
