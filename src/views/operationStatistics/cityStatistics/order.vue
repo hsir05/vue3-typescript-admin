@@ -34,7 +34,7 @@ export default defineComponent({
         },
         xAxis: {
           type: "category",
-          boundaryGap: false,
+          //   boundaryGap: false,
           data: [
             "6:00",
             "7:00",
@@ -92,7 +92,6 @@ export default defineComponent({
               11111, 4000, 2000, 500, 333, 222, 111,
             ],
             type: "line",
-            areaStyle: {},
             itemStyle: {
               color: "#5ab1ef",
             },
@@ -104,7 +103,6 @@ export default defineComponent({
               198, 60, 30, 22, 11,
             ],
             type: "line",
-            areaStyle: {},
             itemStyle: {
               color: "#019680",
             },

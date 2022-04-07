@@ -1,6 +1,10 @@
 {
     "result": [
         {
+            "value": "allCity",
+            "label": "全部城市"
+        },
+        {
             "value": "110000",
             "label": "北京",
             "lng": 116.405725,

@@ -50,22 +50,34 @@
         ref="table"
         striped
         :columns="columns"
-        class="box-border"
+        class="box-border mb-15px"
         :row-key="getRowKeyId"
         :data="data"
         :pagination="false"
       />
-
+      <div class="flex mb-20px">
+        <span>城市单量统计</span>
+        <n-select
+          clearable
+          style="width: 100px"
+          filterable
+          v-model:value="status"
+          @update:value="handleStatus"
+          :options="option"
+        />
+      </div>
       <Order />
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
+import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import openCityList from "@/config/openCityList.json";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
+import { getOder } from "@/api/operationStatistics/cityOrder";
+import { getInfluxList, getOpenCity } from "@/api/common/common";
 export default defineComponent({
   name: "CityStatistics",
   components: {
@@ -73,10 +85,11 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false);
+    const status = ref("finished");
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
-      section: null,
-      cityCode: null,
+      section: [new Date("2022-03-16"), new Date("2022-03-18")],
+      cityCode: "allCity",
     });
     const message = useMessage();
 
@@ -123,9 +136,52 @@ export default defineComponent({
       },
     ];
 
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      loading.value = true;
+      try {
+        let openCity = await getOpenCity();
+        console.log(openCity);
+
+        let influx = await getInfluxList();
+        console.log(influx);
+
+        let res = await getOder({
+          cityCode: "allCity",
+          beginDate: "2022-03-16",
+          endDate: "2022-03-18",
+        });
+        console.log(res);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    function handleStatus() {}
+
     return {
       loading,
       openCityList,
+      status,
+      option: [
+        {
+          label: "完成",
+          value: "finished",
+        },
+        {
+          label: "取消",
+          value: "cancelled",
+        },
+        {
+          label: "无效",
+          value: "invalid",
+        },
+      ],
       queryForm,
       columns,
       data,
@@ -158,6 +214,7 @@ export default defineComponent({
       },
 
       query,
+      handleStatus,
     };
   },
 });

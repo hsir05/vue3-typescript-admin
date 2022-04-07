@@ -7,7 +7,7 @@ import { joinTimestamp, formatRequestDate } from './helper';
 import { RequestEnum, ResultEnum, ContentTypeEnum } from '@/enums/httpEnum';
 import { PageEnum } from '@/enums/pageEnum';
 
-import { useGlobSetting } from '@/hooks/setting';
+import { useGlobSetting } from '@/hooks/setting'; 
 
 import { isString } from '@/utils/is';
 import { deepMerge, isUrl } from '@/utils';
@@ -62,22 +62,23 @@ const transform: AxiosTransform = {
       throw new Error('请求出错，请稍候重试');
     }
     //  这里 code，result，message为 后台统一的字段，需要修改为项目自己的接口返回格式
-    const { code, result, message } = data;
+    const { success, code, result, message } = data;
     // 请求成功
-    const hasSuccess = data && Reflect.has(data, 'code') && code === ResultEnum.SUCCESS;
+    // const hasSuccess = data && Reflect.has(data, success) && success === ResultEnum.SUCCESS;
+    // const hasSuccess = data && Reflect.has(data, success) && success
 
     // 是否显示提示信息
     if (isShowMessage) {
-      if (hasSuccess && (successMessageText || isShowSuccessMessage)) {
+      if (success && (successMessageText || isShowSuccessMessage)) {
         // 是否显示自定义信息提示
         naiDialog.success({
           type: 'success',
           content: successMessageText || message || '操作成功！',
         });
-      } else if (!hasSuccess && (errorMessageText || isShowErrorMessage)) {
+      } else if (!success && (errorMessageText || isShowErrorMessage)) {
         // 是否显示自定义信息提示
         naiMessage.error(message || errorMessageText || '操作失败！');
-      } else if (!hasSuccess && options.errorMessageMode === 'modal') {
+      } else if (!success && options.errorMessageMode === 'modal') {
         // errorMessageMode=‘custom-modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
         naiDialog.info({
           title: '提示',
@@ -89,7 +90,10 @@ const transform: AxiosTransform = {
     }
 
     // 接口请求成功，直接返回结果
-    if (code === ResultEnum.SUCCESS) {
+    // if (code === ResultEnum.SUCCESS) {
+    //   return result;
+    // }
+     if (success) {
       return result;
     }
     // 接口请求错误，统一提示错误信息 这里逻辑可以根据项目进行修改
@@ -153,8 +157,9 @@ const transform: AxiosTransform = {
       if (!isString(params)) {
         formatDate && formatRequestDate(params);
         if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
-          config.data = data;
-          config.params = params;
+        //   config.data = data;
+          config.params = data;
+          // 传参数方式修改
         } else {
           config.data = params;
           config.params = undefined;

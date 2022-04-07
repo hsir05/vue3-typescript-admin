@@ -43,7 +43,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     css: {
       preprocessorOptions: {
         scss: {
-            charset: false, // 解决scss编译报警告问题
+          charset: false, // 解决scss编译报警告问题
           additionalData: '@import "@/assets/styles/var.scss";',
         },
       },
@@ -51,12 +51,26 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     server: {
       host: true,
       port: VITE_PORT,
-        proxy: {
-        //   "/api": "http://localhost:8888/",
-          "/api": "http://192.168.1.1:8080/", 
+      proxy: {
+        //   "*": "http://localhost:8888",
+        // "/api": {
+        //   target: "http://192.168.1.50:8080",
+        //   changeOrigin: true,
+        //   rewrite: (path) => {
+        //       return path.replace("/api", "")
+        //   },
+        // },
+        "/api": {
+          target: "http://192.168.1.50:8080",
+          changeOrigin: true,
+          rewrite: (path) => {
+              return path.replace("/api", "")
+          },
         },
+      },
     },
-    optimizeDeps: { //在预构建中强制排除的依赖项。
+    optimizeDeps: {
+      //在预构建中强制排除的依赖项。
       include: [],
       exclude: ["vue-demi"], // vue-demi同时支持Vue2和3的通用Vue库的开发工具
     },
