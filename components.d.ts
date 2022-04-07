@@ -75,6 +75,7 @@ declare module 'vue' {
     'Table copy': typeof import('./src/components/Table/Table copy.vue')['default']
     TableActions: typeof import('./src/components/TableActions/TableActions.vue')['default']
     Upload: typeof import('./src/components/Upload/Upload.vue')['default']
+    WalletItem: typeof import('./src/components/walletItem/walletItem.vue')['default']
   }
 }
 

@@ -8,7 +8,7 @@
       inline
       label-placement="top"
       label-width="120"
-      class="mb-10px"
+      class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
     >
@@ -54,7 +54,6 @@
 import { defineComponent, reactive, toRefs, h, ref } from "vue";
 import { tableDataItem } from "./type";
 import WalletItem from "@/components/walletItem/walletItem.vue";
-
 import { FormInst } from "naive-ui";
 export default defineComponent({
   name: "TransactionRecord",

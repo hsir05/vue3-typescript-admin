@@ -29,7 +29,8 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import WalletItem from "./walletItem.vue";
+import WalletItem from "@/components/walletItem/walletItem.vue";
+
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "Refund",

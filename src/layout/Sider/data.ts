@@ -191,7 +191,7 @@ export const menuOptions: MenuOption[] = [
     ],
   },
 
-    {
+  {
     label: "集团客户会员关系管理",
     key: "group-customers-member",
     icon: renderIcon(PeopleIcon),
@@ -206,7 +206,7 @@ export const menuOptions: MenuOption[] = [
         path: "/group-customers/customer",
         key: "group-customers-customer",
       },
-       {
+      {
         label: "集团客户钱包管理",
         path: "/group-customers/wallet",
         key: "group-customers-wallet",
@@ -221,8 +221,25 @@ export const menuOptions: MenuOption[] = [
         path: "/group-customers/invoice-list",
         key: "group-customers-invoice-list",
       },
-    ]
-},
+    ],
+  },
+  {
+    label: "司机财务管理",
+    key: "driver-finance",
+    icon: renderIcon(AlbumIcon),
+    children: [
+      {
+        label: "司机钱包管理",
+        path: "/driver-finance/wallet",
+        key: "driver-finance-wallet",
+      },
+      { 
+        label: "司机提现设置",
+        path: "/driver-finance/withdrawal",
+        key: "driver-finance",
+      },
+    ],
+  },
   {
     label: "设置管理",
     key: "bear-setting",
@@ -231,7 +248,7 @@ export const menuOptions: MenuOption[] = [
       {
         label: "个人设置",
         path: "/setting/profile",
-        key: "protect-wild-animals-setting",
+        key: "bear-setting-setting",
       },
     ],
   },
