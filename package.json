@@ -21,6 +21,7 @@
     "@vueuse/core": "^7.6.2",
     "axios": "^0.26.0",
     "blueimp-md5": "^2.19.0",
+    "echarts": "^5.3.2",
     "element-resize-detector": "^1.2.4",
     "lodash-es": "^4.17.21",
     "nprogress": "^0.2.0",

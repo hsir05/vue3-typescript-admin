@@ -7,6 +7,7 @@ import {
   CafeOutline as CafeIcon,
   PeopleOutline as PeopleIcon,
   PersonOutline as PersonIcon,
+  WalletOutline as WalletIcon,
 } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
 
@@ -226,7 +227,7 @@ export const menuOptions: MenuOption[] = [
   {
     label: "司机财务管理",
     key: "driver-finance",
-    icon: renderIcon(AlbumIcon),
+    icon: renderIcon(WalletIcon),
     children: [
       {
         label: "司机钱包管理",
@@ -242,6 +243,28 @@ export const menuOptions: MenuOption[] = [
         label: "司机提现统计",
         path: "/driver-finance/withdrawal-statistics",
         key: "driver-finance-withdrawal-statistics",
+      },
+    ],
+  },
+  {
+    label: "运营分析统计",
+    key: "operation-statistics",
+    icon: renderIcon(WalletIcon),
+    children: [
+      {
+        label: "城市单量统计",
+        path: "/operation-statistics/city-statistics",
+        key: "operation-statistics-city-statistics",
+      },
+      { 
+        label: "运营企业单量统计",
+        path: "/operation-statistics/enterprise-statistics",
+        key: "operation-statistics-enterprise-statistics",
+      },
+      { 
+        label: "司机单量统计",
+        path: "/operation-statistics/driver-statistics",
+        key: "operation-statistics-driver-statistics",
       },
     ],
   },
