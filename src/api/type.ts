@@ -35,8 +35,14 @@ export interface getRolesState {
     status: null | string;
 }
 
-export interface getOderState {
+export interface getCityOderState {
     cityCode: string
+    beginDate: string
+    endDate: string
+}
+
+export interface getCompanyOderState {
+    companyId: string
     beginDate: string
     endDate: string
 }

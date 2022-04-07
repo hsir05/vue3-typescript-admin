@@ -1,5 +1,5 @@
 <template>
-  <div class="city-statistics">
+  <div>
     <!-- 检索 -->
     <n-form
       ref="queryFormRef"
@@ -76,7 +76,7 @@ import { FormInst, useMessage } from "naive-ui";
 import openCityList from "@/config/openCityList.json";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
-import { getOder } from "@/api/operationStatistics/cityOrder";
+import { getCityOder } from "@/api/operationStatistics/operationStatistics";
 import { getInfluxList, getOpenCity } from "@/api/common/common";
 export default defineComponent({
   name: "CityStatistics",
@@ -149,7 +149,7 @@ export default defineComponent({
         let influx = await getInfluxList();
         console.log(influx);
 
-        let res = await getOder({
+        let res = await getCityOder({
           cityCode: "allCity",
           beginDate: "2022-03-16",
           endDate: "2022-03-18",
