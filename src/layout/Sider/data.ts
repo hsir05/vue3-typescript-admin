@@ -8,7 +8,9 @@ import {
   PeopleOutline as PeopleIcon,
   PersonOutline as PersonIcon,
   WalletOutline as WalletIcon,
+  DocumentTextOutline,
 } from "@vicons/ionicons5";
+import { AreaChartOutlined as AreaChartIcon } from "@vicons/antd";
 import { renderIcon } from "@/utils/index";
 
 export const menuOptions: MenuOption[] = [
@@ -249,7 +251,7 @@ export const menuOptions: MenuOption[] = [
   {
     label: "运营分析统计",
     key: "operation-statistics",
-    icon: renderIcon(WalletIcon),
+    icon: renderIcon(AreaChartIcon),
     children: [
       {
         label: "城市单量统计",
@@ -277,6 +279,11 @@ export const menuOptions: MenuOption[] = [
         key: "operation-statistics-satisfaction",
       },
       { 
+        label: "城市热力订单图",
+        path: "/operation-statistics/city-order-distribution",
+        key: "operation-statistics-city-order-distribution",
+      },
+      { 
         label: "订单时间区间分布",
         path: "/operation-statistics/order-distribution",
         key: "operation-statistics-order-distribution",
@@ -285,6 +292,28 @@ export const menuOptions: MenuOption[] = [
         label: "个人用户统计",
         path: "/operation-statistics/users-statistics",
         key: "operation-statistics-users-statistics",
+      },
+    ],
+  },
+  {
+    label: "对帐单",
+    key: "statement",
+    icon: renderIcon(DocumentTextOutline),
+    children: [
+      {
+        label: "流量方对帐单",
+        path: "/statement/influx",
+        key: "statement_influx",
+      },
+      {
+        label: "运营企业对帐单",
+        path: "/statement/operate-company",
+        key: "statement_operate-company",
+      },
+      {
+        label: "司机对帐单",
+        path: "/statement/driver",
+        key: "statement_driver",
       },
     ],
   },

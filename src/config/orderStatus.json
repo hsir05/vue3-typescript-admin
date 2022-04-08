@@ -1,0 +1,16 @@
+{
+    "result": [
+        {
+          "label": "完成",
+          "value": "finished"
+        },
+        {
+          "label": "取消",
+          "value": "cancelled"
+        },
+        {
+          "label": "无效",
+          "value": "invalid"
+        }
+    ]
+}

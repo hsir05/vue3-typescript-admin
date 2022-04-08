@@ -58,6 +58,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operationStatistics/satisfactionStatistics/satisfactionStatistics.vue"),
       },
+       {
+        path: "/operation-statistics/city-order-distribution",
+        name: `operation-city-order-distribution`,
+        meta: {
+          title: "城市热力订单图",
+        },
+        component: () => import("@/views/operationStatistics/cityOrderDistribution/cityOrderDistribution.vue"),
+      },
       {
         path: "/operation-statistics/order-distribution",
         name: `operation-order-distribution`,
