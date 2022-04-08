@@ -10,7 +10,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/operation-statistics",
     name: "operationStatistics",
-    redirect: "/operation-statistics/city-statistics",
+    redirect: "/operation-statistics/city",
     component: PARENTLAYOUT,
     meta: {
       title: "运营统计分析",
@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/operation-statistics/city-statistics",
+        path: "/operation-statistics/city",
         name: `operation-statistics_city-statistics`,
         meta: {
           title: "城市单量统计",
@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/operationStatistics/cityStatistics/cityStatistics.vue"),
       },
       {
-        path: "/operation-statistics/enterprise-statistics",
+        path: "/operation-statistics/enterprise",
         name: `driver-finance_enterprise-statistics`,
         meta: {
           title: "运营企业单量统计",
@@ -35,14 +35,21 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/operationStatistics/enterpriseStatistics/enterpriseStatistics.vue"),
       },
       {
-        path: "/operation-statistics/driver-statistics",
+        path: "/operation-statistics/driver",
         name: `driver-finance_driver-statistics`,
         meta: {
           title: "司机单量统计",
         },
         component: () => import("@/views/operationStatistics/driverStatistics/driverStatistics.vue"),
       },
-
+      {
+        path: "/operation-statistics/driver-online-time",
+        name: `driver-finance_driver-statistics`,
+        meta: {
+          title: "司机在线时长统计",
+        },
+        component: () => import("@/views/operationStatistics/diriverOnlineTimeStatistics/diriverOnlineTimeStatistics.vue"),
+      },
     ],
   },
 ];

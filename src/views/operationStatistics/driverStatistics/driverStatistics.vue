@@ -22,26 +22,19 @@
         />
       </n-form-item>
 
-      <div class="flex-center">
-        <n-form-item label="时间区间" path="section">
-          <n-date-picker
-            v-model:value="queryForm.section"
-            style="width: 250px"
-            type="daterange"
-            :shortcuts="rangeShortcuts"
-            :update-value-on-close="true"
-          />
-        </n-form-item>
+      <n-form-item label="时间区间" path="section">
+        <n-date-picker
+          v-model:value="queryForm.section"
+          style="width: 250px"
+          type="daterange"
+          :shortcuts="rangeShortcuts"
+          :update-value-on-close="true"
+        />
+      </n-form-item>
 
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          class="ml-10px"
-          type="primary"
-          @click="query"
-          >查找</n-button
-        >
-      </div>
+      <n-button attr-type="button" :loading="loading" class="ml-10px" type="primary" @click="query"
+        >查找</n-button
+      >
     </n-form>
     <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
       <n-data-table

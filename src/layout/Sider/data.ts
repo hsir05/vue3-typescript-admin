@@ -253,18 +253,23 @@ export const menuOptions: MenuOption[] = [
     children: [
       {
         label: "城市单量统计",
-        path: "/operation-statistics/city-statistics",
-        key: "operation-statistics-city-statistics",
+        path: "/operation-statistics/city",
+        key: "operation-statistics-city",
       },
       { 
         label: "运营企业单量统计",
-        path: "/operation-statistics/enterprise-statistics",
-        key: "operation-statistics-enterprise-statistics",
+        path: "/operation-statistics/enterprise",
+        key: "operation-statistics-enterprise",
       },
       { 
         label: "司机单量统计",
-        path: "/operation-statistics/driver-statistics",
-        key: "operation-statistics-driver-statistics",
+        path: "/operation-statistics/driver",
+        key: "operation-statistics-driver",
+      },
+      { 
+        label: "司机在线时长统计",
+        path: "/operation-statistics/driver-online-time",
+        key: "operation-statistics-driver-onlien-time",
       },
     ],
   },
