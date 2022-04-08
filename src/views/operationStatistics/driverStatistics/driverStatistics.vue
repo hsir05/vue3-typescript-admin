@@ -11,9 +11,9 @@
       label-width="100"
       :model="queryForm"
     >
-      <n-form-item label="运营企业" label-placement="left">
+      <n-form-item label="运营企业" path="companyId">
         <n-select
-          v-model:value="queryForm.cityCode"
+          v-model:value="queryForm.companyId"
           clearable
           filterable
           placeholder="选择运营企业"
@@ -52,7 +52,7 @@
         class="box-border mb-15px"
         :row-key="getRowKeyId"
         :data="data"
-        :pagination="false"
+        :pagination="pagination"
       />
     </div>
   </div>
@@ -69,7 +69,7 @@ export default defineComponent({
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
       section: [new Date("2022-03-16"), new Date("2022-03-18")],
-      cityCode: "allCity",
+      companyId: "75e642e0096b4a41a2b2ecf933c92247",
     });
     const message = useMessage();
 
@@ -78,38 +78,86 @@ export default defineComponent({
     const columns = [
       {
         title: "司机工号",
-        key: "flowSquare",
+        key: "driverNo",
         align: "center",
       },
       {
         title: "司机姓名",
-        key: "finishOrder",
+        key: "driverName",
         align: "center",
       },
       {
-        title: "接机",
-        key: "cancelOrder",
+        title: "单量",
+        key: "orderCount",
         align: "center",
       },
       {
-        title: "送机",
-        key: "invalidOrder",
+        title: "去接乘客期间累计",
+        key: "attrs",
         align: "center",
+        children: [
+          {
+            title: "里程(km)",
+            key: "receptionMileage",
+            align: "center",
+          },
+          {
+            title: "时长(分钟)",
+            key: "receptionDuration",
+            align: "center",
+          },
+        ],
       },
       {
-        title: "半日租",
-        key: "total",
+        title: "等待服务期间累计",
+        key: "attrs",
         align: "center",
+        children: [
+          {
+            title: "里程(km)",
+            key: "waitMileage",
+            align: "center",
+          },
+          {
+            title: "时长(分钟)",
+            key: "waitDuration",
+            align: "center",
+          },
+        ],
       },
       {
-        title: "全日租",
-        key: "total",
+        title: "服务中累计",
+        key: "attrs",
         align: "center",
+        children: [
+          {
+            title: "里程(km)",
+            key: "serviceMileage",
+            align: "center",
+          },
+          {
+            title: "时长(分钟)",
+            key: "serviceDuration",
+            align: "center",
+          },
+        ],
       },
       {
-        title: "总计",
-        key: "total",
+        title: "费用提交期间累计",
+        key: "attrs",
         align: "center",
+        children: [
+          {
+            title: "里程(km)",
+            key: "submissionMileage",
+            align: "center",
+          },
+          {
+            title: "时长(分钟)",
+            key: "submissionDuration",
+            align: "center",
+          },
+        ],
       },
     ];
 
@@ -118,6 +166,13 @@ export default defineComponent({
       queryFormRef.value?.validate((errors) => {
         if (!errors) {
           console.log(unref(queryForm));
+          //   let { companyId, beginDate: section[0], endDate: section[1] } = unref(queryForm)
+          console.log({
+            companyId: unref(queryForm).companyId,
+            beginDate: unref(queryForm).section[0],
+            endDate: unref(queryForm).section[0],
+          });
+
           message.success("验证成功");
         } else {
           console.log(errors);
@@ -131,6 +186,9 @@ export default defineComponent({
       queryForm,
       columns,
       data,
+      pagination: {
+        pageSize: 10,
+      },
       getRowKeyId: (row: tableDataItem) => row.id,
       operateCompanyOptions: [],
       rangeShortcuts: {

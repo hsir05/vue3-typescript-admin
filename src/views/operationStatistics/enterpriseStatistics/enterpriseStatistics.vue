@@ -63,7 +63,7 @@
             style="width: 100px; margin-right: 10px"
             filterable
             v-model:value="orderType"
-            @update:value="handleStatus"
+            @update:value="handleOrderType"
             :options="orderTypeOption"
           />
           <n-select
@@ -181,7 +181,13 @@ export default defineComponent({
       }
     };
 
-    function handleStatus() {}
+    function handleStatus(value: string) {
+      console.log(value);
+    }
+
+    function handleOrderType(value: string) {
+      console.log(value);
+    }
 
     return {
       loading,
@@ -245,6 +251,7 @@ export default defineComponent({
 
       query,
       handleStatus,
+      handleOrderType,
     };
   },
 });

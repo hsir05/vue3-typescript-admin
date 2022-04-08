@@ -162,7 +162,9 @@ export default defineComponent({
       }
     };
 
-    function handleStatus() {}
+    function handleStatus(value: string) {
+      console.log(value);
+    }
 
     return {
       loading,
