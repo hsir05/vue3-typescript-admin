@@ -271,6 +271,21 @@ export const menuOptions: MenuOption[] = [
         path: "/operation-statistics/driver-online-time",
         key: "operation-statistics-driver-onlien-time",
       },
+      { 
+        label: "司机满意度统计",
+        path: "/operation-statistics/satisfaction",
+        key: "operation-statistics-satisfaction",
+      },
+      { 
+        label: "订单时间区间分布",
+        path: "/operation-statistics/order-distribution",
+        key: "operation-statistics-order-distribution",
+      },
+      { 
+        label: "个人用户统计",
+        path: "/operation-statistics/users-statistics",
+        key: "operation-statistics-users-statistics",
+      },
     ],
   },
   {

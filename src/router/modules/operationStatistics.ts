@@ -50,6 +50,30 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operationStatistics/diriverOnlineTimeStatistics/diriverOnlineTimeStatistics.vue"),
       },
+      {
+        path: "/operation-statistics/satisfaction",
+        name: `operation-statistics_satisfaction-statistics`,
+        meta: {
+          title: "司机满意度统计",
+        },
+        component: () => import("@/views/operationStatistics/satisfactionStatistics/satisfactionStatistics.vue"),
+      },
+      {
+        path: "/operation-statistics/order-distribution",
+        name: `operation-order-distribution`,
+        meta: {
+          title: "订单时间区间分布",
+        },
+        component: () => import("@/views/operationStatistics/orderDistribution/orderDistribution.vue"),
+      },
+       {
+        path: "/operation-statistics/users-statistics",
+        name: `operation-users-statistics`,
+        meta: {
+          title: "个人用户统计",
+        },
+        component: () => import("@/views/operationStatistics/usersStatistics/usersStatistics.vue"),
+      },
     ],
   },
 ];
