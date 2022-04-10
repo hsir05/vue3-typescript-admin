@@ -122,16 +122,20 @@ export default defineComponent({
       },
     ];
 
-    onMounted(() => {
+    onMounted(async () => {
       const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(116.403414, 39.924091);
+      const { createMarker } = await renderBaiduMap(116.403414, 39.92409);
+      createMarker();
     });
 
-    function handleEdit(record: tableDataItem, index: number) {
+    async function handleEdit(record: tableDataItem, index: number) {
       console.log(toRaw(record), index);
       label.value = toRaw(record).city as string;
       const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
+      const { createMarker } = await renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
+      createMarker((lng: number, lat: number) => {
+        console.log(lng, lat);
+      });
     }
     function handleDelete(record: tableDataItem) {
       console.log(record);

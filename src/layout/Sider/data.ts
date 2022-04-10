@@ -10,7 +10,7 @@ import {
   WalletOutline as WalletIcon,
   DocumentTextOutline,
 } from "@vicons/ionicons5";
-import { AreaChartOutlined as AreaChartIcon } from "@vicons/antd";
+import { AreaChartOutlined as AreaChartIcon, FileExclamationOutlined as FileExclIcon } from "@vicons/antd";
 import { renderIcon } from "@/utils/index";
 
 export const menuOptions: MenuOption[] = [
@@ -314,6 +314,18 @@ export const menuOptions: MenuOption[] = [
         label: "司机对帐单",
         path: "/statement/driver",
         key: "statement_driver",
+      },
+    ],
+  },
+   {
+    label: "工单管理",
+    key: "work-order",
+    icon: renderIcon(FileExclIcon),
+    children: [
+      {
+        label: "美团投诉订单管理",
+        path: "/work-order/meituan-order",
+        key: "work-order-meituan-order",
       },
     ],
   },

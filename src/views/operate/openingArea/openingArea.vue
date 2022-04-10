@@ -271,9 +271,10 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(103.841521, 36.067212);
+      await renderBaiduMap(103.841521, 36.067212);
+      //   addBoundary()
     });
 
     function handleEdit(record: tableDataItem) {
