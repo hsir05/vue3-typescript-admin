@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operationStatistics/enterpriseStatistics/enterpriseStatistics.vue"),
       },
-      {
+      { 
         path: "/operation-statistics/driver",
         name: `driver-finance_driver-statistics`,
         meta: {
@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/operation-statistics/driver-online-time",
-        name: `driver-finance_driver-statistics`,
+        name: `driver-finance_driver-online-time`,
         meta: {
           title: "司机在线时长统计",
         },

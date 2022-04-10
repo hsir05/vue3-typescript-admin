@@ -35,8 +35,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
 
-    const handle = (key: string, item: MenuOption) => {
-      console.log(key);
+    const handle = (_: string, item: MenuOption) => {
       router.push({ path: item.path as string });
     };
     return {

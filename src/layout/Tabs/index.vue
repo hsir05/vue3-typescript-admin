@@ -333,6 +333,19 @@ export default defineComponent({
       observer = elementResizeDetectorMaker();
       observer.listenTo(navWrap.value, handleResize);
     }
+
+    function scrollTo(value: number, amplitude: number) {
+      const currentScroll = navScroll.value.scrollLeft;
+      const scrollWidth =
+        (amplitude > 0 && currentScroll + amplitude >= value) ||
+        (amplitude < 0 && currentScroll + amplitude <= value)
+          ? value
+          : currentScroll + amplitude;
+      navScroll.value && navScroll.value.scrollTo(scrollWidth, 0);
+      if (scrollWidth === value) return;
+      window.requestAnimationFrame(() => scrollTo(value, amplitude));
+    }
+
     function scrollPrev() {
       const containerWidth = navScroll.value.offsetWidth;
       const currentScroll = navScroll.value.scrollLeft;
@@ -345,7 +358,6 @@ export default defineComponent({
       const containerWidth = navScroll.value.offsetWidth;
       const navWidth = navScroll.value.scrollWidth;
       const currentScroll = navScroll.value.scrollLeft;
-
       if (navWidth - currentScroll <= containerWidth) return;
       const scrollLeft =
         navWidth - currentScroll > containerWidth * 2
@@ -434,8 +446,6 @@ export default defineComponent({
       overflow: hidden;
 
       &-item {
-        //   background: v-bind(getCardColor);
-        //   color: v-bind(getBaseColor);
         background: $white;
         color: #666;
         height: 32px;

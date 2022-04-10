@@ -53,7 +53,11 @@
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import {
+  TrashOutline as RemoveIcon,
+  CreateOutline as CreateIcon,
+  EyeOutline as EyeIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import OprComDrawer from "./oprComDrawer.vue";
 import { tableDataItem } from "./type";
@@ -129,14 +133,15 @@ export default defineComponent({
         title: "操作",
         key: "action",
         align: "center",
-        width: "260px",
+        width: "130px",
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "查看",
                 type: "primary",
-                icon: CreateIcon,
+                icon: EyeIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
@@ -144,6 +149,7 @@ export default defineComponent({
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
+                isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
@@ -153,6 +159,7 @@ export default defineComponent({
                 icon: RemoveIcon,
                 secondary: true,
                 auth: ["dict002"],
+                isIconBtn: true,
                 popConfirm: {
                   onPositiveClick: handleRemove.bind(null, record),
                   title: "您确定删除?",

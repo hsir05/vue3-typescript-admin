@@ -8,7 +8,7 @@
       class="pt-15px pb-15px bg-white mb-5px"
       require-mark-placement="right-hanging"
       :show-feedback="false"
-      label-width="100"
+      label-width="90"
       :model="queryForm"
     >
       <n-form-item label="流量方" label-placement="left">
@@ -17,7 +17,7 @@
           clearable
           filterable
           placeholder="选择流量方"
-          style="width: 260px"
+          style="width: 220px"
           :options="openCityList.result"
         />
       </n-form-item>
@@ -28,7 +28,7 @@
           clearable
           filterable
           placeholder="选择开通城市"
-          style="width: 260px"
+          style="width: 220px"
           :options="openCityList.result"
         />
       </n-form-item>
@@ -37,7 +37,7 @@
         <n-form-item label="时间区间" path="section">
           <n-date-picker
             v-model:value="queryForm.section"
-            style="width: 250px"
+            style="width: 220px"
             type="daterange"
             :shortcuts="rangeShortcuts"
             :update-value-on-close="true"
