@@ -86,6 +86,7 @@ import { tableDataItem } from "./type";
 import Order from "./order.vue";
 import { getCompanyOder } from "@/api/operationStatistics/operationStatistics";
 import { getInfluxList, getOperationCompany } from "@/api/common/common";
+import { rangeShortcuts } from "@/config/table";
 export default defineComponent({
   name: "EnterpriseStatistics",
   components: {
@@ -225,29 +226,7 @@ export default defineComponent({
       },
       operateCompanyOptions: [],
       getRowKeyId: (row: tableDataItem) => row.id,
-      rangeShortcuts: {
-        今天: [1629216000000, 1631203200000],
-        过去3天: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        过去7天: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        过去15天: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        本月: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        上月: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-      },
+      rangeShortcuts,
 
       query,
       handleStatus,

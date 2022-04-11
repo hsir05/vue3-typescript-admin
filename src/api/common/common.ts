@@ -25,3 +25,11 @@ export function getOpenCity() {
     method: 'post',
   });
 }
+
+//下载流文件
+export function download() {    
+  return http.request({
+    url: '/openCity/openCityList',
+    method: 'post',
+  });
+}

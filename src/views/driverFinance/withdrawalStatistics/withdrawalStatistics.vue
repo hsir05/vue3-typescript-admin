@@ -72,6 +72,7 @@
 import { defineComponent, ref, h, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { queryFormState, tableDataItem } from "./type";
+import { rangeShortcuts } from "@/config/table";
 export default defineComponent({
   name: "WithdrawalStatistics",
   setup() {
@@ -185,30 +186,8 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
+      rangeShortcuts,
       getRowKeyId: (row: tableDataItem) => row.id,
-      rangeShortcuts: {
-        今天: [1629216000000, 1631203200000],
-        过去3天: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        过去7天: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        过去15天: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        本月: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-        上月: () => {
-          const cur = new Date().getTime();
-          return [cur - 2 * 60 * 60 * 1000, cur];
-        },
-      },
       queryRules: {
         operatingEnterprise: {
           required: true,

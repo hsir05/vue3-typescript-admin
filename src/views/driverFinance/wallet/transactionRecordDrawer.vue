@@ -38,6 +38,7 @@
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
       </n-form-item>
     </n-form>
+    <!-- 表格 -->
     <n-data-table
       :loading="loading"
       ref="table"
