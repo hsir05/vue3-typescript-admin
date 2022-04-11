@@ -9,6 +9,7 @@ import {
   PersonOutline as PersonIcon,
   WalletOutline as WalletIcon,
   DocumentTextOutline,
+  ColorFilterOutline,
 } from "@vicons/ionicons5";
 import { AreaChartOutlined as AreaChartIcon, FileExclamationOutlined as FileExclIcon } from "@vicons/antd";
 import { renderIcon } from "@/utils/index";
@@ -292,6 +293,18 @@ export const menuOptions: MenuOption[] = [
         label: "个人用户统计",
         path: "/operation-statistics/users-statistics",
         key: "operation-statistics-users-statistics",
+      },
+    ],
+  },
+  {
+    label: "营销管理",
+    key: "marketing",
+    icon: renderIcon(ColorFilterOutline),
+    children: [
+      {
+        label: "广告配置",
+        path: "/marketing/ad",
+        key: "marketing_ad",
       },
     ],
   },
