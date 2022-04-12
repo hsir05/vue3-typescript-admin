@@ -30,6 +30,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "代金券配置",
         },
         component: () => import("@/views/marketing/vouchers/vouchers.vue"),
+      },
+      {
+        path: "/marketing/vouchers-rule",
+         name: `marketing_vouchers-rule`,
+        meta: {
+          title: "代金券消费规则配置",
+        },
+        component: () => import("@/views/marketing/vouchersRule/vouchersRule.vue"),
       }
     ],
   },

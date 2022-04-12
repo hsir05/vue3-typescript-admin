@@ -311,6 +311,11 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/vouchers",
         key: "marketing_vouchers",
       },
+       {
+        label: "代金券消费规则配置",
+        path: "/marketing/vouchers-rule",
+        key: "marketing_vouchers-rule",
+      },
     ],
   },
   {
