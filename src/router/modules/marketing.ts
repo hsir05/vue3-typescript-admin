@@ -38,6 +38,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "代金券消费规则配置",
         },
         component: () => import("@/views/marketing/vouchersRule/vouchersRule.vue"),
+      },
+      {
+        path: "/marketing/recharge-activity",
+         name: `marketing_recharge-activity`,
+        meta: {
+          title: "钱包充值活动管理",
+        },
+        component: () => import("@/views/marketing/rechargeActivity/rechargeActivity.vue"),
       }
     ],
   },

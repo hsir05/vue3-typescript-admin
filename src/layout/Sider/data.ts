@@ -295,7 +295,7 @@ export const menuOptions: MenuOption[] = [
         key: "operation-statistics-users-statistics",
       },
     ],
-  },
+  }, 
   {
     label: "营销管理",
     key: "marketing",
@@ -316,6 +316,11 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/vouchers-rule",
         key: "marketing_vouchers-rule",
       },
+       {
+        path: "/marketing/recharge-activity",
+        key: "marketing_recharge-activity",
+        label: "钱包充值活动管理",
+      }
     ],
   },
   {
