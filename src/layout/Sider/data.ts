@@ -306,6 +306,11 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/ad",
         key: "marketing_ad",
       },
+       {
+        label: "代金券配置",
+        path: "/marketing/vouchers",
+        key: "marketing_vouchers",
+      },
     ],
   },
   {

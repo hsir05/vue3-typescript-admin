@@ -22,6 +22,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "广告配置",
         },
         component: () => import("@/views/marketing/ad/ad.vue"),
+      },
+       {
+        path: "/marketing/vouchers",
+         name: `marketing_vouchers`,
+        meta: {
+          title: "代金券配置",
+        },
+        component: () => import("@/views/marketing/vouchers/vouchers.vue"),
       }
     ],
   },
