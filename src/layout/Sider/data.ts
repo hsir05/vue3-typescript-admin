@@ -320,6 +320,11 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/recharge-activity",
         key: "marketing_recharge-activity",
         label: "钱包充值活动管理",
+      },
+       {
+        path: "/marketing/payment-channel",
+        key: "marketing_payment-channel",
+        label: "订单支付渠道管理",
       }
     ],
   },

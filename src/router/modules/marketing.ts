@@ -46,6 +46,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "钱包充值活动管理",
         },
         component: () => import("@/views/marketing/rechargeActivity/rechargeActivity.vue"),
+      },
+       {
+        path: "/marketing/payment-channel",
+         name: `marketing_payment-channel`,
+        meta: {
+          title: "订单支付渠道管理",
+        },
+        component: () => import("@/views/marketing/paymentChannel/paymentChannel.vue"),
       }
     ],
   },
