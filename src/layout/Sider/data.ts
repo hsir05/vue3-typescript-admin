@@ -311,6 +311,11 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/vouchers",
         key: "marketing_vouchers",
       },
+      {
+        path: "/marketing/exchange-code",
+        key: "marketing_exchange-code",
+        label: "兑换码管理",
+      },
        {
         label: "代金券消费规则配置",
         path: "/marketing/vouchers-rule",
@@ -330,7 +335,8 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/advance-charge",
         key: "marketing_advance-charge",
         label: "订单预支付渠道管理",
-      }
+      },
+      
     ],
   },
   {

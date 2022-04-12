@@ -3,7 +3,7 @@
     bordered
     collapse-mode="width"
     :collapsed-width="64"
-    :width="230"
+    :width="240"
     :collapsed="getCollapsed"
     :inverted="inverted"
   >

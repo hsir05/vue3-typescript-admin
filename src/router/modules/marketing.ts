@@ -62,6 +62,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "订单预支付渠道管理",
         },
         component: () => import("@/views/marketing/advanceCharge/advanceCharge.vue"),
+      },
+      {
+        path: "/marketing/exchange-code",
+         name: `marketing_exchange-code`,
+        meta: {
+          title: "兑换码管理",
+        },
+        component: () => import("@/views/marketing/exchangeCode/exchangeCode.vue"),
       }
     ],
   },

@@ -68,8 +68,8 @@ export default defineComponent({
   components: { ChannelModal },
   setup() {
     const form = ref({
-      orderType: "",
-      equipType: "",
+      orderType: null,
+      equipType: null,
     });
     const loading = ref(false);
     const message = useMessage();
