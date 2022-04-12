@@ -1,11 +1,11 @@
 <template>
   <div class="h-full overflow-hidden box-border">
     <!-- 搜索 -->
-    <div class="flex-align-start">
+    <div class="flex-align-start pt-15px mb-10px bg-white">
       <n-form-item
         ref="queryFormRef"
         :rule="queryRule"
-        label-width="70"
+        label-width="90"
         label="开通城市"
         label-placement="left"
       >
@@ -49,15 +49,19 @@
 <script lang="ts">
 import { defineComponent, ref, h, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import {
+  TrashOutline as RemoveIcon,
+  CreateOutline as CreateIcon,
+  ArrowBackCircleOutline as ArrowBackIcon,
+  ArrowForwardCircleOutline as ArrowIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import { NTag } from "naive-ui";
 import AdDrawer from "./adDrawer.vue";
-import { tableDataItem } from "../type";
+import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst, useMessage, NTag, NImage } from "naive-ui";
 export default defineComponent({
   name: "Ad",
   components: { BasicTable, AdDrawer },
@@ -68,11 +72,24 @@ export default defineComponent({
     const itemCount = ref(null);
 
     const cityCode = ref(null);
-    const formRef = ref<FormInst | null>(null);
     const queryFormRef = ref<FormInst | null>(null);
     const message = useMessage();
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<tableDataItem[]>([
+      {
+        id: "123123",
+        title: "string",
+        adUrl:
+          "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_advertisement/images/400df05c-bb6b-49af-b1ee-ea7a7a309bb0.jpg",
+        cityName: "string",
+        cityCode: "string",
+        startTime: "string",
+        endTime: "string",
+        h5Url: "string",
+        sort: 23,
+        status: 1,
+      },
+    ]);
 
     const columns = [
       {
@@ -89,18 +106,44 @@ export default defineComponent({
         },
       },
       {
-        title: "帐号",
-        key: "account",
+        title: "广告",
+        key: "adUrl",
+        align: "center",
+        render(row: tableDataItem) {
+          return h(NImage as any, {
+            src: row.adUrl,
+            width: 90,
+          });
+        },
+      },
+      {
+        title: "广告开通城市",
+        key: "cityName",
         align: "center",
       },
       {
-        title: "名称",
-        key: "name",
+        title: "广告标题",
+        key: "title",
         align: "center",
       },
       {
-        title: "电话",
-        key: "phone",
+        title: "广告生效时间",
+        key: "startTime",
+        align: "center",
+      },
+      {
+        title: "广告失效时间",
+        key: "endTime",
+        align: "center",
+      },
+      {
+        title: "广告H5url",
+        key: "h5Url",
+        align: "center",
+      },
+      {
+        title: "序列",
+        key: "sort",
         align: "center",
       },
       {
@@ -120,11 +163,6 @@ export default defineComponent({
         },
       },
       {
-        title: "创建时间",
-        key: "create_time",
-        align: "center",
-      },
-      {
         title: "操作",
         key: "action",
         align: "center",
@@ -133,8 +171,25 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
+                label: "前移",
+                type: "primary",
+                isIconBtn: true,
+                icon: ArrowBackIcon,
+                onClick: handleUp.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "后移",
+                type: "primary",
+                isIconBtn: true,
+                icon: ArrowIcon,
+                onClick: handleDown.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
                 label: "编辑",
                 type: "primary",
+                isIconBtn: true,
                 icon: CreateIcon,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
@@ -143,6 +198,7 @@ export default defineComponent({
                 label: "删除",
                 type: "error",
                 icon: RemoveIcon,
+                isIconBtn: true,
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
@@ -158,7 +214,7 @@ export default defineComponent({
 
     async function handleValidate() {
       try {
-        await formRef.value?.validate();
+        await queryFormRef.value?.validate();
         console.log(cityCode.value);
       } catch (err) {
         console.log(err);
@@ -192,10 +248,17 @@ export default defineComponent({
       console.log("选择了", rowKeys);
     }
 
+    function handleUp(record: Recordable) {
+      console.log("点击了编辑", record.id);
+    }
+    function handleDown(record: Recordable) {
+      console.log("点击了编辑", record.id);
+    }
+
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = adDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer("编辑广告", record);
     }
     function handleBatch() {
       console.log("点击了批量删除");
@@ -203,7 +266,7 @@ export default defineComponent({
     function handleAdd() {
       console.log("点击了新增");
       const { openDrawer } = adDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer("添加城市广告", cityCode.value);
     }
     function handleRemove(record: Recordable) {
       //   message.info("点击了删除", record);
@@ -234,7 +297,6 @@ export default defineComponent({
       options: [],
       data,
       cityCode,
-      formRef,
       queryFormRef,
       loading,
       adDrawerRef,
