@@ -325,6 +325,11 @@ export const menuOptions: MenuOption[] = [
         path: "/marketing/payment-channel",
         key: "marketing_payment-channel",
         label: "订单支付渠道管理",
+      },
+      {
+        path: "/marketing/advance-charge",
+        key: "marketing_advance-charge",
+        label: "订单预支付渠道管理",
       }
     ],
   },
