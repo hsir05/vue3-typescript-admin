@@ -11,7 +11,7 @@ import {
   DocumentTextOutline,
   ColorFilterOutline,
 } from "@vicons/ionicons5";
-import { AreaChartOutlined as AreaChartIcon, FileExclamationOutlined as FileExclIcon } from "@vicons/antd";
+import { FundProjectionScreenOutlined, AreaChartOutlined as AreaChartIcon, FileExclamationOutlined as FileExclIcon } from "@vicons/antd";
 import { renderIcon } from "@/utils/index";
 
 export const menuOptions: MenuOption[] = [
@@ -370,6 +370,23 @@ export const menuOptions: MenuOption[] = [
         label: "美团投诉订单管理",
         path: "/work-order/meituan-order",
         key: "work-order-meituan-order",
+      },
+    ],
+  },
+  {
+    label: "实时运营动态",
+    key: "realtime-dynamic",
+    icon: renderIcon(FundProjectionScreenOutlined),
+    children: [
+      {
+        label: "司机实时分布",
+        path: "/realtime-dynamic/driver-distrib",
+        key: "realtime-dynamic-driver-distrib",
+      },
+      {
+        label: "实时运营监测",
+        path: "/realtime-dynamic/operateRealMonitor",
+        key: "realtime-dynamic-operateReal-monitor",
       },
     ],
   },

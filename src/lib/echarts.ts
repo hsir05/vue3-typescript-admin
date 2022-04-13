@@ -7,6 +7,7 @@ import {
   MapChart,
   PictorialBarChart,
   RadarChart,
+  GaugeChart,
 } from 'echarts/charts';
 
 import {
@@ -36,6 +37,7 @@ echarts.use([
   AriaComponent,
   ParallelComponent,
   BarChart,
+  GaugeChart,
   LineChart,
   PieChart,
   MapChart,
