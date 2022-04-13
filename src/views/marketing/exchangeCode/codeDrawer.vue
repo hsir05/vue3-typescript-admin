@@ -64,6 +64,7 @@
 import { defineComponent, reactive, h, ref, toRefs, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import { TrashOutline as RemoveIcon } from "@vicons/ionicons5";
 import VoucherModal from "./voucherModal.vue";
 import { tableDataItem } from "./type";
 export default defineComponent({
