@@ -13,16 +13,41 @@ export default defineComponent({
     },
     height: {
       type: String as PropType<string>,
-      default: "280px",
+      default: "300px",
+    },
+    text: {
+      type: String,
+      default: () => "",
+    },
+    subtext: {
+      type: String,
+      default: () => "",
+    },
+    data: {
+      type: Array as PropType<number[]>,
+    },
+    xAxisData: {
+      type: Array as PropType<string[]>,
+      default: () => [],
     },
   },
-  setup() {
+  setup(props) {
     const chartRef = ref<HTMLDivElement | null>(null);
 
     const { setOptions } = useEcharts(chartRef as Ref<HTMLDivElement>);
 
     onMounted(() => {
       setOptions({
+        title: {
+          text: props.text,
+          subtext: props.subtext,
+        },
+        grid: {
+          left: "3%",
+          right: "4%",
+          bottom: "3%",
+          containLabel: true,
+        },
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -34,35 +59,7 @@ export default defineComponent({
         },
         xAxis: {
           type: "category",
-          //   boundaryGap: false,
-          data: [
-            "6:00",
-            "7:00",
-            "8:00",
-            "9:00",
-            "10:00",
-            "11:00",
-            "12:00",
-            "13:00",
-            "14:00",
-            "15:00",
-            "16:00",
-            "17:00",
-            "18:00",
-            "19:00",
-            "20:00",
-            "21:00",
-            "22:00",
-            "23:00",
-          ],
-          splitLine: {
-            show: true,
-            lineStyle: {
-              width: 1,
-              type: "solid",
-              color: "rgba(226,226,226,0.5)",
-            },
-          },
+          data: props.xAxisData,
           axisTick: {
             show: false,
           },
@@ -70,11 +67,6 @@ export default defineComponent({
         yAxis: [
           {
             type: "value",
-            max: 80000,
-            splitNumber: 4,
-            axisTick: {
-              show: false,
-            },
             splitArea: {
               show: true,
               areaStyle: {
@@ -83,28 +75,32 @@ export default defineComponent({
             },
           },
         ],
-        grid: { left: "1%", right: "1%", top: "2  %", bottom: 0, containLabel: true },
+
         series: [
           {
-            smooth: true,
-            data: [
-              111, 222, 4000, 18000, 33333, 55555, 66666, 33333, 14000, 36000, 66666, 44444, 22222,
-              11111, 4000, 2000, 500, 333, 222, 111,
-            ],
-            type: "line",
-            itemStyle: {
-              color: "#5ab1ef",
+            data: props.data,
+            label: {
+              show: true,
+              position: "top",
             },
-          },
-          {
-            smooth: true,
-            data: [
-              33, 66, 88, 333, 3333, 5000, 18000, 3000, 1200, 13000, 22000, 11000, 2221, 1201, 390,
-              198, 60, 30, 22, 11,
-            ],
-            type: "line",
+            barMaxWidth: 80,
+            type: "bar",
             itemStyle: {
-              color: "#019680",
+              color: function (params) {
+                const colorList = [
+                  "#c23531",
+                  "#1eafdd",
+                  "#91c7ae",
+                  "#63869e",
+                  "#e56c3d",
+                  "#d7b027",
+                  "#2f4554",
+                  "#61a0a8",
+                  "#d48265",
+                  "#91c7ae",
+                ];
+                return colorList[params.dataIndex];
+              },
             },
           },
         ],
