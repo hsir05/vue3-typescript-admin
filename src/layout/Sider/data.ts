@@ -9,7 +9,7 @@ import {
   PersonOutline as PersonIcon,
   WalletOutline as WalletIcon,
   DocumentTextOutline,
-  ColorFilterOutline,
+  ColorFilterOutline,FileTrayFullOutline
 } from "@vicons/ionicons5";
 import { FundProjectionScreenOutlined, AreaChartOutlined as AreaChartIcon, FileExclamationOutlined as FileExclIcon } from "@vicons/antd";
 import { renderIcon } from "@/utils/index";
@@ -387,6 +387,23 @@ export const menuOptions: MenuOption[] = [
         label: "实时运营监测",
         path: "/realtime-dynamic/operateRealMonitor",
         key: "realtime-dynamic-operateReal-monitor",
+      },
+    ],
+  },
+    {
+    label: "运营订单管理",
+    key: "operate-order",
+    icon: renderIcon(FileTrayFullOutline),
+    children: [
+      {
+        label: "服务中订单",
+        path: "/operate-order/serving",
+        key: "operate-order-serving",
+      },
+      {
+        label: "已完成订单",
+        path: "/operate-order/finished",
+        key: "operate-order_finished",
       },
     ],
   },
