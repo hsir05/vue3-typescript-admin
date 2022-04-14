@@ -90,6 +90,7 @@
     <BatchCodeDrawer ref="batchCodeDrawerRef" :width="750" />
 
     <AmountDrawer ref="amountDrawerRef" :width="500" />
+    <BatchAmountDrawer ref="batchAmountDrawerRef" :width="750" />
   </div>
 </template>
 <script lang="ts">
@@ -102,6 +103,7 @@ import ExchangeRecordCodeDrawer from "./exchangeRecordDrawer.vue";
 import CodeDrawer from "./codeDrawer.vue";
 import AmountDrawer from "./amountDrawer.vue";
 import BatchCodeDrawer from "./batchCodeDrawer.vue";
+import BatchAmountDrawer from "./batchAmountDrawer.vue";
 import { EyeOutline as EyeIcon, DocumentAttachOutline as DocumentIcon } from "@vicons/ionicons5";
 import {
   FileExcelOutlined as FileExceIcon,
@@ -113,6 +115,7 @@ export default defineComponent({
   name: "ExchangeCode",
   components: {
     CodeDetailDrawer,
+    BatchAmountDrawer,
     AmountDrawer,
     ExchangeRecordCodeDrawer,
     CodeDrawer,
@@ -134,6 +137,7 @@ export default defineComponent({
     const codeDetailDrawerRef = ref();
     const recordDrawerRef = ref();
     const codeDrawerRef = ref();
+    const batchAmountDrawerRef = ref();
     const amountDrawerRef = ref();
     const batchCodeDrawerRef = ref();
     const loading = ref(false);
@@ -225,7 +229,6 @@ export default defineComponent({
     function query() {}
 
     function handleCode(key: string | number) {
-      console.log(key);
       if (key === "codeSingle") {
         const { openDrawer } = codeDrawerRef.value;
         openDrawer("添加兑换码");
@@ -236,10 +239,12 @@ export default defineComponent({
     }
 
     function handleAmout(key: string | number) {
-      console.log(key);
       if (key === "amoutSingle") {
         const { openDrawer } = amountDrawerRef.value;
         openDrawer("添加兑换码");
+      } else {
+        const { openDrawer } = batchAmountDrawerRef.value;
+        openDrawer("批量添加代金券");
       }
     }
 
@@ -273,6 +278,7 @@ export default defineComponent({
       recordDrawerRef,
       codeDrawerRef,
       batchCodeDrawerRef,
+      batchAmountDrawerRef,
       amountDrawerRef,
       loading,
       options: [],
