@@ -43,69 +43,15 @@
     </n-form>
     <div class="bg-white p-10px">
       <n-row>
-        <n-col :span="8">
-          <n-statistic label="待派订单" :value="99" class="text-center p-10px border">
+        <n-col :span="8" v-for="(item, index) in staticData" :key="index">
+          <n-statistic :label="item.label" class="text-center p-10px">
             <template #prefix>
-              <n-icon>
-                <AlarmIcon />
-              </n-icon>
+              <n-icon :component="item.icon" size="25" />
             </template>
-            <template #suffix> / 100 </template>
-          </n-statistic>
-        </n-col>
-        <n-col :span="8">
-          <n-statistic label="待服务订单" class="text-center p-10px">
-            <template #prefix>
-              <n-icon>
-                <BarcodeIcon />
-              </n-icon>
+            <template #suffix>
+              <span>{{ item.value }}</span>
+              <p class="today" v-if="item.today">今日</p>
             </template>
-            149
-          </n-statistic>
-        </n-col>
-
-        <n-col :span="8">
-          <n-statistic label="服务中订单" class="text-center p-10px">
-            <template #prefix>
-              <n-icon>
-                <CodeIcon />
-              </n-icon>
-            </template>
-            4,123
-          </n-statistic>
-        </n-col>
-
-        <n-col :span="8">
-          <n-statistic label="待支付订单" class="text-center p-10px">
-            <template #prefix>
-              <n-icon>
-                <IdCardIcon />
-              </n-icon> </template
-            >123
-          </n-statistic>
-        </n-col>
-
-        <n-col :span="8">
-          <n-statistic label="已完成订单" class="text-center p-10px">
-            <template #prefix>
-              <n-icon>
-                <NewspaperIcon />
-              </n-icon>
-            </template>
-            <span>800</span>
-            <p class="today">今日</p>
-          </n-statistic>
-        </n-col>
-
-        <n-col :span="8">
-          <n-statistic label="已取消订单" class="text-center p-10px">
-            <template #prefix>
-              <n-icon>
-                <ReaderIcon />
-              </n-icon>
-            </template>
-            <span>362</span>
-            <p class="today">今日</p>
           </n-statistic>
         </n-col>
       </n-row>
@@ -135,8 +81,8 @@
     </div>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
 import { FormInst } from "naive-ui";
 import Line from "./line.vue";
 import Gauge from "./gauge.vue";
@@ -148,42 +94,56 @@ import {
   CodeWorking as CodeIcon,
   IdCardOutline as IdCardIcon,
 } from "@vicons/ionicons5";
-export default defineComponent({
-  name: "OperateRealMonitor",
-  components: {
-    BarcodeIcon,
-    Line,
-    Gauge,
-    AlarmIcon,
-    CodeIcon,
-    ReaderIcon,
-    IdCardIcon,
-    NewspaperIcon,
-  },
-  setup() {
-    const baiduMapRef = ref();
-    const loading = ref(false);
-    const formRef = ref<FormInst | null>(null);
-    const form = ref({
-      companyId: null,
-      orderType: null,
-    });
 
-    onMounted(() => {});
-
-    function handleValidate() {}
-
-    return {
-      formRef,
-      form,
-      loading,
-      baiduMapRef,
-      options: [],
-
-      handleValidate,
-    };
-  },
+const loading = ref(false);
+const options = [{ label: "asdf", value: "sd" }];
+const formRef = ref<FormInst | null>(null);
+const form = ref({
+  companyId: null,
+  orderType: null,
 });
+const staticData = [
+  {
+    label: "待派订单",
+    value: "10",
+    icon: AlarmIcon,
+    today: false,
+  },
+  {
+    label: "待服务订单",
+    value: "10",
+    icon: BarcodeIcon,
+    today: false,
+  },
+  {
+    label: "服务中订单",
+    value: "10",
+    icon: CodeIcon,
+    today: false,
+  },
+  {
+    label: "待支付订单",
+    value: "10",
+    icon: IdCardIcon,
+    today: false,
+  },
+  {
+    label: "已完成订单",
+    value: "10",
+    icon: NewspaperIcon,
+    today: true,
+  },
+  {
+    label: "已取消订单",
+    value: "10",
+    icon: ReaderIcon,
+    today: true,
+  },
+];
+
+onMounted(() => {});
+
+function handleValidate() {}
 </script>
 <style lang="scss" scoped>
 .right {
