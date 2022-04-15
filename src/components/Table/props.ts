@@ -11,5 +11,15 @@ export const basicProps = {
     itemCount: {
         type: Number,
         default: () => null
+    },
+    isAddBtn: {
+        type: Boolean,
+        default: () => false
+    },
+    
+    isMultipBtn: {
+        type: Boolean,
+        default: () => false
     }
+    
 }

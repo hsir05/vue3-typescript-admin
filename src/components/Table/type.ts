@@ -41,6 +41,14 @@ export const basicProps = {
     type: Object as PropType<BasicColumn>,
     default: null,
   },
+  isAddBtn: {
+      type: Boolean,
+      default: () => false
+  },
+  isMultipBtn: {
+      type: Boolean,
+      default: () => false
+  }
 //   canResize: propTypes.bool.def(true),
 //   resizeHeightOffset: propTypes.number.def(0),
 };

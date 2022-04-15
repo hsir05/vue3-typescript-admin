@@ -3,12 +3,13 @@
     <!-- 顶部功能区 -->
     <div class="flex pb-10px">
       <n-button-group>
-        <n-button type="primary" @click="handleAdd"
+        <n-button type="primary" @click="handleAdd" v-if="getBindValues.isAddBtn"
           ><template #icon>
             <n-icon><AddIcon /></n-icon> </template
           >添加</n-button
         >
         <n-button
+          v-if="getBindValues.isAddBtn"
           secondary
           @click="handleBatch"
           :disabled="checkedRowKeysRef.length > 0 ? false : true"
@@ -78,7 +79,7 @@ export default defineComponent({
     ...basicProps,
   },
   emits: ["on-add", "on-batch", "on-checked-row", "reload-page", "on-page", "on-pagSize"],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
     const checkedRowKeysRef = ref<string[]>([]);
     const tableSize = ref("medium");
 
@@ -91,6 +92,8 @@ export default defineComponent({
       () => `calc(100vh - 95px - ${unref(props).itemCount ? "280px" : "245px"})`
     );
 
+    console.log(attrs);
+
     const getBindValues = computed(() => {
       console.log({ ...unref(props) });
 
@@ -99,6 +102,8 @@ export default defineComponent({
         columns: toRaw(unref(props).columns),
         loading: toRaw(unref(props).loading),
         data: toRaw(unref(props).data),
+        isAddBtn: toRaw(unref(props).isAddBtn),
+        isMultipBtn: toRaw(unref(props).isMultipBtn),
       };
     });
     const getItemCount = computed(() => {

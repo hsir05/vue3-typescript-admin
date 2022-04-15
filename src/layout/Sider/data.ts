@@ -404,6 +404,22 @@ export const menuOptions: MenuOption[] = [
         label: "已完成订单",
         path: "/operate-order/finished",
         key: "operate-order_finished",
+       
+      },
+       {
+        label: "已取消订单",
+        path: "/operate-order/channel",
+        key: "operate-order_channel",
+      },
+      {
+        label: "无效订单",
+        path: "/operate-order/invalid",
+        key: "operate-order_invalid",
+      },
+      {
+        label: "订单评论",
+        path: "/operate-order/order-comment",
+        key: "operate-order_order-comment",
       },
     ],
   },
