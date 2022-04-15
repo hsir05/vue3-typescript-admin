@@ -23,7 +23,6 @@
             </div>
           </div>
         </div>
-
         <div
           class="upload-card-item upload-card-item-select-picture"
           :style="getCSSProperties"
@@ -54,13 +53,13 @@
       </div>
     </n-space>
 
-    <n-modal v-model:show="showModal" preset="card" style="width: 600px" title="一张很酷的图片">
-      <img :src="previewImageUrl" style="width: 100%" />
+    <n-modal v-model:show="showModal" preset="card" style="max-width: 650px; text-align: center">
+      <img :src="previewUrl" style="max-height: 650px" />
     </n-modal>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, computed } from "vue";
+import { defineComponent, reactive, watch, toRefs, computed } from "vue";
 import { useMessage, useDialog, UploadFileInfo } from "naive-ui";
 import {
   EyeOutlined,
@@ -88,16 +87,29 @@ export default defineComponent({
       showModal: false,
       previewUrl: "",
       originalImgList: [] as string[],
-      imgList: [] as string[],
+      imgList: props.value,
     });
 
-    const previewImageUrlRef = ref("");
-    const showModalRef = ref(false);
-    function handlePreview(file: UploadFileInfo) {
-      const { url } = file;
-      previewImageUrlRef.value = url as string;
-      showModalRef.value = true;
-    }
+    // const previewImageUrlRef = ref("");
+    // const showModalRef = ref(false);
+
+    //赋值默认图片显示
+    watch(
+      () => props.value,
+      () => {
+        console.log(props.value);
+
+        state.imgList = props.value.map((item: string) => {
+          return item;
+        });
+      }
+    );
+
+    // function handlePreview(file: UploadFileInfo) {
+    //   const { url } = file;
+    //   previewImageUrlRef.value = url as string;
+    //   showModalRef.value = true;
+    // }
 
     const getCSSProperties = computed(() => {
       return {
@@ -107,6 +119,8 @@ export default defineComponent({
     });
 
     function preview(url: string) {
+      console.log(url);
+
       state.showModal = true;
       state.previewUrl = url;
     }
@@ -162,12 +176,12 @@ export default defineComponent({
     return {
       ...toRefs(state),
       beforeUpload,
-      previewImageUrl: previewImageUrlRef,
-      showModalRef,
+      //   previewImageUrl: previewImageUrlRef,
+      //   showModalRef,
       maxNumber: props.maxNumber,
       helpText: props.helpText,
       getCSSProperties,
-      handlePreview,
+      //   handlePreview,
       finish,
       remove,
       preview,
@@ -199,11 +213,15 @@ export default defineComponent({
       flex-direction: column;
       align-items: center;
       text-align: center;
+      .upload-card-item-info {
+        width: 100%;
+      }
       &:hover {
         background: 0 0;
 
         .upload-card-item-info::before {
           opacity: 1;
+          width: 100%;
         }
 
         &-info::before {
@@ -225,6 +243,7 @@ export default defineComponent({
 
         &::before {
           position: absolute;
+          left: 0;
           z-index: 1;
           width: 100%;
           height: 100%;
@@ -243,6 +262,7 @@ export default defineComponent({
           position: absolute;
           top: 50%;
           left: 50%;
+          width: 100%;
           z-index: 10;
           white-space: nowrap;
           transform: translate(-50%, -50%);
@@ -250,7 +270,7 @@ export default defineComponent({
           transition: all 0.3s;
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: space-around;
 
           &:hover {
             background: 0 0;

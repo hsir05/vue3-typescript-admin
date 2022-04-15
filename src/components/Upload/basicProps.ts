@@ -15,9 +15,17 @@ export const basicProps = {
     type: Number as PropType<number>,
     default: 2,
   },
+  multiple:{
+      type: Boolean,
+      default: () => false
+  },
+  max: {
+      type: Number as PropType<number>,
+    default: 1,
+  },
   maxNumber: {
     type: Number as PropType<number>,
-    default: Infinity,
+    default: 1,
   },
   value: {
     type: Array as PropType<string[]>,

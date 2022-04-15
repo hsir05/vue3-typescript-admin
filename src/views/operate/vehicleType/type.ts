@@ -1,12 +1,12 @@
 export interface tableDataItem {
   id?: string | null;
-  orderType: string | null;
-  vehicleType: string | null;
-  descript: string | null;
-  vehicleTypeImg: string | null;
-  busyImg: null | string;
-  ldleImg: null | string;
-  lock: number | null;
+  orderBusinessType: string | null;
+  vehicleTypeName: string | null;
+  vehicleTypeDesc: string | null;
+  vehicleTypeImage: string | null;
+  vehicleTypeFreeIcon: null | string;
+  vehicleTypeBusyIcon: null | string;
+  vehicleTypeLock: number | null;
 }
 
 export interface tableItemProps {
