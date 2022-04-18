@@ -25,8 +25,6 @@ export default defineComponent({
   },
   setup() {
     const { getCollapsed, navMode, navStyle } = useProjectSetting();
-    console.log(navMode.value);
-
     const inverted = computed(() => unref(navStyle) !== "light");
 
     return {
@@ -39,6 +37,6 @@ export default defineComponent({
 </script>
 <style scoped lang="scss">
 .scroll-height {
-  height: calc(100vh - 80px);
+  height: calc(100vh - 65px);
 }
 </style>

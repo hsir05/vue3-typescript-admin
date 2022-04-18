@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="h-full box-border">
     <!-- 检索 -->
     <n-form
       ref="queryFormRef"
@@ -39,19 +39,23 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
-    <n-select
-      clearable
-      style="width: 100px"
-      filterable
-      v-model:value="status"
-      @update:value="handleStatus"
-      :options="orderStateus.result"
-    />
+    <div class="map">
+      <n-select
+        clearable
+        class="status-select"
+        filterable
+        v-model:value="status"
+        @update:value="handleStatus"
+        :options="orderStateus.result"
+      />
+
+      <Map ref="baiduMapRef" />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -60,11 +64,14 @@ import { FormInst, useMessage } from "naive-ui";
 import orderStateus from "@/config/orderStatus.json";
 import openCityList from "@/config/openCityList.json";
 import { rangeShortcuts } from "@/config/table";
+import Map from "@/components/Map/BaiduMap.vue";
 export default defineComponent({
   name: "CityOrderDistribution",
+  components: { Map },
   setup() {
     const loading = ref(false);
     const status = ref("finished");
+    const baiduMapRef = ref();
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
       section: [new Date("2022-03-16"), new Date("2022-03-18")],
@@ -72,7 +79,10 @@ export default defineComponent({
     });
     const message = useMessage();
 
-    onMounted(() => {});
+    onMounted(async () => {
+      const { renderBaiduMap } = baiduMapRef.value;
+      await renderBaiduMap(103.841521, 36.067212);
+    });
 
     function handleStatus(value: string) {
       console.log(value);
@@ -94,6 +104,7 @@ export default defineComponent({
 
     return {
       loading,
+      baiduMapRef,
       queryFormRef,
       status,
       queryForm,
@@ -107,3 +118,17 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss" scoped>
+.map {
+  width: 100%;
+  height: calc(100% - 90px);
+  position: relative;
+}
+.status-select {
+  width: 100px;
+  position: absolute;
+  top: 5px;
+  right: 90px;
+  z-index: 900;
+}
+</style>
