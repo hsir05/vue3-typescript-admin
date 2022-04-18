@@ -86,8 +86,8 @@
 
         <div class="text-center flex-center ml-140px">
           <n-button attr-type="button" :disabled="loading" type="primary" @click="handleValidate"
-            >保存</n-button
-          >
+            >保存
+          </n-button>
           <n-button
             attr-type="button"
             :disabled="loading"

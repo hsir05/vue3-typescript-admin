@@ -158,13 +158,13 @@ export default defineComponent({
     function handleAdd() {
       console.log("点击了新增");
       const { openDrawer } = chargeRuleDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer("新增");
     }
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = chargeRuleDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer("编辑", record);
     }
 
     function handlePage(pagination: PaginationState) {

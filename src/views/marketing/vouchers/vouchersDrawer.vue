@@ -84,7 +84,7 @@ export default defineComponent({
     const title = ref("");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
+    const form = ref({
       voucherFaceValue: null,
       phone: null,
       startTime: null,
