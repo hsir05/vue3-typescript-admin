@@ -87,6 +87,24 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/capacity/dispatcher/dispatcher.vue"),
       },
+
+       {
+        path: "/capacity/registration-review",
+        name: `capacity_registration-review`,
+        meta: {
+          title: "司机注册审核",
+        },
+        component: () => import("@/views/capacity/registrationReview/registrationReview.vue"),
+      },
+
+       {
+        path: "/capacity/order-limit",
+        name: `capacity_order-limit`,
+        meta: {
+          title: "实时单量上限",
+        },
+        component: () => import("@/views/capacity/orderLimit/orderLimit.vue"),
+      },
       {
         path: "/capacity/driver-member",
         name: `capacity_driver-member`,

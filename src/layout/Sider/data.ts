@@ -136,16 +136,27 @@ export const menuOptions: MenuOption[] = [
         key: "capacity-team",
       },
       {
-        label: "企业紧急联系人",
+        label: "企业紧急联系人管理",
         path: "/capacity/ente-eme-contact",
         key: "capacity-ente-eme-contact",
       },
       {
-        label: "值班调度人",
+        label: "企业值班调度人管理",
         path: "/capacity/dispatcher",
         key: "capacity-dispatcher",
       },
+     
       {
+        label: "司机注册审核",
+        path: "/capacity/registration-review",
+        key: "capacity-registration-review",
+      },
+      {
+        label: "实时单量上限",
+        path: "/capacity/order-limit",
+        key: "capacity-order-limit",
+      },
+       {
         label: "司机会员产品管理",
         path: "/capacity/driver-member",
         key: "capacity-driver-member",

@@ -15,14 +15,14 @@
           v-model:value="queryValue.plate"
           clearable
           placeholder="输入车牌号"
-          style="width: 200px"
+          style="width: 160px"
         />
       </n-form-item>
 
       <n-form-item label="运营企业" path="companyName">
         <n-select
           clearable
-          style="width: 200px"
+          style="width: 160px"
           v-model:value="queryValue.companyName"
           placeholder="选择运营企业"
           :options="options"
@@ -34,7 +34,7 @@
           v-model:value="queryValue.number"
           clearable
           placeholder="输入司机工号"
-          style="width: 200px"
+          style="width: 160px"
         />
       </n-form-item>
       <n-form-item label="司机姓名" path="name">
@@ -42,7 +42,7 @@
           v-model:value="queryValue.name"
           clearable
           placeholder="输入司机姓名"
-          style="width: 200px"
+          style="width: 160px"
         />
       </n-form-item>
 
