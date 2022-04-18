@@ -255,13 +255,14 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: flex-start;
+  $w: 420px;
   &-left {
-    width: 350px;
+    width: $w;
     background-color: $white;
     padding: 20px 10px 10px;
   }
   &-right {
-    width: calc(100% - 350px - 10px);
+    width: calc(100% - $w - 10px);
     background-color: $white;
     max-width: 600px;
     padding: 20px 10px 10px;

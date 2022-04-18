@@ -7,6 +7,7 @@
         style="width: calc(100% - 375px - 15px); height: 100%"
         ref="basicTableRef"
         :columns="columns"
+        :isAddBtn="true"
         :loading="loading"
         :itemCount="itemCount"
         @reload-page="reloadPage"

@@ -9,16 +9,16 @@
           >添加</n-button
         >
         <n-button
-          v-if="getBindValues.isAddBtn"
+          v-if="getBindValues.isBatchBtn"
           secondary
           @click="handleBatch"
           :disabled="checkedRowKeysRef.length > 0 ? false : true"
           type="error"
         >
-          <template #icon>
+          <!-- <template #icon>
             <n-icon><RemoveIcon /></n-icon>
-          </template>
-          批量删除
+          </template> -->
+          {{ getBindValues.batchText }}
         </n-button>
         <slot name="toolbarLeft"></slot>
       </n-button-group>
@@ -68,18 +68,18 @@
 import { defineComponent, ref, toRaw, unref, computed, reactive, toRefs } from "vue";
 import Reload from "@/components/Reload/Reload.vue";
 import Density from "@/components/Density/Density.vue";
-import { Add as AddIcon, TrashOutline as RemoveIcon } from "@vicons/ionicons5";
+import { Add as AddIcon } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
 import { basicProps } from "./props";
 export default defineComponent({
   name: "Table",
-  components: { AddIcon, RemoveIcon, Reload, Density },
+  components: { AddIcon, Reload, Density },
   props: {
     ...basicProps,
   },
   emits: ["on-add", "on-batch", "on-checked-row", "reload-page", "on-page", "on-pagSize"],
-  setup(props, { emit, attrs }) {
+  setup(props, { emit }) {
     const checkedRowKeysRef = ref<string[]>([]);
     const tableSize = ref("medium");
 
@@ -92,18 +92,15 @@ export default defineComponent({
       () => `calc(100vh - 95px - ${unref(props).itemCount ? "280px" : "245px"})`
     );
 
-    console.log(attrs);
-
     const getBindValues = computed(() => {
-      console.log({ ...unref(props) });
-
       return {
         ...unref(props),
         columns: toRaw(unref(props).columns),
         loading: toRaw(unref(props).loading),
         data: toRaw(unref(props).data),
         isAddBtn: toRaw(unref(props).isAddBtn),
-        isMultipBtn: toRaw(unref(props).isMultipBtn),
+        batchText: toRaw(unref(props).batchText),
+        isBatchBtn: toRaw(unref(props).isBatchBtn),
       };
     });
     const getItemCount = computed(() => {

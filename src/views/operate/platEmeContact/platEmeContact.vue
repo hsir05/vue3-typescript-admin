@@ -70,7 +70,11 @@
 <script lang="ts">
 import { defineComponent, ref, h, unref, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { CreateOutline as CreateIcon, Add as AddIcon } from "@vicons/ionicons5";
+import {
+  CreateOutline as CreateIcon,
+  Add as AddIcon,
+  TrashOutline as RemoveIcon,
+} from "@vicons/ionicons5";
 import { tableItemProps, tableDataItem } from "./type";
 import { FormInst, useMessage, FormItemRule } from "naive-ui";
 
@@ -92,15 +96,6 @@ export default defineComponent({
       },
     ]);
     const columns = [
-      //     {
-      //     title: "序号",
-      //     key: "index",
-      //     align: "center",
-      //     width: 65,
-      //     render(_: tableItemProps, rowIndex: number) {
-      //       return h("span", `${rowIndex + 1}`);
-      //     },
-      //   },
       {
         title: "姓名",
         key: "name",
@@ -129,6 +124,18 @@ export default defineComponent({
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
+              {
+                label: "删除",
+                type: "error",
+                icon: RemoveIcon,
+                isIconBtn: true,
+                secondary: true,
+                auth: ["dict002"],
+                popConfirm: {
+                  onPositiveClick: handleRemove.bind(null, record),
+                  title: "您确定删除?",
+                },
+              },
             ],
           });
         },
@@ -152,6 +159,11 @@ export default defineComponent({
           message.error("验证失败");
         }
       });
+    }
+
+    function handleRemove(record: Recordable) {
+      //   message.info("点击了删除", record);
+      console.log("点击了删除", record);
     }
 
     function handleValiReset() {

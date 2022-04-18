@@ -61,7 +61,6 @@
       <!-- 左侧表格 -->
       <div class="mt-10px mb-10px text-right flex">
         <!-- <span>虚拟车头列表</span> -->
-
         <n-button attr-type="button" type="primary" @click="handleAddVirtual">
           <template #icon>
             <n-icon> <AddIcon /> </n-icon>
@@ -148,27 +147,16 @@
           />
         </n-form-item>
 
-        <n-form-item label="车辆类型" path="carType">
+        <n-form-item label="车辆类型" path="carType" class="flex-align-start">
           <n-select
             clearable
-            style="width: 280px"
+            style="width: 270px"
             filterable
             v-model:value="form.carType"
             placeholder="选择车辆类型"
             :options="cityData.result"
           />
         </n-form-item>
-
-        <!-- <n-form-item label="司机头像" path="avatar">
-          <n-select
-            clearable
-            filterable
-            style="width: 200px"
-            v-model:value="form.avatar"
-            placeholder="选择司机头像"
-            :options="cityData.result"
-          />
-        </n-form-item> -->
 
         <n-form-item label="司机头像" path="avatar">
           <BasicUpload
@@ -179,24 +167,18 @@
             :height="100"
             @upload-change="uploadChange"
             v-model:value="uploadList"
-            helpText="单个文件不超过2MB，最多只能上传1个文件"
+            helpText="单个文件不超过2MB,最多只能上传1个文件"
           />
         </n-form-item>
 
         <div class="text-center w-full">
-          <n-button
-            attr-type="button"
-            size="large"
-            :loading="loading"
-            type="primary"
-            @click="handleValidate"
+          <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
             >保存</n-button
           >
 
           <n-button
             attr-type="button"
             :loading="loading"
-            size="large"
             class="ml-10px"
             type="warning"
             @click="handleValiReset"
@@ -439,12 +421,13 @@ export default defineComponent({
   display: flex;
   justify-content: end;
   align-content: flex-start;
+  $width: 420px;
   &-left {
-    width: 400px;
+    width: $width;
     background-color: $white;
   }
   &-right {
-    width: calc(100% - 400px - 10px);
+    width: calc(100% - $width - 10px);
     background-color: $white;
   }
 }

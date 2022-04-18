@@ -6,8 +6,8 @@
       inline
       :rule="rule"
       label-placement="left"
-      label-width="100"
-      class="pt-15px pb-15px bg-white"
+      label-width="120"
+      class="pt-15px pb-15px bg-white mb-10px"
       :show-feedback="false"
       :model="queryValue"
     >
@@ -46,6 +46,8 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :isBatchBtn="true"
+      batchText="批量修改"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"

@@ -25,7 +25,8 @@
           class="ml-10px"
           type="primary"
           @click="handleValidate"
-          >查找</n-button
+        >
+          查找</n-button
         >
       </div>
       <div class="btn-bg flex">
@@ -33,10 +34,12 @@
 
         <n-button attr-type="button" type="primary" @click="handleAddArea">
           <template #icon>
-            <n-icon> <AddIcon /> </n-icon>
+            <n-icon>
+              <AddIcon />
+            </n-icon>
           </template>
-          添加开通区域</n-button
-        >
+          添加开通区域
+        </n-button>
       </div>
       <!-- 表格 -->
       <n-data-table
@@ -62,8 +65,8 @@
           <span class="ml-5px">新增或编辑区域时：</span>
         </div>
         <div class="ml-30px">
-          <p class="mt-5px">地图中<span class="color-yellow-400">黄色区块</span>为不可编辑区块；</p>
-          <p class="mt-5px">地图中<span class="color-green-300">绿色区块</span>为已选择区块；</p>
+          <p class="mt-5px">地图中<span style="color: #eba624">黄色区块</span>为不可编辑区块；</p>
+          <p class="mt-5px">地图中<span style="color: #89b929">绿色区块</span>为已选择区块；</p>
           <p class="mt-5px">地图中空白区块为可选择区块。</p>
         </div>
         <n-form
@@ -93,8 +96,10 @@
             <n-tooltip trigger="hover">
               <template #trigger>
                 <n-button attr-type="button" text type="primary" @click="handleEditArea">
-                  <n-icon size="20"> <HandIcon /> </n-icon
-                ></n-button>
+                  <n-icon size="20">
+                    <HandIcon />
+                  </n-icon>
+                </n-button>
               </template>
               调整地图位置
             </n-tooltip>
@@ -108,8 +113,10 @@
                   type="primary"
                   @click="handleEditArea"
                 >
-                  <n-icon size="20"> <CreatIcon /> </n-icon
-                ></n-button>
+                  <n-icon size="20">
+                    <CreatIcon />
+                  </n-icon>
+                </n-button>
               </template>
               选择
             </n-tooltip>
@@ -123,8 +130,10 @@
                   type="primary"
                   @click="handleEditArea"
                 >
-                  <n-icon size="20"> <ArrowBackIcon /> </n-icon
-                ></n-button>
+                  <n-icon size="20">
+                    <ArrowBackIcon />
+                  </n-icon>
+                </n-button>
               </template>
               还原
             </n-tooltip>
@@ -138,8 +147,10 @@
                   type="primary"
                   @click="handleEditArea"
                 >
-                  <n-icon size="20"> <SaveOutIcon /> </n-icon
-                ></n-button>
+                  <n-icon size="20">
+                    <SaveOutIcon />
+                  </n-icon>
+                </n-button>
               </template>
               保存
             </n-tooltip>
@@ -153,8 +164,10 @@
                   type="primary"
                   @click="handleEditArea"
                 >
-                  <n-icon size="20"> <RefreshIcon /> </n-icon
-                ></n-button>
+                  <n-icon size="20">
+                    <RefreshIcon />
+                  </n-icon>
+                </n-button>
               </template>
               取消
             </n-tooltip>
@@ -325,10 +338,12 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: space-between;
+
   .open-area-left {
     width: 300px;
     background-color: $white;
   }
+
   .btn-bg {
     background-color: v-bind(appTheme);
   }
@@ -342,6 +357,7 @@ export default defineComponent({
     padding-top: 5px;
     padding-left: 5px;
     position: relative;
+
     .map-edit-area {
       position: absolute;
       padding: 10px;

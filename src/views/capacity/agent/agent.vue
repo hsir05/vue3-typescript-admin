@@ -29,6 +29,7 @@
     <BasicTable
       :data="data"
       ref="basicTableRef"
+      :isAddBtn="true"
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"

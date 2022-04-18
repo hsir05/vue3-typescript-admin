@@ -16,10 +16,13 @@ export const basicProps = {
         type: Boolean,
         default: () => false
     },
-    
-    isMultipBtn: {
+    isBatchBtn: {
         type: Boolean,
         default: () => false
+    },
+    batchText: {
+        type: String,
+        default: () => '批量删除'
     }
     
 }

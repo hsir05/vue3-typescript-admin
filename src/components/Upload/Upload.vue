@@ -10,8 +10,8 @@
           :key="`img_${index}`"
         >
           <div class="upload-card-item-info">
-            <div class="img-box">
-              <img :src="item" />
+            <div class="img-box" :style="{ width: getCSSProperties.width }">
+              <img :src="item" style="width: 100%" />
             </div>
             <div class="img-box-actions">
               <n-icon size="18" class="mx-2 action-icon" @click="preview(item)">
@@ -54,7 +54,7 @@
     </n-space>
 
     <n-modal v-model:show="showModal" preset="card" style="max-width: 650px; text-align: center">
-      <img :src="previewUrl" style="max-height: 650px" />
+      <img :src="previewUrl" style="width: 100%" />
     </n-modal>
   </div>
 </template>
