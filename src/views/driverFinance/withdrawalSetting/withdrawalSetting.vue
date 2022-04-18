@@ -3,6 +3,7 @@
     <n-form
       ref="formRef"
       :rules="rules"
+      size="large"
       label-placement="left"
       :style="{ maxWidth: '500px', margin: '20px auto' }"
       require-mark-placement="right-hanging"
@@ -60,10 +61,20 @@
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+        <n-button
+          attr-type="button"
+          size="large"
+          :loading="loading"
+          type="primary"
+          @click="handleValidate"
           >保存</n-button
         >
-        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+        <n-button
+          attr-type="button"
+          size="large"
+          type="warning"
+          class="ml-10px"
+          @click="handleReset"
           >重置</n-button
         >
       </div>

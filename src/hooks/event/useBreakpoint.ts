@@ -1,5 +1,5 @@
-import { ref, computed, ComputedRef, unref } from "vue"
-import { screenMap, sizeEnum, screenEnum } from '@/enums/breakpointEnum';
+import { computed, ComputedRef, unref } from "vue"
+import { sizeEnum, screenEnum } from '@/enums/breakpointEnum';
 
 let globalScreenRef: ComputedRef<sizeEnum | undefined>
 let globalWidthRef: ComputedRef<number>
@@ -23,6 +23,6 @@ export function useBreakpoint(){
     }
 }
 
-export function createBreakpointListen(fn?: (opt: CreateCallbackParams) => void) {
+// export function createBreakpointListen(fn?: (opt: CreateCallbackParams) => void) {
 
-}
+// }

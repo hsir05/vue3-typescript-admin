@@ -4,6 +4,7 @@
     collapse-mode="width"
     :collapsed-width="64"
     :width="240"
+    :class="{ 'scroll-height': navMode === 'horizontal-mix' }"
     :collapsed="getCollapsed"
     :inverted="inverted"
   >
@@ -24,6 +25,7 @@ export default defineComponent({
   },
   setup() {
     const { getCollapsed, navMode, navStyle } = useProjectSetting();
+    console.log(navMode.value);
 
     const inverted = computed(() => unref(navStyle) !== "light");
 
@@ -35,3 +37,8 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped lang="scss">
+.scroll-height {
+  height: calc(100vh - 80px);
+}
+</style>

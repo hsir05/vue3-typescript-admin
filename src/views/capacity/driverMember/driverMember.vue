@@ -5,8 +5,8 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="100"
-      class="pt-15px pb-15px bg-white"
+      label-width="130"
+      class="pt-15px pb-15px bg-white mb-10px"
       :show-feedback="false"
       :model="queryValue"
     >

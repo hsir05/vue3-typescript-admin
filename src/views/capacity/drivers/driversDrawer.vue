@@ -80,6 +80,7 @@
         <n-button
           attr-type="button"
           :loading="loading"
+          :disabled="disabled"
           size="large"
           type="primary"
           @click="handleValidate"
@@ -88,6 +89,7 @@
         <n-button
           attr-type="button"
           type="warning"
+          :disabled="disabled"
           size="large"
           class="ml-10px"
           @click="handleReset"
