@@ -28,14 +28,16 @@
     </n-form-item>
 
     <div class="form-item ml-25px" v-for="(item, index) in form.vhchileData" :key="index">
-      <FormItem
+      <!-- <FormItem
         :item="item"
         :ref="
           (el) => {
             if (el) formItemRef[index] = el;
           }
         "
-      />
+      /> -->
+
+      <FormItem :item="item" />
 
       <n-button
         attr-type="button"
