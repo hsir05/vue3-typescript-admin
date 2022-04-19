@@ -53,8 +53,12 @@
       </div>
     </n-space>
 
-    <n-modal v-model:show="showModal" preset="card" style="max-width: 650px; text-align: center">
-      <img :src="previewUrl" style="width: 100%" />
+    <n-modal
+      v-model:show="showModal"
+      preset="card"
+      style="max-width: 650px; max-height: 600px; text-align: center; overflow: hidden"
+    >
+      <img :src="previewUrl" style="height: 100%" />
     </n-modal>
   </div>
 </template>

@@ -65,7 +65,7 @@
               :data="{}"
               name="files"
               :width="80"
-              :height="110"
+              :height="160"
               @upload-change="uploadChange"
               v-model:value="busyImgList"
             />
@@ -77,7 +77,7 @@
               :data="{}"
               name="files"
               :width="80"
-              :height="110"
+              :height="160"
               @upload-change="uploadChange"
               v-model:value="ldleImgList"
             />
