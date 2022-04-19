@@ -29,18 +29,7 @@
           查找</n-button
         >
       </div>
-      <div class="btn-bg flex">
-        <n-button attr-type="button" type="primary">当前选中区域：{{ area }}</n-button>
 
-        <n-button attr-type="button" type="primary" @click="handleAddArea">
-          <template #icon>
-            <n-icon>
-              <AddIcon />
-            </n-icon>
-          </template>
-          添加开通区域
-        </n-button>
-      </div>
       <!-- 表格 -->
       <n-data-table
         ref="table"
@@ -58,121 +47,8 @@
       <Map ref="baiduMapRef" />
 
       <div class="map-edit-area">
-        <div class="">
-          <n-icon size="24" style="vertical-align: middle">
-            <AlertIcon color="#f0a020" />
-          </n-icon>
-          <span class="ml-5px">新增或编辑区域时：</span>
-        </div>
-        <div class="ml-30px">
-          <p class="mt-5px">地图中<span style="color: #eba624">黄色区块</span>为不可编辑区块；</p>
-          <p class="mt-5px">地图中<span style="color: #89b929">绿色区块</span>为已选择区块；</p>
-          <p class="mt-5px">地图中空白区块为可选择区块。</p>
-        </div>
-        <n-form
-          ref="editFormRef"
-          :rules="editRules"
-          size="small"
-          label-placement="left"
-          :style="{ maxWidth: '250px', marginLeft: '25px', marginTop: '20px' }"
-          require-mark-placement="right-hanging"
-          label-width="80"
-          :model="editForm"
-        >
-          <n-form-item label="区域名称" path="areaName">
-            <n-input v-model:value="editForm.areaName" clearable placeholder="输入区域名称" />
-          </n-form-item>
-
-          <n-form-item label="状态" path="status">
-            <n-radio-group v-model:value="editForm.status">
-              <n-space>
-                <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
-                  item.label
-                }}</n-radio>
-              </n-space>
-            </n-radio-group>
-          </n-form-item>
-          <n-form-item label="操作">
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button attr-type="button" text type="primary" @click="handleEditArea">
-                  <n-icon size="20">
-                    <HandIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              调整地图位置
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleEditArea"
-                >
-                  <n-icon size="20">
-                    <CreatIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              选择
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleEditArea"
-                >
-                  <n-icon size="20">
-                    <ArrowBackIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              还原
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleEditArea"
-                >
-                  <n-icon size="20">
-                    <SaveOutIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              保存
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleEditArea"
-                >
-                  <n-icon size="20">
-                    <RefreshIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              取消
-            </n-tooltip>
-          </n-form-item>
-        </n-form>
+        <OrderItem />
+        <OrderEdit />
       </div>
     </div>
   </div>
@@ -182,32 +58,18 @@ import { defineComponent, ref, h, onMounted } from "vue";
 import Map from "@/components/Map/BaiduMap.vue";
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import { tableItemProps, tableDataItem } from "./type";
+import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
-import {
-  AlertCircle as AlertIcon,
-  TrashOutline as TrashIcon,
-  CreateOutline as CreatIcon,
-  SaveOutline as SaveOutIcon,
-  ArrowUndoCircleOutline as ArrowBackIcon,
-  RefreshCircleOutline as RefreshIcon,
-  Add as AddIcon,
-  HandRightOutline as HandIcon,
-  CreateOutline as CreateIcon,
-} from "@vicons/ionicons5";
+import OrderItem from "./orderTableItem.vue";
+import OrderEdit from "./orderEditItem.vue";
+import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import openCityList from "@/config/openCityList.json";
 export default defineComponent({
   name: "OrderLimit",
   components: {
     Map,
-    AddIcon,
-    AlertIcon,
-    HandIcon,
-    CreatIcon,
-    RefreshIcon,
-    ArrowBackIcon,
-    SaveOutIcon,
+    OrderItem,
+    OrderEdit,
   },
   setup() {
     const cityCode = ref("620100");
@@ -215,8 +77,6 @@ export default defineComponent({
     const formRef = ref<FormInst | null>(null);
     const baiduMapRef = ref();
     const message = useMessage();
-    const { appTheme } = useProjectSetting();
-    const area = ref("主城区");
 
     const data = ref([
       {
@@ -226,12 +86,6 @@ export default defineComponent({
         cityCode: "620100",
       },
     ]);
-    const editFormRef = ref();
-    const editForm = ref<tableDataItem>({
-      areaName: null,
-      status: 1,
-      areaCode: null,
-    });
 
     const columns = [
       {
@@ -253,19 +107,19 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
+                label: "x详情",
+                type: "primary",
+                isIconBtn: true,
+                icon: EyeIcon,
+                onClick: hanldleSee.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
                 onClick: handleEdit.bind(null, record, index),
-                auth: ["dict001"],
-              },
-              {
-                label: "删除",
-                type: "primary",
-                isIconBtn: true,
-                icon: TrashIcon,
-                onClick: handleDelete.bind(null, record),
                 auth: ["dict001"],
               },
             ],
@@ -295,25 +149,22 @@ export default defineComponent({
       const { renderBaiduMap } = baiduMapRef.value;
       renderBaiduMap(103.841521, 36.067212);
     }
-    function handleDelete() {}
-    function handleAddArea() {}
+    function hanldleSee(record: Recordable) {
+      console.log(record);
+    }
 
     function handleEditArea() {}
 
     return {
       loading,
-      area,
       cityCode,
       formRef,
       openCityList,
       baiduMapRef,
       data,
-      appTheme,
-      editForm,
-      editFormRef,
       columns,
       statusOptions,
-      getRowKeyId: (row: tableItemProps) => row.id,
+      getRowKeyId: (row: tableDataItem) => row.id,
       rule: {
         trigger: ["input", "blur"],
         validator() {
@@ -325,9 +176,7 @@ export default defineComponent({
       editRules: {
         areaName: { required: true, trigger: ["blur", "change"], message: "请输入区域名称" },
       },
-
       handleValidate,
-      handleAddArea,
       handleEditArea,
     };
   },
@@ -342,10 +191,6 @@ export default defineComponent({
   .open-area-left {
     width: 300px;
     background-color: $white;
-  }
-
-  .btn-bg {
-    background-color: v-bind(appTheme);
   }
 
   .map {
@@ -363,10 +208,10 @@ export default defineComponent({
       padding: 10px;
       left: 10px;
       top: 10px;
-      width: 300px;
-      height: 270px;
+      width: 470px;
+      height: auto;
       background-color: $white;
-      border-radius: 4px;
+      border-radius: 2px;
     }
   }
 }
