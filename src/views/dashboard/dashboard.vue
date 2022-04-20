@@ -4,20 +4,20 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
-import { getMenus } from "@/api/system/menus";
+import { defineComponent } from "vue";
+// import { getMenus } from "@/api/system/menus";
 export default defineComponent({
   name: "Dashboard",
   components: {},
   setup() {
-    onMounted(async () => {
-      try {
-        let res = await getMenus();
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
-    });
+    // onMounted(async () => {
+    //   try {
+    //     let res = await getMenus();
+    //     console.log(res);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // });
     return {};
   },
 });
