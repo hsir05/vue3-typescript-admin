@@ -154,7 +154,7 @@ import { FormInst, useMessage } from "naive-ui";
 import openCityList from "@/config/openCityList.json";
 import { DownloadOutlined as DownloadIcon } from "@vicons/antd";
 import { tableDataItem } from "../type";
-import { downloadInflux, getInfluxDetail } from "@/api/statement/statement";
+// import { downloadInflux, getInfluxDetail } from "@/api/statement/statement";
 import { pageSizes, rangeShortcuts } from "@/config/table";
 export default defineComponent({
   name: "InfluxStatement",
@@ -274,8 +274,8 @@ export default defineComponent({
           page: 0,
           pageSize: 10,
         };
-        let res = await getInfluxDetail(option);
-        console.log(res);
+        // let res = await getInfluxDetail(option);
+        console.log(option);
 
         setTimeout(() => {}, 1000);
       } catch (err) {
@@ -293,15 +293,16 @@ export default defineComponent({
           page: 0,
           influxName: "qwe",
         };
-        let res = await downloadInflux(option);
+        // let res = await downloadInflux(option);
+        console.log(option);
         //创建一个隐藏的a链接
-        const link = document.createElement("a");
-        let blob = new Blob([res.data], { type: "application/vnd.ms-excel" }); //文件流处理
-        link.style.display = "none"; //去除a标签的样式
-        link.href = URL.createObjectURL(blob);
-        link.download = "文件";
-        document.body.appendChild(link);
-        link.click();
+        // const link = document.createElement("a");
+        // let blob = new Blob([res.data], { type: "application/vnd.ms-excel" }); //文件流处理
+        // link.style.display = "none"; //去除a标签的样式
+        // link.href = URL.createObjectURL(blob);
+        // link.download = "文件";
+        // document.body.appendChild(link);
+        // link.click();
       } catch (err) {
         console.log(err);
       }
