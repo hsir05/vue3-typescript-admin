@@ -57,7 +57,7 @@ import RoleDrawer from "./roleDrawer.vue";
 import { NTag } from "naive-ui";
 import { statusOptions } from "@/config/form";
 import { tableDataItem } from "./type";
-import { getRoles } from "@/api/system/roles";
+// import { getRoles } from "@/api/system/roles";
 export default defineComponent({
   name: "Role",
   components: { BasicTable, RoleDrawer },
@@ -158,15 +158,15 @@ export default defineComponent({
     });
 
     const getData = async () => {
-      loading.value = true;
-      try {
-        let res = await getRoles({ ...queryValue.value });
-        data.value = res.data;
-        itemCount.value = res.itemCount;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-      }
+      //   loading.value = true;
+      //   try {
+      //     let res = await getRoles({ ...queryValue.value });
+      //     data.value = res.data;
+      //     itemCount.value = res.itemCount;
+      //     loading.value = false;
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
     };
 
     function handleCheckRow(rowKeys: string[]) {

@@ -76,7 +76,7 @@ import { NTag } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
-import { getUsers } from "@/api/system/user";
+// import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "User",
@@ -198,16 +198,18 @@ export default defineComponent({
     });
 
     const getData = async (pagination: PaginationState) => {
-      loading.value = true;
-      try {
-        let res = await getUsers({ ...pagination, ...queryValue.value });
-        data.value = res.data;
-        itemCount.value = res.itemCount;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
+      console.log(pagination);
+
+      //   loading.value = true;
+      //   try {
+      //     let res = await getUsers({ ...pagination, ...queryValue.value });
+      //     data.value = res.data;
+      //     itemCount.value = res.itemCount;
+      //     loading.value = false;
+      //   } catch (err) {
+      //     console.log(err);
+      //     loading.value = false;
+      //   }
     };
 
     // nextTick(() => {

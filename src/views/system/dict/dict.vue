@@ -94,7 +94,7 @@ import {
 import { tableDataItem } from "./type";
 // import { data } from "./data";
 import { pageSizes } from "@/config/table";
-import { getDict } from "@/api/system/dict";
+// import { getDict } from "@/api/system/dict";
 import { PaginationState } from "@/api/type";
 
 export default defineComponent({
@@ -130,15 +130,17 @@ export default defineComponent({
     });
 
     const getData = async (pagination: PaginationState) => {
-      loading.value = true;
-      try {
-        let res = await getDict({ ...pagination, ...queryValue.value });
-        data.value = res.data;
-        itemCount.value = res.itemCount;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-      }
+      console.log(pagination);
+
+      //   loading.value = true;
+      //   try {
+      //     let res = await getDict({ ...pagination, ...queryValue.value });
+      //     data.value = res.data;
+      //     itemCount.value = res.itemCount;
+      //     loading.value = false;
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
     };
 
     function handleCheck(rowKeys: string[]) {
