@@ -7,8 +7,9 @@
     "email": "haqsir@163.com"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vue-tsc --noEmit && vite build",
+    "devBuild": "vue-tsc --noEmit && vite build --mode development",
     "build:dev": "vite build --mode development",
     "build:pro": "vite build --mode production",
     "preview": "vite preview",

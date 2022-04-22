@@ -10,7 +10,7 @@ import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 import path from "path";
 
 export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
-  const { VITE_GLOB_APP_TITLE } = env;
+  const { VITE_GLOB_APP_SHORT_NAME } = env;
   const {
     VITE_BUILD_COMPRESS,
     VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE,
@@ -30,7 +30,7 @@ export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
       minify: isBuild,
       inject: {
         data: {
-          title: VITE_GLOB_APP_TITLE,
+          title: VITE_GLOB_APP_SHORT_NAME,
         },
       },
     }),

@@ -1,6 +1,6 @@
 
 export interface loginState {
-    username: string;
+    account: string;
     password: string;
     captcha: string;
 }

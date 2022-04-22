@@ -11,7 +11,7 @@ export interface GlobConfig {
 
 export interface GlobEnvConfig {
   // 标题
-  VITE_GLOB_APP_TITLE: string;
+//   VITE_GLOB_APP_TITLE: string;
   // 接口地址
   VITE_GLOB_API_URL: string;
   // 接口前缀

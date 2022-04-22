@@ -17,6 +17,8 @@ export interface UploadFileParams {
   file: File | Blob;
   // 文件名称
   filename?: string;
+  // 上传类别
+  uploadType?: string;
   [key: string]: any;
 }
 
@@ -63,4 +65,5 @@ export interface Result<T = any> {
   message: string;
   success: boolean;
   result?: T;
+  data?: T;
 }

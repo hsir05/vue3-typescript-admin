@@ -162,7 +162,7 @@
           <BasicUpload
             :action="uploadUrl"
             :data="{}"
-            name="files"
+            name="file"
             :width="100"
             :height="100"
             @upload-change="uploadChange"

@@ -1,25 +1,17 @@
 <template>
   <div class="login-container">
-      <div class="login-mobile-logo">
-          <img src="../../assets/image/logo.png" alt="">
-      </div>
+    <div class="login-mobile-logo">
+      <img src="../../assets/image/logo.png" alt="" />
+    </div>
     <div class="login">
       <div class="login-left">
         <div class="login-title">
           <div class="login-title-img">
-            <img
-              src="../../assets/image/logo.png"
-              alt="logo"
-              style="width: 100%"
-            />
+            <img src="../../assets/image/logo.png" alt="logo" style="width: 100%" />
           </div>
         </div>
         <div class="login-left-img">
-          <img
-            src="../../assets/image/login-middle.png"
-            style="width: 100%"
-            alt=""
-          />
+          <img src="../../assets/image/login-middle.png" style="width: 100%" alt="" />
         </div>
         <div class="login-info">
           <p>兰州益民出行汽车服务有限公司</p>
@@ -29,18 +21,9 @@
       </div>
       <div class="login-form">
         <span class="login-form-title">益民出行综合管理平台</span>
-        <n-form
-          ref="formRef"
-          label-placement="left"
-          size="large"
-          :model="formValue"
-          :rules="rules"
-        >
-          <n-form-item path="username">
-            <n-input
-              v-model:value="formValue.account"
-              placeholder="请输入用户名"
-            >
+        <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
+          <n-form-item path="account">
+            <n-input v-model:value="formValue.account" placeholder="请输入用户名">
               <template #prefix>
                 <n-icon size="18" color="#808695">
                   <PersonOutline />
@@ -63,30 +46,13 @@
             </n-input>
           </n-form-item>
 
-          <n-form-item path="captcha">
-            <div class="captcha">
-              <img
-                src="../../assets/image/image.jpeg"
-                style="height: 100%"
-                alt=""
-              />
-            </div>
-            <n-input
-              v-model:value="formValue.captcha"
-              maxlength="4"
-              placeholder="请输入验证码"
-              style="width: 78%; margin-left: 10px"
-            />
+          <n-form-item path="captcha" v-show="isCaptcha">
+            <n-input v-model:value="formValue.captcha" maxlength="4" placeholder="请输入验证码" />
           </n-form-item>
 
           <n-form-item>
-            <n-button
-              type="primary"
-              class="login-btn"
-              :loading="loading"
-              @click="handleSubmit"
-            >
-              登录
+            <n-button type="primary" class="login-btn" :loading="loading" @click="handleSubmit">
+              {{ isCaptcha ? "登录" : "下一步" }}
             </n-button>
           </n-form-item>
 
@@ -97,9 +63,13 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive } from "vue";
-import { FormInst } from "naive-ui";
+import { defineComponent, ref, reactive, unref } from "vue";
+import { useRouter } from "vue-router";
+import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
+import { getCaptcha } from "@/api/login/login";
+import { useAppUserStore } from "@/store/modules/useUserStore";
+
 export default defineComponent({
   name: "Login",
   components: {
@@ -107,12 +77,14 @@ export default defineComponent({
     LockClosedOutline,
   },
   setup() {
+    const router = useRouter();
     const formRef = ref<FormInst | null>(null);
-    // const message = useMessage()
+    const message = useMessage();
     const loading = ref(false);
+    const isCaptcha = ref(false);
 
     const rules = {
-      username: { required: true, message: "请输入用户名", trigger: "blur" },
+      account: { required: true, message: "请输入用户名", trigger: "blur" },
       password: { required: true, message: "请输入密码", trigger: "blur" },
       captcha: { required: true, message: "请输入验证码", trigger: "blur" },
     };
@@ -120,27 +92,55 @@ export default defineComponent({
     const autoLogin = ref(true);
 
     const formValue = reactive({
-      account: "",
-      password: "",
-      captcha: "",
+      account: "chenke",
+      password: "password",
+      captcha: "123456",
     });
+
+    const getCapt = async () => {
+      try {
+        let res = await getCaptcha(unref(formValue));
+        console.log(res);
+        isCaptcha.value = true;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const { login } = useAppUserStore();
+    const loginUser = async () => {
+      loading.value = true;
+
+      try {
+        await login(unref(formValue));
+        loading.value = false;
+        message.success("登录成功，即将进入系统");
+
+        setTimeout(() => {
+          router.push({ path: "/dashboard" });
+        }, 1000);
+      } catch (err) {
+        console.log(err);
+        message.info("登录失败");
+      }
+    };
 
     const handleSubmit = (e: MouseEvent) => {
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
-          loading.value = true;
-          //   message.success('登录成功，即将进入系统');
+          isCaptcha.value ? loginUser() : getCapt();
         } else {
           console.log(errors);
-          // message.info('登录失败');
         }
       });
     };
     return {
       formRef,
       rules,
+      isCaptcha,
       autoLogin,
+      getCapt,
       formValue,
       loading,
 
@@ -155,8 +155,8 @@ export default defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
-  .login-mobile-logo{
-      display: none;
+  .login-mobile-logo {
+    display: none;
   }
   .login-btn {
     // background-color: #0082fc;
@@ -240,10 +240,10 @@ export default defineComponent({
     background-color: #fff;
     background: url("../../assets/image/login-bg2-m.png") top no-repeat;
     background-size: contain;
-    .login-mobile-logo{
-        display: block;
-        text-align: center;
-        padding-top: 70px;
+    .login-mobile-logo {
+      display: block;
+      text-align: center;
+      padding-top: 70px;
     }
     .login-form-title,
     .tips {

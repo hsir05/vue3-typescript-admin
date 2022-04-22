@@ -91,7 +91,7 @@ import { useAppTabsStore } from "@/store/modules/useTabsStore";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { RouteItem } from "@/store/modules/useTabsStore";
 import { locStorage } from "@/utils/storage";
-import { TABS_ROUTES_KEY } from "@/config/constant";
+import { MULTIPLE_TABS_KEY } from "@/config/constant";
 import { PageEnum } from "@/enums/pageEnum";
 import elementResizeDetectorMaker from "element-resize-detector";
 import {
@@ -149,8 +149,9 @@ export default defineComponent({
     const simpleRoute = getSimpleRoute(route);
 
     try {
-      const routesStr = locStorage.get(TABS_ROUTES_KEY);
-      cacheRoutes = routesStr ? JSON.parse(routesStr) : [simpleRoute];
+      const routesStr = locStorage.get(MULTIPLE_TABS_KEY);
+      //   cacheRoutes = routesStr ? JSON.parse(routesStr) : [simpleRoute];
+      cacheRoutes = routesStr ? routesStr : [simpleRoute];
     } catch (e) {
       cacheRoutes = [simpleRoute];
     }
@@ -163,7 +164,8 @@ export default defineComponent({
     );
 
     window.addEventListener("beforeunload", () => {
-      locStorage.set(TABS_ROUTES_KEY, JSON.stringify(tabsList.value));
+      locStorage.set(MULTIPLE_TABS_KEY, tabsList.value);
+      //   locStorage.set(TABS_ROUTES_KEY, JSON.stringify(tabsList.value));
     });
     const whiteList: string[] = [
       PageEnum.BASE_LOGIN_NAME,

@@ -1,9 +1,8 @@
 import { defineStore } from "pinia";
 import { locStorage } from "@/utils/storage";
 import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
-// import { login } from "@/api/login/login";
-// import { loginState } from "@/api/interface";
-// import { ResultEnum } from "@/enums/httpEnum";
+import { login } from "@/api/login/login";
+import { loginState } from "@/api/type";
 
 interface UserState {
   token: string;
@@ -11,7 +10,7 @@ interface UserState {
   avatar: string;
   role: string;
   info: any;
-  permissions: string[]
+  permissions: string[];
 }
 
 export const useAppUserStore = defineStore({
@@ -22,7 +21,7 @@ export const useAppUserStore = defineStore({
     avatar: "https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg",
     role: "",
     info: "",
-    permissions: ["dict001", "dict002"]
+    permissions: ["dict001", "dict002"],
   }),
   getters: {
     getToken(): string {
@@ -56,20 +55,22 @@ export const useAppUserStore = defineStore({
     },
     setRole(role: string) {
       this.role = role;
+    }, 
+    login(userInfo: loginState) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let res = await login(userInfo);
+          const { token, iat, exp } = res;
+          console.log(iat);
+          locStorage.set(ACCESS_TOKEN_KEY, token, exp);
+          locStorage.set(USER_INFO_KEY, exp);
+          this.setToken(token);
+          resolve(res);
+        } catch (err) {
+          reject(err);
+        }
+      });
     },
-    // login(userInfo: loginState) {
-    //     login(userInfo).then((res) => {
-    //         const { result, code, expire } = res;
-    //         if (code === ResultEnum.SUCCESS) {
-    //         locStorage.set(ACCESS_TOKEN_KEY, result.token, expire);
-    //         locStorage.set(USER_INFO_KEY, result, expire);
-    //         this.setToken(result.token);
-    //         return Promise.resolve(res);
-    //     }
-    //     }).catch((e) => {
-    //         return Promise.reject(e);
-    //     })
-    // },
     logout() {
       this.setRole("");
       locStorage.remove(ACCESS_TOKEN_KEY);

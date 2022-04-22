@@ -17,10 +17,8 @@
     >
       <n-form-item label="司机免冠照片" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -30,10 +28,8 @@
 
       <n-form-item label="人脸识别采集图片" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -43,10 +39,8 @@
 
       <n-form-item label="司机身份证头像面" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -55,10 +49,8 @@
       </n-form-item>
       <n-form-item label="司机身份证国徽面" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -67,10 +59,8 @@
       </n-form-item>
       <n-form-item label="司机驾驶证正页" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -79,10 +69,8 @@
       </n-form-item>
       <n-form-item label="司机驾驶证副页" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -91,10 +79,8 @@
       </n-form-item>
       <n-form-item label="司机网约车资格证正页" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -103,10 +89,8 @@
       </n-form-item>
       <n-form-item label="司机网约车资格证副页" path="bareheadedPhoto">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="100"
           :height="100"
           @upload-change="uploadChange"
@@ -142,11 +126,6 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
-    });
-    const uploadHeaders = reactive({
-      platform: "miniPrograms",
-      timestamp: new Date().getTime(),
-      token: "Q6fFCuhc1vkKn5JNFWaCLf6gRAc5n0LQHd08dSnG4qo=",
     });
     const title = ref("司机证件照片信息");
     const uploadList = ref([
@@ -214,7 +193,6 @@ export default defineComponent({
     return {
       ...toRefs(state),
       uploadUrl,
-      uploadHeaders,
       formRef,
       uploadList,
       form,

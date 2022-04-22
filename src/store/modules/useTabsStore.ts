@@ -14,11 +14,11 @@ export interface MultipleTabState {
 }
 
 const whiteList = ["Redirect", "login"];
-
+ 
 export const useAppTabsStore = defineStore({
   id: "app-tabs",
   state: (): MultipleTabState => ({
-    cachetabsList: new Set(),
+    cachetabsList: new Set(), 
     tabsList: locStorage.get(MULTIPLE_TABS_KEY) || [],
   }),
   getters: {
@@ -61,7 +61,7 @@ export const useAppTabsStore = defineStore({
         this.tabsList = this.tabsList.filter((item) => item.fullPath === PageEnum.BASE_HOME);
       } else {
         this.tabsList = [];
-      }
+      } 
       locStorage.set(MULTIPLE_TABS_KEY, this.tabsList);
     },
   },

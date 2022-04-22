@@ -94,26 +94,15 @@ export default defineComponent({
       imgList: props.value,
     });
 
-    // const previewImageUrlRef = ref("");
-    // const showModalRef = ref(false);
-
     //赋值默认图片显示
     watch(
       () => props.value,
       () => {
-        console.log(props.value);
-
         state.imgList = props.value.map((item: string) => {
           return item;
         });
       }
     );
-
-    // function handlePreview(file: UploadFileInfo) {
-    //   const { url } = file;
-    //   previewImageUrlRef.value = url as string;
-    //   showModalRef.value = true;
-    // }
 
     const getCSSProperties = computed(() => {
       return {
@@ -123,8 +112,6 @@ export default defineComponent({
     });
 
     function preview(url: string) {
-      console.log(url);
-
       state.showModal = true;
       state.previewUrl = url;
     }
@@ -198,6 +185,16 @@ export default defineComponent({
   min-width: 150px;
   overflow: hidden;
 
+  &:deep(.n-upload) {
+    height: 100%;
+  }
+  &:deep(.n-upload-trigger) {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   &-card {
     width: auto;
     height: auto;

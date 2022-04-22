@@ -8,7 +8,7 @@
         :data="data"
         :columns="columns"
         class="box-border"
-        min-height="500px"
+        min-height="calc(100vh - 210px)"
         flex-height
         :row-key="getRowKeyId"
         :pagination="false"
@@ -44,41 +44,35 @@
           </n-radio-group>
         </n-form-item>
 
-        <n-form-item label="车辆类型图片" path="lock">
+        <n-form-item label="车辆类型图片" path="vehicleTypeImageId">
           <BasicUpload
-            :action="uploadUrl"
-            :headers="uploadHeaders"
-            :data="{}"
-            name="files"
+            :data="{ uploadType: UploadTypeEnum.VEHICLETYPE }"
+            name="file"
             :width="310"
             :height="130"
-            @upload-change="uploadChange"
+            @upload-change="uploadVechicleChange"
             v-model:value="vehichleTypeList"
           />
         </n-form-item>
 
         <div class="flex-align-start">
-          <n-form-item label="忙碌图标" path="busyImg">
+          <n-form-item label="忙碌图标" path="vehicleTypeBusyIconId">
             <BasicUpload
-              :action="uploadUrl"
-              :headers="uploadHeaders"
-              :data="{}"
-              name="files"
+              :data="{ uploadType: UploadTypeEnum.VEHICLETYPE }"
+              name="file"
               :width="80"
               :height="160"
-              @upload-change="uploadChange"
+              @upload-change="uploadBusyChange"
               v-model:value="busyImgList"
             />
           </n-form-item>
-          <n-form-item label="空闲图标" path="ldleImg">
+          <n-form-item label="空闲图标" path="vehicleTypeFreeIconId">
             <BasicUpload
-              :action="uploadUrl"
-              :headers="uploadHeaders"
-              :data="{}"
-              name="files"
+              :data="{ uploadType: UploadTypeEnum.VEHICLETYPE }"
+              name="file"
               :width="80"
               :height="160"
-              @upload-change="uploadChange"
+              @upload-change="uploadFreeChange"
               v-model:value="ldleImgList"
             />
           </n-form-item>
@@ -88,14 +82,6 @@
           <n-button attr-type="button" :disabled="loading" type="primary" @click="handleValidate"
             >保存
           </n-button>
-          <n-button
-            attr-type="button"
-            :disabled="loading"
-            type="warning"
-            class="ml-10px"
-            @click="handleReset"
-            >重置</n-button
-          >
         </div>
       </n-form>
     </div>
@@ -106,11 +92,11 @@ import { defineComponent, ref, h, reactive, unref, toRefs, onMounted } from "vue
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import { InfoCircleFilled as infoIcon } from "@vicons/antd";
-import { NTag, UploadFileInfo, FormInst, useMessage } from "naive-ui";
+import { NTag, FormInst, useMessage } from "naive-ui";
 import BasicUpload from "@/components/Upload/Upload.vue";
-import { uploadUrl } from "@/config/config";
+import { UploadTypeEnum } from "@/enums/httpEnum";
 import { tableDataItem, tableItemProps } from "./type";
-// import { getVehicleType } from "@/api/operate/operate";
+import { getVehicleType, vehicleTypeSave } from "@/api/operate/operate";
 import { rules } from "./data";
 export default defineComponent({
   name: "VehicleType",
@@ -121,43 +107,22 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
-    const uploadHeaders = reactive({
-      platform: "miniPrograms",
-      timestamp: new Date().getTime(),
-      token: "Q6fFCuhc1vkKn5JNFWaCLf6gRAc5n0LQHd08dSnG4qo=",
-    });
-    const ldleImgList = ref([
-      "https://yimin-chuxing-test.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/708299c0-0e8b-48ec-8a61-02673dce1b34.png",
-    ]);
-    const vehichleTypeList = ref([
-      "https://yimin-chuxing-test.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/79ec0386-a572-4038-97ba-235248e08745.png",
-    ]);
-    const busyImgList = ref([
-      "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-    ]);
+    const ldleImgList = ref<string[]>([]);
+    const vehichleTypeList = ref<string[]>([]);
+    const busyImgList = ref<string[]>([]);
+
     const formRef = ref<FormInst | null>(null);
     const message = useMessage();
     const form = ref<tableDataItem>({
-      orderBusinessType: null,
-      vehicleTypeName: null,
-      vehicleTypeDesc: null,
-      vehicleTypeImage: null,
-      vehicleTypeFreeIcon: null,
-      vehicleTypeBusyIcon: null,
+      vehicleTypeId: "",
+      vehicleTypeDesc: "",
+      vehicleTypeImageId: "",
+      vehicleTypeBusyIconId: "",
+      vehicleTypeFreeIconId: "",
       vehicleTypeLock: 1,
     });
 
-    const fileList = ref<UploadFileInfo[]>([
-      {
-        id: "3123ssdf",
-        name: "ddd",
-        status: "finished",
-        percentage: 100,
-        url: "https://yimin-chuxing-test.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/708299c0-0e8b-48ec-8a61-02673dce1b34.png",
-      },
-    ]);
-
-    const data = ref<any[]>([]);
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -235,372 +200,39 @@ export default defineComponent({
     const getData = async () => {
       try {
         state.loading = true;
-        // let res = await getVehicleType();
-        setTimeout(() => {
-          let res = {
-            success: true,
-            code: "suc000101",
-            message: "车辆类型查询成功",
-            data: [
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260001",
-                orderBusinessType: "专车业务",
-                vehicleTypeName: "专车-经济型",
-                vehicleTypeDesc: "专车--5座紧凑型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "4a07630a31454671a46d8b2b9bd7432b",
-                  filePath:
-                    "https://yimin-chuxing-test.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/708299c0-0e8b-48ec-8a61-02673dce1b34.png",
-                  fileSuffix: ".png",
-                  contentType: "application/octet-stream",
-                  fileSize: 6111,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260001",
-                  dataType: "AFT0015",
-                  uploadTime: "2021-12-01T04:38:28.000+00:00",
-                  uploadLoginCredentialId: "ca780fcec7df4dbeb53a95bcaa078a45",
-                  sourceName: "%E4%B8%93%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10011",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260001",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车经济型忙碌.png",
-                },
-                vehicleTypeSeq: 1,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260002",
-                orderBusinessType: "专车业务",
-                vehicleTypeName: "专车-舒适型",
-                vehicleTypeDesc: "专车--5座舒适型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10012",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260002",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车舒适型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10013",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260002",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车舒适型忙碌.png",
-                },
-                vehicleTypeSeq: 2,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260003",
-                orderBusinessType: "专车业务",
-                vehicleTypeName: "专车-商务型",
-                vehicleTypeDesc: "专车--7座商务型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10014",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260003",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车商务型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10015",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260003",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车商务型忙碌.png",
-                },
-                vehicleTypeSeq: 3,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260004",
-                orderBusinessType: "专车业务",
-                vehicleTypeName: "专车-豪华型",
-                vehicleTypeDesc: "专车--5座豪华型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10016",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E8%B1%AA%E5%8D%8E%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260004",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车豪华型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10017",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E4%B8%93%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260004",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "专车豪华型忙碌.png",
-                },
-                vehicleTypeSeq: 4,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260011",
-                orderBusinessType: "快车业务",
-                vehicleTypeName: "快车-经济型",
-                vehicleTypeDesc: "快车--5座紧凑型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10018",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260011",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车经济型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10019",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260011",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车经济型忙碌.png",
-                },
-                vehicleTypeSeq: 1,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260012",
-                orderBusinessType: "快车业务",
-                vehicleTypeName: "快车-舒适型",
-                vehicleTypeDesc: "快车--5座舒适型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10020",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260012",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车舒适型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10021",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260012",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车舒适型忙碌.png",
-                },
-                vehicleTypeSeq: 2,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260013",
-                orderBusinessType: "快车业务",
-                vehicleTypeName: "快车-商务型",
-                vehicleTypeDesc: "快车--7座商务型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10022",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260013",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车商务型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10023",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260013",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车商务型忙碌.png",
-                },
-                vehicleTypeSeq: 3,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260014",
-                orderBusinessType: "快车业务",
-                vehicleTypeName: "快车-豪华型",
-                vehicleTypeDesc: "快车--5座豪华型",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "8a80808766a926240166a9268cb10024",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E7%A9%BA%E9%97%B2.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260014",
-                  dataType: "AFT0015",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车豪华型空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "8a80808766a926240166a9268cb10025",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/%E5%BF%AB%E8%BD%A6%E5%BF%99%E7%A2%8C.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6251,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260014",
-                  dataType: "AFT0016",
-                  uploadTime: "2018-10-25T02:56:08.000+00:00",
-                  uploadLoginCredentialId: null,
-                  sourceName: "快车豪华型忙碌.png",
-                },
-                vehicleTypeSeq: 4,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-              {
-                vehicleTypeId: "8a80808763af1ab00163af1aea260021",
-                orderBusinessType: "出租车业务",
-                vehicleTypeName: "出租车",
-                vehicleTypeDesc: "5座出租车",
-                vehicleTypeImage: null,
-                vehicleTypeFreeIcon: {
-                  fileId: "e47f5f5aa4eb45cfaea0d5c7c55c1c02",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/fb505490-a72d-4d56-bc59-b786cd6751d0.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6111,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260021",
-                  dataType: "AFT0015",
-                  uploadTime: "2021-07-13T07:17:11.000+00:00",
-                  uploadLoginCredentialId: "ca780fcec7df4dbeb53a95bcaa078a45",
-                  sourceName: "专车-经济型-空闲.png",
-                },
-                vehicleTypeBusyIcon: {
-                  fileId: "4e91d4dc722547cfaf69f35fee408509",
-                  filePath:
-                    "https://yimin-chuxing.oss-cn-beijing.aliyuncs.com/yimin_vehicle_images/vehicle_type/98d2ac00-2610-490e-81d6-1a695bc397cf.png",
-                  fileSuffix: ".png",
-                  contentType: "image/png",
-                  fileSize: 6111,
-                  tableName: "tb_vehicle_type",
-                  dataId: "8a80808763af1ab00163af1aea260021",
-                  dataType: "AFT0016",
-                  uploadTime: "2021-07-13T07:29:40.000+00:00",
-                  uploadLoginCredentialId: "ca780fcec7df4dbeb53a95bcaa078a45",
-                  sourceName: "专车-经济型-空闲.png",
-                },
-                vehicleTypeSeq: 1,
-                vehicleTypeLock: 0,
-                createTime: 1541749712000,
-              },
-            ],
-          };
-          data.value = res.data;
-          state.loading = false;
-        }, 900);
+        let res = await getVehicleType();
+        data.value = res;
+        state.loading = false;
       } catch (err) {
         console.log(err);
+        state.loading = false;
+      }
+    };
+
+    const vehicleTypeSaveSub = async () => {
+      state.loading = true;
+      try {
+        let res = await vehicleTypeSave(form.value);
+        console.log(res);
+        message.success("保存成功");
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
       }
     };
 
     function handleSee(record: Recordable) {
       state.disabled = true;
+      let vechile = record.vehicleTypeImage.filePath;
+      let ldle = record.vehicleTypeFreeIcon.filePath;
+      let busy = record.vehicleTypeBusyIcon.filePath;
+      vehichleTypeList.value = vechile ? [vechile] : [];
+      ldleImgList.value = ldle ? [ldle] : [];
+      busyImgList.value = busy ? [busy] : [];
+
       const {
-        id,
-        orderBusinessType,
-        vehicleTypeName,
         vehicleTypeDesc,
+        vehicleTypeId,
         vehicleTypeImage,
         vehicleTypeFreeIcon,
         vehicleTypeBusyIcon,
@@ -608,13 +240,11 @@ export default defineComponent({
       } = record;
 
       form.value = {
-        id,
-        orderBusinessType,
-        vehicleTypeName,
+        vehicleTypeId,
         vehicleTypeDesc,
-        vehicleTypeImage,
-        vehicleTypeFreeIcon,
-        vehicleTypeBusyIcon,
+        vehicleTypeImageId: vehicleTypeImage.fileId,
+        vehicleTypeBusyIconId: vehicleTypeBusyIcon.fileId,
+        vehicleTypeFreeIconId: vehicleTypeFreeIcon.fileId,
         vehicleTypeLock,
       };
     }
@@ -650,51 +280,42 @@ export default defineComponent({
           state.loading = true;
           state.disabled = true;
           console.log(unref(form));
-
-          message.success("验证成功");
+          vehicleTypeSaveSub();
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
 
-    function uploadChange(list: string[]) {
+    function uploadVechicleChange(list: string[]) {
       console.log(list);
+      message.success("上传成功!");
     }
-
-    function handleReset() {
-      form.value = {
-        orderBusinessType: null,
-        vehicleTypeName: null,
-        vehicleTypeDesc: null,
-        vehicleTypeImage: null,
-        vehicleTypeFreeIcon: null,
-        vehicleTypeBusyIcon: null,
-        vehicleTypeLock: 1,
-      };
-      formRef.value?.restoreValidation();
-      state.isModal = false;
-      state.loading = false;
-      state.disabled = false;
+    function uploadBusyChange(list: string[]) {
+      console.log(list);
+      message.success("上传成功!");
+    }
+    function uploadFreeChange(list: string[]) {
+      console.log(list);
+      message.success("上传成功!");
     }
 
     return {
       ...toRefs(state),
       data,
       formRef,
-      uploadHeaders,
-      fileList,
-      uploadUrl,
       vehichleTypeList,
+      UploadTypeEnum,
       ldleImgList,
       busyImgList,
       form,
       columns,
       rules,
+
       getRowKeyId: (row: tableItemProps) => row.id,
-      handleReset,
-      uploadChange,
+      uploadBusyChange,
+      uploadFreeChange,
+      uploadVechicleChange,
       handleValidate,
     };
   },

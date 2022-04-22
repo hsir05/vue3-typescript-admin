@@ -38,10 +38,8 @@
 
       <n-form-item label="车辆照片" path="lock">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="310"
           :height="130"
           @upload-change="uploadChange"
@@ -52,10 +50,8 @@
 
       <n-form-item label="运输证" path="lock">
         <BasicUpload
-          :action="uploadUrl"
-          :headers="uploadHeaders"
           :data="{}"
-          name="files"
+          name="file"
           :width="310"
           :height="130"
           @upload-change="uploadChange"
@@ -129,11 +125,6 @@ export default defineComponent({
       vehiclesDate: null,
     });
 
-    const uploadHeaders = reactive({
-      platform: "miniPrograms",
-      timestamp: new Date().getTime(),
-      token: "Q6fFCuhc1vkKn5JNFWaCLf6gRAc5n0LQHd08dSnG4qo=",
-    });
     const uploadList = ref([
       "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
     ]);
@@ -221,7 +212,6 @@ export default defineComponent({
       cityData,
       uploadUrl,
       form,
-      uploadHeaders,
       uploadList,
       openDrawer,
       handleUpdateValue,

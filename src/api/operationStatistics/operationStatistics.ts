@@ -3,7 +3,7 @@ import { getCityOderState, getCompanyOderState } from "../type"
 
 
 //获取城市单量
-export function getCityOder(data: getCityOderState) {    
+export function getCityOrder(data: getCityOderState) {    
   return http.request({
     url: '/order/getCityOrderStatistics',
     method: 'post',

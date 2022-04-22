@@ -39,7 +39,7 @@ export const createStorage = ({ prefixKey = '', storage = localStorage } = {}) =
      * 读取缓存
      * @param {string} key 缓存键
      * @param {*=} def 默认值
-     */
+     */ 
     get(key: string, def: any = null) {
       const item = this.storage.getItem(this.getKey(key));
       if (item) {

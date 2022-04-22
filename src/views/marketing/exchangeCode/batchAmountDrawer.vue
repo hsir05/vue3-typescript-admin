@@ -54,6 +54,7 @@ import { tableDataItem } from "./type";
 export default defineComponent({
   name: "BatchCodeDrawer",
   components: { CodeDetailModal, CodeDrawer },
+  emits: ["on-save-after"],
   setup() {
     const state = reactive({
       isDrawer: false,

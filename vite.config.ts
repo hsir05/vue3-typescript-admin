@@ -57,7 +57,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         //   target: "http://192.168.1.50:8080",
         //   changeOrigin: true,
         //   rewrite: (path) => {
-        //       return path.replace("/api", "")
+        //       return path.replace("/api", "") 
         //   },
         // },
         "/api": {
@@ -65,6 +65,23 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           changeOrigin: true,
           rewrite: (path) => {
               return path.replace("/api", "")
+          },
+        },
+        "/attachFile/upload": {
+          target: "http://192.168.1.38:8080",
+        },
+         "/api2": { 
+          target: "http://192.168.1.38:8080",
+          changeOrigin: true,
+          rewrite: (path) => {
+              return path.replace("/api2", "")
+          },
+        },
+         "/api3": {
+          target: "http://192.168.1.45:8080",
+          changeOrigin: true,
+          rewrite: (path) => {
+              return path.replace("/api3", "")
           },
         },
       },

@@ -66,7 +66,7 @@
           :options="option"
         />
       </div>
-      <Order />
+      <Order :data="data" />
     </div>
   </div>
 </template>
@@ -76,7 +76,7 @@ import { FormInst, useMessage } from "naive-ui";
 import openCityList from "@/config/openCityList.json";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
-import { getCityOder } from "@/api/operationStatistics/operationStatistics";
+import { getCityOrder } from "@/api/operationStatistics/operationStatistics";
 import { getInfluxList, getOpenCity } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
 export default defineComponent({
@@ -139,6 +139,7 @@ export default defineComponent({
 
     onMounted(() => {
       getData();
+      getCityOrderData();
     });
 
     const getData = async () => {
@@ -150,7 +151,7 @@ export default defineComponent({
         let influx = await getInfluxList();
         console.log(influx);
 
-        let res = await getCityOder({
+        let res = await getCityOrder({
           cityCode: "allCity",
           beginDate: "2022-03-16",
           endDate: "2022-03-18",
@@ -160,6 +161,15 @@ export default defineComponent({
       } catch (err) {
         console.log(err);
         loading.value = false;
+      }
+    };
+
+    const getCityOrderData = async () => {
+      try {
+        let res = await getCityOrder({ cityCode: "", beginDate: "", endDate: "" });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
       }
     };
 

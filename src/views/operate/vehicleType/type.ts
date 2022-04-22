@@ -1,14 +1,13 @@
+
 export interface tableDataItem {
-  id?: string | null;
-  orderBusinessType: string | null;
-  vehicleTypeName: string | null;
-  vehicleTypeDesc: string | null;
-  vehicleTypeImage: string | null;
-  vehicleTypeFreeIcon: null | string;
-  vehicleTypeBusyIcon: null | string;
-  vehicleTypeLock: number | null;
+  vehicleTypeId: string
+  vehicleTypeDesc: string
+  vehicleTypeImageId: string
+  vehicleTypeBusyIconId: string
+  vehicleTypeFreeIconId: string
+  vehicleTypeLock: number;
 }
 
 export interface tableItemProps {
-    id: string | number
+  id: string;
 }

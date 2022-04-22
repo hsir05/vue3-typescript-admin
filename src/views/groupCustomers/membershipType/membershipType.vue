@@ -5,7 +5,7 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="110"
+      label-width="120"
       class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
@@ -55,7 +55,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
@@ -64,7 +64,7 @@ import MemberDrawer from "./memberDrawer.vue";
 import DetailDrawer from "@/components/memberDetail/memberDetailDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { getGroupMemberList } from "@/api/groupCustomers/groupCustomers";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "MembershipType",
@@ -170,27 +170,22 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ page: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
-
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+    const getData = async (pagination: PaginationState) => {
+      loading.value = true;
+      try {
+        let res = await getGroupMemberList({ ...pagination, ...queryValue.value });
+        data.value = res.data;
+        itemCount.value = res.itemCount;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);

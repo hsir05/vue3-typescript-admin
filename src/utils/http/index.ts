@@ -20,10 +20,8 @@ import { useMessage, useDialog } from 'naive-ui'
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix || '';
-
 import router from '@/router';
 import { locStorage } from '@/utils/storage';
-
 const naiMessage = useMessage()
 const naiDialog = useDialog()
 
@@ -62,7 +60,7 @@ const transform: AxiosTransform = {
       throw new Error('请求出错，请稍候重试');
     }
     //  这里 code，result，message为 后台统一的字段，需要修改为项目自己的接口返回格式
-    const { success, code, result, message } = data;
+    const { success, code, message } = data;
     // 请求成功
     // const hasSuccess = data && Reflect.has(data, success) && success === ResultEnum.SUCCESS;
     // const hasSuccess = data && Reflect.has(data, success) && success
@@ -94,7 +92,7 @@ const transform: AxiosTransform = {
     //   return result;
     // }
      if (success) {
-      return result;
+      return data.data;
     }
     // 接口请求错误，统一提示错误信息 这里逻辑可以根据项目进行修改
     let errorMsg = message;
@@ -157,11 +155,11 @@ const transform: AxiosTransform = {
       if (!isString(params)) {
         formatDate && formatRequestDate(params);
         if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
-        //   config.data = data;
+          config.data = data;
           config.params = data;
           // 传参数方式修改
         } else {
-          config.data = params;
+          config.data = data;
           config.params = undefined;
         }
         if (joinParamsToUrl) {
@@ -183,7 +181,8 @@ const transform: AxiosTransform = {
    * @description: 请求拦截器处理
    */
   requestInterceptors: (config, options) => {
-    // 请求之前处理config
+    // 请求之前处理config 
+    /// token
     const userStore = useAppUserStore();
     const token = userStore.getToken;
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
@@ -245,7 +244,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         authenticationScheme: '',
         // 接口前缀
         prefixUrl: urlPrefix,
-        headers: { 'Content-Type': ContentTypeEnum.JSON },
+        headers: { Accept:ContentTypeEnum.JSON, 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
         // 数据处理方式
         transform,
         // 配置项，下面的选项都可以在独立的接口请求中覆盖

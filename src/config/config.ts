@@ -1,3 +1,3 @@
 
 
-export const uploadUrl = 'http://testcxpm.yiminyueche.com/attachfile/cutUploader'
+export const uploadUrl = '/attachFile/upload'

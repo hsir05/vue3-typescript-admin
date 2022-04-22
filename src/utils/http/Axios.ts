@@ -113,7 +113,7 @@ export class VAxios {
     const formData = new window.FormData();
     const customFilename = params.name || 'file';
 
-    if (params.filename) {
+    if (params.filename) { 
       formData.append(customFilename, params.file, params.filename);
     } else {
       formData.append(customFilename, params.file);

@@ -1,26 +1,45 @@
-import type { PropType } from 'vue';
-import { NUpload } from 'naive-ui';
+import type { PropType } from "vue";
+import { NUpload } from "naive-ui";
+import { uploadUrl } from "@/config/config";
+import { useAppUserStore } from "@/store/modules/useUserStore";
+
+const userStore = useAppUserStore();
+
+interface uploadHeaders {
+  Authorization: String;
+}
 
 export const basicProps = {
   ...NUpload.props,
   accept: {
     type: String,
-    default: '.jpg,.png,.jpeg,.svg,.gif',
+    default: ".jpg,.png,.jpeg,.svg,.gif",
+  },
+  action: {
+    type: String,
+    default: uploadUrl,
+  },
+  headers: {
+    type: Object as PropType<uploadHeaders>,
+    default: () =>  { 
+        let obj = {Authorization: userStore.getToken}
+        return obj
+     }
   },
   helpText: {
     type: String as PropType<string>,
-    default: '',
+    default: "",
   },
   maxSize: {
     type: Number as PropType<number>,
     default: 2,
   },
-  multiple:{
-      type: Boolean,
-      default: () => false
+  multiple: {
+    type: Boolean,
+    default: () => false,
   },
   max: {
-      type: Number as PropType<number>,
+    type: Number as PropType<number>,
     default: 1,
   },
   maxNumber: {

@@ -13,7 +13,7 @@ export function getStorageShortName() {
   return `${getCommonStoragePrefix()}${`__${pkg.version}`}__`.toUpperCase();
 }
 
-export function getAppEnvConfig() {
+export function getAppEnvConfig() { 
   const ENV_NAME = getConfigFileName(import.meta.env);
 
   const ENV = (import.meta.env.DEV
@@ -22,7 +22,7 @@ export function getAppEnvConfig() {
     : window[ENV_NAME as any]) as unknown as GlobEnvConfig;
 
   const {
-    VITE_GLOB_APP_TITLE,
+    // VITE_GLOB_APP_TITLE,
     VITE_GLOB_API_URL,
     VITE_GLOB_APP_SHORT_NAME,
     VITE_GLOB_API_URL_PREFIX,
@@ -30,6 +30,7 @@ export function getAppEnvConfig() {
     VITE_GLOB_PROD_MOCK,
     VITE_GLOB_IMG_URL,
   } = ENV;
+  
 
   if (!/^[a-zA-Z\_]*$/.test(VITE_GLOB_APP_SHORT_NAME)) {
     console.warn(
@@ -38,7 +39,7 @@ export function getAppEnvConfig() {
   }
 
   return {
-    VITE_GLOB_APP_TITLE,
+    // VITE_GLOB_APP_TITLE,
     VITE_GLOB_API_URL,
     VITE_GLOB_APP_SHORT_NAME,
     VITE_GLOB_API_URL_PREFIX,

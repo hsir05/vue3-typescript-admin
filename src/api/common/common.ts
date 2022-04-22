@@ -1,35 +1,34 @@
-import { http } from '@/utils/http';
-
+import { http } from "@/utils/http";
 
 //获取流量方
-export function getInfluxList() {    
+export function getInfluxList() {
   return http.request({
-    url: '/dictionary/influxList',
-    method: 'post',
+    url: "/dictionary/influxList",
+    method: "post",
   });
 }
 
-
 //获取所有运营企业列表
-export function getOperationCompany() {    
+export function getOperationCompany() {
   return http.request({
-    url: '/operationCompany/getAllOperationCompany',
-    method: 'post',
+    url: "/operationCompany/getAllOperationCompany",
+    method: "post",
   });
 }
 
 //获得所有开通城市
-export function getOpenCity() {    
+export function getOpenCity() {
   return http.request({
-    url: '/openCity/openCityList',
-    method: 'post',
+    url: "/openCity/openCityList",
+    method: "post",
   });
 }
 
 //下载流文件
-export function download() {    
+export function download() {
   return http.request({
-    url: '/openCity/openCityList',
-    method: 'post',
+    url: "/openCity/openCityList",
+    method: "post",
   });
 }
+

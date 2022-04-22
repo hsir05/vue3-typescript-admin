@@ -29,7 +29,7 @@
           clearable
           filterable
           v-model:value="dirverNum"
-          @update:value="handleCompany"
+          @update:value="handleDriverNum"
           placeholder="选择司机工号"
           :options="options"
         />
@@ -40,7 +40,7 @@
           clearable
           filterable
           v-model:value="vehicleType"
-          @update:value="handleCompany"
+          @update:value="handleVehicleType"
           placeholder="选择车辆类型"
           :options="options"
         />
@@ -54,6 +54,12 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import Map from "@/components/Map/BaiduMap.vue";
+import { getOperationCompany } from "@/api/common/common";
+import {
+  getWorkingDriverList,
+  getDriverDetail,
+  driverPosition,
+} from "@/api/realtimeDynamic/realtimeDynamic";
 import idle from "@/assets/image/icon_driver_map_idle.png";
 import busy from "@/assets/image/icon_driver_map_busy.png";
 import offDuty from "@/assets/image/icon_driver_map_offDuty.png";
@@ -63,9 +69,13 @@ const companyId = ref();
 const dirverNum = ref();
 const vehicleType = ref();
 const baiduMapRef = ref();
+const compOpton = ref([]);
+
 onMounted(async () => {
   const { renderBaiduMap } = baiduMapRef.value;
   await renderBaiduMap(103.841521, 36.067212);
+
+  getOperateCompanyData();
 });
 
 const data = [
@@ -93,6 +103,53 @@ const options = [
   },
 ];
 
+const getOperateCompanyData = async () => {
+  try {
+    let res = await getOperationCompany();
+    console.log(res);
+    compOpton.value = res;
+    if (res.length > 0) {
+      let id = res[0].operationCompanyId;
+      getWorkingDriver(id);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+function handleDriverNum(value: string) {
+  getWorkingDriver(value);
+}
+
+const getWorkingDriver = async (id: string) => {
+  try {
+    let res = await getWorkingDriverList({ operationCompanyId: id });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+};
+function handleVehicleType(value: string) {
+  getDetail(value);
+}
+
+const getDetail = async (id: string) => {
+  try {
+    let res = await getDriverDetail({ driverId: id });
+    console.log(res);
+    getDriverPosition();
+  } catch (err) {
+    console.log(err);
+  }
+};
+const getDriverPosition = async () => {
+  try {
+    let res = await driverPosition({ operationCompanyId: "", driverId: "", vehicleType: "" });
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+};
 function handleCompany(value: string) {
   console.log(value);
 }
