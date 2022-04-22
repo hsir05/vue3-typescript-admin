@@ -14,8 +14,8 @@
         :pagination="false"
       />
     </div>
-    <div class="table-edit">
-      <n-divider title-placement="left"> 车辆类型编辑 </n-divider>
+    <div class="table-edit" v-if="isShow">
+      <n-divider title-placement="left"> 车辆类型{{ disabled ? "查看" : "编辑" }} </n-divider>
 
       <div class="tip mb-10px">
         <n-icon size="18" color="#f0a020" class="m-auto mr-6px"> <infoIcon /> </n-icon>提示:
@@ -48,6 +48,7 @@
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.VEHICLETYPE }"
             name="file"
+            :disabled="disabled"
             :width="310"
             :height="130"
             @upload-change="uploadVechicleChange"
@@ -60,6 +61,7 @@
             <BasicUpload
               :data="{ uploadType: UploadTypeEnum.VEHICLETYPE }"
               name="file"
+              :disabled="disabled"
               :width="80"
               :height="160"
               @upload-change="uploadBusyChange"
@@ -70,6 +72,7 @@
             <BasicUpload
               :data="{ uploadType: UploadTypeEnum.VEHICLETYPE }"
               name="file"
+              :disabled="disabled"
               :width="80"
               :height="160"
               @upload-change="uploadFreeChange"
@@ -79,8 +82,16 @@
         </div>
 
         <div class="text-center flex-center ml-140px">
-          <n-button attr-type="button" :disabled="loading" type="primary" @click="handleValidate"
+          <n-button
+            attr-type="button"
+            :disabled="loading || disabled"
+            type="primary"
+            @click="handleValidate"
             >保存
+          </n-button>
+
+          <n-button attr-type="button" type="primary" class="ml-10px" @click="handleVisble"
+            >取消
           </n-button>
         </div>
       </n-form>
@@ -103,7 +114,7 @@ export default defineComponent({
   components: { BasicUpload, infoIcon },
   setup() {
     const state = reactive({
-      isModal: false,
+      isShow: false,
       loading: false,
       disabled: false,
     });
@@ -176,7 +187,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleSee.bind(null, record),
+                onClick: handle.bind(null, record, true),
                 auth: ["dict001"],
               },
               {
@@ -184,7 +195,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handle.bind(null, record, false),
                 auth: ["dict001"],
               },
             ],
@@ -212,24 +223,19 @@ export default defineComponent({
     const vehicleTypeSaveSub = async () => {
       state.loading = true;
       try {
-        let res = await vehicleTypeSave(form.value);
-        console.log(res);
+        await vehicleTypeSave(form.value);
+        getData();
         message.success("保存成功");
+        state.loading = false;
       } catch (err) {
         console.log(err);
         state.loading = false;
       }
     };
 
-    function handleSee(record: Recordable) {
-      state.disabled = true;
-      let vechile = record.vehicleTypeImage.filePath;
-      let ldle = record.vehicleTypeFreeIcon.filePath;
-      let busy = record.vehicleTypeBusyIcon.filePath;
-      vehichleTypeList.value = vechile ? [vechile] : [];
-      ldleImgList.value = ldle ? [ldle] : [];
-      busyImgList.value = busy ? [busy] : [];
-
+    function handle(record: Recordable, bool: boolean) {
+      state.disabled = bool;
+      state.isShow = true;
       const {
         vehicleTypeDesc,
         vehicleTypeId,
@@ -239,36 +245,16 @@ export default defineComponent({
         vehicleTypeLock,
       } = record;
 
+      vehichleTypeList.value = vehicleTypeImage ? [vehicleTypeImage.filePath] : [];
+      ldleImgList.value = vehicleTypeFreeIcon ? [vehicleTypeFreeIcon.filePath] : [];
+      busyImgList.value = vehicleTypeBusyIcon ? [vehicleTypeBusyIcon.filePath] : [];
+
       form.value = {
         vehicleTypeId,
         vehicleTypeDesc,
-        vehicleTypeImageId: vehicleTypeImage.fileId,
-        vehicleTypeBusyIconId: vehicleTypeBusyIcon.fileId,
-        vehicleTypeFreeIconId: vehicleTypeFreeIcon.fileId,
-        vehicleTypeLock,
-      };
-    }
-    function handleEdit(record: Recordable) {
-      state.disabled = false;
-      const {
-        id,
-        orderBusinessType,
-        vehicleTypeName,
-        vehicleTypeDesc,
-        vehicleTypeImage,
-        vehicleTypeFreeIcon,
-        vehicleTypeBusyIcon,
-        vehicleTypeLock,
-      } = record;
-
-      form.value = {
-        id,
-        orderBusinessType,
-        vehicleTypeName,
-        vehicleTypeDesc,
-        vehicleTypeImage,
-        vehicleTypeFreeIcon,
-        vehicleTypeBusyIcon,
+        vehicleTypeImageId: vehicleTypeImage ? vehicleTypeImage.fileId : null,
+        vehicleTypeBusyIconId: vehicleTypeBusyIcon ? vehicleTypeBusyIcon.fileId : null,
+        vehicleTypeFreeIconId: vehicleTypeFreeIcon ? vehicleTypeFreeIcon.fileId : null,
         vehicleTypeLock,
       };
     }
@@ -287,17 +273,21 @@ export default defineComponent({
       });
     }
 
-    function uploadVechicleChange(list: string[]) {
-      console.log(list);
-      message.success("上传成功!");
+    function uploadVechicleChange(file: { filePath: string; fileId: string }) {
+      form.value.vehicleTypeImageId = file.fileId;
+      vehichleTypeList.value = [file.filePath];
     }
-    function uploadBusyChange(list: string[]) {
-      console.log(list);
-      message.success("上传成功!");
+    function uploadBusyChange(file: { filePath: string; fileId: string }) {
+      form.value.vehicleTypeBusyIconId = file.fileId;
+      busyImgList.value = [file.filePath];
     }
-    function uploadFreeChange(list: string[]) {
-      console.log(list);
-      message.success("上传成功!");
+    function uploadFreeChange(file: { filePath: string; fileId: string }) {
+      form.value.vehicleTypeFreeIconId = file.fileId;
+      ldleImgList.value = [file.filePath];
+    }
+
+    function handleVisble() {
+      state.isShow = false;
     }
 
     return {
@@ -313,6 +303,7 @@ export default defineComponent({
       rules,
 
       getRowKeyId: (row: tableItemProps) => row.id,
+      handleVisble,
       uploadBusyChange,
       uploadFreeChange,
       uploadVechicleChange,

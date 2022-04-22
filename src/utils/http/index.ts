@@ -12,7 +12,7 @@ import { useGlobSetting } from '@/hooks/setting';
 import { isString } from '@/utils/is';
 import { deepMerge, isUrl } from '@/utils';
 import { setObjToUrlParams } from '@/utils';
-
+import qs from "qs"
 import { RequestOptions, Result, CreateAxiosOptions } from './types';
 
 import { useAppUserStore } from '@/store/modules/useUserStore';
@@ -152,27 +152,34 @@ const transform: AxiosTransform = {
         config.params = undefined;
       }
     } else {
-      if (!isString(params)) {
-        formatDate && formatRequestDate(params);
-        if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
-          config.data = data;
-          config.params = data;
-          // 传参数方式修改
-        } else {
-          config.data = data;
-          config.params = undefined;
-        }
-        if (joinParamsToUrl) {
-          config.url = setObjToUrlParams(
-            config.url as string,
-            Object.assign({}, config.params, config.data)
-          );
-        }
-      } else {
-        // 兼容restful风格
-        config.url = config.url + params;
-        config.params = undefined;
-      }
+        console.log(data);
+        console.log(qs.stringify(data));
+        
+         config.data = data;
+        //  config.params = data;
+    //   if (!isString(params)) {
+    //     formatDate && formatRequestDate(params);
+    //     if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
+    //       config.data = data;
+    //       config.params = data;
+    //       // 传参数方式修改
+    //     } else {
+    //         console.log(2222);
+            
+    //       config.data = params;
+    //       config.params = undefined;
+    //     }
+    //     if (joinParamsToUrl) {
+    //       config.url = setObjToUrlParams(
+    //         config.url as string,
+    //         Object.assign({}, config.params, config.data)
+    //       );
+    //     }
+    //   } else {
+    //     // 兼容restful风格
+    //     config.url = config.url + params;
+    //     config.params = undefined;
+    //   }
     }
     return config;
   },
@@ -244,7 +251,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         authenticationScheme: '',
         // 接口前缀
         prefixUrl: urlPrefix,
-        headers: { Accept:ContentTypeEnum.JSON, 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
+        headers: { Accept:ContentTypeEnum.JSON, 'Content-Type': ContentTypeEnum.JSON },
         // 数据处理方式
         transform,
         // 配置项，下面的选项都可以在独立的接口请求中覆盖

@@ -16,17 +16,17 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="开通城市" path="code">
+      <n-form-item label="开通城市" path="cityCode">
         <n-select
           clearable
-          v-model:value="form.code"
+          v-model:value="form.cityCode"
           placeholder="选择开通城市"
           @update:value="handleUpdateValue"
-          :options="cityData.result"
+          :options="cityData"
         />
       </n-form-item>
       <n-form-item label="城市编码">
-        <n-input v-model:value="form.code" disabled clearable placeholder="输入城市编码" />
+        <n-input v-model:value="form.cityCode" disabled clearable placeholder="输入城市编码" />
       </n-form-item>
       <n-form-item label="经度" path="lng">
         <n-input-number v-model:value="form.lng" :disable="true" clearable placeholder="输入经度" />
@@ -39,11 +39,12 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, toRaw } from "vue";
+import { defineComponent, VNodeChild, ref, unref, onMounted, toRaw } from "vue";
 import BasicModal from "@/components/Modal/Modal.vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { tableDataItem } from "./type";
-import cityData from "@/config/cityData.json";
+import { getOpenCity } from "@/api/common/common";
+import { openCitySave } from "@/api/operate/operate";
 export default defineComponent({
   name: "OpeningUrbanModal",
   components: { BasicModal },
@@ -51,10 +52,11 @@ export default defineComponent({
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
+    const cityData = ref([]);
 
     const form = ref<tableDataItem>({
-      city: null,
-      code: null,
+      cityName: null,
+      cityCode: null,
       lng: null,
       lat: null,
     });
@@ -65,10 +67,34 @@ export default defineComponent({
       showModal();
     };
 
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      try {
+        let res = await getOpenCity();
+        cityData.value = res || [];
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     function handleValidate() {
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           console.log(unref(form));
+          let option = {
+            cityName: form.value.cityName as string,
+            cityCode: form.value.cityCode as string,
+            lng: form.value.lng as number,
+            lat: form.value.lat as number,
+          };
+          try {
+            await openCitySave(option);
+          } catch (err) {
+            console.log(err);
+          }
 
           message.success("验证成功");
         } else {
@@ -79,7 +105,7 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { city: null, code: null, lng: null, lat: null };
+      form.value = { cityName: null, cityCode: null, lng: null, lat: null };
       formRef.value?.restoreValidation();
     }
 
@@ -88,8 +114,8 @@ export default defineComponent({
       // console.log(toRaw(form.value));
       form.value = {
         ...toRaw(form.value),
-        city: option.label as string,
-        code: option.value as string,
+        cityName: option.label as string,
+        cityCode: option.value as string,
       };
       console.log(form.value);
 
@@ -103,8 +129,28 @@ export default defineComponent({
       form,
       loading,
       cityData,
+      renderLabel: (option: SelectOption): VNodeChild => {
+        console.log(option);
+
+        return option.cityName as string;
+        // return [
+        //   h(
+        //     NIcon,
+        //     {
+        //       style: {
+        //         verticalAlign: '-0.15em',
+        //         marginRight: '4px'
+        //       }
+        //     },
+        //     {
+        //       default: () => h(MusicIcon)
+        //     }
+        //   ),
+        //   option.label as string
+        // ]
+      },
       rules: {
-        code: { required: true, trigger: ["blur", "change"], message: "请选择开通城市" },
+        cityCode: { required: true, trigger: ["blur", "change"], message: "请选择开通城市" },
         lng: { required: true, type: "number", trigger: ["blur", "input"], message: "请输入经度" },
         lat: { required: true, type: "number", trigger: ["blur", "input"], message: "请输入纬度" },
       },

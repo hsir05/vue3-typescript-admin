@@ -1,4 +1,5 @@
 import { http } from '@/utils/http';
+import { String } from 'lodash';
 
 
 /**
@@ -34,7 +35,7 @@ interface vehicleTypeState {
     vehicleTypeDesc: string
     vehicleTypeImageId: string
     vehicleTypeFreeIconId: string
-    vehicleTypeBusyIconId: string
+    vehicleTypeBusyIconId: string 
     vehicleTypeLock: number
 }
 export function vehicleTypeSave(data: vehicleTypeState) {
@@ -49,19 +50,21 @@ export function vehicleTypeSave(data: vehicleTypeState) {
 /**
  * 保存开通城市 
 */
-export function openCitySave() {
+export function openCitySave(data: { cityName: string; cityCode: string; lng: number; lat: number}) {
   return http.request({
     url: '/openCity/save',
     method: 'post',
+    data: data
   });
 }
 /**
  * 删除开通城市 
 */
-export function removeOpenCity() {
+export function removeOpenCity(data: {cityCode: string}) {
   return http.request({
     url: '/openCity/delete',
     method: 'post',
+    data: data
   });
 }
 
@@ -77,10 +80,11 @@ export function getAllOpenCity() {
 /**
  * 保存开通城市的中心点坐标 
 */
-export function saveCenterPoint() {
+export function saveCenterPoint(data: {lng: number, lat: number}) {
   return http.request({
     url: '/openCity/saveCenterPoint',
     method: 'post',
+    data
   });
 }
 /**

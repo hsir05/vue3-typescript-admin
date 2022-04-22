@@ -113,10 +113,11 @@ export default defineComponent({
 
       try {
         await login(unref(formValue));
-        loading.value = false;
+
         message.success("登录成功，即将进入系统");
 
         setTimeout(() => {
+          loading.value = false;
           router.push({ path: "/dashboard" });
         }, 1000);
       } catch (err) {

@@ -14,9 +14,10 @@
       <n-data-table
         ref="table"
         :data="data"
+        :loading="loading"
         :columns="columns"
         class="box-border"
-        min-height="500px"
+        min-height="calc(100vh - 260px)"
         flex-height
         :row-key="getRowKeyId"
         :pagination="false"
@@ -32,6 +33,7 @@
 <script lang="ts">
 import { defineComponent, h, ref, onMounted, toRaw } from "vue";
 import { tableItemProps, tableDataItem } from "./type";
+import { useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Map from "@/components/Map/BaiduMap.vue";
 import {
@@ -39,6 +41,7 @@ import {
   TrashOutline as TrashIcon,
   Add as AddIcon,
 } from "@vicons/ionicons5";
+import { getAllOpenCity, removeOpenCity, saveCenterPoint } from "@/api/operate/operate";
 import OpeningUrbanModal from "./openingUrbanModal.vue";
 export default defineComponent({
   name: "OpeningUrban",
@@ -46,30 +49,11 @@ export default defineComponent({
   setup() {
     const baiduMapRef = ref();
     const ModalRef = ref();
-    const label = ref("北京");
-    const data = ref([
-      {
-        id: "1123123",
-        city: "北京",
-        code: "11000",
-        lng: 116.403414,
-        lat: 39.924091,
-      },
-      {
-        id: "1123333123",
-        city: "兰州",
-        code: "620100",
-        lng: 103.832758,
-        lat: 36.06537,
-      },
-      {
-        id: "13123",
-        city: "杭州",
-        code: "330100",
-        lng: 120.1126,
-        lat: 30.225875,
-      },
-    ]);
+    const label = ref();
+    const loading = ref(false);
+    const mapLoading = ref(false);
+    const data = ref([]);
+    const message = useMessage();
 
     const columns = [
       {
@@ -83,12 +67,12 @@ export default defineComponent({
       },
       {
         title: "城市",
-        key: "city",
+        key: "cityName",
         align: "center",
       },
       {
         title: "城市编码",
-        key: "code",
+        key: "cityCode",
         width: 100,
         align: "center",
       },
@@ -122,23 +106,58 @@ export default defineComponent({
       },
     ];
 
-    onMounted(async () => {
-      const { renderBaiduMap } = baiduMapRef.value;
-      const { createMarker } = await renderBaiduMap(116.403414, 39.92409);
-      createMarker();
+    onMounted(() => {
+      getData();
     });
+
+    const getData = async () => {
+      try {
+        loading.value = true;
+        let res = await getAllOpenCity();
+        data.value = res;
+        if (res.length > 0) {
+          label.value = res[0].cityName;
+          const { renderBaiduMap } = baiduMapRef.value;
+          const { createMarker } = await renderBaiduMap(res[0].lng, res[0].lat);
+          createMarker(updateMapPoint);
+        }
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+    async function updateMapPoint(lng: number, lat: number) {
+      console.log(lng, lat);
+
+      try {
+        mapLoading.value = true;
+        await saveCenterPoint({ lng, lat });
+        mapLoading.value = false;
+      } catch (err) {
+        console.log(err);
+        mapLoading.value = false;
+      }
+    }
 
     async function handleEdit(record: tableDataItem, index: number) {
       console.log(toRaw(record), index);
-      label.value = toRaw(record).city as string;
+      label.value = toRaw(record).cityName as string;
       const { renderBaiduMap } = baiduMapRef.value;
       const { createMarker } = await renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
       createMarker((lng: number, lat: number) => {
         console.log(lng, lat);
       });
     }
-    function handleDelete(record: tableDataItem) {
-      console.log(record);
+    async function handleDelete(record: tableDataItem) {
+      loading.value = true;
+      try {
+        await removeOpenCity({ cityCode: record.cityCode as string });
+        message.success("保存成功");
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     function handleAddCity() {
@@ -149,6 +168,8 @@ export default defineComponent({
     return {
       baiduMapRef,
       ModalRef,
+      loading,
+      mapLoading,
       data,
       columns,
       label,

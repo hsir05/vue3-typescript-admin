@@ -61,28 +61,15 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         //   },
         // },
         "/api": {
-          target: "http://192.168.1.50:8080",
-          changeOrigin: true,
+          target: "http://test-ngcxpm-api.yiminyueche.com",
+          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
           rewrite: (path) => {
               return path.replace("/api", "")
           },
         },
         "/attachFile/upload": {
-          target: "http://192.168.1.38:8080",
-        },
-         "/api2": { 
-          target: "http://192.168.1.38:8080",
+          target: "http://test-ngcxpm-api.yiminyueche.com",
           changeOrigin: true,
-          rewrite: (path) => {
-              return path.replace("/api2", "")
-          },
-        },
-         "/api3": {
-          target: "http://192.168.1.45:8080",
-          changeOrigin: true,
-          rewrite: (path) => {
-              return path.replace("/api3", "")
-          },
         },
       },
     },

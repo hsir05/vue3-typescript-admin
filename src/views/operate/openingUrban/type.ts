@@ -5,8 +5,8 @@ export interface tableItemProps {
 
 export interface tableDataItem {
   id?: string | null;
-  city: string | null;
-  code: string | null;
+  cityName: string | null;
+  cityCode: string | null;
   lng: number | null;
   lat: number | null;
 }

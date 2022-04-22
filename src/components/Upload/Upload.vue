@@ -1,49 +1,52 @@
 <template>
   <div class="w-fulls">
     <div class="upload">
-      <div class="upload-card">
-        <!--图片列表-->
-        <div
-          class="upload-card-item"
-          :style="getCSSProperties"
-          v-for="(item, index) in imgList"
-          :key="`img_${index}`"
-        >
-          <div class="upload-card-item-info">
-            <div class="img-box" :style="{ width: getCSSProperties.width }">
-              <img :src="item" style="width: 100%" />
-            </div>
-            <div class="img-box-actions">
-              <n-icon size="18" class="mx-2 action-icon" @click="preview(item)">
-                <EyeOutlined />
-              </n-icon>
-              <n-icon size="18" class="mx-2 action-icon" @click="remove(index)">
-                <DeleteOutlined />
-              </n-icon>
+      <n-spin size="small" :show="loading">
+        <div class="upload-card">
+          <!--图片列表-->
+          <div
+            class="upload-card-item"
+            :style="getCSSProperties"
+            v-for="(item, index) in imgList"
+            :key="`img_${index}`"
+          >
+            <div class="upload-card-item-info">
+              <div class="img-box" :style="{ width: getCSSProperties.width }">
+                <img :src="item" style="width: 100%" />
+              </div>
+              <div class="img-box-actions">
+                <n-icon size="18" class="mx-2 action-icon" @click="preview(item)">
+                  <EyeOutlined />
+                </n-icon>
+                <n-icon size="18" class="mx-2 action-icon" @click="remove(index)">
+                  <DeleteOutlined />
+                </n-icon>
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          class="upload-card-item upload-card-item-select-picture"
-          :style="getCSSProperties"
-          v-if="imgList.length < maxNumber"
-        >
-          <n-upload
-            v-bind="$props"
-            :file-list-style="{ display: 'none' }"
-            @on-before-upload="beforeUpload"
-            @on-finish="finish"
-            @on-remove="remove"
+          <div
+            class="upload-card-item upload-card-item-select-picture"
+            :style="getCSSProperties"
+            v-if="imgList.length < maxNumber"
           >
-            <div class="flex flex-col justify-center">
-              <n-icon size="18" class="m-auto">
-                <PlusOutlined />
-              </n-icon>
-              <span class="upload-title">上传图片</span>
-            </div>
-          </n-upload>
+            <n-upload
+              v-bind="$props"
+              :file-list-style="{ display: 'none' }"
+              @before-upload="beforeUpload"
+              @finish="finish"
+              @error="handleErr"
+              @remove="remove"
+            >
+              <div class="flex flex-col justify-center">
+                <n-icon size="18" class="m-auto">
+                  <PlusOutlined />
+                </n-icon>
+                <span class="upload-title">上传图片</span>
+              </div>
+            </n-upload>
+          </div>
         </div>
-      </div>
+      </n-spin>
     </div>
 
     <n-space>
@@ -63,7 +66,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, watch, toRefs, computed } from "vue";
+import { defineComponent, ref, reactive, watch, toRefs, computed } from "vue";
 import { useMessage, useDialog, UploadFileInfo } from "naive-ui";
 import {
   EyeOutlined,
@@ -82,10 +85,11 @@ export default defineComponent({
   props: {
     ...basicProps,
   },
-  emits: ["uploadChange", "delete"],
+  emits: ["upload-change", "upload-error", "delete"],
   setup(props, { emit }) {
     const message = useMessage();
     const dialog = useDialog();
+    const loading = ref(false);
 
     const state = reactive({
       showModal: false,
@@ -138,13 +142,24 @@ export default defineComponent({
         message.error(`只能上传文件类型为${fileType.join(",")}`);
         return false;
       }
+      loading.value = true;
+      console.log(222);
 
       return true;
     }
 
     //上传结束
-    function finish({ file }: { file: UploadFileInfo }) {
-      console.log(file);
+    function finish({ event }: { event?: ProgressEvent }) {
+      let res = (event?.target as XMLHttpRequest).response;
+      emit("upload-change", JSON.parse(res).data);
+      message.success("上传成功!");
+      loading.value = false;
+    }
+    function handleErr({ event }: { event?: ProgressEvent }) {
+      let res = (event?.target as XMLHttpRequest).response;
+      console.log(JSON.parse(res).data);
+      message.error("上传失败，请稍候重试或联系管理员");
+      loading.value = false;
     }
 
     //删除
@@ -157,7 +172,7 @@ export default defineComponent({
         onPositiveClick: () => {
           state.imgList.splice(index, 1);
           state.originalImgList.splice(index, 1);
-          emit("uploadChange", state.originalImgList);
+          emit("upload-change", state.originalImgList);
           emit("delete", state.originalImgList);
         },
         onNegativeClick: () => {},
@@ -167,13 +182,12 @@ export default defineComponent({
     return {
       ...toRefs(state),
       beforeUpload,
-      //   previewImageUrl: previewImageUrlRef,
-      //   showModalRef,
       maxNumber: props.maxNumber,
       helpText: props.helpText,
       getCSSProperties,
-      //   handlePreview,
+      loading,
       finish,
+      handleErr,
       remove,
       preview,
     };
@@ -182,9 +196,7 @@ export default defineComponent({
 </script>
 <style lang="scss" scoped>
 .upload {
-  min-width: 150px;
   overflow: hidden;
-
   &:deep(.n-upload) {
     height: 100%;
   }
