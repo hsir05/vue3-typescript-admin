@@ -3,6 +3,7 @@
     <n-dialog-provider>
       <n-notification-provider>
         <n-message-provider>
+          <MessageContent />
           <slot></slot>
         </n-message-provider>
       </n-notification-provider>
@@ -11,6 +12,8 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
+import { MessageContent } from "@/components/MessageContent/index";
+
 import {
   NDialogProvider,
   NNotificationProvider,
@@ -21,6 +24,7 @@ export default defineComponent({
   name: "Application",
   components: {
     NDialogProvider,
+    MessageContent,
     NNotificationProvider,
     NMessageProvider,
     NLoadingBarProvider,

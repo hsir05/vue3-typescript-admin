@@ -102,7 +102,7 @@ import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import { getCityOpenArea } from "@/api/operate/operate";
 import BusTypeItem from "./busTypeItem.vue";
 import ChargeForm from "./chargeFrom.vue";
-import { getAllOpenCity } from "@/api/common/common";
+import { getAllOpenCity, getDict } from "@/api/common/common";
 import { getOpenAreaBuss, delBusiness } from "@/api/operate/operate";
 export default defineComponent({
   name: "OpeningBusiness",
@@ -167,6 +167,7 @@ export default defineComponent({
 
     onMounted(() => {
       getData();
+      getOrderType();
     });
 
     const getData = async () => {
@@ -181,6 +182,14 @@ export default defineComponent({
           };
           return obj;
         });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const getOrderType = async () => {
+      try {
+        let res = await getDict({ parentEntryCode: "OT00000" });
+        console.log(res);
       } catch (err) {
         console.log(err);
       }

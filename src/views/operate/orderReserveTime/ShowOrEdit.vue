@@ -19,9 +19,6 @@ export default defineComponent({
     const inputValue = ref(props.value);
     function handleOnClick() {
       isEdit.value = true;
-      //   nextTick(() => {
-      //      inputRef.value?.focus()
-      //   })
     }
     function handleChange() {
       props.onUpdateValue(inputValue.value);

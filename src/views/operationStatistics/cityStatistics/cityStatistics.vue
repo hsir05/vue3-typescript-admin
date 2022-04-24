@@ -73,11 +73,10 @@
 <script lang="ts">
 import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import openCityList from "@/config/openCityList.json";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
 import { getCityOrder } from "@/api/operationStatistics/operationStatistics";
-import { getInfluxList, getOpenCity } from "@/api/common/common";
+import { getInfluxList, getAllOpenCity } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
 export default defineComponent({
   name: "CityStatistics",
@@ -145,8 +144,8 @@ export default defineComponent({
     const getData = async () => {
       loading.value = true;
       try {
-        let openCity = await getOpenCity();
-        console.log(openCity);
+        let result = await getAllOpenCity();
+        console.log(result);
 
         let influx = await getInfluxList();
         console.log(influx);
@@ -179,7 +178,7 @@ export default defineComponent({
 
     return {
       loading,
-      openCityList,
+      openCityList: [],
       status,
       option: [
         {

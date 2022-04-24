@@ -3,7 +3,7 @@
     <div class="order-reserve-time-left">
       <n-data-table
         ref="table"
-        :data="cityData.result"
+        :data="openCityList"
         :columns="columns"
         class="box-border"
         min-height="calc(100vh - 204px)"
@@ -33,12 +33,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, h, ref } from "vue";
+import { defineComponent, h, ref, onMounted } from "vue";
 import { tableItemProps, tableDataItem, tableEditDataItem } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
-import cityData from "@/config/cityData.json";
-// import { NInput } from 'naive-ui'
+import { getAllOpenCity, getDict } from "@/api/common/common";
 
 import ShowOrEdit from "./ShowOrEdit.vue";
 export default defineComponent({
@@ -71,13 +70,13 @@ export default defineComponent({
     const columns = [
       {
         title: "城市名称",
-        key: "label",
+        key: "cityName",
         width: 120,
         align: "center",
       },
       {
         title: "城市编码",
-        key: "value",
+        key: "cityCode",
         width: 90,
         align: "center",
       },
@@ -102,18 +101,19 @@ export default defineComponent({
         },
       },
     ];
+    const openCityList = ref([]);
 
     const editColumns = [
       {
         title: "#",
         key: "orderBusinessType",
-        width: 120,
+        width: 100,
         align: "center",
       },
       {
         title: "专车业务",
         key: "majorBus",
-        width: 100,
+        align: "center",
         render(row: tableEditDataItem, index: number) {
           return h(ShowOrEdit as any, {
             value: row.majorBus,
@@ -126,7 +126,6 @@ export default defineComponent({
       {
         title: "快车业务",
         key: "fastBus",
-        width: 90,
         align: "center",
         render(row: tableEditDataItem, index: number) {
           return h(ShowOrEdit as any, {
@@ -153,14 +152,36 @@ export default defineComponent({
       },
     ];
 
+    onMounted(() => {
+      getData();
+      getBusType();
+    });
+
     function handleEdit() {}
 
+    const getData = async () => {
+      try {
+        let res = await getAllOpenCity();
+        openCityList.value = res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const getBusType = async () => {
+      try {
+        let res = await getDict({ parentEntryCode: "OT00000" });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     return {
-      cityData,
       columns,
       getRowKeyId: (row: tableItemProps) => row.id,
 
       editColumns,
+      openCityList,
       editData,
     };
   },

@@ -23,6 +23,14 @@ export function getAllOpenCity() {
     method: "post",
   });
 }
+// 通过父字典编码查询子字典集合
+export function getDict(data: { parentEntryCode: string}) {
+  return http.request({
+    url: "/dictionary/listByParentEntryCode",
+    method: "post",
+    data
+  });
+}
 
 //下载流文件
 export function download() {

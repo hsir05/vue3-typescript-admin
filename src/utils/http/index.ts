@@ -12,7 +12,6 @@ import { useGlobSetting } from "@/hooks/setting";
 import { isString } from "@/utils/is";
 import { deepMerge, isUrl } from "@/utils";
 import { setObjToUrlParams } from "@/utils";
-import qs from "qs";
 import { RequestOptions, Result, CreateAxiosOptions } from "./types";
 
 import { useAppUserStore } from "@/store/modules/useUserStore";
@@ -24,6 +23,9 @@ import router from "@/router";
 import { locStorage } from "@/utils/storage";
 const naiMessage = useMessage();
 const naiDialog = useDialog();
+
+//@ts-ignore
+let $message = window.$message;
 
 /**
  * @description: 数据处理，方便区分多种处理方式
@@ -93,6 +95,9 @@ const transform: AxiosTransform = {
     // }
     if (success) {
       return data;
+    } else {
+        // @ts-ignore
+        window.$message.error(message)
     }
     // 接口请求错误，统一提示错误信息 这里逻辑可以根据项目进行修改
     let errorMsg = message;

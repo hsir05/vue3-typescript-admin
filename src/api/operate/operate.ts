@@ -146,3 +146,40 @@ export function delBusiness(data: {openBusinessId: string | null}) {
   });
 }
 
+/**
+ * 根据城市编码获取接单预留时间设置集合 
+*/
+export function setTime(data: {cityCode: string | null}) {
+  return http.request({
+    url: '/acceptOrderReserveTimeSetting/getAcceptOrderReserveTimeSettingByCityCode',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 保存接单预留时间设置 
+*/
+interface saveTiemState {
+    acceptOrderReserveTimeSettingId: string | null
+    orderType: string | null
+    orderBusinessType: string | null
+    reserveTime: string | null
+    cityCode: string | null
+}
+export function saveTime(data: saveTiemState) {
+  return http.request({
+    url: '/acceptOrderReserveTimeSetting/save',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 删除接单预留时间设置 
+*/
+export function removeTime(data: {acceptOrderReserveTimeSettingId: string | null}) {
+  return http.request({
+    url: '/acceptOrderReserveTimeSetting/delete',
+    method: 'post',
+    data
+  });
+}

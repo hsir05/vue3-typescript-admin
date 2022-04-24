@@ -15,7 +15,7 @@
             filterable
             placeholder="选择开通城市"
             style="width: 260px"
-            :options="openCityList.result"
+            :options="openCityList"
           />
         </n-form-item>
 
@@ -185,6 +185,7 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { tableItemProps, tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
+import { getAllOpenCity } from "@/api/common/common";
 import {
   AlertCircle as AlertIcon,
   TrashOutline as TrashIcon,
@@ -196,7 +197,7 @@ import {
   HandRightOutline as HandIcon,
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
-import openCityList from "@/config/openCityList.json";
+import { itemState } from "@/interface/common/common";
 export default defineComponent({
   name: "OpenArea",
   components: {
@@ -210,7 +211,7 @@ export default defineComponent({
     SaveOutIcon,
   },
   setup() {
-    const cityCode = ref("620100");
+    const cityCode = ref();
     const loading = ref(false);
     const formRef = ref<FormInst | null>(null);
     const baiduMapRef = ref();
@@ -218,14 +219,8 @@ export default defineComponent({
     const { appTheme } = useProjectSetting();
     const area = ref("主城区");
 
-    const data = ref([
-      {
-        areaCode: "620100A01",
-        areaLock: 0,
-        areaName: "主城区",
-        cityCode: "620100",
-      },
-    ]);
+    const openCityList = ref([]);
+    const data = ref([]);
     const editFormRef = ref();
     const editForm = ref<tableDataItem>({
       areaName: null,
@@ -285,10 +280,37 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      const { renderBaiduMap } = baiduMapRef.value;
-      await renderBaiduMap(103.841521, 36.067212);
+      getOpenCity();
+      //   const { renderBaiduMap } = baiduMapRef.value;
+      //   await renderBaiduMap(103.841521, 36.067212);
       //   addBoundary()
     });
+
+    const getOpenCity = async () => {
+      try {
+        loading.value = true;
+        let res = await getAllOpenCity();
+        openCityList.value = res.data.map((item: itemState) => {
+          let obj = {
+            label: item.cityName,
+            value: item.cityCode,
+            lng: item.lng,
+            lat: item.lat,
+          };
+          return obj;
+        });
+
+        if (res.data.length > 0) {
+          const { renderBaiduMap } = baiduMapRef.value;
+          await renderBaiduMap(res.data[0].lng, res.data[0].lat);
+        }
+
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleEdit(record: tableDataItem) {
       console.log(record);

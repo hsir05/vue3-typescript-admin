@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, h, ref, onMounted, toRaw } from "vue";
 import { tableItemProps, tableDataItem } from "./type";
-import { useMessage } from "naive-ui";
+// import { useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Map from "@/components/Map/BaiduMap.vue";
 import {
@@ -54,7 +54,7 @@ export default defineComponent({
     const loading = ref(false);
     const mapLoading = ref(false);
     const data = ref([]);
-    const message = useMessage();
+    // const message = useMessage();
 
     const columns = [
       {
@@ -153,10 +153,11 @@ export default defineComponent({
     async function handleDelete(record: tableDataItem) {
       loading.value = true;
       try {
-        await removeOpenCity({ cityCode: record.cityCode as string });
-        message.success("保存成功");
+        let res = await removeOpenCity({ cityCode: record.cityCode as string });
+        console.log(res);
       } catch (err) {
         console.log(err);
+        // message.error('');
         loading.value = false;
       }
     }
