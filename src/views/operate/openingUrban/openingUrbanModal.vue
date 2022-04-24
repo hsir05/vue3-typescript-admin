@@ -124,7 +124,7 @@ export default defineComponent({
 
     async function handleUpdateValue(_: string, option: SelectOption) {
       try {
-        let res = await uniqueCityName({ cityCode: option.vlaue as string });
+        let res = await uniqueCityName({ cityCode: option.value as string });
         if (res.success) {
           form.value = {
             lat: option.lat as number,
@@ -132,11 +132,11 @@ export default defineComponent({
             cityName: option.label as string,
             cityCode: option.value as string,
           };
-        } else {
-          message.error(res.message);
         }
       } catch (err) {
         console.log(err);
+        form.value.cityCode = null;
+        form.value.cityName = null;
       }
     }
 

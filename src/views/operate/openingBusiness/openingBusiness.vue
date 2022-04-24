@@ -89,7 +89,7 @@
       <BusTypeItem title="出租车" :list="taxi" @on-update-value="handleTaxi" />
     </div>
     <!-- 右侧 -->
-    <ChargeForm />
+    <ChargeForm ref="chargeFormDrawerRef" :width="650" />
   </div>
 </template>
 <script lang="ts">
@@ -110,10 +110,12 @@ export default defineComponent({
     BusTypeItem,
     ChargeForm,
   },
+  emits: ["on-save-after"],
   setup() {
     const data = ref([]);
     const openCityList = ref([]);
     const loading = ref(false);
+    const chargeFormDrawerRef = ref();
 
     const cityCode = ref(null);
     const formRef = ref<FormInst | null>(null);
@@ -231,11 +233,13 @@ export default defineComponent({
     function handleSpeEco(value: number[]) {
       state.specialEconomic = value;
       console.log(value);
-      remove("");
+      const { openDrawer } = chargeFormDrawerRef.value;
+      openDrawer();
     }
     function handleSpeCom(value: number[]) {
       state.specialComfort = value;
       console.log(value);
+      remove("");
     }
     function handleSpeBus(value: number[]) {
       state.specialBus = value;
@@ -270,6 +274,7 @@ export default defineComponent({
       ...toRefs(state),
       loading,
       queryFormRef,
+      chargeFormDrawerRef,
       cityCode,
       columns,
       getRowKeyId: (row: tableItemProps) => row.id,
@@ -314,7 +319,7 @@ export default defineComponent({
   &-right {
     width: calc(100% - $w - 10px);
     background-color: $white;
-    max-width: 600px;
+    overflow: scroll;
     padding: 20px 10px 10px;
     box-sizing: border-box;
     margin-left: 10px;

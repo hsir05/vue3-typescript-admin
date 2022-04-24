@@ -1,101 +1,103 @@
 <template>
-  <n-form
-    ref="formRef"
-    :rules="rules"
-    label-placement="left"
-    class="charge"
-    require-mark-placement="right-hanging"
-    label-width="130"
-    :model="form"
-  >
-    <n-form-item label="基础计费" path="chargeRuleBaseId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleBaseId"
-        placeholder="选择基础计费"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
-    <n-form-item label="里程计费" path="chargeRuleMileageId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleMileageId"
-        placeholder="选择里程计费"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
-    <n-form-item label="时长计费" path="chargeRuleDurationId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleDurationId"
-        placeholder="选择时长计费"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
-    <n-form-item label="取消计费" path="chargeRuleCancelId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleCancelId"
-        placeholder="选择取消计费"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
-    <n-form-item label="等待计费" path="chargeRuleWaitId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleWaitId"
-        placeholder="选择等待计费"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
-    <n-form-item label="工作日浮动" path="chargeRuleFloatWorkdayId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleFloatWorkdayId"
-        placeholder="选择工作日浮动"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
+  <BasicDrawer v-model:show="isDrawer" title="计费规则" @on-close-after="onCloseAfter">
+    <n-form
+      ref="formRef"
+      :rules="rules"
+      label-placement="left"
+      class="charge"
+      require-mark-placement="right-hanging"
+      label-width="110"
+      :model="form"
+    >
+      <n-form-item label="基础计费" path="chargeRuleBaseId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleBaseId"
+          placeholder="选择基础计费"
+          :options="baseList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
+      <n-form-item label="里程计费" path="chargeRuleMileageId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleMileageId"
+          placeholder="选择里程计费"
+          :options="mileageList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
+      <n-form-item label="时长计费" path="chargeRuleDurationId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleDurationId"
+          placeholder="选择时长计费"
+          :options="durationList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
+      <n-form-item label="取消计费" path="chargeRuleCancelId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleCancelId"
+          placeholder="选择取消计费"
+          :options="cancelList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
+      <n-form-item label="等待计费" path="chargeRuleWaitId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleWaitId"
+          placeholder="选择等待计费"
+          :options="waitList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
+      <n-form-item label="工作日浮动" path="chargeRuleFloatWorkdayId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleFloatWorkdayId"
+          placeholder="选择工作日浮动"
+          :options="floatList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
 
-    <n-form-item label="节假日浮动" path="chargeRuleFloatHolidayId">
-      <n-select
-        clearable
-        filterable
-        v-model:value="form.chargeRuleFloatHolidayId"
-        placeholder="选择节假日浮动"
-        :options="option"
-      /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-        <n-icon> <AddIcon /> </n-icon
-      ></n-button>
-    </n-form-item>
+      <n-form-item label="节假日浮动" path="chargeRuleFloatHolidayId">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.chargeRuleFloatHolidayId"
+          placeholder="选择节假日浮动"
+          :options="floatList"
+        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+          <n-icon> <AddIcon /> </n-icon
+        ></n-button>
+      </n-form-item>
 
-    <div class="text-center flex-center">
-      <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
-        >确认开通</n-button
-      >
-      <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
-        >取消</n-button
-      >
-    </div>
-  </n-form>
+      <div class="text-center flex-center">
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >确认开通</n-button
+        >
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+          >取消</n-button
+        >
+      </div>
+    </n-form>
+  </BasicDrawer>
 </template>
 <script lang="ts">
 import { defineComponent, ref, unref, toRefs, reactive, onMounted } from "vue";
@@ -134,8 +136,7 @@ export default defineComponent({
       require: true,
     },
   },
-  setup() {
-    const loading = ref(false);
+  setup(_, { emit }) {
     const formRef = ref<FormInst | null>(null);
     const form = ref<formState>({
       openBusinessId: null,
@@ -151,11 +152,16 @@ export default defineComponent({
       chargeRuleFloatHolidayId: null,
       chargeRuleFloatWorkdayId: null,
     });
+    const stateDrawer = reactive({
+      isDrawer: false,
+      loading: false,
+      disabled: false,
+    });
     const state = reactive({
       baseList: [],
+      waitList: [],
       mileageList: [],
       durationList: [],
-      waitList: [],
       cancelList: [],
       floatList: [],
     });
@@ -181,14 +187,14 @@ export default defineComponent({
 
     async function save() {
       try {
-        loading.value = true;
+        stateDrawer.loading = true;
         let res = await saveBusiness(form.value);
         console.log(res);
-        loading.value = false;
+        stateDrawer.loading = false;
         message.success("保存成功");
       } catch (err) {
         console.log(err);
-        loading.value = false;
+        stateDrawer.loading = false;
       }
     }
 
@@ -203,28 +209,102 @@ export default defineComponent({
       ];
       Promise.all(requestList)
         .then((res) => {
-          console.log(res);
+          state.baseList = res[0].data.map(
+            (item: { chargeRuleBaseDescription: string; chargeRuleBaseId: string }) => {
+              let obj = {
+                label: item.chargeRuleBaseDescription,
+                value: item.chargeRuleBaseId,
+              };
+              return obj;
+            }
+          );
+          state.waitList = res[1].data.map(
+            (item: { chargeRuleWaitDesc: string; chargeRuleWaitId: string }) => {
+              let obj = {
+                label: item.chargeRuleWaitDesc,
+                value: item.chargeRuleWaitId,
+              };
+              return obj;
+            }
+          );
+          state.mileageList = res[2].data.map(
+            (item: { chargeRuleMileageDesc: string; chargeRuleMileageId: string }) => {
+              let obj = {
+                label: item.chargeRuleMileageDesc,
+                value: item.chargeRuleMileageId,
+              };
+              return obj;
+            }
+          );
+          state.durationList = res[3].data.map(
+            (item: { chargeRuleDurationDesc: string; chargeRuleDurationId: string }) => {
+              let obj = {
+                label: item.chargeRuleDurationDesc,
+                value: item.chargeRuleDurationId,
+              };
+              return obj;
+            }
+          );
+          state.cancelList = res[4].data.map(
+            (item: { chargeRuleCancelDesc: string; chargeRuleCancelId: string }) => {
+              let obj = {
+                label: item.chargeRuleCancelDesc,
+                value: item.chargeRuleCancelId,
+              };
+              return obj;
+            }
+          );
+          state.floatList = res[5].data.map(
+            (item: { chargeRuleFloatDesc: string; chargeRuleFloatId: string }) => {
+              let obj = {
+                label: item.chargeRuleFloatDesc,
+                value: item.chargeRuleFloatId,
+              };
+              return obj;
+            }
+          );
         })
         .catch((err) => {
           console.log(err);
         });
     };
 
+    function openDrawer() {
+      //   if (record) {
+      //     // form.value = { ...form.value, ...record };
+      //   }
+      stateDrawer.isDrawer = true;
+    }
+
     function handleReset() {}
 
     function handleAdd() {}
 
+    function onCloseAfter() {
+      stateDrawer.isDrawer = false;
+      stateDrawer.loading = false;
+      stateDrawer.disabled = false;
+    }
+
+    function handleSaveAfter() {
+      emit("on-save-after");
+    }
+
     return {
-      loading,
       formRef,
+
       form,
       option: [],
       rules: {},
+      ...toRefs(stateDrawer),
       ...toRefs(state),
 
       handleValidate,
       handleAdd,
       handleReset,
+      openDrawer,
+      handleSaveAfter,
+      onCloseAfter,
     };
   },
 });

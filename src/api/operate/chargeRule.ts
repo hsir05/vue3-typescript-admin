@@ -75,3 +75,51 @@ export function saveChargeRuleMileage() {
     method: 'post'
   });
 }
+
+/**
+ * 保存时长计费规则 
+*/
+export function saveChargeRuleDuration() {
+  return http.request({
+    url: '/chargeRule/saveChargeRuleDuration',
+    method: 'post'
+  });
+}
+/**
+ * 保存等待计费规则 
+*/
+export function saveChargeRuleWait() {
+  return http.request({
+    url: '/chargeRule/saveChargeRuleWait',
+    method: 'post'
+  });
+}
+
+/**
+ * 保存取消计费规则 
+*/
+export function saveChargeRuleCancel() {
+  return http.request({
+    url: '/chargeRule/saveChargeRuleCancel',
+    method: 'post'
+  });
+}
+/**
+ * 保存浮动计费规则 
+*/
+export function saveChargeRuleFloat() {
+  return http.request({
+    url: '/chargeRule/saveChargeRuleFloat',
+    method: 'post'
+  });
+}
+
+/**
+ * 向开通区域分配计费规则 
+*/
+export function dispatchRuleToOpenBusiness() {
+  return http.request({
+    url: '/chargeRule/dispatchRuleToOpenBusiness',
+    method: 'post'
+  });
+}

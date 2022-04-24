@@ -69,6 +69,8 @@ import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
 import { getCaptcha } from "@/api/login/login";
 import { useAppUserStore } from "@/store/modules/useUserStore";
+import { ACCESS_TOKEN_KEY } from "@/config/constant";
+import { locStorage } from "@/utils/storage";
 
 export default defineComponent({
   name: "Login",
@@ -99,6 +101,9 @@ export default defineComponent({
 
     const getCapt = async () => {
       try {
+        let token =
+          "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTc4MGZjZWM3ZGY0ZGJlYjUzYTk1YmNhYTA3OGE0NSIsInJvbGVzIjpbIjdkZDc5NWY3YTE2ZjQ4YjliNzY4MmM5NmQ3NzM0NTRlIl0sImlhdCI6MTY1MDgwNjk3MjE0NywiZXhwIjoxNjUwOTg2OTcyMTQ3fQ.OReBmoqDLAtTo4UPqmDKO7F69MUzR3KoAtYHML5ux0U";
+        locStorage.set(ACCESS_TOKEN_KEY, token);
         let res = await getCaptcha(unref(formValue));
         console.log(res);
         isCaptcha.value = true;

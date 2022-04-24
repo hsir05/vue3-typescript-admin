@@ -58,7 +58,7 @@ export const useAppUserStore = defineStore({
     }, 
     login(userInfo: loginState) {
       return new Promise(async (resolve, reject) => {
-        try {
+        try { 
           let res = await login(userInfo);
           const { token, iat, exp } = res;
           console.log(iat);

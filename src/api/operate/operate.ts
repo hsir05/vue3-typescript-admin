@@ -74,17 +74,19 @@ export function saveCenterPoint(data: {lng: number, lat: number}) {
   return http.request({
     url: '/openCity/saveCenterPoint',
     method: 'post',
-    data
+    data:data
   });
 }
 /**
  * 校验开通城市是否重复 
 */
 export function uniqueCityName(data: {cityCode: string}) {
+    console.log(data);
+    
   return http.request({
     url: '/openCity/uniqueCityCode',
     method: 'post',
-    data
+    data: data
   });
 }
 

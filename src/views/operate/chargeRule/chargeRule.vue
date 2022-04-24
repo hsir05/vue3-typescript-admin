@@ -4,7 +4,7 @@
       <!-- 表格 -->
       <BasicTable
         :data="data"
-        style="width: calc(100% - 375px - 15px); height: 100%"
+        style="height: 100%"
         ref="basicTableRef"
         :columns="columns"
         :isAddBtn="true"
@@ -16,7 +16,7 @@
         @on-pagination="handlepagSize"
       />
       <!-- 右侧编辑 -->
-      <div class="right-edit">
+      <!-- <div class="right-edit">
         <n-divider title-placement="left"> 开通业务分配基础计费规则 </n-divider>
         <n-form
           ref="busionessFormRef"
@@ -70,7 +70,7 @@
             >
           </div>
         </n-form>
-      </div>
+      </div> -->
     </div>
     <ChargeRuleDrawer :width="500" @on-save-after="handleSaveAfter" ref="chargeRuleDrawerRef" />
   </div>
@@ -245,15 +245,13 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
-.charge-rule {
-}
 .charge-rule-box {
   height: 100%;
 }
-.right-edit {
-  background-color: $white;
-  width: 390px;
-  margin-left: 15px;
-  height: 100%;
-}
+// .right-edit {
+//   background-color: $white;
+//   width: 390px;
+//   margin-left: 15px;
+//   height: 100%;
+// }
 </style>
