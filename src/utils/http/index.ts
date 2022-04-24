@@ -1,29 +1,29 @@
 // axios配置  可自行根据项目进行更改，只需更改该文件即可，其他文件可以不动
-import { VAxios } from './Axios';
-import { AxiosTransform } from './axiosTransform';
-import axios, { AxiosResponse } from 'axios';
-import { checkStatus } from './checkStatus';
-import { joinTimestamp, formatRequestDate } from './helper';
-import { RequestEnum, ResultEnum, ContentTypeEnum } from '@/enums/httpEnum';
-import { PageEnum } from '@/enums/pageEnum';
+import { VAxios } from "./Axios";
+import { AxiosTransform } from "./axiosTransform";
+import axios, { AxiosResponse } from "axios";
+import { checkStatus } from "./checkStatus";
+import { joinTimestamp, formatRequestDate } from "./helper";
+import { RequestEnum, ResultEnum, ContentTypeEnum } from "@/enums/httpEnum";
+import { PageEnum } from "@/enums/pageEnum";
 
-import { useGlobSetting } from '@/hooks/setting'; 
+import { useGlobSetting } from "@/hooks/setting";
 
-import { isString } from '@/utils/is';
-import { deepMerge, isUrl } from '@/utils';
-import { setObjToUrlParams } from '@/utils';
-import qs from "qs"
-import { RequestOptions, Result, CreateAxiosOptions } from './types';
+import { isString } from "@/utils/is";
+import { deepMerge, isUrl } from "@/utils";
+import { setObjToUrlParams } from "@/utils";
+import qs from "qs";
+import { RequestOptions, Result, CreateAxiosOptions } from "./types";
 
-import { useAppUserStore } from '@/store/modules/useUserStore';
-import { useMessage, useDialog } from 'naive-ui'
+import { useAppUserStore } from "@/store/modules/useUserStore";
+import { useMessage, useDialog } from "naive-ui";
 
 const globSetting = useGlobSetting();
-const urlPrefix = globSetting.urlPrefix || '';
-import router from '@/router';
-import { locStorage } from '@/utils/storage';
-const naiMessage = useMessage()
-const naiDialog = useDialog()
+const urlPrefix = globSetting.urlPrefix || "";
+import router from "@/router";
+import { locStorage } from "@/utils/storage";
+const naiMessage = useMessage();
+const naiDialog = useDialog();
 
 /**
  * @description: 数据处理，方便区分多种处理方式
@@ -36,13 +36,13 @@ const transform: AxiosTransform = {
     const {
       isShowMessage = true,
       isShowErrorMessage,
-      isShowSuccessMessage, 
+      isShowSuccessMessage,
       successMessageText,
       errorMessageText,
       isTransformResponse,
       isReturnNativeResponse,
     } = options;
-   
+
     // 是否返回原生响应头 比如：需要获取响应头时使用该属性
     if (isReturnNativeResponse) {
       return res;
@@ -50,14 +50,14 @@ const transform: AxiosTransform = {
     // 不进行任何处理，直接返回
     // 用于页面代码可能需要直接获取code，data，message这些信息时开启
     if (!isTransformResponse) {
-      return res.data;
+      return res;
     }
 
     const { data } = res;
 
     if (!data) {
       // return '[HTTP] Request has no return value';
-      throw new Error('请求出错，请稍候重试');
+      throw new Error("请求出错，请稍候重试");
     }
     //  这里 code，result，message为 后台统一的字段，需要修改为项目自己的接口返回格式
     const { success, code, message } = data;
@@ -70,18 +70,18 @@ const transform: AxiosTransform = {
       if (success && (successMessageText || isShowSuccessMessage)) {
         // 是否显示自定义信息提示
         naiDialog.success({
-          type: 'success',
-          content: successMessageText || message || '操作成功！',
+          type: "success",
+          content: successMessageText || message || "操作成功！",
         });
       } else if (!success && (errorMessageText || isShowErrorMessage)) {
         // 是否显示自定义信息提示
-        naiMessage.error(message || errorMessageText || '操作失败！');
-      } else if (!success && options.errorMessageMode === 'modal') {
+        naiMessage.error(message || errorMessageText || "操作失败！");
+      } else if (!success && options.errorMessageMode === "modal") {
         // errorMessageMode=‘custom-modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
         naiDialog.info({
-          title: '提示',
+          title: "提示",
           content: message,
-          positiveText: '确定',
+          positiveText: "确定",
           onPositiveClick: () => {},
         });
       }
@@ -91,8 +91,8 @@ const transform: AxiosTransform = {
     // if (code === ResultEnum.SUCCESS) {
     //   return result;
     // }
-     if (success) {
-      return data.data;
+    if (success) {
+      return data;
     }
     // 接口请求错误，统一提示错误信息 这里逻辑可以根据项目进行修改
     let errorMsg = message;
@@ -107,11 +107,11 @@ const transform: AxiosTransform = {
         const LoginPath = PageEnum.BASE_LOGIN;
         if (router.currentRoute.value?.name === LoginName) return;
         // 到登录页
-        errorMsg = '登录超时，请重新登录!';
+        errorMsg = "登录超时，请重新登录!";
         naiDialog.warning({
-          title: '提示',
-          content: '登录身份已失效，请重新登录!',
-          positiveText: '确定',
+          title: "提示",
+          content: "登录身份已失效，请重新登录!",
+          positiveText: "确定",
           //negativeText: '取消',
           closable: false,
           maskClosable: false,
@@ -123,7 +123,7 @@ const transform: AxiosTransform = {
         });
         break;
     }
-   
+
     throw new Error(errorMsg);
   },
 
@@ -152,34 +152,26 @@ const transform: AxiosTransform = {
         config.params = undefined;
       }
     } else {
-        console.log(data);
-        console.log(qs.stringify(data));
-        
-         config.data = data;
-        //  config.params = data;
-    //   if (!isString(params)) {
-    //     formatDate && formatRequestDate(params);
-    //     if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
-    //       config.data = data;
-    //       config.params = data;
-    //       // 传参数方式修改
-    //     } else {
-    //         console.log(2222);
-            
-    //       config.data = params;
-    //       config.params = undefined;
-    //     }
-    //     if (joinParamsToUrl) {
-    //       config.url = setObjToUrlParams(
-    //         config.url as string,
-    //         Object.assign({}, config.params, config.data)
-    //       );
-    //     }
-    //   } else {
-    //     // 兼容restful风格
-    //     config.url = config.url + params;
-    //     config.params = undefined;
-    //   }
+      if (!isString(params)) {
+        formatDate && formatRequestDate(params);
+        if (Reflect.has(config, "data") && config.data && Object.keys(config.data).length > 0) {
+          config.params = params;
+          // 传参数方式修改
+        } else {
+          config.data = data;
+          config.params = undefined;
+        }
+        if (joinParamsToUrl) {
+          config.url = setObjToUrlParams(
+            config.url as string,
+            Object.assign({}, config.params, config.data)
+          );
+        }
+      } else {
+        // 兼容restful风格
+        config.url = config.url + params;
+        config.params = undefined;
+      }
     }
     return config;
   },
@@ -188,7 +180,7 @@ const transform: AxiosTransform = {
    * @description: 请求拦截器处理
    */
   requestInterceptors: (config, options) => {
-    // 请求之前处理config 
+    // 请求之前处理config
     /// token
     const userStore = useAppUserStore();
     const token = userStore.getToken;
@@ -208,18 +200,18 @@ const transform: AxiosTransform = {
     const { response, code, message } = error || {};
     // TODO 此处要根据后端接口返回格式修改
     const msg: string =
-      response && response.data && response.data.message ? response.data.message : '';
+      response && response.data && response.data.message ? response.data.message : "";
     const err: string = error.toString();
     try {
-      if (code === 'ECONNABORTED' && message.indexOf('timeout') !== -1) {
-        naiMessage.error('接口请求超时，请刷新页面重试!');
+      if (code === "ECONNABORTED" && message.indexOf("timeout") !== -1) {
+        naiMessage.error("接口请求超时，请刷新页面重试!");
         return;
       }
-      if (err && err.includes('Network Error')) {
+      if (err && err.includes("Network Error")) {
         naiDialog.info({
-          title: '网络异常',
-          content: '请检查您的网络连接是否正常',
-          positiveText: '确定',
+          title: "网络异常",
+          content: "请检查您的网络连接是否正常",
+          positiveText: "确定",
           //negativeText: '取消',
           closable: false,
           maskClosable: false,
@@ -236,7 +228,7 @@ const transform: AxiosTransform = {
     if (!isCancel) {
       checkStatus(error.response && error.response.status, msg);
     } else {
-      console.warn(error, '请求被取消！');
+      console.warn(error, "请求被取消！");
     }
     //return Promise.reject(error);
     return Promise.reject(response?.data);
@@ -248,10 +240,10 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
     deepMerge(
       {
         timeout: 10 * 1000,
-        authenticationScheme: '',
+        authenticationScheme: "",
         // 接口前缀
         prefixUrl: urlPrefix,
-        headers: { Accept:ContentTypeEnum.JSON, 'Content-Type': ContentTypeEnum.JSON },
+        headers: { Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON },
         // 数据处理方式
         transform,
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
@@ -267,7 +259,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 格式化提交参数时间
           formatDate: true,
           // 消息提示类型
-          errorMessageMode: 'none',
+          errorMessageMode: "none",
           // 接口地址
           apiUrl: globSetting.apiUrl,
           // 接口拼接地址

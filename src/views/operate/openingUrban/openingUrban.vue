@@ -41,7 +41,8 @@ import {
   TrashOutline as TrashIcon,
   Add as AddIcon,
 } from "@vicons/ionicons5";
-import { getAllOpenCity, removeOpenCity, saveCenterPoint } from "@/api/operate/operate";
+import { removeOpenCity, saveCenterPoint } from "@/api/operate/operate";
+import { getAllOpenCity } from "@/api/common/common";
 import OpeningUrbanModal from "./openingUrbanModal.vue";
 export default defineComponent({
   name: "OpeningUrban",
@@ -114,11 +115,11 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await getAllOpenCity();
-        data.value = res;
-        if (res.length > 0) {
-          label.value = res[0].cityName;
+        data.value = res.data;
+        if (res.data.length > 0) {
+          label.value = res.data[0].cityName;
           const { renderBaiduMap } = baiduMapRef.value;
-          const { createMarker } = await renderBaiduMap(res[0].lng, res[0].lat);
+          const { createMarker } = await renderBaiduMap(res.data[0].lng, res.data[0].lat);
           createMarker(updateMapPoint);
         }
         loading.value = false;

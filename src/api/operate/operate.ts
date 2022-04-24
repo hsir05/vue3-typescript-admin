@@ -1,5 +1,4 @@
 import { http } from '@/utils/http';
-import { String } from 'lodash';
 
 
 /**
@@ -69,15 +68,6 @@ export function removeOpenCity(data: {cityCode: string}) {
 }
 
 /**
- * 查询所有开通城市 
-*/
-export function getAllOpenCity() {
-  return http.request({
-    url: '/openCity/openCityList',
-    method: 'post',
-  });
-}
-/**
  * 保存开通城市的中心点坐标 
 */
 export function saveCenterPoint(data: {lng: number, lat: number}) {
@@ -90,18 +80,69 @@ export function saveCenterPoint(data: {lng: number, lat: number}) {
 /**
  * 校验开通城市是否重复 
 */
-export function uniqueCityName() {
+export function uniqueCityName(data: {cityCode: string}) {
   return http.request({
-    url: '/openCity/uniqueCityName',
+    url: '/openCity/uniqueCityCode',
     method: 'post',
+    data
+  });
+}
+
+
+/*****开通业务管理---------------------****/
+
+/**
+ * 获取开通区域 
+*/
+export function getCityOpenArea(data: {cityCode: string | null}) {
+  return http.request({
+    url: '/openArea/openAreaListByCityCode',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 开通区域编码查找该开通区域的开通业务列表 
+*/
+export function getOpenAreaBuss(data: {areaCode: string}) {
+  return http.request({
+    url: '/openBusiness/getOpenBusinessListByAreaCode',
+    method: 'post',
+    data
   });
 }
 /**
- * 校验开通城市是否重复 
+ * 开通区域编码查找该开通区域的开通业务列表 
 */
-// export function uniqueCityName() {
-//   return http.request({
-//     url: '/openCity/uniqueCityName',
-//     method: 'post',
-//   });
-// }
+interface saveOpenAreaState {
+    openBusinessId: string | null	
+    areaCode: string | null	
+    orderType: string | null	
+    vehicleTypeId: string | null	
+    chargeRuleBaseId: string | null	
+    chargeRuleMileageId: string | null	
+    chargeRuleDurationId: string | null	
+    chargeRuleCancelId: string | null	
+    chargeRuleWaitId: string | null	
+    chargeRuleFloatHolidayId: string | null	
+    chargeRuleFloatWorkdayId: string | null
+}
+export function saveBusiness(data: saveOpenAreaState) {
+  return http.request({
+    url: '/openBusiness/save',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 开通区域编码查找该开通区域的开通业务列表 
+*/
+export function delBusiness(data: {openBusinessId: string | null}) {
+  return http.request({
+    url: '/openBusiness/delete',
+    method: 'post',
+    data
+  });
+}
+

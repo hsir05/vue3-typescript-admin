@@ -16,7 +16,7 @@
             filterable
             placeholder="选择开通城市"
             style="width: 260px"
-            :options="openCityList.result"
+            :options="openCityList"
           />
         </n-form-item>
 
@@ -25,8 +25,9 @@
           :loading="loading"
           class="ml-10px"
           type="primary"
-          @click="handleValidate"
-          >查找</n-button
+          @click="queryOpenArea"
+        >
+          查找</n-button
         >
       </div>
 
@@ -92,14 +93,17 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive, toRefs } from "vue";
+import { defineComponent, ref, h, reactive, toRefs, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import openCityList from "@/config/openCityList.json";
+import { itemState } from "@/interface/common/common";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { tableItemProps, tableDataItem, busTypeState } from "./type";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import { getCityOpenArea } from "@/api/operate/operate";
 import BusTypeItem from "./busTypeItem.vue";
 import ChargeForm from "./chargeFrom.vue";
+import { getAllOpenCity } from "@/api/common/common";
+import { getOpenAreaBuss, delBusiness } from "@/api/operate/operate";
 export default defineComponent({
   name: "OpeningBusiness",
   components: {
@@ -107,14 +111,8 @@ export default defineComponent({
     ChargeForm,
   },
   setup() {
-    const data = ref([
-      {
-        cityCode: "110000",
-        areaCode: "110000A01",
-        area: "主城区",
-        areaLock: 0,
-      },
-    ]);
+    const data = ref([]);
+    const openCityList = ref([]);
     const loading = ref(false);
 
     const cityCode = ref(null);
@@ -137,7 +135,7 @@ export default defineComponent({
     const columns = [
       {
         title: "开通区域",
-        key: "area",
+        key: "areaName",
         align: "center",
       },
       {
@@ -167,23 +165,64 @@ export default defineComponent({
       },
     ];
 
-    async function handleValidate() {
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      try {
+        let res = await getAllOpenCity();
+        openCityList.value = res.data.map((item: itemState) => {
+          let obj = {
+            label: item.cityName,
+            value: item.cityCode,
+            lng: item.lng,
+            lat: item.lat,
+          };
+          return obj;
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    async function queryOpenArea() {
       try {
         await formRef.value?.validate();
         console.log(cityCode.value);
+        let res = await getCityOpenArea({ cityCode: cityCode.value });
+        data.value = res.data;
       } catch (err) {
         console.log(err);
         message.error("验证失败");
       }
     }
 
+    async function getBussiness(areaCode: string) {
+      try {
+        let res = await getOpenAreaBuss({ areaCode });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function remove(openBusinessId: string) {
+      try {
+        let res = await delBusiness({ openBusinessId });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     function handleEdit(record: tableDataItem) {
-      console.log(record);
+      getBussiness(record.areaCode as string);
     }
 
     function handleSpeEco(value: number[]) {
       state.specialEconomic = value;
       console.log(value);
+      remove("");
     }
     function handleSpeCom(value: number[]) {
       state.specialComfort = value;
@@ -244,7 +283,7 @@ export default defineComponent({
       handleFastCom,
       handleFastBus,
       handleFastPre,
-      handleValidate,
+      queryOpenArea,
       handleTaxi,
     };
   },
@@ -255,12 +294,14 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: flex-start;
-  $w: 420px;
+  $w: 460px;
+
   &-left {
     width: $w;
     background-color: $white;
     padding: 20px 10px 10px;
   }
+
   &-right {
     width: calc(100% - $w - 10px);
     background-color: $white;

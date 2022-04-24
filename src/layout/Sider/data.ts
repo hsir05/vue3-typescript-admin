@@ -434,18 +434,18 @@ export const menuOptions: MenuOption[] = [
       },
     ],
   },
-  {
-    label: "设置管理",
-    key: "bear-setting",
-    icon: renderIcon(SettingsIcon),
-    children: [
-      {
-        label: "个人设置",
-        path: "/setting/profile",
-        key: "bear-setting-setting",
-      },
-    ],
-  },
+//   {
+//     label: "设置管理",
+//     key: "bear-setting",
+//     icon: renderIcon(SettingsIcon),
+//     children: [
+//       {
+//         label: "个人设置",
+//         path: "/setting/profile",
+//         key: "bear-setting-setting",
+//       },
+//     ],
+//   },
   //   {
   //     label: '异常页面',
   //     key: 'bear-exception',

@@ -2,6 +2,7 @@
   <BasicModal
     width="650px"
     title="添加开通城市"
+    :loading="loading"
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
@@ -19,6 +20,7 @@
       <n-form-item label="开通城市" path="cityCode">
         <n-select
           clearable
+          filterable
           v-model:value="form.cityCode"
           placeholder="选择开通城市"
           @update:value="handleUpdateValue"
@@ -39,12 +41,13 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, VNodeChild, ref, unref, onMounted, toRaw } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import BasicModal from "@/components/Modal/Modal.vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { tableDataItem } from "./type";
-import { getOpenCity } from "@/api/common/common";
-import { openCitySave } from "@/api/operate/operate";
+import { getAllOpenCity } from "@/api/common/common";
+import { itemState } from "@/interface/common/common";
+import { openCitySave, uniqueCityName } from "@/api/operate/operate";
 export default defineComponent({
   name: "OpeningUrbanModal",
   components: { BasicModal },
@@ -52,7 +55,7 @@ export default defineComponent({
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
-    const cityData = ref([]);
+    const cityData = ref<tableDataItem[]>([]);
 
     const form = ref<tableDataItem>({
       cityName: null,
@@ -73,8 +76,16 @@ export default defineComponent({
 
     const getData = async () => {
       try {
-        let res = await getOpenCity();
-        cityData.value = res || [];
+        let res = await getAllOpenCity();
+        cityData.value = res.data.map((item: itemState) => {
+          let obj = {
+            label: item.cityName,
+            value: item.cityCode,
+            lng: item.lng,
+            lat: item.lat,
+          };
+          return obj;
+        });
       } catch (err) {
         console.log(err);
       }
@@ -83,7 +94,7 @@ export default defineComponent({
     function handleValidate() {
       formRef.value?.validate(async (errors) => {
         if (!errors) {
-          console.log(unref(form));
+          loading.value = true;
           let option = {
             cityName: form.value.cityName as string,
             cityCode: form.value.cityCode as string,
@@ -92,11 +103,13 @@ export default defineComponent({
           };
           try {
             await openCitySave(option);
+            message.success("添加成功");
+            loading.value = false;
           } catch (err) {
             console.log(err);
+            message.error("添加失败");
+            loading.value = false;
           }
-
-          message.success("验证成功");
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -109,18 +122,22 @@ export default defineComponent({
       formRef.value?.restoreValidation();
     }
 
-    function handleUpdateValue(_: string, option: SelectOption) {
-      console.log(option);
-      // console.log(toRaw(form.value));
-      form.value = {
-        ...toRaw(form.value),
-        cityName: option.label as string,
-        cityCode: option.value as string,
-      };
-      console.log(form.value);
-
-      //    form.value.city = unref(option).label
-      //    form.value.code = option.value
+    async function handleUpdateValue(_: string, option: SelectOption) {
+      try {
+        let res = await uniqueCityName({ cityCode: option.vlaue as string });
+        if (res.success) {
+          form.value = {
+            lat: option.lat as number,
+            lng: option.lng as number,
+            cityName: option.label as string,
+            cityCode: option.value as string,
+          };
+        } else {
+          message.error(res.message);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     return {
@@ -129,26 +146,6 @@ export default defineComponent({
       form,
       loading,
       cityData,
-      renderLabel: (option: SelectOption): VNodeChild => {
-        console.log(option);
-
-        return option.cityName as string;
-        // return [
-        //   h(
-        //     NIcon,
-        //     {
-        //       style: {
-        //         verticalAlign: '-0.15em',
-        //         marginRight: '4px'
-        //       }
-        //     },
-        //     {
-        //       default: () => h(MusicIcon)
-        //     }
-        //   ),
-        //   option.label as string
-        // ]
-      },
       rules: {
         cityCode: { required: true, trigger: ["blur", "change"], message: "请选择开通城市" },
         lng: { required: true, type: "number", trigger: ["blur", "input"], message: "请输入经度" },

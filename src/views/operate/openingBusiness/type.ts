@@ -10,7 +10,17 @@ export interface tableDataItem {
 }
 
 export interface formState {
-  operateCity: null | string;
+  openBusinessId: string | null;
+  areaCode: string | null;
+  orderType: string | null;
+  vehicleTypeId: string | null;
+  chargeRuleBaseId: string | null;
+  chargeRuleMileageId: string | null;
+  chargeRuleDurationId: string | null;
+  chargeRuleCancelId: string | null;
+  chargeRuleWaitId: string | null;
+  chargeRuleFloatHolidayId: string | null;
+  chargeRuleFloatWorkdayId: string | null;
 }
 
 export interface busTypeState {

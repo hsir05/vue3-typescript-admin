@@ -17,7 +17,7 @@ export function getOperationCompany() {
 }
 
 //获得所有开通城市
-export function getOpenCity() {
+export function getAllOpenCity() {
   return http.request({
     url: "/openCity/openCityList",
     method: "post",

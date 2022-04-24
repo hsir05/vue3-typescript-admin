@@ -4,6 +4,7 @@
     auto-focus
     :close-on-esc="closeOnEsc"
     :mask-closable="maskClosable"
+    :on-after-leave="afterLeave"
   >
     <n-card
       :style="{ width: width, height: height }"
@@ -23,7 +24,7 @@
 
       <template #footer>
         <n-button @click="cancel">取消</n-button>
-        <n-button type="primary" class="ml-10px" @click="ok">确认</n-button>
+        <n-button type="primary" class="ml-10px" :loading="loading" @click="ok">确认</n-button>
       </template>
     </n-card>
   </n-modal>
@@ -55,6 +56,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["on-ok", "on-cancel"],
   setup(_, { emit }) {
@@ -64,7 +69,6 @@ export default defineComponent({
       isModal.value = true;
     };
     const ok = () => {
-      console.log("ok");
       emit("on-ok");
     };
     const cancel = () => {
@@ -72,8 +76,14 @@ export default defineComponent({
       emit("on-cancel");
     };
 
+    const afterLeave = () => {
+      isModal.value = false;
+      emit("on-cancel");
+    };
+
     return {
       isModal,
+      afterLeave,
       showModal,
       ok,
       cancel,
