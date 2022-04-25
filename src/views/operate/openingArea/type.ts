@@ -8,5 +8,13 @@ export interface tableDataItem {
   id?: string | null;
   areaName: string | null;
   areaCode: string | null;
-  status?: number | null;
+  areaLock?: number | null;
+}
+
+export interface formState {
+  id?: string | null;
+  cityName: string | null;
+  cityCode: string | null;
+  lng: number | null;
+  lat: number | null;
 }

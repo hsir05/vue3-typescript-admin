@@ -21,7 +21,7 @@
             filterable
             v-model:value="queryForm.influxCode"
             placeholder="选择流量方"
-            :options="influxList.result"
+            :options="influxData"
           />
         </n-form-item>
 
@@ -33,7 +33,7 @@
               filterable
               v-model:value="queryForm.cityCode"
               placeholder="选择开通城市"
-              :options="cityData.result"
+              :options="openCityData"
             />
           </n-form-item>
 
@@ -46,16 +46,6 @@
             >查找</n-button
           >
         </div>
-        <!-- <div class="text-center">
-          <n-button
-            attr-type="button"
-            :loading="loading"
-            class="w-1/3 mr-5px"
-            type="warning"
-            @click="handleReset"
-            >重置</n-button
-          >
-        </div> -->
       </n-form>
 
       <!-- 左侧表格 -->
@@ -111,6 +101,7 @@
             v-model:value="form.phone"
             clearable
             style="width: 280px"
+            @on-update:value="uniquePhone"
             placeholder="输入司机手机号"
           />
         </n-form-item>
@@ -118,6 +109,7 @@
           <n-input
             v-model:value="form.plateNumber"
             clearable
+            @on-update:value="uniquePlate"
             style="width: 280px"
             placeholder="输入车牌号"
           />
@@ -154,13 +146,12 @@
             filterable
             v-model:value="form.carType"
             placeholder="选择车辆类型"
-            :options="cityData.result"
+            :options="openCityData"
           />
         </n-form-item>
 
-        <n-form-item label="司机头像" path="avatar">
+        <n-form-item label="司机头像" path="avatar" class="mt-20px">
           <BasicUpload
-            :action="uploadUrl"
             :data="{}"
             name="file"
             :width="100"
@@ -190,14 +181,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref } from "vue";
+import { defineComponent, ref, h, unref, onMounted, reactive, toRefs } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
-import cityData from "@/config/cityData.json";
-import influxList from "@/config/influxList.json";
 import { uploadUrl } from "@/config/config";
-import vehicleTypeList from "@/config/vehicleTypeList.json";
 import {
   Add as AddIcon,
   Search as SearchIcon,
@@ -207,6 +195,15 @@ import {
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
 import { tableDataItem, tableVirtualDataItem } from "./type";
+import { getInfluxList, getAllOpenCity } from "@/api/common/common";
+import { itemState } from "@/interface/common/common";
+import {
+  saveVirtual,
+  removeVirtual,
+  uniqueDriverPhone,
+  uniquePlateNumber,
+  getDiriver,
+} from "@/api/operate/operate";
 export default defineComponent({
   name: "VirtualVehicle",
   components: { SearchIcon, AddIcon, CarIcon, BasicUpload },
@@ -217,6 +214,10 @@ export default defineComponent({
     const queryForm = ref<tableDataItem>({
       influxCode: null,
       cityCode: null,
+    });
+    const state = reactive({
+      influxData: [],
+      openCityData: [],
     });
 
     const formRef = ref<FormInst | null>(null);
@@ -231,9 +232,7 @@ export default defineComponent({
       avatar: null,
     });
 
-    const uploadList = ref([
-      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    ]);
+    const uploadList = ref([]);
 
     const message = useMessage();
 
@@ -311,28 +310,115 @@ export default defineComponent({
       },
     ]);
 
+    onMounted(() => {
+      getInflux();
+      getOpenCity();
+    });
+
     function query(e: MouseEvent) {
       e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
+      queryFormRef.value?.validate(async (errors) => {
         if (!errors) {
           console.log(unref(queryForm));
-          message.success("验证成功");
+          let option = {
+            influxCode: queryForm.value.influxCode as string,
+            cityCode: queryForm.value.cityCode as string,
+          };
+          let res = await getDiriver(option);
+          console.log(res);
+
+          message.success(res.message);
         } else {
           console.log(errors);
           message.error("验证失败");
         }
       });
     }
-    function handleReset() {
-      queryForm.value = { influxCode: null, cityCode: null };
-      queryFormRef.value?.restoreValidation();
+
+    async function getInflux() {
+      try {
+        let res = await getInfluxList();
+        console.log(res);
+        state.influxData = res.data;
+
+        state.influxData = res.data.map((item: { entryName: string; entryCode: string }) => {
+          let obj = {
+            label: item.entryName,
+            value: item.entryCode,
+          };
+          return obj;
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    async function getOpenCity() {
+      try {
+        let res = await getAllOpenCity();
+        console.log(res);
+        state.openCityData = res.data.map((item: itemState) => {
+          let obj = {
+            label: item.cityName,
+            value: item.cityCode,
+          };
+          return obj;
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function uniquePhone(driverPhone: string) {
+      try {
+        let option = {
+          influxCode: queryForm.value.influxCode,
+          cityCode: queryForm.value.cityCode,
+          driverPhone: driverPhone,
+        };
+        let res = await uniqueDriverPhone(option);
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function uniquePlate(plateNumber: string) {
+      try {
+        let option = {
+          influxCode: queryForm.value.influxCode,
+          cityCode: queryForm.value.cityCode,
+          plateNumber: plateNumber,
+        };
+        let res = await uniquePlateNumber(option);
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function remove(virtualDriverId: string) {
+      try {
+        let res = await removeVirtual({ virtualDriverId });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function save() {
+      try {
+        let option = {};
+        let res = await saveVirtual({ option });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     function handleSee() {}
     function handleEdit() {}
     function handleRemove(record: Recordable) {
-      message.info("点击了删除", record);
-      console.log("点击了删除", record);
+      remove(record.vehicleTypeId);
     }
 
     function handleAddVirtual() {}
@@ -346,6 +432,7 @@ export default defineComponent({
       formRef.value?.validate((errors) => {
         if (!errors) {
           console.log(unref(form));
+          save();
           message.success("验证成功");
         } else {
           console.log(errors);
@@ -374,6 +461,7 @@ export default defineComponent({
       disabled,
       columns,
       data,
+      ...toRefs(state),
       getRowKeyId: (row: tableDataItem) => row.id,
 
       queryFormRef,
@@ -395,14 +483,11 @@ export default defineComponent({
         carType: { required: true, trigger: ["blur", "change"], message: "请输入车辆类型" },
         avatar: { required: true, trigger: ["blur", "change"], message: "请上传司机头像" },
       },
-
-      cityData,
-      influxList,
-      vehicleTypeList,
       uploadList,
 
       query,
-      handleReset,
+      uniquePhone,
+      uniquePlate,
 
       handleAddVirtual,
       handleValidate,

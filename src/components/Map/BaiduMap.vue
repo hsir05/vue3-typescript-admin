@@ -1,5 +1,7 @@
 <template>
-  <div ref="domRef" class="w-full h-full"></div>
+  <div ref="domRef" class="w-full h-full" style="display: table">
+    <n-empty class="empty" />
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -10,9 +10,10 @@
           :rule="rule"
         >
           <n-select
-            v-model:value="cityCode"
+            v-model:value="form.cityCode"
             clearable
             filterable
+            @update:value="handleUpdateValue"
             placeholder="选择开通城市"
             style="width: 260px"
             :options="openCityList"
@@ -24,7 +25,7 @@
           :loading="loading"
           class="ml-10px"
           type="primary"
-          @click="handleValidate"
+          @click="query"
         >
           查找</n-button
         >
@@ -44,6 +45,7 @@
       <!-- 表格 -->
       <n-data-table
         ref="table"
+        :loading="loading"
         :data="data"
         :columns="columns"
         class="box-border"
@@ -57,7 +59,7 @@
     <div class="map">
       <Map ref="baiduMapRef" />
 
-      <div class="map-edit-area">
+      <div class="map-edit-area" v-if="isShow">
         <div class="">
           <n-icon size="24" style="vertical-align: middle">
             <AlertIcon color="#f0a020" />
@@ -83,8 +85,8 @@
             <n-input v-model:value="editForm.areaName" clearable placeholder="输入区域名称" />
           </n-form-item>
 
-          <n-form-item label="状态" path="status">
-            <n-radio-group v-model:value="editForm.status">
+          <n-form-item label="状态" path="areaLock">
+            <n-radio-group v-model:value="editForm.areaLock">
               <n-space>
                 <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
                   item.label
@@ -95,7 +97,7 @@
           <n-form-item label="操作">
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button attr-type="button" text type="primary" @click="handleEditArea">
+                <n-button attr-type="button" text type="primary" @click="handleAdjust">
                   <n-icon size="20">
                     <HandIcon />
                   </n-icon>
@@ -118,7 +120,7 @@
                   </n-icon>
                 </n-button>
               </template>
-              选择
+              选择区域
             </n-tooltip>
 
             <n-tooltip trigger="hover">
@@ -128,7 +130,7 @@
                   class="ml-10px"
                   text
                   type="primary"
-                  @click="handleEditArea"
+                  @click="handleReset"
                 >
                   <n-icon size="20">
                     <ArrowBackIcon />
@@ -145,7 +147,7 @@
                   class="ml-10px"
                   text
                   type="primary"
-                  @click="handleEditArea"
+                  @click="handleSave"
                 >
                   <n-icon size="20">
                     <SaveOutIcon />
@@ -180,12 +182,19 @@
 <script lang="ts">
 import { defineComponent, ref, h, onMounted } from "vue";
 import Map from "@/components/Map/BaiduMap.vue";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst, SelectOption, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import { tableItemProps, tableDataItem } from "./type";
+import { tableItemProps, tableDataItem, formState } from "./type";
 import { statusOptions } from "@/config/form";
 import { getAllOpenCity } from "@/api/common/common";
+import {
+  getCityOpenArea,
+  removeArea,
+  saveOpenArea,
+  getOpenAreaPointList,
+  getNonEditablePointList,
+} from "@/api/operate/operate";
 import {
   AlertCircle as AlertIcon,
   TrashOutline as TrashIcon,
@@ -211,8 +220,14 @@ export default defineComponent({
     SaveOutIcon,
   },
   setup() {
-    const cityCode = ref();
+    const form = ref<formState>({
+      cityCode: null,
+      cityName: null,
+      lng: null,
+      lat: null,
+    });
     const loading = ref(false);
+    const isShow = ref(false);
     const formRef = ref<FormInst | null>(null);
     const baiduMapRef = ref();
     const message = useMessage();
@@ -224,13 +239,13 @@ export default defineComponent({
     const editFormRef = ref();
     const editForm = ref<tableDataItem>({
       areaName: null,
-      status: 1,
+      areaLock: 1,
       areaCode: null,
     });
 
     const columns = [
       {
-        title: "开通区域",
+        title: "区域名称",
         key: "areaName",
         align: "center",
       },
@@ -238,6 +253,22 @@ export default defineComponent({
         title: "区域编码",
         key: "areaCode",
         align: "center",
+      },
+      {
+        title: "状态",
+        key: "areaLock",
+        align: "center",
+        render(row: tableDataItem) {
+          return h(
+            NTag,
+            {
+              type: row.areaLock === 1 ? "success" : "error",
+            },
+            {
+              default: () => (row.areaLock === 1 ? "正常" : "锁定"),
+            }
+          );
+        },
       },
       {
         title: "操作",
@@ -269,21 +300,8 @@ export default defineComponent({
       },
     ];
 
-    async function handleValidate() {
-      try {
-        await formRef.value?.validate();
-        console.log(cityCode.value);
-      } catch (err) {
-        console.log(err);
-        message.error("验证失败");
-      }
-    }
-
-    onMounted(async () => {
+    onMounted(() => {
       getOpenCity();
-      //   const { renderBaiduMap } = baiduMapRef.value;
-      //   await renderBaiduMap(103.841521, 36.067212);
-      //   addBoundary()
     });
 
     const getOpenCity = async () => {
@@ -299,12 +317,6 @@ export default defineComponent({
           };
           return obj;
         });
-
-        if (res.data.length > 0) {
-          const { renderBaiduMap } = baiduMapRef.value;
-          await renderBaiduMap(res.data[0].lng, res.data[0].lat);
-        }
-
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -312,20 +324,127 @@ export default defineComponent({
       }
     };
 
+    async function query() {
+      try {
+        isShow.value = false;
+        await formRef.value?.validate();
+        loading.value = true;
+        let res = await getCityOpenArea({ cityCode: form.value.cityCode });
+        console.log(res);
+        data.value = res.data;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+
+    function handleUpdateValue(_: string, option: SelectOption) {
+      form.value = {
+        cityCode: option.value as string,
+        cityName: option.label as string,
+        lng: option.lng as number,
+        lat: option.lat as number,
+      };
+    }
+
+    async function remove(areaCode: string) {
+      try {
+        loading.value = true;
+        let res = await removeArea({ areaCode });
+        console.log(res);
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    function handleAdjust() {}
+    function handleReset() {}
+    async function handleSave() {
+      try {
+        loading.value = true;
+        let option = {
+          areaCode: editForm.value.areaCode,
+          areaName: editForm.value.areaName,
+          cityCode: form.value.cityCode,
+          areaLock: editForm.value.areaLock,
+          openAreaPointList: {
+            lng: form.value.lng,
+            lat: form.value.lat,
+          },
+        };
+        let res = await saveOpenArea(option);
+        console.log(res);
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    async function getOpenAreaPoint(areaCode: string) {
+      try {
+        loading.value = true;
+        let res = await getOpenAreaPointList({ areaCode });
+        console.log(res);
+
+        getNonPonit(
+          res.data[0].lng,
+          res.data[res.data.length - 1].lng,
+          res.data[0].lat,
+          res.data[res.data.length - 1].lat
+        );
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    async function getNonPonit(lngMin: number, lngMax: number, latMin: number, latMax: number) {
+      try {
+        loading.value = true;
+        let option = {
+          areaCode: editForm.value.areaCode as string,
+          lngMin: lngMin,
+          lngMax: lngMax,
+          latMin: latMin,
+          latMax: latMax,
+        };
+        let res = await getNonEditablePointList(option);
+        console.log(res);
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+
     function handleEdit(record: tableDataItem) {
       console.log(record);
+      isShow.value = true;
+
+      getOpenAreaPoint(record.areaCode as string);
+
+      editForm.value = record;
       const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(103.841521, 36.067212);
+      renderBaiduMap(form.value.lng, form.value.lat);
     }
-    function handleDelete() {}
+    function handleDelete(record: tableDataItem) {
+      remove(record.areaCode as string);
+    }
     function handleAddArea() {}
 
     function handleEditArea() {}
 
     return {
       loading,
+      isShow,
       area,
-      cityCode,
+      form,
       formRef,
       openCityList,
       baiduMapRef,
@@ -339,7 +458,7 @@ export default defineComponent({
       rule: {
         trigger: ["input", "blur"],
         validator() {
-          if (cityCode.value === null) {
+          if (form.value.cityCode === null) {
             return new Error("选择开通城市");
           }
         },
@@ -348,7 +467,11 @@ export default defineComponent({
         areaName: { required: true, trigger: ["blur", "change"], message: "请输入区域名称" },
       },
 
-      handleValidate,
+      query,
+      handleSave,
+      handleAdjust,
+      handleReset,
+      handleUpdateValue,
       handleAddArea,
       handleEditArea,
     };
@@ -362,7 +485,7 @@ export default defineComponent({
   justify-content: space-between;
 
   .open-area-left {
-    width: 300px;
+    width: 390px;
     background-color: $white;
   }
 
@@ -371,7 +494,7 @@ export default defineComponent({
   }
 
   .map {
-    width: calc(100% - 300px - 10px);
+    width: calc(100% - 390px - 10px);
     height: auto;
     overflow: scroll;
     background-color: $white;

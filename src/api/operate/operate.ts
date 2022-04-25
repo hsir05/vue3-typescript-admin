@@ -93,6 +93,68 @@ export function uniqueCityName(data: {cityCode: string}) {
   });
 }
 
+/*****开通区域管理---------------------****/
+/**
+ * 删除开通区域 
+*/
+export function removeArea(data: {areaCode: string | null}) {
+  return http.request({
+    url: '/openArea/delete',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 保存开通区域及下属的关键点信息
+*/
+interface saveAreaState{
+    areaCode: string | null
+    areaName: string | null
+    cityCode: string | null
+    areaLock?: number | null
+    openAreaPointList:{
+        lng: number | null;
+        lat: number | null
+    }
+}
+export function saveOpenArea(data: saveAreaState) {
+  return http.request({
+    url: '/openArea/saveOpenArea',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 获取开通区域的关键点
+*/
+export function getOpenAreaPointList(data: {areaCode: string}) {
+  return http.request({
+    url: '/openArea/getOpenAreaPointList',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 获取开通区域的关键点
+*/
+interface nonEditState {
+    areaCode: string
+    lngMin: number
+    lngMax: number
+    latMin: number
+    latMax: number
+}
+export function getNonEditablePointList(data: nonEditState) {
+  return http.request({
+    url: '/openArea/getNonEditablePointList',
+    method: 'post',
+    data
+  });
+}
+
+
 
 /*****开通业务管理---------------------****/
 
@@ -262,6 +324,97 @@ export function deleteAirportList(data: {openCityAirportId: string | null}) {
 export function uniqueOpenCityAirport(data: {cityCode: string | null; airportName: string | null; oldAirportName: string | null; }) {
   return http.request({
     url: '/openCityAirport/uniqueOpenCityAirport',
+    method: 'post',
+    data
+  });
+}
+
+//--------------虚拟车头管理-----------------
+/**
+ * 通过流量方和城市编码查询虚拟司机列表
+*/
+export function getDiriver(data: {influxCode: string; cityCode: string}) {
+  return http.request({
+    url: '/virtualDriver/virtualDriverList',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 保存虚拟车头信息 
+*/
+interface saveVirtualState{
+    cityCode: string | null
+    influxCode: string | null
+    virtualDriverId?: string | null
+    oldDriverPhone?: string | null
+    oldPlateNumber?: string | null
+    driverFullName: string | null
+    driverPhone: string | null
+    plateNumber: string | null
+    vehicleBrand: string | null
+    vehicleSeries: string | null
+    vehicleColor: string | null
+    vehicleTypeId: string | null
+    driverIdentificationPhotoUrl?: string | null
+    driverIdentificationPhotoId?: string | null
+    vehicleNote: string | null
+}
+export function saveVirtual(data: saveVirtualState) {
+  return http.request({
+    url: '/virtualDriver/save',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 查询虚拟车头详情 
+*/
+export function getVirtual(data: {virtualDriverId: string}) {
+  return http.request({
+    url: '/virtualDriver/getOne',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 查询虚拟车头详情 
+*/
+export function removeVirtual(data: {virtualDriverId: string}) {
+  return http.request({
+    url: '/virtualDriver/delete',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 校验同一业务类型下司机手机号是否重复 
+*/
+interface phoneState{
+    driverPhone: string | null
+    influxCode: string | null
+    cityCode: string | null
+}
+export function uniqueDriverPhone(data: phoneState) {
+  return http.request({
+    url: '/virtualDriver/uniqueDriverPhone',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 校验同一业务类型下司机手机号是否重复 
+*/
+interface plateNumberState{
+    plateNumber: string | null
+    influxCode: string | null
+    cityCode: string | null
+}
+export function uniquePlateNumber(data: plateNumberState) {
+  return http.request({
+    url: '/virtualDriver/uniquePlateNumber',
     method: 'post',
     data
   });

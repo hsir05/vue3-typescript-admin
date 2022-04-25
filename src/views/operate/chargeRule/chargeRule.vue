@@ -1,8 +1,83 @@
 <template>
   <div class="h-full overflow-hidden charge-rule">
+    <n-tabs type="segment" :on-update:value="handleTabs">
+      <n-tab-pane name="k1" tab="基础计费规则">
+        <n-data-table
+          ref="table"
+          :data="data"
+          :columns="columns"
+          class="box-border"
+          min-height="400px"
+          flex-height
+          :row-key="getRowKeyId"
+          :pagination="false"
+        />
+      </n-tab-pane>
+      <n-tab-pane name="k2" tab="里程计费规则">
+        <n-data-table
+          ref="table"
+          :data="data"
+          :columns="columns"
+          class="box-border"
+          min-height="400px"
+          flex-height
+          :row-key="getRowKeyId"
+          :pagination="false"
+        />
+      </n-tab-pane>
+      <n-tab-pane name="k3" tab="时长计费规则">
+        <n-data-table
+          ref="table"
+          :data="data"
+          :columns="columns"
+          class="box-border"
+          min-height="400px"
+          flex-height
+          :row-key="getRowKeyId"
+          :pagination="false"
+        />
+      </n-tab-pane>
+      <n-tab-pane name="k4" tab="取消计费规则">
+        <n-data-table
+          ref="table"
+          :data="data"
+          :columns="columns"
+          class="box-border"
+          min-height="400px"
+          flex-height
+          :row-key="getRowKeyId"
+          :pagination="false"
+        />
+      </n-tab-pane>
+      <n-tab-pane name="k5" tab="等待计费规则">
+        <n-data-table
+          ref="table"
+          :data="data"
+          :columns="columns"
+          class="box-border"
+          min-height="400px"
+          flex-height
+          :row-key="getRowKeyId"
+          :pagination="false"
+        />
+      </n-tab-pane>
+      <n-tab-pane name="k6" tab="浮动计费规则">
+        <n-data-table
+          ref="table"
+          :data="data"
+          :columns="columns"
+          class="box-border"
+          min-height="400px"
+          flex-height
+          :row-key="getRowKeyId"
+          :pagination="false"
+        />
+      </n-tab-pane>
+    </n-tabs>
+
     <div class="flex-align-start charge-rule-box">
       <!-- 表格 -->
-      <BasicTable
+      <!-- <BasicTable
         :data="data"
         style="height: 100%"
         ref="basicTableRef"
@@ -14,7 +89,7 @@
         @on-page="handlePage"
         @on-add="handleAdd"
         @on-pagination="handlepagSize"
-      />
+      /> -->
       <!-- 右侧编辑 -->
       <!-- <div class="right-edit">
         <n-divider title-placement="left"> 开通业务分配基础计费规则 </n-divider>
@@ -77,7 +152,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, unref } from "vue";
-import BasicTable from "@/components/Table/Table.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import ChargeRuleDrawer from "./chargeRuleDrawer.vue";
@@ -88,12 +162,11 @@ import orderType from "@/config/orderTypeList.json";
 import vehicleTypeList from "@/config/vehicleTypeList.json";
 export default defineComponent({
   name: "ChargeRule",
-  components: { BasicTable, ChargeRuleDrawer },
+  components: { ChargeRuleDrawer },
   setup() {
     const loading = ref(false);
     const itemCount = ref(null);
     const chargeRuleDrawerRef = ref();
-    const basicTableRef = ref();
 
     const busionessFormRef = ref<FormInst | null>(null);
     const businessForm = ref<tableDataItem>({
@@ -150,10 +223,8 @@ export default defineComponent({
       },
     ];
 
-    function reloadPage() {
-      const { resetPagination } = basicTableRef.value;
-      resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+    function handleTabs(value: string) {
+      console.log(value);
     }
 
     function handleAdd() {
@@ -206,9 +277,9 @@ export default defineComponent({
       data,
       loading,
       chargeRuleDrawerRef,
+      getRowKeyId: (row: tableDataItem) => row.id,
       itemCount,
       columns,
-      basicTableRef,
       busionessFormRef,
       businessRules: {
         vehicleType: { required: true, trigger: ["blur", "change"], message: "请选择车辆类型" },
@@ -218,22 +289,8 @@ export default defineComponent({
       businessForm,
       orderType,
       vehicleTypeList,
-      openArea: [
-        {
-          type: "group",
-          label: "Rubber Soul",
-          key: "Rubber Soul",
-          children: [
-            {
-              label: "Everybody's",
-              value: "song0",
-              key: "Rubber Soul",
-            },
-          ],
-        },
-      ],
 
-      reloadPage,
+      handleTabs,
       handlePage,
       handleAdd,
       handleSubmit,

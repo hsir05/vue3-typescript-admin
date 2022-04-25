@@ -334,11 +334,6 @@ export default defineComponent({
     margin-left: 10px;
   }
 
-  .empty {
-    margin-top: 30%;
-    transform: translateY(-50%);
-  }
-
   .busy-type-item {
     display: flex;
     align-content: center;
