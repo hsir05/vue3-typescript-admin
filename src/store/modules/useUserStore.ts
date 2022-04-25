@@ -60,7 +60,7 @@ export const useAppUserStore = defineStore({
       return new Promise(async (resolve, reject) => {
         try { 
           let res = await login(userInfo);
-          const { token, iat, exp } = res;
+          const { token, iat, exp } = res.data;
           console.log(iat);
           locStorage.set(ACCESS_TOKEN_KEY, token, exp);
           locStorage.set(USER_INFO_KEY, exp);

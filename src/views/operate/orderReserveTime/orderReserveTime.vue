@@ -43,30 +43,7 @@ import ShowOrEdit from "./ShowOrEdit.vue";
 export default defineComponent({
   name: "OrderReserveTime",
   setup() {
-    const editData = ref([
-      {
-        id: "123rwrwer",
-        orderBusinessType: "立即",
-        orderType: "OT00003",
-        reserveTime: 0,
-        majorBus: "22",
-        fastBus: "0",
-        taxiBus: "0",
-        cityCode: "110000",
-        acceptOrderReserveTimeSettingId: "",
-      },
-      {
-        id: "123rwr33wer",
-        orderBusinessType: "预约",
-        orderType: "OT00003",
-        reserveTime: 0,
-        majorBus: "1",
-        fastBus: "0",
-        taxiBus: "0",
-        cityCode: "110000",
-        acceptOrderReserveTimeSettingId: "",
-      },
-    ]);
+    const editData = ref([]);
     const columns = [
       {
         title: "城市名称",

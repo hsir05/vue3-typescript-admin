@@ -211,8 +211,8 @@ export default defineComponent({
     const getData = async () => {
       try {
         state.loading = true;
-        let res = await getVehicleType();
-        data.value = res;
+        let res = await getVehicleType({ operationCompanyId: "" });
+        data.value = res.data;
         state.loading = false;
       } catch (err) {
         console.log(err);

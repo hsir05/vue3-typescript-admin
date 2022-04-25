@@ -94,26 +94,4 @@ a{
 .striped {
     background-color: #fafafc;
   }
-.busy-type-item {
-  display: flex;
-  align-content: center;
-  border: 1px solid #efeff5;
-  margin-top: -1px;
-  
-  .vehicle-type-item {
-    padding: 10px;
-    display: inline-block;
-    min-width: 120px;
-    text-align: center;
-  }
-  .n-checkbox-group {
-    width: 100%;
-  }
-  .n-checkbox {
-    min-width: 22px;
-    padding: 10px;
-    width: 11.5%;
-    border-left: 1px solid #f2f3f5;
-    justify-content: center;
-  }
-}
+

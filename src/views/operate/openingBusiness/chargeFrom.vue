@@ -16,9 +16,10 @@
           v-model:value="form.chargeRuleBaseId"
           placeholder="选择基础计费"
           :options="baseList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
+        />
+        <!-- <n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
           <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        ></n-button> -->
       </n-form-item>
       <n-form-item label="里程计费" path="chargeRuleMileageId">
         <n-select
@@ -27,9 +28,7 @@
           v-model:value="form.chargeRuleMileageId"
           placeholder="选择里程计费"
           :options="mileageList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-          <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        />
       </n-form-item>
       <n-form-item label="时长计费" path="chargeRuleDurationId">
         <n-select
@@ -38,9 +37,7 @@
           v-model:value="form.chargeRuleDurationId"
           placeholder="选择时长计费"
           :options="durationList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-          <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        />
       </n-form-item>
       <n-form-item label="取消计费" path="chargeRuleCancelId">
         <n-select
@@ -49,9 +46,7 @@
           v-model:value="form.chargeRuleCancelId"
           placeholder="选择取消计费"
           :options="cancelList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-          <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        />
       </n-form-item>
       <n-form-item label="等待计费" path="chargeRuleWaitId">
         <n-select
@@ -60,9 +55,7 @@
           v-model:value="form.chargeRuleWaitId"
           placeholder="选择等待计费"
           :options="waitList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-          <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        />
       </n-form-item>
       <n-form-item label="工作日浮动" path="chargeRuleFloatWorkdayId">
         <n-select
@@ -71,9 +64,7 @@
           v-model:value="form.chargeRuleFloatWorkdayId"
           placeholder="选择工作日浮动"
           :options="floatList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-          <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        />
       </n-form-item>
 
       <n-form-item label="节假日浮动" path="chargeRuleFloatHolidayId">
@@ -83,17 +74,21 @@
           v-model:value="form.chargeRuleFloatHolidayId"
           placeholder="选择节假日浮动"
           :options="floatList"
-        /><n-button attr-type="button" type="warning" class="ml-10px" @click="handleAdd()">
-          <n-icon> <AddIcon /> </n-icon
-        ></n-button>
+        />
       </n-form-item>
 
       <div class="text-center flex-center">
         <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
           >确认开通</n-button
         >
-        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
-          >取消</n-button
+        <n-button
+          attr-type="button"
+          :loading="loading"
+          type="warning"
+          v-if="form.openBusinessId"
+          class="ml-10px"
+          @click="remove"
+          >关闭业务</n-button
         >
       </div>
     </n-form>
@@ -103,8 +98,8 @@
 import { defineComponent, ref, unref, toRefs, reactive, onMounted } from "vue";
 import { formState } from "./type";
 import { FormInst, useMessage } from "naive-ui";
-import { Add as AddIcon } from "@vicons/ionicons5";
 import { saveBusiness } from "@/api/operate/operate";
+import { removeBusiness } from "@/api/operate/operate";
 import {
   baseList,
   mileageList,
@@ -115,27 +110,7 @@ import {
 } from "@/api/operate/chargeRule";
 export default defineComponent({
   name: "ChargeForm",
-  components: {
-    AddIcon,
-  },
-  props: {
-    openBusinessId: {
-      type: String,
-      require: true,
-    },
-    areaCode: {
-      type: String,
-      require: true,
-    },
-    orderType: {
-      type: String,
-      require: true,
-    },
-    vehicleTypeId: {
-      type: String,
-      require: true,
-    },
-  },
+  emits: ["on-save-after"],
   setup(_, { emit }) {
     const formRef = ref<FormInst | null>(null);
     const form = ref<formState>({
@@ -177,7 +152,6 @@ export default defineComponent({
         if (!errors) {
           console.log(unref(form));
           save();
-          message.success("验证成功");
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -190,8 +164,24 @@ export default defineComponent({
         stateDrawer.loading = true;
         let res = await saveBusiness(form.value);
         console.log(res);
+        message.success(res.message);
         stateDrawer.loading = false;
-        message.success("保存成功");
+
+        onCloseAfter();
+      } catch (err) {
+        console.log(err);
+        stateDrawer.loading = false;
+      }
+    }
+    async function remove() {
+      try {
+        stateDrawer.loading = true;
+        let res = await removeBusiness({ openBusinessId: form.value.openBusinessId as string });
+        console.log(res);
+        message.success(res.message);
+        stateDrawer.loading = false;
+
+        onCloseAfter();
       } catch (err) {
         console.log(err);
         stateDrawer.loading = false;
@@ -269,21 +259,16 @@ export default defineComponent({
         });
     };
 
-    function openDrawer() {
-      //   if (record) {
-      //     // form.value = { ...form.value, ...record };
-      //   }
+    function openDrawer(data: formState) {
+      form.value = data;
       stateDrawer.isDrawer = true;
     }
-
-    function handleReset() {}
-
-    function handleAdd() {}
 
     function onCloseAfter() {
       stateDrawer.isDrawer = false;
       stateDrawer.loading = false;
       stateDrawer.disabled = false;
+      handleSaveAfter();
     }
 
     function handleSaveAfter() {
@@ -300,8 +285,7 @@ export default defineComponent({
       ...toRefs(state),
 
       handleValidate,
-      handleAdd,
-      handleReset,
+      remove,
       openDrawer,
       handleSaveAfter,
       onCloseAfter,

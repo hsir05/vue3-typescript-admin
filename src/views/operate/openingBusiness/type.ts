@@ -10,17 +10,17 @@ export interface tableDataItem {
 }
 
 export interface formState {
-  openBusinessId: string | null;
+  openBusinessId?: string | null;
   areaCode: string | null;
   orderType: string | null;
   vehicleTypeId: string | null;
-  chargeRuleBaseId: string | null;
-  chargeRuleMileageId: string | null;
-  chargeRuleDurationId: string | null;
-  chargeRuleCancelId: string | null;
-  chargeRuleWaitId: string | null;
-  chargeRuleFloatHolidayId: string | null;
-  chargeRuleFloatWorkdayId: string | null;
+  chargeRuleBaseId?: string | null;
+  chargeRuleMileageId?: string | null;
+  chargeRuleDurationId?: string | null;
+  chargeRuleCancelId?: string | null;
+  chargeRuleWaitId?: string | null;
+  chargeRuleFloatHolidayId?: string | null;
+  chargeRuleFloatWorkdayId?: string | null;
 }
 
 export interface busTypeState {
@@ -33,4 +33,18 @@ export interface busTypeState {
   fastBus: number[];
   fastPremium: number[];
   taxi: number[];
+}
+
+export interface vehicleState {
+  vehicleTypeName: string;
+  vehicleTypeId: string;
+}
+export interface orderTypeState {
+  entryName: string;
+  entryId: string;
+  entryCode: string;
+}
+export interface itemState {
+  vehicleTypeId: string;
+  orderType: string;
 }

@@ -15,7 +15,7 @@
             clearable
             filterable
             placeholder="选择开通城市"
-            style="width: 260px"
+            style="width: 300px"
             :options="openCityList"
           />
         </n-form-item>
@@ -44,77 +44,91 @@
     </div>
     <!-- 中间 -->
     <div class="opening-business-right">
-      <div class="busy-type-item striped">
-        <span class="vehicle-type-item">#</span>
-        <div class="n-checkbox-group">
-          <span class="n-checkbox">立即</span>
-          <span class="n-checkbox">预约</span>
-          <span class="n-checkbox">接机</span>
-          <span class="n-checkbox">送机</span>
-          <span class="n-checkbox">半日租</span>
-          <span class="n-checkbox">全日租</span>
+      <template v-if="isShow">
+        <div
+          :class="['busy-type-item', index % 2 === 0 ? '' : 'striped']"
+          v-for="(vehicleType, index) in vehicleTypeData"
+          :key="vehicleType.vehicleTypeId"
+        >
+          <span class="busy-type-content-item">{{ vehicleType.vehicleTypeName }}</span>
+          <template v-if="index === 0">
+            <span
+              class="busy-type-content-item"
+              v-for="orderType in orderTypeData"
+              :key="orderType.entryId"
+              >{{ orderType.entryName }}</span
+            >
+          </template>
+
+          <template v-else>
+            <span
+              class="busy-type-content-item"
+              v-for="orderType in orderTypeData"
+              :key="orderType.entryId"
+            >
+              <n-tooltip
+                trigger="hover"
+                v-if="getValResult(vehicleType.vehicleTypeId, orderType.entryCode).result"
+              >
+                <template #trigger>
+                  <n-tag
+                    type="success"
+                    @click="
+                      toggle(
+                        vehicleType,
+                        orderType,
+                        getValResult(vehicleType.vehicleTypeId, orderType.entryCode).obj
+                      )
+                    "
+                    size="small"
+                    >已开通</n-tag
+                  >
+                </template>
+                点击关闭
+              </n-tooltip>
+
+              <n-tooltip trigger="hover" v-else>
+                <template #trigger>
+                  <n-tag type="warning" size="small" @click="toggle(vehicleType, orderType)"
+                    >关闭</n-tag
+                  >
+                </template>
+                点击开通
+              </n-tooltip>
+            </span>
+          </template>
         </div>
-      </div>
-
-      <BusTypeItem title="专车-经济型" :list="specialEconomic" @on-update-value="handleSpeEco" />
-      <BusTypeItem
-        title="专车-舒适型"
-        :list="specialComfort"
-        @on-update-value="handleSpeCom"
-        :striped="true"
-      />
-      <BusTypeItem title="专车-商务型" :list="specialBus" @on-update-value="handleSpeBus" />
-      <BusTypeItem
-        title="专车-豪华型"
-        :list="specialPremium"
-        @on-update-value="handleSpePre"
-        :striped="true"
-      />
-
-      <BusTypeItem title="快车-经济型" :list="fastEconomic" @on-update-value="handleFastEco" />
-      <BusTypeItem
-        title="快车-舒适型"
-        :list="fastComfort"
-        @on-update-value="handleFastCom"
-        :striped="true"
-      />
-      <BusTypeItem title="快车-商务型" :list="fastBus" @on-update-value="handleFastBus" />
-      <BusTypeItem
-        title="快车-豪华型"
-        :list="fastPremium"
-        @on-update-value="handleFastPre"
-        :striped="true"
-      />
-
-      <BusTypeItem title="出租车" :list="taxi" @on-update-value="handleTaxi" />
+      </template>
+      <n-empty v-else class="empty" />
     </div>
     <!-- 右侧 -->
-    <ChargeForm ref="chargeFormDrawerRef" :width="650" />
+    <ChargeFormDrawer ref="chargeFormDrawerRef" :width="650" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, reactive, toRefs, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { itemState } from "@/interface/common/common";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { tableItemProps, tableDataItem, busTypeState } from "./type";
+import { tableItemProps, tableDataItem, busTypeState, vehicleState, orderTypeState } from "./type";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import { getCityOpenArea } from "@/api/operate/operate";
-import BusTypeItem from "./busTypeItem.vue";
-import ChargeForm from "./chargeFrom.vue";
+import ChargeFormDrawer from "./chargeFrom.vue";
 import { getAllOpenCity, getDict } from "@/api/common/common";
-import { getOpenAreaBuss, delBusiness } from "@/api/operate/operate";
+// import { getOpenAreaBuss, delBusiness, getVehicleType } from "@/api/operate/operate";
+import { getOpenAreaBuss, getVehicleType } from "@/api/operate/operate";
+import { formState } from "./type";
 export default defineComponent({
   name: "OpeningBusiness",
   components: {
-    BusTypeItem,
-    ChargeForm,
+    ChargeFormDrawer,
   },
   emits: ["on-save-after"],
   setup() {
     const data = ref([]);
     const openCityList = ref([]);
     const loading = ref(false);
+    const isShow = ref(false);
+    const areaCode = ref<string | null>(null);
     const chargeFormDrawerRef = ref();
 
     const cityCode = ref(null);
@@ -133,6 +147,10 @@ export default defineComponent({
       fastPremium: [],
       taxi: [],
     });
+
+    const vehicleTypeData = ref<vehicleState[]>([]);
+    const orderTypeData = ref<orderTypeState[]>([]);
+    const bussinessData = ref([]);
 
     const columns = [
       {
@@ -169,18 +187,48 @@ export default defineComponent({
 
     onMounted(() => {
       getData();
-      getOrderType();
+      getSquareData();
     });
+
+    const getSquareData = () => {
+      Promise.all([
+        getVehicleType({ operationCompanyId: "" }),
+        getDict({ parentEntryCode: "OT00000" }),
+      ])
+        .then((res) => {
+          let dataArr = res.map((item) => item.data);
+          console.log(dataArr);
+
+          dataArr[0].unshift({ vehicleTypeId: " ", vehicleTypeName: "#" });
+          vehicleTypeData.value = dataArr[0];
+          orderTypeData.value = dataArr[1];
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    const getValResult = (vehicleTypeId: string, entryCode: string) => {
+      let obj = {};
+      let result = bussinessData.value.some((item: formState) => {
+        if (item.vehicleTypeId === vehicleTypeId && item.orderType === entryCode) {
+          obj = item;
+          return true;
+        } else {
+          return false;
+        }
+      });
+
+      return { obj, result: result };
+    };
 
     const getData = async () => {
       try {
         let res = await getAllOpenCity();
-        openCityList.value = res.data.map((item: itemState) => {
+        openCityList.value = res.data.map((item: { cityName: string; cityCode: string }) => {
           let obj = {
             label: item.cityName,
             value: item.cityCode,
-            lng: item.lng,
-            lat: item.lat,
           };
           return obj;
         });
@@ -188,18 +236,12 @@ export default defineComponent({
         console.log(err);
       }
     };
-    const getOrderType = async () => {
-      try {
-        let res = await getDict({ parentEntryCode: "OT00000" });
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+
     async function queryOpenArea() {
       try {
+        isShow.value = false;
+        bussinessData.value = [];
         await formRef.value?.validate();
-        console.log(cityCode.value);
         let res = await getCityOpenArea({ cityCode: cityCode.value });
         data.value = res.data;
       } catch (err) {
@@ -211,70 +253,43 @@ export default defineComponent({
     async function getBussiness(areaCode: string) {
       try {
         let res = await getOpenAreaBuss({ areaCode });
-        console.log(res);
+        bussinessData.value = res.data;
+        isShow.value = true;
       } catch (err) {
         console.log(err);
       }
     }
 
-    async function remove(openBusinessId: string) {
-      try {
-        let res = await delBusiness({ openBusinessId });
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
-    }
+    const toggle = (vehicleType: vehicleState, orderType: orderTypeState, editObj?: formState) => {
+      let option = {
+        orderType: orderType.entryCode,
+        vehicleTypeId: vehicleType.vehicleTypeId,
+        areaCode: areaCode.value,
+        ...editObj,
+      };
+      console.log(option);
+
+      const { openDrawer } = chargeFormDrawerRef.value;
+      openDrawer(option);
+    };
 
     function handleEdit(record: tableDataItem) {
+      areaCode.value = record.areaCode as string;
       getBussiness(record.areaCode as string);
     }
 
-    function handleSpeEco(value: number[]) {
-      state.specialEconomic = value;
-      console.log(value);
-      const { openDrawer } = chargeFormDrawerRef.value;
-      openDrawer();
-    }
-    function handleSpeCom(value: number[]) {
-      state.specialComfort = value;
-      console.log(value);
-      remove("");
-    }
-    function handleSpeBus(value: number[]) {
-      state.specialBus = value;
-      console.log(value);
-    }
-    function handleSpePre(value: number[]) {
-      state.specialPremium = value;
-      console.log(value);
-    }
-    function handleFastEco(value: number[]) {
-      state.fastEconomic = value;
-      console.log(value);
-    }
-    function handleFastCom(value: number[]) {
-      state.fastComfort = value;
-      console.log(value);
-    }
-    function handleFastBus(value: number[]) {
-      state.fastBus = value;
-      console.log(value);
-    }
-    function handleFastPre(value: number[]) {
-      state.fastPremium = value;
-      console.log(value);
-    }
-    function handleTaxi(value: number[]) {
-      state.taxi = value;
-      console.log(value);
+    function handleSaveAfter() {
+      getBussiness(areaCode.value as string);
     }
 
     return {
       ...toRefs(state),
       loading,
+      isShow,
       queryFormRef,
       chargeFormDrawerRef,
+      vehicleTypeData,
+      orderTypeData,
       cityCode,
       columns,
       getRowKeyId: (row: tableItemProps) => row.id,
@@ -289,16 +304,10 @@ export default defineComponent({
         },
       },
 
-      handleSpeEco,
-      handleSpeBus,
-      handleSpePre,
-      handleSpeCom,
-      handleFastEco,
-      handleFastCom,
-      handleFastBus,
-      handleFastPre,
+      getValResult,
+      toggle,
       queryOpenArea,
-      handleTaxi,
+      handleSaveAfter,
     };
   },
 });
@@ -323,6 +332,32 @@ export default defineComponent({
     padding: 20px 10px 10px;
     box-sizing: border-box;
     margin-left: 10px;
+  }
+
+  .empty {
+    margin-top: 30%;
+    transform: translateY(-50%);
+  }
+
+  .busy-type-item {
+    display: flex;
+    align-content: center;
+    border: 1px solid #efeff5;
+    margin-top: -1px;
+
+    .busy-type-content-item {
+      min-width: 22px;
+      padding: 10px;
+      width: 14.28%;
+      border-left: 1px solid #f2f3f5;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .n-tag {
+      cursor: pointer;
+    }
   }
 }
 </style>

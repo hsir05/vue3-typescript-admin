@@ -4,12 +4,15 @@ import { http } from '@/utils/http';
 /**
  * 车辆类型管理
 */
-export function getVehicleType() {
+export function getVehicleType(data: {operationCompanyId: string}) {
   return http.request({
-    url: '/vehicleType/vehicleTypeList',
+    url: '/vehicleType/list',
     method: 'post',
+    data: data
   });
 }
+
+
 /**
  * 查询车辆类型详情 
 */
@@ -118,17 +121,28 @@ export function getOpenAreaBuss(data: {areaCode: string}) {
  * 开通区域编码查找该开通区域的开通业务列表 
 */
 interface saveOpenAreaState {
-    openBusinessId: string | null	
-    areaCode: string | null	
-    orderType: string | null	
-    vehicleTypeId: string | null	
-    chargeRuleBaseId: string | null	
-    chargeRuleMileageId: string | null	
-    chargeRuleDurationId: string | null	
-    chargeRuleCancelId: string | null	
-    chargeRuleWaitId: string | null	
-    chargeRuleFloatHolidayId: string | null	
-    chargeRuleFloatWorkdayId: string | null
+    openBusinessId?: string | null;
+  areaCode: string | null;
+  orderType: string | null;
+  vehicleTypeId: string | null;
+  chargeRuleBaseId?: string | null;
+  chargeRuleMileageId?: string | null;
+  chargeRuleDurationId?: string | null;
+  chargeRuleCancelId?: string | null;
+  chargeRuleWaitId?: string | null;
+  chargeRuleFloatHolidayId?: string | null;
+  chargeRuleFloatWorkdayId?: string | null;
+    // openBusinessId?: string | null	
+    // areaCode: string | null	
+    // orderType: string | null	
+    // vehicleTypeId: string | null	
+    // chargeRuleBaseId: string | null	
+    // chargeRuleMileageId: string | null	
+    // chargeRuleDurationId: string | null	
+    // chargeRuleCancelId: string | null	
+    // chargeRuleWaitId: string | null	
+    // chargeRuleFloatHolidayId: string | null	
+    // chargeRuleFloatWorkdayId: string | null
 }
 export function saveBusiness(data: saveOpenAreaState) {
   return http.request({
@@ -138,9 +152,9 @@ export function saveBusiness(data: saveOpenAreaState) {
   });
 }
 /**
- * 开通区域编码查找该开通区域的开通业务列表 
+ * 删除（关闭）开通业务 
 */
-export function delBusiness(data: {openBusinessId: string | null}) {
+export function removeBusiness(data: {openBusinessId: string | null}) {
   return http.request({
     url: '/openBusiness/delete',
     method: 'post',

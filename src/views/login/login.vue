@@ -23,7 +23,11 @@
         <span class="login-form-title">益民出行综合管理平台</span>
         <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
           <n-form-item path="account">
-            <n-input v-model:value="formValue.account" placeholder="请输入用户名">
+            <n-input
+              v-model:value="formValue.account"
+              @keyup.enter="handleSubmit"
+              placeholder="请输入用户名"
+            >
               <template #prefix>
                 <n-icon size="18" color="#808695">
                   <PersonOutline />
@@ -33,6 +37,7 @@
           </n-form-item>
           <n-form-item path="password">
             <n-input
+              @keyup.enter="handleSubmit"
               v-model:value="formValue.password"
               type="password"
               showPasswordOn="click"
@@ -47,7 +52,12 @@
           </n-form-item>
 
           <n-form-item path="captcha" v-show="isCaptcha">
-            <n-input v-model:value="formValue.captcha" maxlength="4" placeholder="请输入验证码" />
+            <n-input
+              v-model:value="formValue.captcha"
+              @keyup.enter="handleSubmit"
+              maxlength="4"
+              placeholder="请输入验证码"
+            />
           </n-form-item>
 
           <n-form-item>
@@ -69,8 +79,8 @@ import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
 import { getCaptcha } from "@/api/login/login";
 import { useAppUserStore } from "@/store/modules/useUserStore";
-import { ACCESS_TOKEN_KEY } from "@/config/constant";
-import { locStorage } from "@/utils/storage";
+// import { ACCESS_TOKEN_KEY } from "@/config/constant";
+// import { locStorage } from "@/utils/storage";
 
 export default defineComponent({
   name: "Login",
@@ -101,9 +111,9 @@ export default defineComponent({
 
     const getCapt = async () => {
       try {
-        let token =
-          "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTc4MGZjZWM3ZGY0ZGJlYjUzYTk1YmNhYTA3OGE0NSIsInJvbGVzIjpbIjdkZDc5NWY3YTE2ZjQ4YjliNzY4MmM5NmQ3NzM0NTRlIl0sImlhdCI6MTY1MDgwNjk3MjE0NywiZXhwIjoxNjUwOTg2OTcyMTQ3fQ.OReBmoqDLAtTo4UPqmDKO7F69MUzR3KoAtYHML5ux0U";
-        locStorage.set(ACCESS_TOKEN_KEY, token);
+        // let token =
+        //   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTc4MGZjZWM3ZGY0ZGJlYjUzYTk1YmNhYTA3OGE0NSIsInJvbGVzIjpbIjdkZDc5NWY3YTE2ZjQ4YjliNzY4MmM5NmQ3NzM0NTRlIl0sImlhdCI6MTY1MDgwNjk3MjE0NywiZXhwIjoxNjUwOTg2OTcyMTQ3fQ.OReBmoqDLAtTo4UPqmDKO7F69MUzR3KoAtYHML5ux0U";
+        // locStorage.set(ACCESS_TOKEN_KEY, token);
         let res = await getCaptcha(unref(formValue));
         console.log(res);
         isCaptcha.value = true;
