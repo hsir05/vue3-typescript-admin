@@ -232,7 +232,7 @@ export default defineComponent({
     const baiduMapRef = ref();
     const message = useMessage();
     const { appTheme } = useProjectSetting();
-    const area = ref("主城区");
+    const area = ref<string>("");
 
     const openCityList = ref([]);
     const data = ref([]);
@@ -396,7 +396,6 @@ export default defineComponent({
           res.data[0].lat,
           res.data[res.data.length - 1].lat
         );
-        message.success(res.message);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -415,7 +414,6 @@ export default defineComponent({
         };
         let res = await getNonEditablePointList(option);
         console.log(res);
-        message.success(res.message);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -426,6 +424,7 @@ export default defineComponent({
     function handleEdit(record: tableDataItem) {
       console.log(record);
       isShow.value = true;
+      area.value = record.areaName;
 
       getOpenAreaPoint(record.areaCode as string);
 

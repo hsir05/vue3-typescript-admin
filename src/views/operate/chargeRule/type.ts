@@ -3,7 +3,7 @@ export interface tableDataItem {
   ruleDescript?: null | string;
   orderType?: null | string;
   vehicleType?: null | string;
-  areaArea?: null | string;
+  openArea?: null | string;
   price?: null | string;
   distance?: null | string;
   time?: null | string;
