@@ -90,8 +90,8 @@
               <n-tooltip trigger="hover" v-else>
                 <template #trigger>
                   <n-tag type="warning" size="small" @click="toggle(vehicleType, orderType)"
-                    >关闭</n-tag
-                  >
+                    >关闭
+                  </n-tag>
                 </template>
                 点击开通
               </n-tooltip>
@@ -267,8 +267,6 @@ export default defineComponent({
         areaCode: areaCode.value,
         ...editObj,
       };
-      console.log(option);
-
       const { openDrawer } = chargeFormDrawerRef.value;
       openDrawer(option);
     };
@@ -332,27 +330,6 @@ export default defineComponent({
     padding: 20px 10px 10px;
     box-sizing: border-box;
     margin-left: 10px;
-  }
-
-  .busy-type-item {
-    display: flex;
-    align-content: center;
-    border: 1px solid #efeff5;
-    margin-top: -1px;
-
-    .busy-type-content-item {
-      min-width: 22px;
-      padding: 10px;
-      width: 14.28%;
-      border-left: 1px solid #f2f3f5;
-      justify-content: center;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .n-tag {
-      cursor: pointer;
-    }
   }
 }
 </style>

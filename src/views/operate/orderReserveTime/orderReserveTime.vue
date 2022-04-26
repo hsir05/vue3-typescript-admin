@@ -3,7 +3,7 @@
     <div class="order-reserve-time-left">
       <n-data-table
         ref="table"
-        :data="openCityList"
+        :data="openCityData"
         :columns="columns"
         class="box-border"
         min-height="calc(100vh - 204px)"
@@ -23,12 +23,42 @@
         删除接单预留时间时：将边框中的内容清空即可删除该接单预留时间
       </n-alert>
 
-      <n-data-table
-        :row-key="getRowKeyId"
-        :columns="editColumns"
-        :data="editData"
-        :pagination="false"
-      />
+      <div class="">
+        <n-spin :show="loading">
+          <template v-if="isShow">
+            <div
+              :class="['busy-type-item', 'flex-align-start', index % 2 === 0 ? '' : 'striped']"
+              v-for="(type, index) in orderTypeData"
+              :key="type.entryId"
+            >
+              <span class="busy-type-content-item">{{ type.entryName }}</span>
+              <template v-for="item in orderBusTypeData" :key="item.entryId">
+                <div class="busy-type-content-item">
+                  <span v-if="index === 0">{{ item.entryName }}</span>
+                  <n-input-number
+                    clearable
+                    :min="0"
+                    :value="getValue(type.entryCode, item.entryCode).reserveTime"
+                    @update:value="handleChange"
+                    @blur="
+                      handleBlur(
+                        $event,
+                        getValue(type.entryCode, item.entryCode),
+                        type.entryCode,
+                        item.entryCode
+                      )
+                    "
+                    v-else
+                    class="number-input"
+                  />
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <n-empty class="empty" v-else />
+        </n-spin>
+      </div>
     </div>
   </div>
 </template>
@@ -38,12 +68,20 @@ import { tableItemProps, tableDataItem, tableEditDataItem } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import { getAllOpenCity, getDict } from "@/api/common/common";
-
+import { useMessage } from "naive-ui";
+import {
+  getAcceptOrderTime,
+  saveAccptOrderTime,
+  removeAcceptOrderTime,
+} from "@/api/operate/operate";
 import ShowOrEdit from "./ShowOrEdit.vue";
 export default defineComponent({
   name: "OrderReserveTime",
   setup() {
     const editData = ref([]);
+    const loading = ref(false);
+    const isShow = ref(false);
+    const cityCode = ref();
     const columns = [
       {
         title: "城市名称",
@@ -66,7 +104,7 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
-                label: "编辑",
+                label: "编辑接单预留时间",
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
@@ -78,7 +116,29 @@ export default defineComponent({
         },
       },
     ];
-    const openCityList = ref([]);
+    interface cityOpenOrderTypeState {
+      cityCode: string | null;
+      orderBusinessType: string | null;
+      acceptOrderReserveTimeSettingId?: string | null;
+      orderType: string | null;
+      reserveTime: number | null;
+    }
+    interface orderTypeState {
+      entryId: string;
+      entryCode: string;
+      entryName: string;
+    }
+    interface orderBusTypeState {
+      entryId: string;
+      entryCode: string;
+      entryName: string;
+    }
+
+    const openCityData = ref([]);
+    const orderTypeData = ref<orderTypeState[]>([]);
+    const cityOpenOrderTypeData = ref<cityOpenOrderTypeState[]>([]);
+    const orderBusTypeData = ref<orderBusTypeState[]>([]);
+    const message = useMessage();
 
     const editColumns = [
       {
@@ -130,36 +190,140 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData();
-      getBusType();
+      getOpenCityData();
+      getOrderBusType();
+      getOrderType();
     });
 
-    function handleEdit() {}
+    function handleEdit(record: Recordable) {
+      cityCode.value = record.cityCode;
+      getAcceptOrderData(record.cityCode);
+    }
 
-    const getData = async () => {
+    const getOpenCityData = async () => {
       try {
         let res = await getAllOpenCity();
-        openCityList.value = res.data;
+        openCityData.value = res.data;
       } catch (err) {
         console.log(err);
       }
     };
-    const getBusType = async () => {
+    const getOrderType = async () => {
       try {
         let res = await getDict({ parentEntryCode: "OT00000" });
-        console.log(res);
+        orderTypeData.value = res.data;
+        orderTypeData.value.unshift({ entryId: " ", entryName: "#", entryCode: " " });
       } catch (err) {
         console.log(err);
+      }
+    };
+
+    const getOrderBusType = async () => {
+      try {
+        let res = await getDict({ parentEntryCode: "OBT0000" });
+        console.log(res);
+        orderBusTypeData.value = res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const getAcceptOrderData = async (cityCode: string) => {
+      try {
+        loading.value = true;
+        isShow.value = false;
+        let res = await getAcceptOrderTime({ cityCode });
+        console.log(res);
+        cityOpenOrderTypeData.value = res.data;
+        loading.value = false;
+        isShow.value = true;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+        isShow.value = false;
+      }
+    };
+    const getValue = (orderType: string, orderBusinessType: string) => {
+      let result = {};
+      for (let key of cityOpenOrderTypeData.value) {
+        if (key.orderBusinessType === orderBusinessType && key.orderType === orderType) {
+          result = key;
+          break;
+        }
+      }
+      return result as cityOpenOrderTypeState;
+    };
+    const handleChange = (value: number) => {
+      console.log(value);
+    };
+    const handleBlur = (
+      event: FocusEvent,
+      item: cityOpenOrderTypeState,
+      orderBusinessType: string,
+      orderType: string
+    ) => {
+      //@ts-ignore
+      let value = event.target && event.target.value;
+      console.log(value);
+
+      if (value) {
+        let option: cityOpenOrderTypeState = {
+          orderType: orderType,
+          orderBusinessType: orderBusinessType,
+          reserveTime: null,
+          cityCode: cityCode.value,
+        };
+        if (item.acceptOrderReserveTimeSettingId) {
+          option = { ...item };
+        }
+
+        option.reserveTime = value;
+        saveOrderTime(option);
+      } else if (item.acceptOrderReserveTimeSettingId) {
+        remove(item.acceptOrderReserveTimeSettingId);
+      }
+    };
+
+    const saveOrderTime = async (option: cityOpenOrderTypeState) => {
+      try {
+        loading.value = true;
+        let res = await saveAccptOrderTime(option);
+        console.log(res);
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+    const remove = async (acceptOrderReserveTimeSettingId: string) => {
+      try {
+        loading.value = true;
+        let res = await removeAcceptOrderTime({ acceptOrderReserveTimeSettingId });
+        console.log(res);
+        loading.value = false;
+        message.success(res.message);
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
       }
     };
 
     return {
       columns,
+      loading,
+      isShow,
       getRowKeyId: (row: tableItemProps) => row.id,
 
       editColumns,
-      openCityList,
+      openCityData,
+      orderTypeData,
+      orderBusTypeData,
+      cityOpenOrderTypeData,
       editData,
+      handleChange,
+      getValue,
+      handleBlur,
     };
   },
 });
@@ -169,15 +333,26 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: flex-start;
+
   &-left {
     width: 300px;
   }
+
   &-right {
     width: calc(100% - 300px - 10px);
     max-width: 1090px;
     padding: 5px;
     background-color: $white;
     box-sizing: border-box;
+  }
+
+  .busy-type-content-item {
+    width: 33%;
+  }
+
+  .number-input {
+    width: 150px;
+    display: inline-block;
   }
 }
 </style>

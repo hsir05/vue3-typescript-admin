@@ -223,11 +223,11 @@ export function removeBusiness(data: {openBusinessId: string | null}) {
     data
   });
 }
-
+//-----------------------接单预留时间管理----------------------------
 /**
  * 根据城市编码获取接单预留时间设置集合 
 */
-export function setTime(data: {cityCode: string | null}) {
+export function getAcceptOrderTime(data: {cityCode: string | null}) {
   return http.request({
     url: '/acceptOrderReserveTimeSetting/getAcceptOrderReserveTimeSettingByCityCode',
     method: 'post',
@@ -238,13 +238,13 @@ export function setTime(data: {cityCode: string | null}) {
  * 保存接单预留时间设置 
 */
 interface saveTiemState {
-    acceptOrderReserveTimeSettingId: string | null
+    acceptOrderReserveTimeSettingId?: string | null
     orderType: string | null
     orderBusinessType: string | null
-    reserveTime: string | null
+    reserveTime: number | null
     cityCode: string | null
 }
-export function saveTime(data: saveTiemState) {
+export function saveAccptOrderTime(data: saveTiemState) {
   return http.request({
     url: '/acceptOrderReserveTimeSetting/save',
     method: 'post',
@@ -254,7 +254,7 @@ export function saveTime(data: saveTiemState) {
 /**
  * 删除接单预留时间设置 
 */
-export function removeTime(data: {acceptOrderReserveTimeSettingId: string | null}) {
+export function removeAcceptOrderTime(data: {acceptOrderReserveTimeSettingId: string | null}) {
   return http.request({
     url: '/acceptOrderReserveTimeSetting/delete',
     method: 'post',
