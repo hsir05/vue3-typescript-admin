@@ -64,7 +64,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, h, ref, onMounted } from "vue";
-import { tableItemProps, tableDataItem, tableEditDataItem } from "./type";
+import { tableItemProps, tableDataItem } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import { getAllOpenCity, getDict } from "@/api/common/common";
@@ -74,7 +74,6 @@ import {
   saveAccptOrderTime,
   removeAcceptOrderTime,
 } from "@/api/operate/operate";
-import ShowOrEdit from "./ShowOrEdit.vue";
 export default defineComponent({
   name: "OrderReserveTime",
   setup() {
@@ -139,55 +138,6 @@ export default defineComponent({
     const cityOpenOrderTypeData = ref<cityOpenOrderTypeState[]>([]);
     const orderBusTypeData = ref<orderBusTypeState[]>([]);
     const message = useMessage();
-
-    const editColumns = [
-      {
-        title: "#",
-        key: "orderBusinessType",
-        width: 100,
-        align: "center",
-      },
-      {
-        title: "专车业务",
-        key: "majorBus",
-        align: "center",
-        render(row: tableEditDataItem, index: number) {
-          return h(ShowOrEdit as any, {
-            value: row.majorBus,
-            onUpdateValue(v: string) {
-              editData.value[index].majorBus = v;
-            },
-          });
-        },
-      },
-      {
-        title: "快车业务",
-        key: "fastBus",
-        align: "center",
-        render(row: tableEditDataItem, index: number) {
-          return h(ShowOrEdit as any, {
-            value: row.fastBus,
-            onUpdateValue(v: string) {
-              editData.value[index].fastBus = v;
-            },
-          });
-        },
-      },
-      {
-        title: "出租车业务",
-        key: "taxiBus",
-        width: 90,
-        align: "center",
-        render(row: tableEditDataItem, index: number) {
-          return h(ShowOrEdit as any, {
-            value: row.taxiBus,
-            onUpdateValue(v: string) {
-              editData.value[index].taxiBus = v;
-            },
-          });
-        },
-      },
-    ];
 
     onMounted(() => {
       getOpenCityData();
@@ -264,7 +214,6 @@ export default defineComponent({
     ) => {
       //@ts-ignore
       let value = event.target && event.target.value;
-      console.log(value);
 
       if (value) {
         let option: cityOpenOrderTypeState = {
@@ -315,7 +264,6 @@ export default defineComponent({
       isShow,
       getRowKeyId: (row: tableItemProps) => row.id,
 
-      editColumns,
       openCityData,
       orderTypeData,
       orderBusTypeData,

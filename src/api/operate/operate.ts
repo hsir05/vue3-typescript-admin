@@ -415,3 +415,50 @@ export function uniquePlateNumber(data: plateNumberState) {
     data
   });
 }
+
+// ----------------平台紧急联系人---------------------
+/**
+ * 查找平台紧急联系人集合 
+*/
+export function getEmergencyContact() {
+  return http.request({
+    url: '/platformEmergencyContact/getPlatformEmergencyContactList',
+    method: 'post'
+  });
+}
+/**
+ * 平台紧急联系人保存 
+*/
+interface emeContactState{
+    contactId?: string | null
+    contactName: string | null
+    contactPhone: string | null
+}
+export function saveEmeContact(data: emeContactState) {
+  return http.request({
+    url: '/platformEmergencyContact/save',
+    method: 'post',
+    data
+  });
+}
+/**
+ * 平台紧急联系人删除 
+*/
+export function removeEmeContact(data: {contactId: string}) {
+  return http.request({
+    url: '/platformEmergencyContact/delete',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * 校验平台紧急联系人电话号码是否重复 
+*/
+export function uniqueContactPhone(data: {contactPhone: string}) {
+  return http.request({
+    url: '/platformEmergencyContact/uniqueContactPhone',
+    method: 'post',
+    data
+  });
+}

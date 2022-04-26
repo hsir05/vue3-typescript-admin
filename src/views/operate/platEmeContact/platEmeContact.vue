@@ -1,18 +1,20 @@
 <template>
-  <div class="emergency-contac">
-    <div class="emergency-contac-left">
+  <div class="emergency-contac h-full">
+    <div class="emergency-contac-left p-5px">
       <div class="mt-10px mb-10px text-right">
-        <!-- <span>虚拟车头列表</span> -->
         <n-button attr-type="button" type="primary" @click="handleAddContact">
           <template #icon>
-            <n-icon> <AddIcon /> </n-icon>
+            <n-icon>
+              <AddIcon />
+            </n-icon>
           </template>
-          添加平台紧急联系人</n-button
-        >
+          添加平台紧急联系人
+        </n-button>
       </div>
       <n-data-table
         ref="table"
         :data="data"
+        :loading="loading"
         :columns="columns"
         class="box-border"
         min-height="500px"
@@ -27,25 +29,27 @@
         ref="formRef"
         :rules="rules"
         label-placement="left"
-        :style="{ maxWidth: '320px', marginLeft: '10px', paddingTop: '50px' }"
+        :style="{ maxWidth: '400px', marginLeft: '10px', paddingTop: '50px' }"
         require-mark-placement="right-hanging"
         label-width="120"
         :model="form"
       >
-        <n-form-item label="姓名" path="name">
+        <n-form-item label="姓名" path="contactName">
           <n-input
-            v-model:value="form.name"
+            v-model:value="form.contactName"
             clearable
             style="width: 280px"
             placeholder="输入司机手机号"
           />
         </n-form-item>
 
-        <n-form-item label="联系电话" path="phone">
+        <n-form-item label="联系电话" path="contactPhone">
           <n-input
-            v-model:value="form.phone"
+            v-model:value="form.contactPhone"
+            :maxlength="11"
             clearable
             style="width: 280px"
+            @blur="uniquePhone"
             placeholder="输入司机手机号"
           />
         </n-form-item>
@@ -68,7 +72,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, toRaw } from "vue";
+import { defineComponent, ref, h, unref, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import {
   CreateOutline as CreateIcon,
@@ -77,34 +81,34 @@ import {
 } from "@vicons/ionicons5";
 import { tableItemProps, tableDataItem } from "./type";
 import { FormInst, useMessage, FormItemRule } from "naive-ui";
-
+import {
+  getEmergencyContact,
+  saveEmeContact,
+  removeEmeContact,
+  uniqueContactPhone,
+} from "@/api/operate/operate";
 export default defineComponent({
   name: "EmergencyContac",
   components: { AddIcon },
   setup() {
     const loading = ref(false);
+    const phone = ref<string | null>(null);
     const formRef = ref<FormInst | null>(null);
     const form = ref<tableDataItem>({
-      name: null,
-      phone: null,
+      contactName: null,
+      contactPhone: null,
     });
-    const data = ref([
-      {
-        id: 12312,
-        name: "章三",
-        phone: "180927654567",
-      },
-    ]);
+    const data = ref([]);
     const columns = [
       {
         title: "姓名",
-        key: "name",
+        key: "contactName",
         width: 120,
         align: "center",
       },
       {
         title: "联系方式",
-        key: "phone",
+        key: "contactPhone",
         width: 120,
         align: "center",
       },
@@ -143,8 +147,12 @@ export default defineComponent({
     ];
     const message = useMessage();
 
+    onMounted(() => {
+      getData();
+    });
+
     function handleEdit(record: tableDataItem) {
-      console.log(toRaw(record));
+      phone.value = record.contactPhone;
       form.value = { ...form.value, ...record };
     }
 
@@ -153,7 +161,7 @@ export default defineComponent({
       formRef.value?.validate((errors) => {
         if (!errors) {
           console.log(unref(form));
-          message.success("验证成功");
+          saveContact();
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -162,12 +170,66 @@ export default defineComponent({
     }
 
     function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+      removeContact(record.contactId);
     }
 
+    const getData = async () => {
+      loading.value = true;
+      try {
+        let res = await getEmergencyContact();
+        console.log(res);
+        data.value = res.data;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+    const uniquePhone = async () => {
+      if (form.value.contactId && form.value.contactPhone === phone.value) {
+        return false;
+      }
+      try {
+        let res = await uniqueContactPhone({ contactPhone: form.value.contactPhone as string });
+        console.log(res);
+        if (res.data.UniqueBooleanResult) {
+          form.value.contactPhone = null;
+          message.success(res.message);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const removeContact = async (contactId: string) => {
+      loading.value = true;
+      try {
+        let res = await removeEmeContact({ contactId });
+        console.log(res);
+        getData();
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+    const saveContact = async () => {
+      loading.value = true;
+      try {
+        let res = await saveEmeContact(form.value);
+        console.log(res);
+        message.success(res.message);
+        getData();
+        handleValiReset();
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
     function handleValiReset() {
-      form.value = { name: null, phone: null };
+      form.value = { contactPhone: null, contactName: null };
       formRef.value?.restoreValidation();
     }
 
@@ -181,33 +243,28 @@ export default defineComponent({
       loading,
       form,
       columns,
-      getRowKeyId: (row: tableItemProps) => row.id,
+      getRowKeyId: (row: tableItemProps) => row.contactId,
       rules: {
-        name: {
+        contactName: {
           required: true,
           trigger: ["blur"],
-          validator: (rule: FormItemRule, value: string) => {
-            console.log(rule);
-            return /^[\u4E00-\u9FA5]{1,5}$/.test(value);
-          },
-          min: 2,
-          max: 15,
           message: "请输入正确的司机姓名",
         },
-        phone: {
+        contactPhone: {
           required: true,
           trigger: ["input"],
           validator: (rule: FormItemRule, value: string) => {
             console.log(rule);
             return /^1\d{10}$/.test(value);
           },
-          message: "请输入电话号码",
+          message: "请输入正确格式的电话号码",
         },
       },
 
       handleValidate,
       handleValiReset,
       handleAddContact,
+      uniquePhone,
     };
   },
 });
@@ -219,11 +276,13 @@ export default defineComponent({
   justify-content: space-between;
 
   &-left {
-    width: 350px;
+    width: 650px;
     background-color: $white;
+    box-sizing: border-box;
   }
+
   &-right {
-    width: calc(100% - 350px - 10px);
+    width: calc(100% - 650px - 10px);
     background-color: $white;
   }
 }

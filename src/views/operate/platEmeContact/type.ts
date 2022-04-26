@@ -1,11 +1,11 @@
 
 
 export interface tableDataItem {
-  id?: string | null;
-  name: string | null;
-  phone: string | null;
+  contactId?: string | null;
+  contactName: string | null;
+  contactPhone: string | null;
 }
 
 export interface tableItemProps {
-    id: string | number
+    contactId: string | number
 }
