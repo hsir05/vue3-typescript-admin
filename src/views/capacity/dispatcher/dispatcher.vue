@@ -47,9 +47,11 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :isAddBtn="true"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
+      :row-key="getRowKeyId"
       @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
       @on-page="handlePage"
@@ -67,7 +69,6 @@ import DispatcherDrawer from "./dispatcherDrawer.vue";
 import { tableDataItem } from "./type";
 import { data } from "./data";
 import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "Dispatcher",
@@ -253,6 +254,7 @@ export default defineComponent({
       dispatcherDrawerRef,
       basicTableRef,
       statusOptions,
+      getRowKeyId: (row: tableDataItem) => row.id,
       columns,
       itemCount,
 

@@ -23,15 +23,16 @@ export function getPage(data: pageSate) {
  * 编辑紧急联系人
 */
 interface editorState  {
-    operationCompanyEmergencyContactId: string | null
+    operationCompanyEmergencyContactId?: string | null
     operationCompanyId: string | null
     // oldOperationCompanyEmergencyContactPhone: string | null
     // oldOperationCompanyEmergencyContactEmail: string | null
     operationCompanyEmergencyContactName: string | null
     operationCompanyEmergencyContactPhone: string | null
     operationCompanyEmergencyContactEmail: string | null
-    dutyTimeBegin: number | null
-    dutyTimeEnd: number | null
+    createTime?: string | null
+    dutyTimeBegin: string | null
+    dutyTimeEnd: string | null
 }
 export function editEmeContact(data: editorState) {
   return http.request({
@@ -64,7 +65,7 @@ export function removeEmeContact(data: {operationCompanyEmergencyContactId: stri
 /**
  * 校验同一企业下紧急联系人手机号不能重复
 */
-export function uniqueContactPhone(data: {operationCompanyId: string;operationCompanyEmergencyContactPhone: string;}) {
+export function uniqueContactPhone(data: {operationCompanyId: string | null;operationCompanyEmergencyContactPhone: string | null;}) {
   return http.request({
     url: '/operationCompanyEmergencyContact/uniqueOperationCompanyEmergencyContactPhone',
     method: 'post',
@@ -75,7 +76,7 @@ export function uniqueContactPhone(data: {operationCompanyId: string;operationCo
 /**
  * 校验同一企业下紧急联系人邮箱不能重复
 */
-export function uniqueContactEmail(data: {operationCompanyId: string;operationCompanyEmergencyContactEmail: string;}) {
+export function uniqueContactEmail(data: {operationCompanyId: string | null;operationCompanyEmergencyContactEmail: string | null;}) {
   return http.request({
     url: '/operationCompanyEmergencyContact/uniqueOperationCompanyEmergencyContactEmail',
     method: 'post',
@@ -86,9 +87,29 @@ export function uniqueContactEmail(data: {operationCompanyId: string;operationCo
 /**
  * 按照运营企业主键和紧急联系人主键获取值班时间范围
 */
-export function getTimeRange(data: {operationCompanyId: string;operationCompanyEmergencyContactId: string;}) {
+export function getTimeRange(data: {operationCompanyId: string | null;operationCompanyEmergencyContactId: string | null;}) {
   return http.request({
     url: '/operationCompanyEmergencyContact/findDutyTimeStrByOprCompanyIdAndContactId',
+    method: 'post',
+    data: data
+  });
+}
+
+//-----------------企业值班调度人-------------------------
+/**
+ * 企业紧急联系人分页
+*/
+interface pageSate  {
+    page: PaginationState,
+    search: {
+        operationCompanyIdEq: string | null
+        operationCompanyEmergencyContactNameLike: string | null
+        operationCompanyEmergencyContactPhoneLike: string | null
+    }
+}
+export function getExpendPage(data: pageSate) {
+  return http.request({
+    url: '/operationCompanyExpendContact/page',
     method: 'post',
     data: data
   });

@@ -81,6 +81,14 @@ import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { FormItemRule } from "naive-ui";
 import { tableDataItem } from "./type";
+import {
+  editEmeContact,
+  addEmeContact,
+  uniqueContactPhone,
+  uniqueContactEmail,
+  getTimeRange,
+} from "@/api/capacity/capacity";
+// import dayjs from 'dayjs'
 export default defineComponent({
   name: "EnteEmeContactDrawer",
   setup(_, { emit }) {
@@ -105,7 +113,13 @@ export default defineComponent({
     function openDrawer(t: string, record?: tableDataItem) {
       console.log(record);
       if (record) {
-        form.value = { ...record };
+        // form.value = { ...record };
+        console.log(record.dutyTimeBegin);
+        // console.log(new Date(record.dutyTimeBegin).getTime());
+
+        // form.value.dutyTimeBegin = 1183135260000
+        // form.value.dutyTimeBegin = new Date(record.dutyTimeBegin).getTime() ;
+        // form.value.dutyTimeEnd = dayjs(record.dutyTimeEnd).format('MM-DD:ss') ;
       }
       title.value = t;
       state.isDrawer = true;
@@ -118,9 +132,11 @@ export default defineComponent({
           state.loading = true;
           state.disabled = true;
           console.log(unref(form));
-
-          handleSaveAfter();
-
+          if (form.value.operationCompanyEmergencyContactId) {
+            editData();
+          } else {
+            addData();
+          }
           message.success("验证成功");
         } else {
           console.log(errors);
@@ -128,6 +144,78 @@ export default defineComponent({
         }
       });
     }
+
+    const editData = async () => {
+      try {
+        state.loading = true;
+        let res = await editEmeContact(form.value);
+        console.log(res);
+        handleSaveAfter();
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+    const addData = async () => {
+      try {
+        state.loading = true;
+        let res = await addEmeContact(form.value);
+        console.log(res);
+        handleSaveAfter();
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+
+    const uniquePhone = async () => {
+      try {
+        state.loading = true;
+        let option = {
+          operationCompanyId: form.value.operationCompanyId,
+          operationCompanyEmergencyContactPhone: form.value.operationCompanyEmergencyContactPhone,
+        };
+        let res = await uniqueContactPhone(option);
+        console.log(res);
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+    const uniqueEmail = async () => {
+      try {
+        state.loading = true;
+        let option = {
+          operationCompanyId: form.value.operationCompanyId,
+          operationCompanyEmergencyContactEmail: form.value.operationCompanyEmergencyContactEmail,
+        };
+        let res = await uniqueContactEmail(option);
+        console.log(res);
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+    const getTimeRangeData = async () => {
+      try {
+        state.loading = true;
+        let option = {
+          operationCompanyId: form.value.operationCompanyId,
+          operationCompanyEmergencyContactId: form.value
+            .operationCompanyEmergencyContactId as string,
+        };
+        let res = await getTimeRange(option);
+        console.log(res);
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
 
     function handleSaveAfter() {
       emit("on-save-after");
@@ -158,21 +246,28 @@ export default defineComponent({
       formRef,
       options: [],
       rules: {
-        enterpriseName: {
+        operationCompanyId: {
           required: true,
           trigger: ["blur", "input"],
-          message: "请输入所在企业名称",
+          message: "请选择所在企业名称",
         },
-        enterpriseNum: {
+        operationCompanyEmergencyContactName: {
           required: true,
           trigger: ["blur", "input"],
-          message: "请输入所在企业编号",
+          message: "请输入紧急联系人姓名",
         },
-        name: { required: true, trigger: ["blur", "input"], message: "请输入紧急联系人姓名" },
-        email: { required: true, trigger: ["blur", "input"], message: "请输入紧急联系人邮箱" },
-        time_start: { required: true, trigger: ["blur", "input"], message: "请选择值班开始时间" },
-        time_end: { required: true, trigger: ["blur", "input"], message: "请选择值班结束时间" },
-        phone: {
+        operationCompanyEmergencyContactEmail: {
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请输入紧急联系人邮箱",
+        },
+        dutyTimeBegin: {
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请选择值班开始时间",
+        },
+        dutyTimeEnd: { required: true, trigger: ["blur", "input"], message: "请选择值班结束时间" },
+        operationCompanyEmergencyContactPhone: {
           required: true,
           trigger: ["input"],
           validator: (rule: FormItemRule, value: string) => {
@@ -183,8 +278,11 @@ export default defineComponent({
         },
       },
       openDrawer,
+      uniqueEmail,
+      uniquePhone,
       handleReset,
       handleValidate,
+      getTimeRangeData,
       onCloseAfter,
     };
   },

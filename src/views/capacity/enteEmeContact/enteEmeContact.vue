@@ -49,6 +49,7 @@
       :loading="loading"
       :itemCount="itemCount"
       :row-key="getRowKeyId"
+      :isAddBtn="true"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-batch="handleBatch"
@@ -73,6 +74,7 @@ import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 import { getPage } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "EnteEmeContact",
   components: { BasicTable, EnteEmeContactDrawer },
@@ -107,6 +109,9 @@ export default defineComponent({
         title: "所在企业名称",
         key: "enterpriseName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "紧急联系人姓名",
@@ -122,6 +127,9 @@ export default defineComponent({
         title: "紧急联系人邮箱",
         key: "operationCompanyEmergencyContactEmail",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "值班时间开始",
@@ -137,6 +145,10 @@ export default defineComponent({
         title: "添加时间",
         key: "createTime",
         align: "center",
+        width: 135,
+        render(record: tableDataItem) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",

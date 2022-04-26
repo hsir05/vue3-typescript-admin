@@ -4,9 +4,9 @@ export interface tableDataItem {
     operationCompanyEmergencyContactName: string | null;
     operationCompanyEmergencyContactPhone: null| string;
     operationCompanyEmergencyContactEmail: string | null;
-    dutyTimeBegin: number | null; 
-    dutyTimeEnd: number | null;
-    operationCompanyId?: string | null;
+    dutyTimeBegin: string | null; 
+    dutyTimeEnd: string | null;
+    operationCompanyId: string | null;
     createTime?: string | null;
 }
 
