@@ -85,7 +85,7 @@ export default defineComponent({
   props: {
     ...basicProps,
   },
-  emits: ["upload-change", "upload-error", "delete"],
+  emits: ["upload-change", "upload-error", "delete-upload"],
   setup(props, { emit }) {
     const message = useMessage();
     const dialog = useDialog();
@@ -94,7 +94,7 @@ export default defineComponent({
     const state = reactive({
       showModal: false,
       previewUrl: "",
-      originalImgList: [] as string[],
+      //   originalImgList: [] as string[],
       imgList: props.value,
     });
 
@@ -171,9 +171,9 @@ export default defineComponent({
         negativeText: "取消",
         onPositiveClick: () => {
           state.imgList.splice(index, 1);
-          state.originalImgList.splice(index, 1);
-          emit("upload-change", state.originalImgList);
-          emit("delete", state.originalImgList);
+          //   state.originalImgList.splice(index, 1);
+          //   emit("upload-change", state.imgList);
+          emit("delete-upload", state.imgList);
         },
         onNegativeClick: () => {},
       });

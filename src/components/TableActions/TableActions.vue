@@ -2,7 +2,28 @@
   <div class="table-action">
     <div class="table-action-content">
       <template v-for="action in getActions" :key="action.label">
-        <n-tooltip trigger="hover" v-if="action.isIconBtn">
+        <n-popconfirm v-if="action.popConfirm" v-bind="action.popConfirm">
+          <template #trigger>
+            <n-tooltip trigger="hover" v-if="action.isIconBtn">
+              <template #trigger>
+                <n-button v-bind="action" size="tiny" style="font-size: 16px">
+                  <template #icon v-if="action.icon">
+                    <n-icon :component="action.icon" />
+                  </template>
+                </n-button>
+              </template>
+              {{ action.label }}
+            </n-tooltip>
+
+            <n-button v-bind="action" class="mx-2" v-else>
+              <template #icon v-if="action.icon"> <n-icon :component="action.icon" /> </template
+              >{{ action.label }}
+            </n-button>
+          </template>
+          {{ action.popConfirm?.title }}
+        </n-popconfirm>
+
+        <n-tooltip trigger="hover" v-else-if="action.isIconBtn">
           <template #trigger>
             <n-button
               type="primary"
@@ -17,20 +38,12 @@
           {{ action.label }}
         </n-tooltip>
 
-        <n-button v-bind="action" class="mx-2" v-else-if="!action.popConfirm">
-          <template #icon v-if="action.icon"><n-icon :component="action.icon" /></template>
+        <n-button v-bind="action" class="mx-2" v-else>
+          <template #icon v-if="action.icon">
+            <n-icon :component="action.icon" />
+          </template>
           {{ action.label }}
         </n-button>
-
-        <n-popconfirm v-else v-bind="action.popConfirm">
-          <template #trigger>
-            <n-button v-bind="action" class="mx-2">
-              <template #icon v-if="action.icon"> <n-icon :component="action.icon" /> </template
-              >{{ action.label }}</n-button
-            >
-          </template>
-          {{ action.popConfirm?.title }}
-        </n-popconfirm>
       </template>
 
       <n-dropdown

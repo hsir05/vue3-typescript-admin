@@ -43,8 +43,8 @@
             class="ml-10px"
             type="primary"
             @click="query"
-            >查找</n-button
-          >
+            >查找
+          </n-button>
         </div>
       </n-form>
 
@@ -53,10 +53,12 @@
         <!-- <span>虚拟车头列表</span> -->
         <n-button attr-type="button" type="primary" @click="handleAddVirtual">
           <template #icon>
-            <n-icon> <AddIcon /> </n-icon>
+            <n-icon>
+              <AddIcon />
+            </n-icon>
           </template>
-          添加虚拟车头</n-button
-        >
+          添加虚拟车头
+        </n-button>
       </div>
       <n-data-table
         :loading="loading"
@@ -88,17 +90,17 @@
         label-width="120"
         :model="form"
       >
-        <n-form-item label="司机姓名" path="name">
+        <n-form-item label="司机姓名" path="driverFullName">
           <n-input
-            v-model:value="form.name"
+            v-model:value="form.driverFullName"
             clearable
             style="width: 280px"
             placeholder="输入司机姓名"
           />
         </n-form-item>
-        <n-form-item label="司机手机号" path="phone">
+        <n-form-item label="司机手机号" path="driverPhone">
           <n-input
-            v-model:value="form.phone"
+            v-model:value="form.driverPhone"
             clearable
             style="width: 280px"
             @on-update:value="uniquePhone"
@@ -114,48 +116,60 @@
             placeholder="输入车牌号"
           />
         </n-form-item>
-        <n-form-item label="车辆品牌" path="brand">
+        <n-form-item label="车辆品牌" path="vehicleBrand">
           <n-input
-            v-model:value="form.brand"
+            v-model:value="form.vehicleBrand"
             clearable
             style="width: 280px"
             placeholder="输入车辆品牌"
           />
         </n-form-item>
-        <n-form-item label="车系" path="carSeies">
+        <n-form-item label="车系" path="vehicleSeries">
           <n-input
-            v-model:value="form.carSeies"
+            v-model:value="form.vehicleSeries"
             clearable
             style="width: 280px"
             placeholder="输入车系"
           />
         </n-form-item>
-        <n-form-item label="车辆颜色" path="color">
+        <n-form-item label="车辆颜色" path="vehicleColor">
           <n-input
-            v-model:value="form.color"
+            v-model:value="form.vehicleColor"
             clearable
             style="width: 280px"
             placeholder="输入车辆颜色"
           />
         </n-form-item>
 
-        <n-form-item label="车辆类型" path="carType" class="flex-align-start">
+        <n-form-item label="车辆类型" path="vehicleTypeId">
           <n-select
             clearable
-            style="width: 270px"
+            style="width: 280px"
             filterable
-            v-model:value="form.carType"
+            v-model:value="form.vehicleTypeId"
             placeholder="选择车辆类型"
-            :options="openCityData"
+            :options="vehicleTypeData"
           />
         </n-form-item>
 
-        <n-form-item label="司机头像" path="avatar" class="mt-20px">
+        <n-form-item label="车辆备注" path="vehicleNote">
+          <n-input
+            v-model:value="form.vehicleNote"
+            type="textarea"
+            round
+            clearable
+            style="width: 280px"
+            placeholder="输入车辆颜色"
+          />
+        </n-form-item>
+
+        <n-form-item label="司机头像" path="driverIdentificationPhotoUrl" class="mt-20px">
           <BasicUpload
-            :data="{}"
+            :data="{ uploadType: UploadTypeEnum.AVATAR }"
             name="file"
             :width="100"
             :height="100"
+            @delete-upload="uploadRemove"
             @upload-change="uploadChange"
             v-model:value="uploadList"
             helpText="单个文件不超过2MB,最多只能上传1个文件"
@@ -185,7 +199,7 @@ import { defineComponent, ref, h, unref, onMounted, reactive, toRefs } from "vue
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
-import { uploadUrl } from "@/config/config";
+import { UploadTypeEnum } from "@/enums/httpEnum";
 import {
   Add as AddIcon,
   Search as SearchIcon,
@@ -194,9 +208,11 @@ import {
   TrashOutline as RemoveIcon,
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
-import { tableDataItem, tableVirtualDataItem } from "./type";
+import { tableDataItem, formState } from "./type";
 import { getInfluxList, getAllOpenCity } from "@/api/common/common";
+import { getVehicleType } from "@/api/operate/operate";
 import { itemState } from "@/interface/common/common";
+import defaultAvatar from "@/assets/image/default-avatar.png";
 import {
   saveVirtual,
   removeVirtual,
@@ -218,28 +234,28 @@ export default defineComponent({
     const state = reactive({
       influxData: [],
       openCityData: [],
+      vehicleTypeData: [],
     });
 
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableVirtualDataItem>({
-      name: null,
-      phone: null,
+    const form = ref<formState>({
+      driverFullName: null,
+      driverPhone: null,
       plateNumber: null,
-      brand: null,
-      carSeies: null,
-      color: null,
-      carType: null,
-      avatar: null,
+      vehicleBrand: null,
+      vehicleSeries: null,
+      vehicleColor: null,
+      vehicleTypeId: null,
+      vehicleNote: null,
+      driverIdentificationPhotoUrl: null,
     });
-
-    const uploadList = ref([]);
-
+    const uploadList = ref<string[]>([]);
     const message = useMessage();
 
     const columns = [
       {
         title: "司机姓名",
-        key: "name",
+        key: "driverFullName",
         width: 80,
         align: "center",
       },
@@ -251,7 +267,7 @@ export default defineComponent({
       },
       {
         title: "车辆类型",
-        key: "carType",
+        key: "vehicleBrand",
         width: 90,
         align: "center",
       },
@@ -268,7 +284,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleSee.bind(null, record),
+                onClick: handle.bind(null, record, true),
                 auth: ["dict001"],
               },
               {
@@ -276,7 +292,7 @@ export default defineComponent({
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handle.bind(null, record, false),
                 auth: ["dict001"],
               },
               {
@@ -296,23 +312,28 @@ export default defineComponent({
         },
       },
     ];
-    const data = ref<tableVirtualDataItem[]>([
+    const data = ref([
       {
-        name: "章三",
-        phone: null,
-        plateNumber: "GA00195",
-        brand: null,
-        carSeies: null,
-        color: null,
-        carType: "专车-经济型",
-        avatar: null,
-        id: "123123",
+        virtualDriverId: "2244b3efbcdf4557b21f4d4144fe6236",
+        influxCode: "IFT0001",
+        cityCode: "620100",
+        driverFullName: "木头",
+        driverPhone: "18394336999",
+        driverIdentificationPhotoUrl: null,
+        vehicleTypeId: "8a80808763af1ab00163af1aea260002",
+        vehicleBrand: "早扥南",
+        vehicleSeries: "雷凌",
+        vehicleColor: "黑",
+        plateNumber: "甘A6933",
+        vehicleNote: null,
+        driverIdentificationPhotoId: null,
       },
     ]);
 
     onMounted(() => {
       getInflux();
       getOpenCity();
+      getVehiclieData();
     });
 
     function query(e: MouseEvent) {
@@ -326,8 +347,6 @@ export default defineComponent({
           };
           let res = await getDiriver(option);
           console.log(res);
-
-          message.success(res.message);
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -368,6 +387,25 @@ export default defineComponent({
       }
     }
 
+    const getVehiclieData = async () => {
+      try {
+        let res = await getVehicleType({ operationCompanyId: "" });
+        console.log(res.data);
+
+        state.vehicleTypeData = res.data.map(
+          (item: { vehicleTypeName: string; vehicleTypeId: string }) => {
+            let obj = {
+              label: item.vehicleTypeName,
+              value: item.vehicleTypeId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     async function uniquePhone(driverPhone: string) {
       try {
         let option = {
@@ -407,24 +445,61 @@ export default defineComponent({
 
     async function save() {
       try {
-        let option = {};
-        let res = await saveVirtual({ option });
+        let option = {
+          ...queryForm.value,
+          ...form.value,
+        };
+        let res = await saveVirtual(option);
         console.log(res);
       } catch (err) {
         console.log(err);
       }
     }
 
-    function handleSee() {}
-    function handleEdit() {}
+    function handle(record: Recordable, bool: boolean) {
+      disabled.value = bool;
+      const {
+        driverFullName,
+        driverPhone,
+        plateNumber,
+        vehicleBrand,
+        vehicleSeries,
+        vehicleColor,
+        vehicleTypeId,
+        vehicleNote,
+        driverIdentificationPhotoUrl,
+      } = record;
+      form.value = {
+        driverFullName,
+        driverPhone,
+        plateNumber,
+        vehicleBrand,
+        vehicleSeries,
+        vehicleColor,
+        vehicleTypeId,
+        vehicleNote,
+        driverIdentificationPhotoUrl,
+      };
+      let imgUrl = driverIdentificationPhotoUrl ? driverIdentificationPhotoUrl : defaultAvatar;
+      uploadList.value = [imgUrl];
+    }
     function handleRemove(record: Recordable) {
       remove(record.vehicleTypeId);
     }
 
-    function handleAddVirtual() {}
+    function handleAddVirtual() {
+      disabled.value = false;
+      uploadList.value = [];
+      handleValiReset();
+    }
 
-    function uploadChange(list: string[]) {
-      console.log(list);
+    function uploadChange(file: { filePath: string; fileId: string }) {
+      form.value.driverIdentificationPhotoUrl = file.fileId;
+      uploadList.value = [file.filePath];
+    }
+    function uploadRemove(file: string[]) {
+      form.value.driverIdentificationPhotoUrl = file[0];
+      uploadList.value = file;
     }
 
     function handleValidate(e: MouseEvent) {
@@ -443,24 +518,25 @@ export default defineComponent({
 
     function handleValiReset() {
       form.value = {
-        name: null,
-        phone: null,
+        driverFullName: null,
+        driverPhone: null,
         plateNumber: null,
-        brand: null,
-        carSeies: null,
-        color: null,
-        carType: null,
-        avatar: null,
+        vehicleBrand: null,
+        vehicleSeries: null,
+        vehicleColor: null,
+        vehicleTypeId: null,
+        vehicleNote: null,
+        driverIdentificationPhotoUrl: null,
       };
       formRef.value?.restoreValidation();
     }
 
     return {
       loading,
-      uploadUrl,
       disabled,
       columns,
       data,
+      UploadTypeEnum,
       ...toRefs(state),
       getRowKeyId: (row: tableDataItem) => row.id,
 
@@ -474,14 +550,22 @@ export default defineComponent({
       formRef,
       form,
       rules: {
-        name: { required: true, trigger: ["blur", "change"], message: "请输入司机姓名" },
-        phone: { required: true, trigger: ["blur", "change"], message: "请输入正确格式的手机号码" },
+        driverFullName: { required: true, trigger: ["blur", "change"], message: "请输入司机姓名" },
+        driverPhone: {
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请输入正确格式的手机号码",
+        },
         plateNumber: { required: true, trigger: ["blur", "change"], message: "请输入正确的车牌号" },
-        brand: { required: true, trigger: ["blur", "change"], message: "请输入车辆品牌" },
-        carSeies: { required: true, trigger: ["blur", "change"], message: "请输入车系" },
-        color: { required: true, trigger: ["blur", "change"], message: "请输入车辆颜色" },
-        carType: { required: true, trigger: ["blur", "change"], message: "请输入车辆类型" },
-        avatar: { required: true, trigger: ["blur", "change"], message: "请上传司机头像" },
+        vehicleBrand: { required: true, trigger: ["blur", "change"], message: "请输入车辆品牌" },
+        vehicleSeries: { required: true, trigger: ["blur", "change"], message: "请输入车系" },
+        vehicleColor: { required: true, trigger: ["blur", "change"], message: "请输入车辆颜色" },
+        vehicleTypeId: { required: true, trigger: ["blur", "change"], message: "请选择车辆类型" },
+        driverIdentificationPhotoUrl: {
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请上传司机头像",
+        },
       },
       uploadList,
 
@@ -492,6 +576,7 @@ export default defineComponent({
       handleAddVirtual,
       handleValidate,
       uploadChange,
+      uploadRemove,
       handleValiReset,
     };
   },
@@ -501,16 +586,19 @@ export default defineComponent({
 .n-divider:not(.n-divider--vertical) {
   margin: 18px 0;
 }
+
 .virtual-vehicle {
   box-sizing: border-box;
   display: flex;
   justify-content: end;
   align-content: flex-start;
   $width: 420px;
+
   &-left {
     width: $width;
     background-color: $white;
   }
+
   &-right {
     width: calc(100% - $width - 10px);
     background-color: $white;

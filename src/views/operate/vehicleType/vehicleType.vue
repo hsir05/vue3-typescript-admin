@@ -51,6 +51,7 @@
             :disabled="disabled"
             :width="310"
             :height="130"
+            @delete-upload="imageRemove"
             @upload-change="uploadVechicleChange"
             v-model:value="vehichleTypeList"
           />
@@ -64,6 +65,7 @@
               :disabled="disabled"
               :width="80"
               :height="160"
+              @delete-upload="busyRemove"
               @upload-change="uploadBusyChange"
               v-model:value="busyImgList"
             />
@@ -75,6 +77,7 @@
               :disabled="disabled"
               :width="80"
               :height="160"
+              @delete-upload="freeRemove"
               @upload-change="uploadFreeChange"
               v-model:value="ldleImgList"
             />
@@ -278,12 +281,25 @@ export default defineComponent({
       vehichleTypeList.value = [file.filePath];
     }
     function uploadBusyChange(file: { filePath: string; fileId: string }) {
-      form.value.vehicleTypeBusyIconId = file.fileId;
+      form.value.vehicleTypeImageId = file.fileId;
       busyImgList.value = [file.filePath];
     }
     function uploadFreeChange(file: { filePath: string; fileId: string }) {
       form.value.vehicleTypeFreeIconId = file.fileId;
       ldleImgList.value = [file.filePath];
+    }
+
+    function imageRemove(file: string[]) {
+      form.value.vehicleTypeImageId = file[0];
+      vehichleTypeList.value = file;
+    }
+    function busyRemove(file: string[]) {
+      form.value.vehicleTypeImageId = file[0];
+      busyImgList.value = file;
+    }
+    function freeRemove(file: string[]) {
+      form.value.vehicleTypeFreeIconId = file[0];
+      ldleImgList.value = file;
     }
 
     function handleVisble() {
@@ -304,6 +320,9 @@ export default defineComponent({
 
       getRowKeyId: (row: tableItemProps) => row.id,
       handleVisble,
+      imageRemove,
+      busyRemove,
+      freeRemove,
       uploadBusyChange,
       uploadFreeChange,
       uploadVechicleChange,

@@ -347,19 +347,15 @@ export function getDiriver(data: {influxCode: string; cityCode: string}) {
 interface saveVirtualState{
     cityCode: string | null
     influxCode: string | null
-    virtualDriverId?: string | null
-    oldDriverPhone?: string | null
-    oldPlateNumber?: string | null
-    driverFullName: string | null
-    driverPhone: string | null
-    plateNumber: string | null
-    vehicleBrand: string | null
-    vehicleSeries: string | null
-    vehicleColor: string | null
-    vehicleTypeId: string | null
-    driverIdentificationPhotoUrl?: string | null
-    driverIdentificationPhotoId?: string | null
-    vehicleNote: string | null
+    driverFullName: string | null;
+    driverPhone: string | null;
+    plateNumber: string | null;
+    vehicleBrand: string | null;
+    vehicleSeries: string | null;
+    vehicleColor: string | null;
+    vehicleTypeId: string | null;
+    vehicleNote: string | null;
+    driverIdentificationPhotoUrl: string | null;
 }
 export function saveVirtual(data: saveVirtualState) {
   return http.request({

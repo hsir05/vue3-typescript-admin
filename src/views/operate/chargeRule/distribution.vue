@@ -92,8 +92,6 @@ export default defineComponent({
       ])
         .then((res) => {
           let dataArr = res.map((item) => item.data);
-          console.log(dataArr);
-
           vehicleTypeData.value = dataArr[0].map(
             (item: { chargeRuleBaseDescription: string; chargeRuleBaseId: string }) => {
               let obj = {
@@ -148,7 +146,7 @@ export default defineComponent({
       businessRules: {
         vehicleType: { required: true, trigger: ["blur", "change"], message: "请选择车辆类型" },
         orderType: { required: true, trigger: ["blur", "change"], message: "请选择订单类型" },
-        areaArea: { required: true, trigger: ["blur", "change"], message: "请选择开通区域" },
+        openArea: { required: true, trigger: ["blur", "change"], message: "请选择开通区域" },
       },
       handleSubmit,
       handleReset,
