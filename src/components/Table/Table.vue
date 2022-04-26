@@ -42,7 +42,6 @@
       class="box-border"
       :min-height="getTableHeight"
       flex-height
-      :row-key="getRowKeyId"
       :pagination="false"
       @update:checked-row-keys="handleCheck"
     />
@@ -69,7 +68,7 @@ import { defineComponent, ref, toRaw, unref, computed, reactive, toRefs } from "
 import Reload from "@/components/Reload/Reload.vue";
 import Density from "@/components/Density/Density.vue";
 import { Add as AddIcon } from "@vicons/ionicons5";
-import { tableDataItem } from "./type";
+// import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
 import { basicProps } from "./props";
 export default defineComponent({
@@ -151,7 +150,7 @@ export default defineComponent({
       getBindValues,
       item: 15,
       getTableHeight,
-      getRowKeyId: (row: tableDataItem) => row.id,
+
       handleCheck,
       handleAdd,
       handleBatch,

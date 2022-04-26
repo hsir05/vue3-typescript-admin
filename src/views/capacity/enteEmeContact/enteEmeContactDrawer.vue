@@ -11,40 +11,48 @@
       label-width="140"
       :model="form"
     >
-      <n-form-item label="所在企业名称" path="enterpriseName">
+      <n-form-item label="所在企业名称" path="operationCompanyId">
         <n-select
           clearable
           filterable
-          v-model:value="form.enterpriseName"
+          v-model:value="form.operationCompanyId"
           placeholder="选择所在企业名称"
           :options="options"
         />
       </n-form-item>
 
-      <n-form-item label="紧急联系人姓名" path="name">
-        <n-input v-model:value="form.name" clearable placeholder="输入紧急联系人姓名" />
-      </n-form-item>
-      <n-form-item label="运营企业编号" path="enterpriseNum">
-        <n-input v-model:value="form.enterpriseNum" clearable placeholder="输入运营企业编号" />
-      </n-form-item>
-      <n-form-item label="紧急联系人手机号" path="phone">
+      <n-form-item label="紧急联系人姓名" path="operationCompanyEmergencyContactName">
         <n-input
-          v-model:value="form.phone"
+          v-model:value="form.operationCompanyEmergencyContactName"
+          clearable
+          placeholder="输入紧急联系人姓名"
+        />
+      </n-form-item>
+      <!-- <n-form-item label="运营企业编号" path="enterpriseNum">
+        <n-input v-model:value="form.enterpriseNum" clearable placeholder="输入运营企业编号" />
+      </n-form-item> -->
+      <n-form-item label="紧急联系人手机号" path="operationCompanyEmergencyContactPhone">
+        <n-input
+          v-model:value="form.operationCompanyEmergencyContactPhone"
           :maxlengn="11"
           clearable
           placeholder="输入紧急联系人手机号"
         />
       </n-form-item>
 
-      <n-form-item label="紧急联系人邮箱" path="email">
-        <n-input v-model:value="form.email" clearable placeholder="输入紧急联系人邮箱" />
+      <n-form-item label="紧急联系人邮箱" path="operationCompanyEmergencyContactEmail">
+        <n-input
+          v-model:value="form.operationCompanyEmergencyContactEmail"
+          clearable
+          placeholder="输入紧急联系人邮箱"
+        />
       </n-form-item>
 
-      <n-form-item label="值班开始时间" path="time_start">
-        <n-time-picker v-model:value="form.time_start" />
+      <n-form-item label="值班开始时间" path="dutyTimeBegin">
+        <n-time-picker v-model:value="form.dutyTimeBegin" />
       </n-form-item>
-      <n-form-item label="值班结束时间" path="time_end">
-        <n-time-picker v-model:value="form.time_end" />
+      <n-form-item label="值班结束时间" path="dutyTimeEnd">
+        <n-time-picker v-model:value="form.dutyTimeEnd" />
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -86,19 +94,18 @@ export default defineComponent({
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<tableDataItem>({
-      enterpriseName: null,
-      name: null,
-      phone: null,
-      email: null,
-      enterpriseNum: null,
-      time_start: null,
-      time_end: null,
+      operationCompanyEmergencyContactName: null,
+      operationCompanyEmergencyContactPhone: null,
+      operationCompanyEmergencyContactEmail: null,
+      operationCompanyId: null,
+      dutyTimeBegin: null,
+      dutyTimeEnd: null,
     });
 
     function openDrawer(t: string, record?: tableDataItem) {
       console.log(record);
       if (record) {
-        form.value = { ...form.value, ...record };
+        form.value = { ...record };
       }
       title.value = t;
       state.isDrawer = true;
@@ -128,13 +135,12 @@ export default defineComponent({
 
     function handleReset() {
       form.value = {
-        enterpriseName: null,
-        enterpriseNum: null,
-        name: null,
-        phone: null,
-        email: null,
-        time_start: null,
-        time_end: null,
+        operationCompanyEmergencyContactName: null,
+        operationCompanyEmergencyContactPhone: null,
+        operationCompanyEmergencyContactEmail: null,
+        operationCompanyId: null,
+        dutyTimeBegin: null,
+        dutyTimeEnd: null,
       };
       formRef.value?.restoreValidation();
     }

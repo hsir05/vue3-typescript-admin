@@ -1,6 +1,5 @@
 import { http } from '@/utils/http';
 
-
 /**
  * 车辆类型管理
 */

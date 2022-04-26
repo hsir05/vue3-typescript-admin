@@ -10,25 +10,25 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="所在企业名称" path="enterpriseName">
+      <n-form-item label="所在企业名称" path="operationCompanyId">
         <n-input
-          v-model:value="queryValue.enterpriseName"
+          v-model:value="queryValue.operationCompanyId"
           clearable
           placeholder="输入所在企业名称"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="紧急联系人姓名" path="name">
+      <n-form-item label="紧急联系人姓名" path="operationCompanyEmergencyContactName">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.operationCompanyEmergencyContactName"
           clearable
           placeholder="输入紧急联系人姓名"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="联系人手机号" path="phone">
+      <n-form-item label="联系人手机号" path="operationCompanyEmergencyContactPhone">
         <n-input
-          v-model:value="queryValue.phone"
+          v-model:value="queryValue.operationCompanyEmergencyContactPhone"
           clearable
           placeholder="输入联系人手机号"
           style="width: 150px"
@@ -48,6 +48,7 @@
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"
+      :row-key="getRowKeyId"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-batch="handleBatch"
@@ -63,15 +64,14 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import EnteEmeContactDrawer from "./enteEmeContactDrawer.vue";
 import { tableDataItem } from "./type";
-import { data } from "./data";
 import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { getPage } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "EnteEmeContact",
@@ -82,12 +82,12 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      name: "",
-      enterpriseName: "",
-      phone: "",
+      operationCompanyEmergencyContactName: null,
+      operationCompanyId: null,
+      operationCompanyEmergencyContactPhone: null,
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref([]);
 
     const columns = [
       {
@@ -110,32 +110,32 @@ export default defineComponent({
       },
       {
         title: "紧急联系人姓名",
-        key: "name",
+        key: "operationCompanyEmergencyContactName",
         align: "center",
       },
       {
         title: "紧急联系人手机号",
-        key: "phone",
+        key: "operationCompanyEmergencyContactPhone",
         align: "center",
       },
       {
         title: "紧急联系人邮箱",
-        key: "email",
+        key: "operationCompanyEmergencyContactEmail",
         align: "center",
       },
       {
         title: "值班时间开始",
-        key: "time_start",
+        key: "dutyTimeBegin",
         align: "center",
       },
       {
         title: "值班时间结束",
-        key: "time_end",
+        key: "dutyTimeEnd",
         align: "center",
       },
       {
         title: "添加时间",
-        key: "create_time",
+        key: "createTime",
         align: "center",
       },
       {
@@ -172,34 +172,38 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = {
+          operationCompanyIdEq: queryValue.value.operationCompanyId,
+          operationCompanyEmergencyContactNameLike:
+            queryValue.value.operationCompanyEmergencyContactName,
+          operationCompanyEmergencyContactPhoneLike:
+            queryValue.value.operationCompanyEmergencyContactPhone,
+        };
+        let res = await getPage({ page, search: search });
+        console.log(res.data);
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
 
     function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+      console.log("点击了编辑", record);
       const { openDrawer } = enteEmeContactDrawerRef.value;
       openDrawer("编辑企业紧急联系人", record);
     }
@@ -221,19 +225,23 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      //   getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", enterpriseName: "", phone: "" };
+      queryValue.value = {
+        operationCompanyEmergencyContactName: null,
+        operationCompanyId: null,
+        operationCompanyEmergencyContactPhone: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      //   getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
@@ -256,6 +264,7 @@ export default defineComponent({
       loading,
       enteEmeContactDrawerRef,
       basicTableRef,
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyEmergencyContactId,
       statusOptions,
       columns,
       itemCount,

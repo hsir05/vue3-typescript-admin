@@ -6,7 +6,7 @@ export interface loginState {
 }
 
 export interface PaginationState {
-    page: number,
+    pageIndex: number,
     pageSize: number
 }
 
