@@ -11,37 +11,45 @@
       label-width="140"
       :model="form"
     >
-      <n-form-item label="所在企业名称" path="enterpriseName">
+      <n-form-item label="所在企业名称" path="operationCompanyId">
         <n-select
           clearable
           filterable
-          v-model:value="form.enterpriseName"
+          v-model:value="form.operationCompanyId"
           placeholder="选择所在企业名称"
           :options="options"
         />
       </n-form-item>
 
-      <n-form-item label="值班调度人姓名" path="name">
-        <n-input v-model:value="form.name" clearable placeholder="输入紧急联系人姓名" />
-      </n-form-item>
-      <n-form-item label="值班调度人手机号" path="phone">
+      <n-form-item label="值班调度人姓名" path="operationCompanyExpendContactName">
         <n-input
-          v-model:value="form.phone"
+          v-model:value="form.operationCompanyExpendContactName"
+          clearable
+          placeholder="输入紧急联系人姓名"
+        />
+      </n-form-item>
+      <n-form-item label="值班调度人手机号" path="operationCompanyExpendContactPhone">
+        <n-input
+          v-model:value="form.operationCompanyExpendContactPhone"
           :maxlengn="11"
           clearable
           placeholder="输入紧急联系人手机号"
         />
       </n-form-item>
 
-      <n-form-item label="值班调度人邮箱" path="email">
-        <n-input v-model:value="form.email" clearable placeholder="输入值班调度人邮箱" />
+      <n-form-item label="值班调度人邮箱" path="operationCompanyExpendContactEmail">
+        <n-input
+          v-model:value="form.operationCompanyExpendContactEmail"
+          clearable
+          placeholder="输入值班调度人邮箱"
+        />
       </n-form-item>
 
-      <n-form-item label="值班开始时间" path="time_start">
-        <n-time-picker v-model:value="form.time_start" />
+      <n-form-item label="值班开始时间" path="dutyTimeBegin">
+        <n-time-picker v-model:value="form.dutyTimeBegin" />
       </n-form-item>
-      <n-form-item label="值班结束时间" path="time_end">
-        <n-time-picker v-model:value="form.time_end" />
+      <n-form-item label="值班结束时间" path="dutyTimeEnd">
+        <n-time-picker v-model:value="form.dutyTimeEnd" />
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -51,24 +59,24 @@
           size="large"
           type="primary"
           @click="handleValidate"
-          >保存</n-button
-        >
+          >保存
+        </n-button>
         <n-button
           attr-type="button"
           type="warning"
           size="large"
           class="ml-10px"
           @click="handleReset"
-          >重置</n-button
-        >
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-import { FormItemRule } from "naive-ui";
+import { FormInst, FormItemRule, useMessage } from "naive-ui";
+import { addExpendContact, editExpendContact } from "@/api/capacity/capacity";
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "DispatcherDrawer",
@@ -83,12 +91,12 @@ export default defineComponent({
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<tableDataItem>({
-      enterpriseName: null,
-      name: null,
-      phone: null,
-      email: null,
-      time_start: null,
-      time_end: null,
+      operationCompanyId: null,
+      operationCompanyExpendContactName: null,
+      operationCompanyExpendContactPhone: null,
+      operationCompanyExpendContactEmail: null,
+      dutyTimeBegin: null,
+      dutyTimeEnd: null,
     });
 
     function openDrawer(t: string, record?: tableDataItem) {
@@ -108,7 +116,12 @@ export default defineComponent({
           state.disabled = true;
           console.log(unref(form));
 
-          handleSaveAfter();
+          let operationCompanyExpendContactId = unref(form).operationCompanyExpendContactId;
+          if (operationCompanyExpendContactId) {
+            editData();
+          } else {
+            addData();
+          }
 
           message.success("验证成功");
         } else {
@@ -118,18 +131,45 @@ export default defineComponent({
       });
     }
 
+    const addData = async () => {
+      try {
+        state.loading = true;
+        let res = await addExpendContact(form.value);
+        console.log(res);
+        message.success(window.$tips[res.code]);
+        handleSaveAfter();
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+    const editData = async () => {
+      try {
+        state.loading = true;
+        let res = await editExpendContact(form.value);
+        console.log(res);
+        message.success(window.$tips[res.code]);
+        handleSaveAfter();
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+
     function handleSaveAfter() {
       emit("on-save-after");
     }
 
     function handleReset() {
       form.value = {
-        enterpriseName: null,
-        name: null,
-        phone: null,
-        email: null,
-        time_start: null,
-        time_end: null,
+        operationCompanyId: null,
+        operationCompanyExpendContactName: null,
+        operationCompanyExpendContactPhone: null,
+        operationCompanyExpendContactEmail: null,
+        dutyTimeBegin: null,
+        dutyTimeEnd: null,
       };
       formRef.value?.restoreValidation();
     }

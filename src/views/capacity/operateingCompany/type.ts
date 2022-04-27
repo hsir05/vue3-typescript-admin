@@ -11,10 +11,7 @@ export interface tableDataItem {
   lng: number | null;
   lat: number | null;
   allowAgency?: number | null;
-  operationCompanyAgencyList?: agencyState[]
+  operationCompanyAgencyList?: string[]
   operationCompanyManagerPhone: string | null;
 }
 
-export interface agencyState {
-    operationCompanyAgencyName: string
-}

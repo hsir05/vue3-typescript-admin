@@ -10,25 +10,25 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="所在企业名称" path="enterpriseName">
+      <n-form-item label="所在企业名称" path="operationCompanyIdEq">
         <n-input
-          v-model:value="queryValue.enterpriseName"
+          v-model:value="queryValue.operationCompanyIdEq"
           clearable
           placeholder="输入所在企业名称"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="紧急联系人姓名" path="name">
+      <n-form-item label="紧急联系人姓名" path="operationCompanyEmergencyContactNameLike">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.operationCompanyEmergencyContactNameLike"
           clearable
           placeholder="输入紧急联系人姓名"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="联系人手机号" path="phone">
+      <n-form-item label="联系人手机号" path="operationCompanyEmergencyContactPhoneLike">
         <n-input
-          v-model:value="queryValue.phone"
+          v-model:value="queryValue.operationCompanyEmergencyContactPhoneLike"
           clearable
           placeholder="输入联系人手机号"
           style="width: 150px"
@@ -70,6 +70,7 @@ import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 import { PaginationState } from "@/api/type";
 import { getExpendPage } from "@/api/capacity/capacity";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "Dispatcher",
   components: { BasicTable, DispatcherDrawer },
@@ -102,38 +103,41 @@ export default defineComponent({
       },
       {
         title: "所在企业名称",
-        key: "enterpriseName",
+        key: "operationCompanyName",
         align: "center",
       },
       {
         title: "值班调度人姓名",
-        key: "name",
+        key: "operationCompanyExpendContactName",
         align: "center",
       },
       {
         title: "值班调度人手机号",
-        key: "phone",
+        key: "operationCompanyExpendContactPhone",
         align: "center",
       },
       {
         title: "值班调度人邮箱",
-        key: "email",
+        key: "operationCompanyExpendContactEmail",
         align: "center",
       },
       {
         title: "值班开始时间",
-        key: "time_start",
+        key: "dutyTimeBegin",
         align: "center",
       },
       {
-        title: "	值班结束时间",
-        key: "time_end",
+        title: "值班结束时间",
+        key: "dutyTimeEnd",
         align: "center",
       },
       {
         title: "创建时间",
-        key: "create_time",
+        key: "createTime",
         align: "center",
+        render(record: tableDataItem) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",
@@ -207,7 +211,6 @@ export default defineComponent({
       openDrawer("新增企业紧急联系人");
     }
     function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
       console.log("点击了删除", record);
     }
 
@@ -216,33 +219,37 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", enterpriseName: "", phone: "" };
+      queryValue.value = {
+        operationCompanyIdEq: null,
+        operationCompanyEmergencyContactNameLike: null,
+        operationCompanyEmergencyContactPhoneLike: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -252,7 +259,7 @@ export default defineComponent({
       dispatcherDrawerRef,
       basicTableRef,
       statusOptions,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyExpendContactId,
       columns,
       itemCount,
 

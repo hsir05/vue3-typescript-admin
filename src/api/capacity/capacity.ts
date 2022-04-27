@@ -222,3 +222,33 @@ export function getExpendPage(data: expendPageState) {
     data: data
   });
 }
+
+/**
+ * 新增企业值班调度人
+*/
+interface expendContactState  {
+    operationCompanyExpendContactId?: string | null
+    operationCompanyId: string | null
+    operationCompanyExpendContactName: string | null
+    operationCompanyExpendContactPhone: string | null
+    operationCompanyExpendContactEmail: string | null
+    dutyTimeBegin: string | null
+    dutyTimeEnd: string | null
+}
+export function addExpendContact(data: expendContactState) {
+  return http.request({
+    url: '/operationCompanyExpendContact/add',
+    method: 'post',
+    data: data
+  });
+}
+/**
+ * 编辑企业值班调度人
+*/
+export function editExpendContact(data: expendContactState) {
+  return http.request({
+    url: '/operationCompanyExpendContact/edit',
+    method: 'post',
+    data: data
+  });
+}

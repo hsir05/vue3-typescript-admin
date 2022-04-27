@@ -63,7 +63,7 @@ import {
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import OprComDrawer from "./oprComDrawer.vue";
-import { tableDataItem, agencyState } from "./type";
+import { tableDataItem } from "./type";
 import { getCompanyPage, updateAgentStatus } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
@@ -213,16 +213,13 @@ export default defineComponent({
       }
     };
 
-    const handleValue = (list: agencyState[] | null | undefined) => {
+    const handleValue = (list: string[] | null | undefined) => {
       if (!list || list.length === 0) {
         return "不允许代理";
       } else if (list.length === 1) {
-        return list[0].operationCompanyAgencyName;
+        return list[0];
       } else {
-        let result = list.reduce(
-          (Separator, item) => (item.operationCompanyAgencyName += Separator),
-          ","
-        );
+        let result = list.reduce((Separator, item) => (item += Separator), ",");
         return result;
       }
     };
