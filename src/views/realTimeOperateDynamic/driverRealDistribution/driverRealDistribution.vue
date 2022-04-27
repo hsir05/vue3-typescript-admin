@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import Map from "@/components/Map/BaiduMap.vue";
-import { getOperationCompany } from "@/api/common/common";
+import { getAllOperateCompany } from "@/api/common/common";
 import {
   getWorkingDriverList,
   getDriverDetail,
@@ -105,7 +105,7 @@ const options = [
 
 const getOperateCompanyData = async () => {
   try {
-    let res = await getOperationCompany();
+    let res = await getAllOperateCompany();
     console.log(res);
     compOpton.value = res;
     if (res.length > 0) {

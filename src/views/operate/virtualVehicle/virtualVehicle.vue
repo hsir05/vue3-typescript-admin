@@ -312,23 +312,7 @@ export default defineComponent({
         },
       },
     ];
-    const data = ref([
-      {
-        virtualDriverId: "2244b3efbcdf4557b21f4d4144fe6236",
-        influxCode: "IFT0001",
-        cityCode: "620100",
-        driverFullName: "木头",
-        driverPhone: "18394336999",
-        driverIdentificationPhotoUrl: null,
-        vehicleTypeId: "8a80808763af1ab00163af1aea260002",
-        vehicleBrand: "早扥南",
-        vehicleSeries: "雷凌",
-        vehicleColor: "黑",
-        plateNumber: "甘A6933",
-        vehicleNote: null,
-        driverIdentificationPhotoId: null,
-      },
-    ]);
+    const data = ref([]);
 
     onMounted(() => {
       getInflux();

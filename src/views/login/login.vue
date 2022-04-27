@@ -114,30 +114,31 @@ export default defineComponent({
         // let token =
         //   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTc4MGZjZWM3ZGY0ZGJlYjUzYTk1YmNhYTA3OGE0NSIsInJvbGVzIjpbIjdkZDc5NWY3YTE2ZjQ4YjliNzY4MmM5NmQ3NzM0NTRlIl0sImlhdCI6MTY1MDgwNjk3MjE0NywiZXhwIjoxNjUwOTg2OTcyMTQ3fQ.OReBmoqDLAtTo4UPqmDKO7F69MUzR3KoAtYHML5ux0U";
         // locStorage.set(ACCESS_TOKEN_KEY, token);
+        loading.value = true;
         let res = await getCaptcha(unref(formValue));
         console.log(res);
         isCaptcha.value = true;
+        loading.value = false;
       } catch (err) {
+        //    isCaptcha.value = true;
         console.log(err);
+        loading.value = false;
       }
     };
 
     const { login } = useAppUserStore();
     const loginUser = async () => {
       loading.value = true;
-
       try {
         await login(unref(formValue));
-
         message.success("登录成功，即将进入系统");
-
         setTimeout(() => {
           loading.value = false;
           router.push({ path: "/dashboard" });
         }, 1000);
       } catch (err) {
         console.log(err);
-        message.info("登录失败");
+        loading.value = false;
       }
     };
 

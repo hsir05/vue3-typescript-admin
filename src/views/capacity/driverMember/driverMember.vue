@@ -16,7 +16,7 @@
           filterable
           v-model:value="queryValue.cityCode"
           placeholder="选择运营城市"
-          :options="cityData.result"
+          :options="openCityData"
         />
       </n-form-item>
 
@@ -54,7 +54,6 @@ import BasicTable from "@/components/Table/Table.vue";
 import DriMemDrawer from "./driMemDrawer.vue";
 import MemberList from "./memberList.vue";
 import { tableDataItem } from "./type";
-import cityData from "@/config/cityData.json";
 import { data } from "./data";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
@@ -64,6 +63,7 @@ export default defineComponent({
 
   setup() {
     const loading = ref(false);
+    const openCityData = ref([]);
     const driMemDrawerRef = ref();
     const memberListRef = ref();
     const basicTableRef = ref();
@@ -251,7 +251,7 @@ export default defineComponent({
       basicTableRef,
       columns,
       itemCount,
-      cityData,
+      openCityData,
 
       reloadPage,
       handleAdd,

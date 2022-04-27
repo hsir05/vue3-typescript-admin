@@ -48,7 +48,7 @@
     <!-- 分页 -->
     <n-pagination
       v-if="getItemCount"
-      v-model:page="page"
+      v-model:page="pageIndex"
       v-model:page-size="pageSize"
       v-model:item-count="getItemCount"
       :page-slot="5"
@@ -83,7 +83,7 @@ export default defineComponent({
     const tableSize = ref("medium");
 
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
 
@@ -126,8 +126,8 @@ export default defineComponent({
       tableSize.value = value;
     }
     // 分页
-    function handlePage(page: number) {
-      pagination.page = page;
+    function handlePage(pageIndex: number) {
+      pagination.pageIndex = pageIndex;
       emit("on-page", unref(pagination));
     }
     // 每页显示
@@ -137,7 +137,7 @@ export default defineComponent({
     }
 
     function resetPagination() {
-      pagination.page = 1;
+      pagination.pageIndex = 1;
       pagination.pageSize = 10;
     }
 

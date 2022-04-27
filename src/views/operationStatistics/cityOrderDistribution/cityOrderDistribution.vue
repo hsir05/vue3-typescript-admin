@@ -51,7 +51,7 @@
         filterable
         v-model:value="status"
         @update:value="handleStatus"
-        :options="orderStateus.result"
+        :options="orderStatusData"
       />
 
       <Map ref="baiduMapRef" />
@@ -61,8 +61,6 @@
 <script lang="ts">
 import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import orderStateus from "@/config/orderStatus.json";
-import openCityList from "@/config/openCityList.json";
 import { rangeShortcuts } from "@/config/table";
 import Map from "@/components/Map/BaiduMap.vue";
 export default defineComponent({
@@ -70,6 +68,8 @@ export default defineComponent({
   components: { Map },
   setup() {
     const loading = ref(false);
+    const openCityData = ref([]);
+    const orderStatusData = ref([]);
     const status = ref("finished");
     const baiduMapRef = ref();
     const queryFormRef = ref<FormInst | null>(null);
@@ -108,8 +108,8 @@ export default defineComponent({
       queryFormRef,
       status,
       queryForm,
-      orderStateus,
-      openCityList,
+      orderStatusData,
+      openCityData,
       rangeShortcuts,
 
       handleStatus,

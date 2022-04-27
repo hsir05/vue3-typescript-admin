@@ -102,12 +102,11 @@ export default defineComponent({
             lat: form.value.lat as number,
           };
           try {
-            await openCitySave(option);
-            message.success("添加成功");
+            let res = await openCitySave(option);
+            message.success(res.message);
             loading.value = false;
           } catch (err) {
             console.log(err);
-            message.error("添加失败");
             loading.value = false;
           }
         } else {
@@ -125,13 +124,15 @@ export default defineComponent({
     async function handleUpdateValue(_: string, option: SelectOption) {
       try {
         let res = await uniqueCityName({ cityCode: option.value as string });
-        if (res.success) {
+
+        if (res.data.UniqueBooleanResult) {
           form.value = {
             lat: option.lat as number,
             lng: option.lng as number,
             cityName: option.label as string,
             cityCode: option.value as string,
           };
+          message.success(res.message);
         }
       } catch (err) {
         console.log(err);

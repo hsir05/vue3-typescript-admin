@@ -47,7 +47,6 @@ import { defineComponent, reactive, toRaw, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { statusOptions, sexOptions } from "@/config/form";
 import { tableDataItem } from "./type";
-import cityData from "@/config/cityData.json";
 import { FormItemRule } from "naive-ui";
 export default defineComponent({
   name: "ChargeRuleDrawer",
@@ -56,6 +55,7 @@ export default defineComponent({
     const state = reactive({
       isDrawer: false,
       loading: false,
+      openCityData: [],
       disabled: false,
     });
     const title = ref("菜单");
@@ -170,7 +170,6 @@ export default defineComponent({
       },
       statusOptions,
       sexOptions,
-      cityData,
       form,
       openDrawer,
       handleUpdateValue,

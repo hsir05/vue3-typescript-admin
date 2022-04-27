@@ -32,7 +32,7 @@
           v-model:value="form.operateCity"
           placeholder="选择代理运营企业"
           @update:value="handleUpdateValue"
-          :options="cityData.result"
+          :options="openCityData"
         />
       </n-form-item>
 
@@ -71,7 +71,6 @@ import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { rules } from "./data";
 import { tableDataItem } from "./type";
-import cityData from "@/config/cityData.json";
 
 export default defineComponent({
   name: "OrderComDrawer",
@@ -81,6 +80,7 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
+      openCityData: [],
     });
     const title = ref("菜单");
     const message = useMessage();
@@ -160,7 +160,6 @@ export default defineComponent({
       formRef,
       title,
       rules,
-      cityData,
       form,
       openDrawer,
       handleUpdateValue,

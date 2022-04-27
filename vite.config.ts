@@ -60,6 +60,13 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         //       return path.replace("/api", "") 
         //   },
         // },
+        // "/api": {
+        //   target: "http://192.168.1.38:8080",
+        //   changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
+        //   rewrite: (path) => {
+        //       return path.replace("/api", "")
+        //   },
+        // },
         "/api": {
           target: "http://test-ngcxpm-api.yiminyueche.com",
           changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target

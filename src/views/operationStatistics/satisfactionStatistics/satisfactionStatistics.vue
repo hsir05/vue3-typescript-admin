@@ -61,7 +61,6 @@
 <script lang="ts">
 import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import openCityList from "@/config/openCityList.json";
 import { getSatisfaction } from "@/api/operationStatistics/operationStatistics";
 import { tableDataItem } from "./type";
 import { rangeShortcuts } from "@/config/table";
@@ -76,6 +75,7 @@ export default defineComponent({
     });
     const message = useMessage();
     const data = ref([]);
+    const openCityData = ref([]);
 
     const columns = [
       {
@@ -160,7 +160,7 @@ export default defineComponent({
 
     return {
       loading,
-      openCityList,
+      openCityData,
       queryForm,
       queryFormRef,
 

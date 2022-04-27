@@ -61,15 +61,15 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DispatcherDrawer from "./dispatcherDrawer.vue";
 import { tableDataItem } from "./type";
-import { data } from "./data";
 import { statusOptions } from "@/config/form";
 import { PaginationState } from "@/api/type";
+import { getExpendPage } from "@/api/capacity/capacity";
 export default defineComponent({
   name: "Dispatcher",
   components: { BasicTable, DispatcherDrawer },
@@ -79,12 +79,12 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      name: "",
-      enterpriseName: "",
-      phone: "",
+      operationCompanyIdEq: null,
+      operationCompanyEmergencyContactNameLike: null,
+      operationCompanyEmergencyContactPhoneLike: null,
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref([]);
 
     const columns = [
       {
@@ -169,27 +169,25 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getExpendPage({ page, search: search });
+        console.log(res.data);
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);

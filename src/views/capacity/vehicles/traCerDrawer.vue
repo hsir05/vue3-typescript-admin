@@ -88,7 +88,6 @@ import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { rules } from "./data";
 import { tableDataItem } from "./type";
-import cityData from "@/config/cityData.json";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { uploadUrl } from "@/config/config";
 export default defineComponent({
@@ -100,6 +99,7 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
+      openCityData: [],
     });
     const title = ref("菜单");
     const message = useMessage();
@@ -209,7 +209,6 @@ export default defineComponent({
       formRef,
       title,
       rules,
-      cityData,
       uploadUrl,
       form,
       uploadList,

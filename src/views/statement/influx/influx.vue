@@ -18,7 +18,7 @@
           filterable
           placeholder="选择流量方"
           style="width: 220px"
-          :options="openCityList.result"
+          :options="openCitData"
         />
       </n-form-item>
 
@@ -29,7 +29,7 @@
           filterable
           placeholder="选择开通城市"
           style="width: 220px"
-          :options="openCityList.result"
+          :options="openCitData"
         />
       </n-form-item>
 
@@ -151,7 +151,6 @@
 <script lang="ts">
 import { defineComponent, ref, unref, reactive, onMounted, toRefs } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import openCityList from "@/config/openCityList.json";
 import { DownloadOutlined as DownloadIcon } from "@vicons/antd";
 import { tableDataItem } from "../type";
 // import { downloadInflux, getInfluxDetail } from "@/api/statement/statement";
@@ -164,6 +163,7 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const queryFormRef = ref<FormInst | null>(null);
+    const openCitData = ref([]);
     const queryForm = ref({
       section: [new Date("2022-03-16"), new Date("2022-03-18")],
       cityCode: "allCity",
@@ -318,7 +318,7 @@ export default defineComponent({
 
     return {
       loading,
-      openCityList,
+      openCitData,
       queryForm,
       columns,
       data,

@@ -28,9 +28,6 @@
           placeholder="输入紧急联系人姓名"
         />
       </n-form-item>
-      <!-- <n-form-item label="运营企业编号" path="enterpriseNum">
-        <n-input v-model:value="form.enterpriseNum" clearable placeholder="输入运营企业编号" />
-      </n-form-item> -->
       <n-form-item label="紧急联系人手机号" path="operationCompanyEmergencyContactPhone">
         <n-input
           v-model:value="form.operationCompanyEmergencyContactPhone"
@@ -62,25 +59,25 @@
           size="large"
           type="primary"
           @click="handleValidate"
-          >保存</n-button
-        >
+          >保存
+        </n-button>
         <n-button
           attr-type="button"
           type="warning"
           size="large"
           class="ml-10px"
           @click="handleReset"
-          >重置</n-button
-        >
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-import { FormItemRule } from "naive-ui";
+import { defineComponent, reactive, toRefs, ref, unref, onMounted } from "vue";
+import { FormInst, FormItemRule, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
+import { getAllOperateCompany } from "@/api/common/common";
 import {
   editEmeContact,
   addEmeContact,
@@ -88,6 +85,7 @@ import {
   uniqueContactEmail,
   getTimeRange,
 } from "@/api/capacity/capacity";
+import loading from "naive-ui/lib/_internal/loading";
 // import dayjs from 'dayjs'
 export default defineComponent({
   name: "EnteEmeContactDrawer",
@@ -96,6 +94,7 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
+      companyData: [],
     });
 
     const title = ref("企业紧急联系人");
@@ -110,13 +109,28 @@ export default defineComponent({
       dutyTimeEnd: null,
     });
 
+    onMounted(() => {
+      getAllCompanyData();
+    });
+
+    const getAllCompanyData = async () => {
+      try {
+        loading.value = true;
+        let res = await getAllOperateCompany();
+        console.log(res);
+        state.companyData = res.data;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
     function openDrawer(t: string, record?: tableDataItem) {
       console.log(record);
       if (record) {
         // form.value = { ...record };
-        console.log(record.dutyTimeBegin);
         // console.log(new Date(record.dutyTimeBegin).getTime());
-
         // form.value.dutyTimeBegin = 1183135260000
         // form.value.dutyTimeBegin = new Date(record.dutyTimeBegin).getTime() ;
         // form.value.dutyTimeEnd = dayjs(record.dutyTimeEnd).format('MM-DD:ss') ;

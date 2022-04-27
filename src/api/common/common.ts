@@ -8,11 +8,13 @@ export function getInfluxList() {
   });
 }
 
-//获取所有运营企业列表
-export function getOperationCompany() {
+/**
+ * 获取所有运营企业
+*/
+export function getAllOperateCompany() {
   return http.request({
-    url: "/operationCompany/getAllOperationCompany",
-    method: "post",
+    url: '/operationCompany/getAllOperationCompanyList',
+    method: 'post',
   });
 }
 

@@ -39,7 +39,7 @@
           v-model:value="queryValue.vehicleType"
           placeholder="选择车辆类型"
           @update:value="handleUpdateValue"
-          :options="vehicleTypeList.result.vehicleTypeList"
+          :options="vehicleTypeData"
         />
       </n-form-item>
 
@@ -87,7 +87,6 @@ import { data } from "./data";
 import { NTag } from "naive-ui";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
-import vehicleTypeList from "@/config/vehicleTypeList.json";
 export default defineComponent({
   name: "Vehicles",
   components: { BasicTable, VehiclesDrawer, TraCerDrawer },
@@ -340,7 +339,7 @@ export default defineComponent({
         openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
       options: [],
-      vehicleTypeList,
+      vehicleTypeData,
 
       reloadPage,
       handleAdd,

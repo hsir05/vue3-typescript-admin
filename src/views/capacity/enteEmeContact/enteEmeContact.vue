@@ -69,10 +69,11 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
+import { useMessage } from "naive-ui";
 import EnteEmeContactDrawer from "./enteEmeContactDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
-import { getPage } from "@/api/capacity/capacity";
+import { getEmeConactPage, removeEmeContact } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
@@ -89,13 +90,15 @@ export default defineComponent({
       operationCompanyEmergencyContactPhone: null,
     });
 
+    const message = useMessage();
+
     const data = ref([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
+      //   {
+      //     type: "selection",
+      //     align: "center",
+      //   },
       {
         title: "序号",
         key: "index",
@@ -117,11 +120,17 @@ export default defineComponent({
         title: "紧急联系人姓名",
         key: "operationCompanyEmergencyContactName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "紧急联系人手机号",
         key: "operationCompanyEmergencyContactPhone",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "紧急联系人邮箱",
@@ -198,7 +207,7 @@ export default defineComponent({
           operationCompanyEmergencyContactPhoneLike:
             queryValue.value.operationCompanyEmergencyContactPhone,
         };
-        let res = await getPage({ page, search: search });
+        let res = await getEmeConactPage({ page, search: search });
         console.log(res.data);
 
         data.value = res.data.content;
@@ -227,17 +236,29 @@ export default defineComponent({
       const { openDrawer } = enteEmeContactDrawerRef.value;
       openDrawer("新增企业紧急联系人");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    async function handleRemove(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await removeEmeContact({
+          operationCompanyEmergencyContactId: record.operationCompanyEmergencyContactId,
+        });
+        console.log(res);
+        message.success(res.message);
+        const { resetPagination } = basicTableRef.value;
+        resetPagination();
+        getData({ pageIndex: 1, pageSize: 10 });
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
@@ -247,7 +268,7 @@ export default defineComponent({
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
@@ -258,16 +279,16 @@ export default defineComponent({
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {

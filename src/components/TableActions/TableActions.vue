@@ -23,20 +23,22 @@
           {{ action.popConfirm?.title }}
         </n-popconfirm>
 
-        <n-tooltip trigger="hover" v-else-if="action.isIconBtn">
-          <template #trigger>
-            <n-button
-              type="primary"
-              size="tiny"
-              v-bind="action"
-              style="font-size: 16px"
-              class="mr-10px"
-            >
-              <n-icon :component="action.icon" />
-            </n-button>
-          </template>
-          {{ action.label }}
-        </n-tooltip>
+        <template v-else-if="action.isIconBtn">
+          <n-tooltip trigger="hover" v-if="!action.isShow">
+            <template #trigger>
+              <n-button
+                type="primary"
+                size="tiny"
+                v-bind="action"
+                style="font-size: 16px"
+                class="mr-10px"
+              >
+                <n-icon :component="action.icon" />
+              </n-button>
+            </template>
+            {{ action.label }}
+          </n-tooltip>
+        </template>
 
         <n-button v-bind="action" class="mx-2" v-else>
           <template #icon v-if="action.icon">

@@ -10,9 +10,9 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="代理商名称" path="agent">
+      <n-form-item label="代理商名称" path="operationCompanyAgencyNamelike">
         <n-input
-          v-model:value="queryValue.agent"
+          v-model:value="queryValue.operationCompanyAgencyNamelike"
           clearable
           placeholder="输入代理商名称"
           style="width: 200px"
@@ -44,7 +44,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 
 import {
@@ -56,8 +56,7 @@ import BasicTable from "@/components/Table/Table.vue";
 import AgentDrawer from "./agentDrawer.vue";
 import { NTag } from "naive-ui";
 import { tableDataItem } from "./type";
-import { data } from "./data";
-// import { getUsers } from "@/api/system/user";
+import { getAgencyPage } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "Agent",
@@ -68,10 +67,10 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      agent: "",
+      operationCompanyAgencyNamelike: "",
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref([]);
 
     const columns = [
       {
@@ -173,27 +172,25 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getAgencyPage({ page, search: search });
+        console.log(res.data);
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
@@ -225,7 +222,7 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { agent: "" };
+      queryValue.value = { operationCompanyAgencyNamelike: "" };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });

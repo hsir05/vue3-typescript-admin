@@ -10,17 +10,17 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="运营企业名称" path="companyName">
+      <n-form-item label="运营企业名称" path="nameLike">
         <n-input
-          v-model:value="queryValue.companyName"
+          v-model:value="queryValue.nameLike"
           clearable
           placeholder="输入运营企业名称"
           style="width: 200px"
         />
       </n-form-item>
-      <n-form-item label="运营企业编码" path="socityCode">
+      <n-form-item label="运营企业编码" path="operationCompanyCodeLike">
         <n-input
-          v-model:value="queryValue.companyCode"
+          v-model:value="queryValue.operationCompanyCodeLike"
           clearable
           placeholder="输入运营企业编码"
           style="width: 200px"
@@ -37,6 +37,7 @@
     <BasicTable
       :data="data"
       ref="basicTableRef"
+      :row-key="getRowKeyId"
       :columns="columns"
       :loading="loading"
       :isAddBtn="true"
@@ -52,18 +53,18 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import { useMessage, useDialog } from "naive-ui";
 import {
-  TrashOutline as RemoveIcon,
+  GitCompareOutline as GitCompareIcon,
   CreateOutline as CreateIcon,
   EyeOutline as EyeIcon,
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import OprComDrawer from "./oprComDrawer.vue";
-import { tableDataItem } from "./type";
-import { data } from "./data";
-// import { getUsers } from "@/api/system/user";
+import { tableDataItem, agencyState } from "./type";
+import { getCompanyPage, updateAgentStatus } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "OperateingCompany",
@@ -74,11 +75,13 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      companyName: "",
-      companyCode: "",
+      nameLike: null,
+      operationCompanyCodeLike: null,
     });
+    const dialog = useDialog();
+    const message = useMessage();
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref([]);
 
     const columns = [
       {
@@ -96,39 +99,60 @@ export default defineComponent({
       },
       {
         title: "运营企业名称",
-        key: "companyName",
+        key: "operationCompanyName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "运营企业编号",
-        key: "companyCode",
-        width: 110,
+        key: "operationCompanyCode",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "社会统一信用代码",
-        key: "socityCode",
+        key: "unifiedSocialCreditCode",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
-
       {
         title: "代理商",
         key: "agent",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render(record: tableDataItem) {
+          return h("span", handleValue(record.operationCompanyAgencyList));
+        },
       },
-
       {
         title: "运营城市",
-        key: "cityName",
-        width: 100,
+        key: "operationCityName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
-
       {
         title: "运营城市编码",
-        key: "cityCode",
+        key: "operationCityCode",
         width: 110,
         align: "center",
+      },
+      {
+        title: "运营城市地址",
+        key: "operationCompanyAddress",
+        align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "操作",
@@ -143,7 +167,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handle.bind(null, record, true),
                 auth: ["dict001"],
               },
               {
@@ -151,20 +175,17 @@ export default defineComponent({
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handle.bind(null, record, false),
                 auth: ["dict001"],
               },
               {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                secondary: true,
-                auth: ["dict002"],
+                label: "修改代理状态",
+                type: "primary",
+                icon: GitCompareIcon,
                 isIconBtn: true,
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
+                isShow: record.allowAgency === 0 ? false : true,
+                onClick: handleAgent.bind(null, record),
+                auth: ["dict001"],
               },
             ],
           });
@@ -172,68 +193,102 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getCompanyPage({ page, search: search });
+        console.log(res.data);
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    const handleValue = (list: agencyState[] | null | undefined) => {
+      if (!list || list.length === 0) {
+        return "不允许代理";
+      } else if (list.length === 1) {
+        return list[0].operationCompanyAgencyName;
+      } else {
+        let result = list.reduce(
+          (Separator, item) => (item.operationCompanyAgencyName += Separator),
+          ","
+        );
+        return result;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handle(record: Recordable, bool: boolean) {
       const { openDrawer } = OprComDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer(`${bool ? "查看" : "编辑"}运营企业`, record, bool);
     }
     function handleBatch() {
       console.log("点击了批量删除");
     }
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = OprComDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer("新增运营企业", false);
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    function handleAgent(record: Recordable) {
+      dialog.warning({
+        title: "提示",
+        content: "你确定修改代理状态？",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: () => {
+          updateStatus(record.operationCompanyId);
+        },
+        onNegativeClick: () => {},
+      });
     }
+
+    const updateStatus = async (operationCompanyId: string) => {
+      try {
+        loading.value = true;
+        let res = await updateAgentStatus({ operationCompanyId });
+        console.log(res);
+        message.success(res.message);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { companyName: "", companyCode: "" };
+      queryValue.value = {
+        nameLike: null,
+        operationCompanyCodeLike: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
@@ -247,7 +302,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -258,6 +313,7 @@ export default defineComponent({
       basicTableRef,
       columns,
       itemCount,
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyId,
 
       reloadPage,
       handleAdd,

@@ -191,7 +191,6 @@ export default defineComponent({
       }
       try {
         let res = await uniqueContactPhone({ contactPhone: form.value.contactPhone as string });
-        console.log(res);
         if (res.data.UniqueBooleanResult) {
           form.value.contactPhone = null;
           message.success(res.message);

@@ -85,7 +85,7 @@ import { FormInst, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
 import { getCompanyOder } from "@/api/operationStatistics/operationStatistics";
-import { getInfluxList, getOperationCompany } from "@/api/common/common";
+import { getInfluxList, getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
 export default defineComponent({
   name: "EnterpriseStatistics",
@@ -163,7 +163,7 @@ export default defineComponent({
     const getData = async () => {
       loading.value = true;
       try {
-        let operationCompany = await getOperationCompany();
+        let operationCompany = await getAllOperateCompany();
         console.log(operationCompany);
 
         let influx = await getInfluxList();

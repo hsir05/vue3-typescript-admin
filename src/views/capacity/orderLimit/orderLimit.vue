@@ -15,7 +15,7 @@
             filterable
             placeholder="选择开通城市"
             style="width: 260px"
-            :options="openCityList.result"
+            :options="openCityData"
           />
         </n-form-item>
 
@@ -63,7 +63,6 @@ import { statusOptions } from "@/config/form";
 import OrderItem from "./orderTableItem.vue";
 import OrderEdit from "./orderEditItem.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
-import openCityList from "@/config/openCityList.json";
 export default defineComponent({
   name: "OrderLimit",
   components: {
@@ -74,6 +73,7 @@ export default defineComponent({
   setup() {
     const cityCode = ref("620100");
     const loading = ref(false);
+    const openCityData = ref([]);
     const formRef = ref<FormInst | null>(null);
     const baiduMapRef = ref();
     const message = useMessage();
@@ -159,7 +159,7 @@ export default defineComponent({
       loading,
       cityCode,
       formRef,
-      openCityList,
+      openCityData,
       baiduMapRef,
       data,
       columns,

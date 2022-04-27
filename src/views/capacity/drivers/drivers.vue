@@ -57,7 +57,7 @@
           v-model:value="queryValue.status"
           placeholder="选择司机状态"
           @update:value="handleUpdateValue"
-          :options="vehicleTypeList.result.vehicleTypeList"
+          :options="vehicleTypeData"
         />
       </n-form-item>
 
@@ -118,13 +118,13 @@ import { data } from "./data";
 import { NTag } from "naive-ui";
 // import { getUsers } from "@/api/system/user";
 import { PaginationState } from "@/api/type";
-import vehicleTypeList from "@/config/vehicleTypeList.json";
 export default defineComponent({
   name: "Drivers",
   components: { BasicTable, DriversDrawer, AddressDrawer, DriverCerDrawer },
   setup() {
     const loading = ref(false);
     const driversDrawerRef = ref();
+    const vehicleTypeData = ref([]);
     const basicTableRef = ref();
     const addressDrawerRef = ref();
     const driverCerDrawerRef = ref();
@@ -391,7 +391,7 @@ export default defineComponent({
       },
       options: [],
       statusOptions,
-      vehicleTypeList,
+      vehicleTypeData,
 
       reloadPage,
       handleAdd,

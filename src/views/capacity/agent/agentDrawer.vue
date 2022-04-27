@@ -32,7 +32,7 @@
           v-model:value="form.operateCity"
           placeholder="选择代理运营企业"
           @update:value="handleUpdateValue"
-          :options="cityData.result"
+          :options="openCityData"
         />
       </n-form-item>
 
@@ -85,7 +85,6 @@ import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { rules } from "./data";
 import { statusOptions, sexOptions } from "@/config/form";
 import { tableDataItem } from "./type";
-import cityData from "@/config/cityData.json";
 
 export default defineComponent({
   name: "AgentDrawer",
@@ -95,6 +94,7 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
+      openCityData: [],
     });
     const title = ref("菜单");
     const message = useMessage();
@@ -176,7 +176,6 @@ export default defineComponent({
       rules,
       statusOptions,
       sexOptions,
-      cityData,
       form,
       openDrawer,
       handleUpdateValue,

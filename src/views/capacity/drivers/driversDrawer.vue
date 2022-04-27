@@ -29,7 +29,7 @@
           filterable
           v-model:value="form.nation"
           placeholder="司机民族"
-          :options="nation.result"
+          :options="nationData"
         />
       </n-form-item>
 
@@ -39,7 +39,7 @@
           filterable
           v-model:value="form.maritalStatus"
           placeholder="选择司机婚姻状况"
-          :options="marital.result"
+          :options="maritalData"
         />
       </n-form-item>
 
@@ -103,8 +103,6 @@
 import { defineComponent, toRefs, ref, unref, reactive } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { sexOptions, statusOptions } from "@/config/form";
-import nation from "@/config/nation.json";
-import marital from "@/config/marital.json";
 import { tableDataItem } from "./type";
 import { rules } from "./data";
 export default defineComponent({
@@ -115,6 +113,8 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
+      nationData: [],
+      maritalData: [],
     });
     const title = ref("司机信息");
     const message = useMessage();
@@ -183,8 +183,6 @@ export default defineComponent({
       form,
       rules,
       sexOptions,
-      nation,
-      marital,
       statusOptions,
 
       onCloseAfter,

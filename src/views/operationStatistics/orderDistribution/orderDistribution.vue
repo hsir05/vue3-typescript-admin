@@ -18,7 +18,7 @@
           filterable
           placeholder="选择开通城市"
           style="width: 260px"
-          :options="openCityList.result"
+          :options="openCityData"
         />
       </n-form-item>
 
@@ -72,11 +72,10 @@
 <script lang="ts">
 import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import openCityList from "@/config/openCityList.json";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
-import { getCityOder } from "@/api/operationStatistics/operationStatistics";
-import { getInfluxList, getOpenCity } from "@/api/common/common";
+// import { getCityOder } from "@/api/operationStatistics/operationStatistics";
+import { getInfluxList, getAllOpenCity } from "@/api/common/common";
 export default defineComponent({
   name: "CityStatistics",
   components: {
@@ -85,6 +84,7 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const status = ref("finished");
+    const openCityData = ref([]);
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
       section: [new Date("2022-03-16"), new Date("2022-03-18")],
@@ -172,18 +172,18 @@ export default defineComponent({
     const getData = async () => {
       loading.value = true;
       try {
-        let openCity = await getOpenCity();
+        let openCity = await getAllOpenCity();
         console.log(openCity);
 
         let influx = await getInfluxList();
         console.log(influx);
 
-        let res = await getCityOder({
-          cityCode: "allCity",
-          beginDate: "2022-03-16",
-          endDate: "2022-03-18",
-        });
-        console.log(res);
+        // let res = await getCityOder({
+        //   cityCode: "allCity",
+        //   beginDate: "2022-03-16",
+        //   endDate: "2022-03-18",
+        // });
+        // console.log(res);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -197,7 +197,7 @@ export default defineComponent({
 
     return {
       loading,
-      openCityList,
+      openCityData,
       status,
       option: [
         {

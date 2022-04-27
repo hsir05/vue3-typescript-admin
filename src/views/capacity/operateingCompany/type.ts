@@ -1,12 +1,20 @@
 export interface tableDataItem {
-  id?: string | null;
-  companyName: null | string;
-  companyCode: null | string;
-  socityCode: null | string;
-  agent: null | string;
-  cityCode: null | string;
-  cityName: null | string;
-  adminName?: null | string;
-  phone?: null | string;
-  sex?: null | number;
+  operationCompanyId?: string | null;
+  operationCompanyCode: string | null;
+  operationCompanyName: string | null;
+  operationCityCode: string | null;
+  unifiedSocialCreditCode: string | null;
+  operationCompanyAddress: string | null;
+  operationCityName: string | null;
+  operationCompanyManagerName: string | null;
+  operationCompanyManagerGender: number | null;
+  lng: number | null;
+  lat: number | null;
+  allowAgency?: number | null;
+  operationCompanyAgencyList?: agencyState[]
+  operationCompanyManagerPhone: string | null;
+}
+
+export interface agencyState {
+    operationCompanyAgencyName: string
 }

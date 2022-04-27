@@ -89,7 +89,7 @@ import { defineComponent, ref, onMounted } from "vue";
 import { FormInst } from "naive-ui";
 import Line from "./line.vue";
 import Gauge from "./gauge.vue";
-import { getOperationCompany } from "@/api/common/common";
+import { getAllOperateCompany } from "@/api/common/common";
 import { getChartsData, getOrderBusinessType } from "@/api/realtimeDynamic/realtimeDynamic";
 import {
   BarcodeOutline as BarcodeIcon,
@@ -171,7 +171,7 @@ export default defineComponent({
 
     const getOperateCompanyData = async () => {
       try {
-        let res = await getOperationCompany();
+        let res = await getAllOperateCompany();
         console.log(res);
       } catch (err) {
         console.log(err);
