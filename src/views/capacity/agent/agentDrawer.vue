@@ -3,7 +3,6 @@
     <n-form
       ref="formRef"
       :rules="rules"
-      size="large"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '440px' }"
@@ -11,51 +10,68 @@
       label-width="140"
       :model="form"
     >
-      <n-form-item label="代理商" path="agent">
-        <n-input v-model:value="form.agent" clearable placeholder="输入代理商" />
-      </n-form-item>
-      <n-form-item label="运营企业编号" path="contacts">
-        <n-input v-model:value="form.contacts" clearable placeholder="输入运营企业编号" />
-      </n-form-item>
-      <n-form-item label="代理商登录账号" path="account">
-        <n-input v-model:value="form.account" clearable placeholder="输入代理商登录账号" />
-      </n-form-item>
-
-      <n-form-item label="代理商联系人" path="contacts">
-        <n-input v-model:value="form.contacts" clearable placeholder="输入代理商联系人" />
-      </n-form-item>
-
-      <n-form-item label="代理运营企业" path="operateCity">
-        <n-select
+      <n-form-item label="代理商名称" path="operationCompanyAgencyName">
+        <n-input
+          v-model:value="form.operationCompanyAgencyName"
+          :maxlength="20"
           clearable
-          filterable
-          v-model:value="form.operateCity"
-          placeholder="选择代理运营企业"
-          @update:value="handleUpdateValue"
-          :options="openCityData"
+          placeholder="输入代理商名称"
+        />
+      </n-form-item>
+      <n-form-item label="登陆账号" path="loginCredential.loginAccount">
+        <n-input
+          v-model:value="form.loginCredential.loginAccount"
+          clearable
+          placeholder="输入登陆账号"
+        />
+      </n-form-item>
+      <n-form-item label="联系人姓名" path="operationCompanyAgencyContactName">
+        <n-input
+          v-model:value="form.operationCompanyAgencyContactName"
+          clearable
+          placeholder="输入联系人姓名"
         />
       </n-form-item>
 
-      <n-form-item label="联系人性别" path="sex">
-        <n-select v-model:value="form.sex" placeholder="选择联系人性别" :options="sexOptions" />
+      <n-form-item label="联系人性别" path="operationCompanyAgencyContactGender">
+        <n-select
+          v-model:value="form.operationCompanyAgencyContactGender"
+          :maxlength="10"
+          placeholder="选择联系人性别"
+          :options="sexOptions"
+        />
       </n-form-item>
-      <n-form-item label="联系人电话" path="phone">
+      <n-form-item label="联系人电话" path="operationCompanyAgencyContactPhone">
         <n-input
-          v-model:value="form.phone"
+          v-model:value="form.operationCompanyAgencyContactPhone"
           clearable
           placeholder="输入联系人电话"
           :maxlength="11"
         />
       </n-form-item>
 
-      <n-form-item label="状态" path="status">
-        <n-radio-group v-model:value="form.status">
+      <div class="mt-10px mb-30px ml-40px">
+        <n-icon size="24" style="vertical-align: middle">
+          <AlertIcon color="#f0a020" />
+        </n-icon>
+        运营企业的代理商抽成比率为零时，才可取消企业代理。
+      </div>
+
+      <n-form-item label="允许代理企业" path="operationCompanyIds">
+        <n-checkbox-group
+          v-model:value="form.operationCompanyIds"
+          @on-update:value="handleCheckbox"
+        >
           <n-space>
-            <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
-              item.label
-            }}</n-radio>
+            <n-checkbox
+              :value="item.operationCompanyId"
+              v-for="item in allowAgentCompanyData"
+              :key="item.operationCompanyId"
+            >
+              {{ item.operationCompanyName }}
+            </n-checkbox>
           </n-space>
-        </n-radio-group>
+        </n-checkbox-group>
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -65,29 +81,33 @@
           size="large"
           type="primary"
           @click="handleValidate"
-          >保存</n-button
-        >
+          >保存
+        </n-button>
         <n-button
           attr-type="button"
+          :disabled="loading"
           type="warning"
           size="large"
           class="ml-10px"
           @click="handleReset"
-          >重置</n-button
-        >
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
+import { defineComponent, reactive, toRefs, ref, onMounted } from "vue";
+import { FormInst, useMessage } from "naive-ui";
 import { rules } from "./data";
 import { statusOptions, sexOptions } from "@/config/form";
-import { tableDataItem } from "./type";
-
+import { tableDataItem, allowCompanyState, formState } from "./type";
+import { AlertCircle as AlertIcon } from "@vicons/ionicons5";
+import { cloneDeep } from "lodash-es";
+import { addAgency, editAgency, getRatio, getAllowAgencyCompany } from "@/api/capacity/capacity";
 export default defineComponent({
   name: "AgentDrawer",
+  components: { AlertIcon },
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const state = reactive({
@@ -96,54 +116,98 @@ export default defineComponent({
       disabled: false,
       openCityData: [],
     });
+
+    const allowAgentCompanyData = ref<allowCompanyState[]>([]);
     const title = ref("菜单");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      agent: null,
-      contacts: null,
-      phone: null,
-      account: null,
-      operateCity: null,
-      sex: null,
-      create_time: null,
-      status: null,
+    const form = ref<formState>({
+      operationCompanyAgencyName: null,
+      loginCredential: {
+        loginAccount: null,
+        loginCredentialState: 1,
+      },
+      operationCompanyAgencyContactName: null,
+      operationCompanyAgencyContactGender: null,
+      operationCompanyAgencyContactPhone: null,
+      operationCompanyIds: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    onMounted(() => {});
+
+    function openDrawer(t: string, record: tableDataItem) {
       console.log(record);
+      allowAgentCompanyData.value = [];
       if (record) {
         form.value = { ...form.value, ...record };
+
+        if (record.operationCompanyList) {
+          let agentCompany: allowCompanyState[] = cloneDeep(record.operationCompanyList);
+          let ids = agentCompany.map((item) => item.operationCompanyId);
+          form.value.operationCompanyIds = ids;
+          allowAgentCompanyData.value = [...agentCompany];
+        }
       }
       title.value = t;
+      getAllowCompanyData();
       state.isDrawer = true;
     }
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
-
+          let res = null;
+          if (form.value.operationCompanyAgencyId) {
+            res = await editAgency(form.value);
+          } else {
+            res = await addAgency(form.value);
+          }
+          console.log(res);
+          message.success(window.$tips[res.code]);
           handleSaveAfter();
-
-          message.success("验证成功");
+          state.loading = false;
         } else {
           console.log(errors);
-          message.error("验证失败");
+          state.loading = false;
         }
       });
     }
 
-    function handleUpdateValue(_: string, option: SelectOption) {
-      console.log(option);
-      // console.log(toRaw(form.value));
+    const getAllowCompanyData = async () => {
+      try {
+        state.loading = true;
+        let res = await getAllowAgencyCompany();
+        console.log(res);
+        allowAgentCompanyData.value = [...res.data, ...allowAgentCompanyData.value];
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
 
-      //    form.value.city = unref(option).label
-      //    form.value.code = option.value
-    }
+    const handleCheckbox = (value: string) => {
+      console.log(value);
+      getRatioData(value);
+    };
+
+    const getRatioData = async (operationCompanyId: string) => {
+      try {
+        state.loading = true;
+        let option = {
+          operationCompanyAgencyId: form.value.operationCompanyAgencyId as string,
+          operationCompanyId: operationCompanyId,
+        };
+        let res = await getRatio(option);
+        console.log(res);
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
 
     function handleSaveAfter() {
       emit("on-save-after");
@@ -151,14 +215,15 @@ export default defineComponent({
 
     function handleReset() {
       form.value = {
-        agent: null,
-        contacts: null,
-        phone: null,
-        account: null,
-        operateCity: null,
-        sex: null,
-        create_time: null,
-        status: null,
+        operationCompanyAgencyName: null,
+        loginCredential: {
+          loginAccount: null,
+          loginCredentialState: 1,
+        },
+        operationCompanyAgencyContactName: null,
+        operationCompanyAgencyContactGender: null,
+        operationCompanyAgencyContactPhone: null,
+        operationCompanyIds: null,
       };
       formRef.value?.restoreValidation();
     }
@@ -166,11 +231,14 @@ export default defineComponent({
       state.isDrawer = false;
       state.loading = false;
       state.disabled = false;
+      state.openCityData = [];
+      allowAgentCompanyData.value = [];
       handleReset();
     }
 
     return {
       ...toRefs(state),
+      allowAgentCompanyData,
       formRef,
       title,
       rules,
@@ -178,9 +246,9 @@ export default defineComponent({
       sexOptions,
       form,
       openDrawer,
-      handleUpdateValue,
       handleReset,
       handleValidate,
+      handleCheckbox,
       onCloseAfter,
     };
   },

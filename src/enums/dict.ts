@@ -56,3 +56,9 @@ export enum Dict {
     // 客户钱包充值类型 WRT0000 
    
 }
+
+export enum sexEnum {
+    "女",
+    "男",
+    "未知"
+}

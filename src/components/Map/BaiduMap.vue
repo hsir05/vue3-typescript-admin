@@ -8,7 +8,6 @@
 import { ref } from "vue";
 import { useScriptTag } from "@vueuse/core";
 import { BAIDU_MAP_SDK_URL } from "@/config/map";
-import stylesData from "@/config/mapstyles.json";
 
 //@ts-nocheck
 const { load } = useScriptTag(BAIDU_MAP_SDK_URL);
@@ -36,7 +35,7 @@ async function renderBaiduMap(lng: number, lat: number) {
   map.enableScrollWheelZoom(); //鼠标滚轮控制缩放
 
   //@ts-ignore
-  map.setMapStyleV2({ styleJson: stylesData.data });
+  //   map.setMapStyleV2({ styleJson: stylesData.data });
   // 创建标注
   function createMarker(callback: Fn) {
     //@ts-ignore

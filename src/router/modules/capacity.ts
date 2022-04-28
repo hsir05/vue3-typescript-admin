@@ -31,6 +31,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/capacity/agent/agent.vue"),
       },
+       {
+        path: "/capacity/undertake-business",
+        name: `capacity_undertake-business`,
+        meta: {
+          title: "企业承接业务设置",
+        },
+        component: () => import("@/views/capacity/undertakeBusiness/undertakeBusiness.vue"),
+      },
       {
         path: "/capacity/order-commissions",
         name: `capacity_order-commissions`,

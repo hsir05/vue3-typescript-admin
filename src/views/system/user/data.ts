@@ -24,7 +24,7 @@ export const rules = {
       return /^1\d{10}$/.test(value);
     },
     message: "请输入电话号码",
-  },
+  }, 
   email: {
     required: true,
     trigger: ["input"],

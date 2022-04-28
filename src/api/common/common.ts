@@ -9,7 +9,7 @@ export function getInfluxList() {
 }
 
 /**
- * 获取所有运营企业
+ * 获取所有运营企业 
 */
 export function getAllOperateCompany() {
   return http.request({
@@ -17,7 +17,15 @@ export function getAllOperateCompany() {
     method: 'post',
   });
 }
-
+/**
+ * 获取所有可代理运营企业 
+*/
+export function getAencyCompany() {
+  return http.request({
+    url: '/operationCompany/findAllowAgencyOperationCompanyList',
+    method: 'post',
+  });
+}
 //获得所有开通城市
 export function getAllOpenCity() {
   return http.request({

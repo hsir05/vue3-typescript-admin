@@ -11,24 +11,26 @@
       :model="queryValue"
     >
       <n-form-item label="所在企业名称" path="operationCompanyIdEq">
-        <n-input
+        <n-select
+          clearable
+          filterable
           v-model:value="queryValue.operationCompanyIdEq"
+          placeholder="选择所在企业名称"
+          :options="companyData"
+        />
+      </n-form-item>
+
+      <n-form-item label="值班调度人姓名" path="operationCompanyExpendContactNameLike">
+        <n-input
+          v-model:value="queryValue.operationCompanyExpendContactNameLike"
           clearable
-          placeholder="输入所在企业名称"
+          placeholder="输入值班调度人姓名姓名"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="紧急联系人姓名" path="operationCompanyEmergencyContactNameLike">
+      <n-form-item label="联系人手机号" path="operationCompanyExpendContactPhoneLike">
         <n-input
-          v-model:value="queryValue.operationCompanyEmergencyContactNameLike"
-          clearable
-          placeholder="输入紧急联系人姓名"
-          style="width: 150px"
-        />
-      </n-form-item>
-      <n-form-item label="联系人手机号" path="operationCompanyEmergencyContactPhoneLike">
-        <n-input
-          v-model:value="queryValue.operationCompanyEmergencyContactPhoneLike"
+          v-model:value="queryValue.operationCompanyExpendContactPhoneLike"
           clearable
           placeholder="输入联系人手机号"
           style="width: 150px"
@@ -66,32 +68,37 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DispatcherDrawer from "./dispatcherDrawer.vue";
+import { useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 import { PaginationState } from "@/api/type";
-import { getExpendPage } from "@/api/capacity/capacity";
+import { getAllOperateCompany } from "@/api/common/common";
+import { getExpendPage, removeExpendContact } from "@/api/capacity/capacity";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "Dispatcher",
   components: { BasicTable, DispatcherDrawer },
   setup() {
     const loading = ref(false);
+    const companyData = ref([]);
     const dispatcherDrawerRef = ref();
+
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
       operationCompanyIdEq: null,
-      operationCompanyEmergencyContactNameLike: null,
-      operationCompanyEmergencyContactPhoneLike: null,
+      operationCompanyExpendContactNameLike: null,
+      operationCompanyExpendContactPhoneLike: null,
     });
+    const message = useMessage();
 
     const data = ref([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
+      //   {
+      //     type: "selection",
+      //     align: "center",
+      //   },
       {
         title: "序号",
         key: "index",
@@ -105,6 +112,9 @@ export default defineComponent({
         title: "所在企业名称",
         key: "operationCompanyName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "值班调度人姓名",
@@ -115,11 +125,17 @@ export default defineComponent({
         title: "值班调度人手机号",
         key: "operationCompanyExpendContactPhone",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "值班调度人邮箱",
         key: "operationCompanyExpendContactEmail",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "值班开始时间",
@@ -175,6 +191,7 @@ export default defineComponent({
 
     onMounted(() => {
       getData({ pageIndex: 1, pageSize: 10 });
+      getAllCompanyData();
     });
 
     const getData = async (page: PaginationState) => {
@@ -193,6 +210,42 @@ export default defineComponent({
       }
     };
 
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        console.log(res);
+        companyData.value = res.data.map(
+          (item: { operationCityName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCityName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    async function handleRemove(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await removeExpendContact({
+          operationCompanyExpendContactId: record.operationCompanyExpendContactId,
+        });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+        const { resetPagination } = basicTableRef.value;
+        resetPagination();
+        getData({ pageIndex: 1, pageSize: 10 });
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
@@ -210,9 +263,6 @@ export default defineComponent({
       const { openDrawer } = dispatcherDrawerRef.value;
       openDrawer("新增企业紧急联系人");
     }
-    function handleRemove(record: Recordable) {
-      console.log("点击了删除", record);
-    }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
@@ -224,8 +274,8 @@ export default defineComponent({
     const reset = () => {
       queryValue.value = {
         operationCompanyIdEq: null,
-        operationCompanyEmergencyContactNameLike: null,
-        operationCompanyEmergencyContactPhoneLike: null,
+        operationCompanyExpendContactNameLike: null,
+        operationCompanyExpendContactPhoneLike: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
@@ -262,6 +312,7 @@ export default defineComponent({
       getRowKeyId: (row: tableDataItem) => row.operationCompanyExpendContactId,
       columns,
       itemCount,
+      companyData,
 
       reloadPage,
       handleAdd,

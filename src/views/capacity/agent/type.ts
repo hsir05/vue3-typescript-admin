@@ -1,11 +1,30 @@
-export interface tableDataItem {
-  id?: string | null;
-  account: null | string;
-  contacts: null | string;
-  agent: null | string;
-  status: null | number;
-  create_time: null | string;
-  phone?: null | string;
-  sex?: null | number;
-  operateCity: null | string
+
+export interface loginCredentialProps {
+    loginCredentialState: number
+    loginAccount: string | null
+}
+ export interface allowCompanyState{
+    operationCompanyId: string
+    operationCompanyName: string
+}
+
+export interface itemState {
+  operationCompanyAgencyId?: string | null;
+  loginCredential: loginCredentialProps;
+  operationCompanyAgencyName: null | string;
+  operationCompanyAgencyContactName: null | string;
+  operationCompanyAgencyContactGender: null | number;
+  operationCompanyAgencyContactPhone: null | string;
+  createTime?: null | string;
+}
+
+
+export interface tableDataItem extends itemState {
+  
+  operationCompanyList: allowCompanyState[] | null
+}
+
+export interface formState extends itemState {
+  operationCompanyIds: null | string[] 
+
 }

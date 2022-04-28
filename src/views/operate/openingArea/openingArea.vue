@@ -232,7 +232,7 @@ export default defineComponent({
     const baiduMapRef = ref();
     const message = useMessage();
     const { appTheme } = useProjectSetting();
-    const area = ref<string>("");
+    const area = ref<string | null>();
 
     const openCityList = ref([]);
     const data = ref([]);

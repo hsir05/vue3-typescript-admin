@@ -5,7 +5,7 @@ export interface tableDataItem {
     operationCompanyExpendContactPhone: string | null;
     operationCompanyExpendContactEmail: string | null;
     operationCompanyExpendContactName: string | null;
-    dutyTimeBegin: string | null; 
-    dutyTimeEnd: string | null;
+    dutyTimeBegin: number | null | string; 
+    dutyTimeEnd: number | null | string;
     createTime?: string | null;
 }

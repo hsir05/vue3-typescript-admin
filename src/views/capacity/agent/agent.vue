@@ -12,7 +12,7 @@
     >
       <n-form-item label="代理商名称" path="operationCompanyAgencyNamelike">
         <n-input
-          v-model:value="queryValue.operationCompanyAgencyNamelike"
+          v-model:value="queryValue.operationCompanyAgencyNameLike"
           clearable
           placeholder="输入代理商名称"
           style="width: 200px"
@@ -30,12 +30,12 @@
       :data="data"
       ref="basicTableRef"
       :isAddBtn="true"
+      :row-key="getRowKeyId"
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
-      @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
@@ -46,18 +46,14 @@
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-
-import {
-  TrashOutline as RemoveIcon,
-  CreateOutline as CreateIcon,
-  EyeOutline as EyeIcon,
-} from "@vicons/ionicons5";
+import { CreateOutline as CreateIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import AgentDrawer from "./agentDrawer.vue";
-import { NTag } from "naive-ui";
+import { NTag, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
-import { getAgencyPage } from "@/api/capacity/capacity";
+import { getAgencyPage, updateAgencyStatus } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
+import { sexEnum } from "@/enums/dict";
 export default defineComponent({
   name: "Agent",
   components: { BasicTable, AgentDrawer },
@@ -67,16 +63,14 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      operationCompanyAgencyNamelike: "",
+      operationCompanyAgencyNameLike: null,
     });
+
+    const message = useMessage();
 
     const data = ref([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
@@ -88,46 +82,50 @@ export default defineComponent({
       },
       {
         title: "代理商",
-        key: "agent",
+        key: "operationCompanyAgencyName",
         align: "center",
       },
       {
         title: "登录账号",
-        key: "account",
+        key: "loginCredential",
         align: "center",
+        render(row: tableDataItem) {
+          return h("span", { value: row.loginCredential ? row.loginCredential.loginAccount : "" });
+        },
       },
       {
         title: "联系人",
-        key: "contacts",
+        key: "operationCompanyAgencyContactName",
         align: "center",
       },
       {
         title: "联系人性别",
-        key: "sex",
+        key: "operationCompanyAgencyContactGender",
         width: 100,
         align: "center",
+        render(row: tableDataItem) {
+          return h("span", sexEnum[row.operationCompanyAgencyContactGender as number]);
+        },
       },
-
       {
         title: "联系人电话",
-        key: "phone",
+        key: "operationCompanyAgencyContactPhone",
         width: 110,
         align: "center",
       },
       {
         title: "状态",
-        key: "status",
+        key: "loginCredential",
         align: "center",
         render(row: tableDataItem) {
-          return h(
-            NTag,
-            {
-              type: row.status === 1 ? "success" : "error",
-            },
-            {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
-            }
-          );
+          if (!row.loginCredential) {
+            return h("span", " ");
+          } else {
+            return h(NTag, {
+              type: row.loginCredential.loginCredentialState === 1 ? "success" : "error",
+              onClick: handleStatus.bind(null, row),
+            });
+          }
         },
       },
       {
@@ -154,18 +152,6 @@ export default defineComponent({
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
               },
-              {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                isIconBtn: true,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
-              },
             ],
           });
         },
@@ -181,8 +167,6 @@ export default defineComponent({
       try {
         let search = { ...queryValue.value };
         let res = await getAgencyPage({ page, search: search });
-        console.log(res.data);
-
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -197,21 +181,29 @@ export default defineComponent({
     }
 
     function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
       const { openDrawer } = agentDrawerRef.value;
-      openDrawer("编辑用户", record);
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
+      openDrawer("编辑代理商", record);
     }
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = agentDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer("新增代理商");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    async function handleStatus(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await updateAgencyStatus({
+          operationCompanyAgencyId: record.operationCompanyAgencyId as string,
+        });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+        const { resetPagination } = basicTableRef.value;
+        resetPagination();
+        getData({ pageIndex: 1, pageSize: 10 });
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -219,33 +211,33 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { operationCompanyAgencyNamelike: "" };
+      queryValue.value = { operationCompanyAgencyNameLike: null };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -256,10 +248,10 @@ export default defineComponent({
       basicTableRef,
       columns,
       itemCount,
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyAgencyId,
 
       reloadPage,
       handleAdd,
-      handleBatch,
       searchHandle,
       reset,
       handleCheckRow,

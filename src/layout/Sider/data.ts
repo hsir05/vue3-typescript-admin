@@ -111,6 +111,11 @@ export const menuOptions: MenuOption[] = [
         key: "capacity-agent",
       },
       {
+        label: "企业承接业务设置",
+        path: "/capacity/undertake-business",
+        key: "capacity-undertake-business",
+      },
+      {
         label: "订单抽成比率",
         path: "/capacity/order-commissions",
         key: "capacity-order-commissions",
