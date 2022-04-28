@@ -5,7 +5,7 @@
       :rules="rules"
       :disabled="disabled"
       label-placement="left"
-      :style="{ maxWidth: '440px' }"
+      :style="{ maxWidth: '540px' }"
       require-mark-placement="right-hanging"
       label-width="140"
       :model="form"
@@ -18,12 +18,8 @@
           placeholder="输入代理商名称"
         />
       </n-form-item>
-      <n-form-item label="登陆账号" path="loginCredential.loginAccount">
-        <n-input
-          v-model:value="form.loginCredential.loginAccount"
-          clearable
-          placeholder="输入登陆账号"
-        />
+      <n-form-item label="登陆账号" path="loginCredential">
+        <n-input v-model:value="form.loginCredential" clearable placeholder="输入登陆账号" />
       </n-form-item>
       <n-form-item label="联系人姓名" path="operationCompanyAgencyContactName">
         <n-input
@@ -58,26 +54,29 @@
       </div>
 
       <n-form-item label="允许代理企业" path="operationCompanyIds">
-        <n-checkbox-group
-          v-model:value="form.operationCompanyIds"
-          @on-update:value="handleCheckbox"
-        >
-          <n-space>
-            <n-checkbox
-              :value="item.operationCompanyId"
-              v-for="item in allowAgentCompanyData"
-              :key="item.operationCompanyId"
-            >
-              {{ item.operationCompanyName }}
-            </n-checkbox>
-          </n-space>
-        </n-checkbox-group>
+        <div class="company-box">
+          <n-checkbox-group
+            v-model:value="form.operationCompanyIds"
+            @on-update:value="handleCheckbox"
+          >
+            <n-space>
+              <n-checkbox
+                :value="item.operationCompanyId"
+                v-for="item in allowAgentCompanyData"
+                :key="item.operationCompanyId"
+              >
+                {{ item.operationCompanyName }}
+              </n-checkbox>
+            </n-space>
+          </n-checkbox-group>
+        </div>
       </n-form-item>
 
       <div class="text-center flex-center">
         <n-button
           attr-type="button"
           :loading="loading"
+          :disabled="disabled"
           size="large"
           type="primary"
           @click="handleValidate"
@@ -85,7 +84,7 @@
         </n-button>
         <n-button
           attr-type="button"
-          :disabled="loading"
+          :disabled="disabled"
           type="warning"
           size="large"
           class="ml-10px"
@@ -97,7 +96,7 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, onMounted } from "vue";
+import { defineComponent, reactive, toRefs, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { rules } from "./data";
 import { statusOptions, sexOptions } from "@/config/form";
@@ -118,29 +117,40 @@ export default defineComponent({
     });
 
     const allowAgentCompanyData = ref<allowCompanyState[]>([]);
-    const title = ref("菜单");
+    const title = ref("代理商");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<formState>({
       operationCompanyAgencyName: null,
-      loginCredential: {
-        loginAccount: null,
-        loginCredentialState: 1,
-      },
+      loginCredential: null,
       operationCompanyAgencyContactName: null,
       operationCompanyAgencyContactGender: null,
       operationCompanyAgencyContactPhone: null,
       operationCompanyIds: null,
     });
 
-    onMounted(() => {});
-
-    function openDrawer(t: string, record: tableDataItem) {
+    function openDrawer(t: string, record: tableDataItem, bool = false) {
       console.log(record);
       allowAgentCompanyData.value = [];
+      state.disabled = bool;
       if (record) {
-        form.value = { ...form.value, ...record };
+        const {
+          operationCompanyAgencyName,
+          operationCompanyAgencyId,
+          operationCompanyAgencyContactGender,
+          operationCompanyAgencyContactPhone,
+          operationCompanyAgencyContactName,
+        } = record;
 
+        form.value = {
+          operationCompanyAgencyName,
+          operationCompanyIds: [],
+          operationCompanyAgencyId,
+          operationCompanyAgencyContactGender,
+          operationCompanyAgencyContactName,
+          operationCompanyAgencyContactPhone,
+          loginCredential: record.loginCredential ? record.loginCredential.loginAccount : null,
+        };
         if (record.operationCompanyList) {
           let agentCompany: allowCompanyState[] = cloneDeep(record.operationCompanyList);
           let ids = agentCompany.map((item) => item.operationCompanyId);
@@ -216,10 +226,7 @@ export default defineComponent({
     function handleReset() {
       form.value = {
         operationCompanyAgencyName: null,
-        loginCredential: {
-          loginAccount: null,
-          loginCredentialState: 1,
-        },
+        loginCredential: null,
         operationCompanyAgencyContactName: null,
         operationCompanyAgencyContactGender: null,
         operationCompanyAgencyContactPhone: null,
@@ -254,3 +261,10 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss" scoped>
+.company-box {
+  max-height: 400px;
+  min-height: 90px;
+  overflow: scroll;
+}
+</style>

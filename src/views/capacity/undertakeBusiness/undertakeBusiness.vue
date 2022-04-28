@@ -42,61 +42,22 @@
         :pagination="false"
       />
     </div>
-    <!-- 中间 -->
-    <div class="opening-business-right">
+    <!-- 中间busy-type-item busy-type-content-item-->
+    <div class="opening-business-right h-full bg-white p-10px">
       <template v-if="isShow">
-        <div
-          :class="['busy-type-item', index % 2 === 0 ? '' : 'striped']"
-          v-for="(vehicleType, index) in vehicleTypeData"
-          :key="vehicleType.vehicleTypeId"
-        >
-          <span class="busy-type-content-item">{{ vehicleType.vehicleTypeName }}</span>
-          <template v-if="index === 0">
-            <span
-              class="busy-type-content-item"
-              v-for="orderType in orderTypeData"
-              :key="orderType.entryId"
-              >{{ orderType.entryName }}</span
-            >
-          </template>
+        <div class="flex-align-start w-full" v-for="item in orderBusTypeData" :key="item.entryId">
+          <div class="busy-type-content-item text-center" style="width: 33%">
+            {{ item.entryName }}
+          </div>
 
-          <template v-else>
-            <span
-              class="busy-type-content-item"
-              v-for="orderType in orderTypeData"
-              :key="orderType.entryId"
-            >
-              <n-tooltip
-                trigger="hover"
-                v-if="getValResult(vehicleType.vehicleTypeId, orderType.entryCode).result"
-              >
-                <template #trigger>
-                  <n-tag
-                    type="success"
-                    @click="
-                      toggle(
-                        vehicleType,
-                        orderType,
-                        getValResult(vehicleType.vehicleTypeId, orderType.entryCode).obj
-                      )
-                    "
-                    size="small"
-                    >已开通</n-tag
-                  >
-                </template>
-                点击关闭
-              </n-tooltip>
-
-              <n-tooltip trigger="hover" v-else>
-                <template #trigger>
-                  <n-tag type="warning" size="small" @click="toggle(vehicleType, orderType)"
-                    >关闭
-                  </n-tag>
-                </template>
-                点击开通
-              </n-tooltip>
-            </span>
-          </template>
+          <div class="" style="width: 66%">
+            <div class="" v-for="val in orderTypeData" :key="val.entryId">
+              <span class="text-center" style="width: 50%; display: inline-block">{{
+                val.entryName
+              }}</span>
+              <span class="text-center" style="width: 50%; display: inline-block">暂无</span>
+            </div>
+          </div>
         </div>
       </template>
       <n-empty v-else class="empty" />
@@ -106,16 +67,16 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive, toRefs, onMounted } from "vue";
+import { defineComponent, ref, h, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { tableItemProps, tableDataItem, busTypeState, vehicleState, orderTypeState } from "./type";
+import { tableItemProps, tableDataItem, orderTypeState } from "./type";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import { getCityOpenArea } from "@/api/operate/operate";
 import ChargeFormDrawer from "./chargeFrom.vue";
 import { getAllOpenCity, getDict } from "@/api/common/common";
-// import { getOpenAreaBuss, delBusiness, getVehicleType } from "@/api/operate/operate";
-import { getOpenAreaBuss, getVehicleType } from "@/api/operate/operate";
+// import { getUndertakeBus, getAreaUndertakeBus, saveUndertakeBus } from "@/api/capacity/capacity"
+import { getUndertakeBus } from "@/api/capacity/capacity";
 import { formState } from "./type";
 export default defineComponent({
   name: "UndertakeBusiness",
@@ -136,19 +97,7 @@ export default defineComponent({
     const queryFormRef = ref<FormInst | null>(null);
     const message = useMessage();
 
-    const state = reactive<busTypeState>({
-      specialEconomic: [],
-      specialComfort: [],
-      specialBus: [],
-      specialPremium: [],
-      fastEconomic: [],
-      fastComfort: [],
-      fastBus: [],
-      fastPremium: [],
-      taxi: [],
-    });
-
-    const vehicleTypeData = ref<vehicleState[]>([]);
+    const orderBusTypeData = ref<orderTypeState[]>([]);
     const orderTypeData = ref<orderTypeState[]>([]);
     const bussinessData = ref([]);
 
@@ -172,11 +121,19 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
+                label: "查看",
+                type: "primary",
+                icon: EyeIcon,
+                isIconBtn: true,
+                onClick: handle.bind(null, record, index),
+                auth: ["dict001"],
+              },
+              {
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record, index),
+                onClick: handle.bind(null, record, index),
                 auth: ["dict001"],
               },
             ],
@@ -192,21 +149,33 @@ export default defineComponent({
 
     const getSquareData = () => {
       Promise.all([
-        getVehicleType({ operationCompanyId: "" }),
+        getDict({ parentEntryCode: "OBT0000" }),
         getDict({ parentEntryCode: "OT00000" }),
       ])
         .then((res) => {
           let dataArr = res.map((item) => item.data);
           console.log(dataArr);
 
-          dataArr[0].unshift({ vehicleTypeId: " ", vehicleTypeName: "#" });
-          vehicleTypeData.value = dataArr[0];
+          orderBusTypeData.value = dataArr[0];
           orderTypeData.value = dataArr[1];
         })
         .catch((err) => {
           console.log(err);
         });
     };
+
+    // const getAreaUndertakeBus = async () => {
+    //     try {
+    //         let option =  {
+    //             areaCode: areaCode.value,
+    //             // operationCompanyId:
+    //         }
+    //         // let res = await getAreaUndertakeBus()
+    //     } catch (err) {
+    //         console.log(err);
+
+    //     }
+    // }
 
     const getValResult = (vehicleTypeId: string, entryCode: string) => {
       let obj = {};
@@ -243,6 +212,8 @@ export default defineComponent({
         bussinessData.value = [];
         await formRef.value?.validate();
         let res = await getCityOpenArea({ cityCode: cityCode.value });
+        console.log(res);
+
         data.value = res.data;
       } catch (err) {
         console.log(err);
@@ -252,7 +223,9 @@ export default defineComponent({
 
     async function getBussiness(areaCode: string) {
       try {
-        let res = await getOpenAreaBuss({ areaCode });
+        let res = await getUndertakeBus({ areaCode });
+        console.log(res.data);
+
         bussinessData.value = res.data;
         isShow.value = true;
       } catch (err) {
@@ -260,33 +233,38 @@ export default defineComponent({
       }
     }
 
-    const toggle = (vehicleType: vehicleState, orderType: orderTypeState, editObj?: formState) => {
-      let option = {
-        orderType: orderType.entryCode,
-        vehicleTypeId: vehicleType.vehicleTypeId,
-        areaCode: areaCode.value,
-        ...editObj,
-      };
-      const { openDrawer } = chargeFormDrawerRef.value;
-      openDrawer(option);
+    const toggle = (
+      orderBusType: orderTypeState,
+      orderType: orderTypeState,
+      editObj?: formState
+    ) => {
+      console.log(orderBusType, orderType, editObj);
+
+      // let option = {
+      //     orderType: orderType.entryCode,
+      //     vehicleTypeId: orderBusType.orderBusTypeId,
+      //     areaCode: areaCode.value,
+      //     ...editObj,
+      // };
+      // const { openDrawer } = chargeFormDrawerRef.value;
+      // openDrawer(option);
     };
 
-    function handleEdit(record: tableDataItem) {
+    function handle(record: tableDataItem) {
       areaCode.value = record.areaCode as string;
       getBussiness(record.areaCode as string);
     }
 
     function handleSaveAfter() {
-      getBussiness(areaCode.value as string);
+      // getBussiness(areaCode.value as string);
     }
 
     return {
-      ...toRefs(state),
       loading,
       isShow,
       queryFormRef,
       chargeFormDrawerRef,
-      vehicleTypeData,
+      orderBusTypeData,
       orderTypeData,
       cityCode,
       columns,
@@ -315,7 +293,8 @@ export default defineComponent({
   display: flex;
   align-content: flex-start;
   justify-content: flex-start;
-  $w: 460px;
+  // $w: 460px;
+  $w: 260px;
 
   &-left {
     width: $w;

@@ -113,7 +113,7 @@ export interface loginCredentialProps {
 interface agencyState {
   operationCompanyAgencyId?: string | null;
   operationCompanyAgencyName: string | null;
-  loginCredential: loginCredentialProps;
+  loginCredential: string | null;
   operationCompanyAgencyContactName: string | null;
   operationCompanyAgencyContactGender: number | null;
   operationCompanyAgencyContactPhone: string | null;
@@ -193,9 +193,49 @@ export function getRatio(data: ratioSate) {
 }
 
 //----------------------企业承接业务设置-----------------------
+/**
+ * 通过开通区域查找该区域下的企业承接业务列表
+ */
 
+export function getUndertakeBus(data: {areaCode: string}) {
+  return http.request({
+    url: "/operationCompanyUndertakeBusiness/getUndertakeBusinessListByAreaCode",
+    method: "post",
+    data: data,
+  });
+}
 
+/**
+ * 按照开通区域和企业查找该区域下的企业承接业务列表
+ */
 
+export function getAreaUndertakeBus(data: {areaCode: string; operationCompanyId: string}) {
+  return http.request({
+    url: "/operationCompanyUndertakeBusiness/getUndertakeBusinessListByAreaCodeAndCompany",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ * 保存企业承接业务
+ */
+interface companyUndertakeBusinessState {
+    orderBusinessType: string | null
+    oorderTyperderBusinessType: string | null
+}
+interface undertakeState {
+    areaCode: string | null
+    operationCompanyId: string | null
+    companyUndertakeBusinessList: companyUndertakeBusinessState
+}
+export function saveUndertakeBus(data: undertakeState) {
+  return http.request({
+    url: "/operationCompanyUndertakeBusiness/save",
+    method: "post",
+    data: data,
+  });
+}
 
 
 

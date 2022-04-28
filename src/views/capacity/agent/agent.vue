@@ -40,7 +40,7 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <AgentDrawer ref="agentDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <AgentDrawer ref="agentDrawerRef" :width="600" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -121,10 +121,16 @@ export default defineComponent({
           if (!row.loginCredential) {
             return h("span", " ");
           } else {
-            return h(NTag, {
-              type: row.loginCredential.loginCredentialState === 1 ? "success" : "error",
-              onClick: handleStatus.bind(null, row),
-            });
+            return h(
+              NTag,
+              {
+                type: row.loginCredential.loginCredentialState === 1 ? "success" : "error",
+                onClick: handleStatus.bind(null, row),
+              },
+              {
+                default: () => (row.loginCredential.loginCredentialState === 1 ? "正常" : "锁定"),
+              }
+            );
           }
         },
       },
@@ -141,7 +147,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handle.bind(null, record, true),
                 auth: ["dict001"],
               },
               {
@@ -149,7 +155,7 @@ export default defineComponent({
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handle.bind(null, record, false),
                 auth: ["dict001"],
               },
             ],
@@ -180,9 +186,9 @@ export default defineComponent({
       console.log("选择了", rowKeys);
     }
 
-    function handleEdit(record: Recordable) {
+    function handle(record: Recordable, bool: boolean) {
       const { openDrawer } = agentDrawerRef.value;
-      openDrawer("编辑代理商", record);
+      openDrawer("编辑代理商", record, bool);
     }
     function handleAdd() {
       const { openDrawer } = agentDrawerRef.value;

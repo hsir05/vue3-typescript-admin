@@ -10,7 +10,7 @@ export interface loginCredentialProps {
 
 export interface itemState {
   operationCompanyAgencyId?: string | null;
-  loginCredential: loginCredentialProps;
+//   loginCredential: loginCredentialProps;
   operationCompanyAgencyName: null | string;
   operationCompanyAgencyContactName: null | string;
   operationCompanyAgencyContactGender: null | number;
@@ -20,11 +20,12 @@ export interface itemState {
 
 
 export interface tableDataItem extends itemState {
-  
+   loginCredential: loginCredentialProps;
   operationCompanyList: allowCompanyState[] | null
 }
 
 export interface formState extends itemState {
   operationCompanyIds: null | string[] 
+  loginCredential: string | null
 
 }
