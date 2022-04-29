@@ -9,30 +9,31 @@ export interface tableDataItem {
   lock?: number | null;
 }
 
+export interface companyUndertakeBusinessState {
+    orderType: string, 
+    orderBusinessType: string
+}
+interface companyState {
+    operationCompanyName: string
+    operationCompanyId: string
+}
 export interface formState {
-  openBusinessId?: string | null;
-  areaCode: string | null;
-  orderType: string | null;
-  vehicleTypeId: string | null;
-  chargeRuleBaseId?: string | null;
-  chargeRuleMileageId?: string | null;
-  chargeRuleDurationId?: string | null;
-  chargeRuleCancelId?: string | null;
-  chargeRuleWaitId?: string | null;
-  chargeRuleFloatHolidayId?: string | null;
-  chargeRuleFloatWorkdayId?: string | null;
+    areaCode: string
+    // operationCompany: companyState
+    // operationCompanyOrderDistanceId: string
+    // operationCompanyUndertakeBusinessId: string
+    orderBusinessType: string
+    orderType: string
 }
 
-export interface busTypeState {
-  specialEconomic: number[];
-  specialComfort: number[];
-  specialBus: number[];
-  specialPremium: number[];
-  fastEconomic: number[];
-  fastComfort: number[];
-  fastBus: number[];
-  fastPremium: number[];
-  taxi: number[];
+export interface resutlState {
+    areaCode?: string
+    operationCompany?: companyState
+    operationCompanyOrderDistanceId?: string
+    operationCompanyUndertakeBusinessId?: string
+    orderBusinessType?: string
+    orderType?: string
+    result: boolean
 }
 
 export interface vehicleState {

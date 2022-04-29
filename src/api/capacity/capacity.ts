@@ -221,13 +221,13 @@ export function getAreaUndertakeBus(data: {areaCode: string; operationCompanyId:
  * 保存企业承接业务
  */
 interface companyUndertakeBusinessState {
-    orderBusinessType: string | null
-    oorderTyperderBusinessType: string | null
+    orderType: string
+    orderBusinessType: string
 }
 interface undertakeState {
     areaCode: string | null
     operationCompanyId: string | null
-    companyUndertakeBusinessList: companyUndertakeBusinessState
+    companyUndertakeBusinessList: companyUndertakeBusinessState[]
 }
 export function saveUndertakeBus(data: undertakeState) {
   return http.request({
