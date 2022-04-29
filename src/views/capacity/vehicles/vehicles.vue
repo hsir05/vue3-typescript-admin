@@ -11,32 +11,32 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="车牌号" path="plageNumber">
+      <n-form-item label="车牌号" path="plateNumberLike">
         <n-input
-          v-model:value="queryValue.plageNumber"
+          v-model:value="queryValue.plateNumberLike"
           clearable
           placeholder="输入车牌号"
           style="width: 200px"
         />
       </n-form-item>
 
-      <n-form-item label="运营企业" path="companyName">
+      <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           clearable
           style="width: 150px"
-          v-model:value="queryValue.companyName"
+          v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
           @update:value="handleUpdateValue"
           :options="options"
         />
       </n-form-item>
 
-      <n-form-item label="车辆类型" path="vehicleType">
+      <n-form-item label="车辆类型" path="vehicleTypeIdEq">
         <n-select
           clearable
           filterable
           style="width: 150px"
-          v-model:value="queryValue.vehicleType"
+          v-model:value="queryValue.vehicleTypeIdEq"
           placeholder="选择车辆类型"
           @update:value="handleUpdateValue"
           :options="vehicleTypeData"
@@ -69,7 +69,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 
 import {
@@ -83,9 +83,8 @@ import BasicTable from "@/components/Table/Table.vue";
 import VehiclesDrawer from "./vehiclesDrawer.vue";
 import TraCerDrawer from "./traCerDrawer.vue";
 import { tableDataItem } from "./type";
-import { data } from "./data";
 import { NTag } from "naive-ui";
-// import { getUsers } from "@/api/system/user";
+import { getVehiclePage } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "Vehicles",
@@ -97,12 +96,13 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      plageNumber: null,
-      companyName: null,
-      vehicleType: null,
+      operationCompanyIdEq: null,
+      plateNumberLike: null,
+      vehicleTypeIdEq: null,
+      vehicleStateEq: null,
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       { type: "selection", align: "center" },
@@ -237,27 +237,25 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getVehiclePage({ page, search: search });
+        console.log(res.data);
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
@@ -339,7 +337,7 @@ export default defineComponent({
         openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
       options: [],
-      vehicleTypeData,
+      vehicleTypeData: [],
 
       reloadPage,
       handleAdd,

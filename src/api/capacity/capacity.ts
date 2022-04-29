@@ -237,8 +237,23 @@ export function saveUndertakeBus(data: undertakeState) {
   });
 }
 
-
-
+//----------------------车辆管理-----------------------
+interface vehiclePage {
+  page: PaginationState;
+  search: {
+    operationCompanyIdEq: string | null;
+    plateNumberLike: string | null;
+    vehicleTypeIdEq: string | null;
+    vehicleStateEq: string | null;
+  };
+}
+export function getVehiclePage(data: vehiclePage) {
+  return http.request({
+    url: "/vehicle/page",
+    method: "post",
+    data: data,
+  });
+}
 
 //----------------------企业紧急联系人管理-----------------------
 /**
