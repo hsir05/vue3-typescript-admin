@@ -379,6 +379,10 @@ export default defineComponent({
     }
 
     const toggle = (orderType: string, orderBusinessType: string, editObj?: formState) => {
+      if (!operationCompanyId.value) {
+        message.warning("请选择运营企业后添加");
+        return false;
+      }
       if (editObj) {
         let index = companyUndertakeBusinessList.value.findIndex(
           (item: companyUndertakeBusinessState) =>
