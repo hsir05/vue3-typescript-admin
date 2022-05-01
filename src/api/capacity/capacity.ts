@@ -106,8 +106,8 @@ export function getAgencyPage(data: agencyPageSate) {
  * 新增代理商
  */
 export interface loginCredentialProps {
-    loginCredentialState: number
-    loginAccount: string | null
+  loginCredentialState: number;
+  loginAccount: string | null;
 }
 
 interface agencyState {
@@ -117,7 +117,7 @@ interface agencyState {
   operationCompanyAgencyContactName: string | null;
   operationCompanyAgencyContactGender: number | null;
   operationCompanyAgencyContactPhone: string | null;
-   operationCompanyIds: null | string[]
+  operationCompanyIds: null | string[];
 }
 export function addAgency(data: agencyState) {
   return http.request({
@@ -140,7 +140,7 @@ export function editAgency(data: agencyState) {
 /**
  * 修改代理商状态
  */
-export function updateAgencyStatus(data: {operationCompanyAgencyId:string}) {
+export function updateAgencyStatus(data: { operationCompanyAgencyId: string }) {
   return http.request({
     url: "/operationCompanyAgency/modifyAgencyStatus",
     method: "post",
@@ -150,7 +150,7 @@ export function updateAgencyStatus(data: {operationCompanyAgencyId:string}) {
 /**
  * 代理商名称去重
  */
-export function uniqueAgencyName(data: {operationCompanyAgencyName:string}) {
+export function uniqueAgencyName(data: { operationCompanyAgencyName: string }) {
   return http.request({
     url: "/operationCompanyAgency/uniqueOperationCompanyAgencyName",
     method: "post",
@@ -160,7 +160,7 @@ export function uniqueAgencyName(data: {operationCompanyAgencyName:string}) {
 /**
  * 校验代理商登录账号是否重复
  */
-export function uniqueAgencyLogin(data: {operationCompanyAgencyName:string}) {
+export function uniqueAgencyLogin(data: { operationCompanyAgencyName: string }) {
   return http.request({
     url: "/operationCompanyAgency/uniqueOperationCompanyAgencyName",
     method: "post",
@@ -174,15 +174,15 @@ export function uniqueAgencyLogin(data: {operationCompanyAgencyName:string}) {
 export function getAllowAgencyCompany() {
   return http.request({
     url: "/operationCompany/findAllowAgencyOperationCompanyList",
-    method: "post"
+    method: "post",
   });
 }
 /**
  * 校验代理商登录账号是否重复
  */
 interface ratioSate {
-    operationCompanyAgencyId: string 
-    operationCompanyId: string
+  operationCompanyAgencyId: string;
+  operationCompanyId: string;
 }
 export function getRatio(data: ratioSate) {
   return http.request({
@@ -197,7 +197,7 @@ export function getRatio(data: ratioSate) {
  * 通过开通区域查找该区域下的企业承接业务列表
  */
 
-export function getUndertakeBus(data: {areaCode: string}) {
+export function getUndertakeBus(data: { areaCode: string }) {
   return http.request({
     url: "/operationCompanyUndertakeBusiness/getUndertakeBusinessListByAreaCode",
     method: "post",
@@ -209,7 +209,7 @@ export function getUndertakeBus(data: {areaCode: string}) {
  * 按照开通区域和企业查找该区域下的企业承接业务列表
  */
 
-export function getAreaUndertakeBus(data: {areaCode: string; operationCompanyId: string}) {
+export function getAreaUndertakeBus(data: { areaCode: string; operationCompanyId: string }) {
   return http.request({
     url: "/operationCompanyUndertakeBusiness/getUndertakeBusinessListByAreaCodeAndCompany",
     method: "post",
@@ -221,17 +221,58 @@ export function getAreaUndertakeBus(data: {areaCode: string; operationCompanyId:
  * 保存企业承接业务
  */
 interface companyUndertakeBusinessState {
-    orderType: string
-    orderBusinessType: string
+  orderType: string;
+  orderBusinessType: string;
 }
 interface undertakeState {
-    areaCode: string | null
-    operationCompanyId: string | null
-    companyUndertakeBusinessList: companyUndertakeBusinessState[]
+  areaCode: string | null;
+  operationCompanyId: string | null;
+  companyUndertakeBusinessList: companyUndertakeBusinessState[];
 }
 export function saveUndertakeBus(data: undertakeState) {
   return http.request({
     url: "/operationCompanyUndertakeBusiness/save",
+    method: "post",
+    data: data,
+  });
+}
+//----------------------订单抽成比率-----------------------
+/**
+ * 按照企业id和流量code查找订单抽成比率
+ */
+interface RatePageInter {
+  operationCompanyId: string | null;
+  areaCode: string | null;
+}
+export function getRatePage(data: RatePageInter) {
+  return http.request({
+    url: "/orderIncomeDivideRate/findByCompanyIdAndAreaCode",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 批量修改订单抽成比率
+ */
+interface OperationCompanyInter {
+  orderIncomeDivideRateId: string | null;
+  areaCode: string | null;
+  orderBusinessType: string | null;
+  orderType: string | null;
+  influxCode: string | null;
+  influxDivideRate: number | null;
+  companyDivideRate: number | null;
+  platformDivideRate: number | null;
+  agencyDivideRate: number | null;
+  driverDivideRate: number | null;
+}
+interface UpdateRate {
+  operationCompanyId: string;
+  orderIncomeDivideRatePDTOList: OperationCompanyInter[];
+}
+export function updateRate(data: UpdateRate) {
+  return http.request({
+    url: "/orderIncomeDivideRate/modifyDivideRate",
     method: "post",
     data: data,
   });

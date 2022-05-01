@@ -46,7 +46,7 @@
         />
       </n-form-item>
 
-      <div class="mt-10px mb-30px ml-40px">
+      <div class="mt-10px mb-30px ml-40px" v-if="timeRangeTips">
         <n-icon size="24" style="vertical-align: middle">
           <AlertIcon color="#f0a020" />
         </n-icon>

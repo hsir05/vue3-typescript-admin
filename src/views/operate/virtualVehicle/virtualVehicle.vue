@@ -83,7 +83,7 @@
       <n-form
         ref="formRef"
         :rules="rules"
-        style="display: flex; flex-wrap: wrap; width: 850px; margin: 0 auto"
+        style="display: flex; flex-wrap: wrap; width: 100%; margin: 0 auto"
         :disabled="disabled"
         label-placement="left"
         require-mark-placement="right-hanging"
@@ -586,6 +586,7 @@ export default defineComponent({
   &-right {
     width: calc(100% - $width - 10px);
     background-color: $white;
+    overflow: scroll;
   }
 }
 </style>

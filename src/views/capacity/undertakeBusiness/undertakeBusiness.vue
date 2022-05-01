@@ -55,8 +55,8 @@
                 val.entryName
               }}</span>
               <span :class="['border-item', 'width-70', index % 2 === 0 ? '' : 'striped']">{{
-                getValResult(item.entryCode, val.entryCode).result
-                  ? getValResult(item.entryCode, val.entryCode).operationCompany
+                getValResult(val.entryCode, item.entryCode).result
+                  ? getValResult(val.entryCode, item.entryCode).operationCompany
                       .operationCompanyName
                   : "暂未开通"
               }}</span>
@@ -325,7 +325,7 @@ export default defineComponent({
       }
     };
 
-    const getValResult = (orderBusinessType: string, orderType: string): resutlState => {
+    const getValResult = (orderType: string, orderBusinessType: string): resutlState => {
       let obj = {};
       let result = bussinessData.value.some((item: formState) => {
         if (item.orderBusinessType === orderBusinessType && item.orderType === orderType) {

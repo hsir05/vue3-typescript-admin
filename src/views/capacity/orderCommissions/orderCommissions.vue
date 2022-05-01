@@ -6,31 +6,31 @@
       inline
       :rule="rule"
       label-placement="left"
-      label-width="120"
+      label-width="90"
       class="pt-15px pb-15px bg-white mb-10px"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="运营企业名称" path="companyName">
+      <n-form-item label="运营企业" path="operationCompanyId">
         <n-select
           clearable
-          style="width: 150px"
-          v-model:value="queryValue.companyName"
-          placeholder="选择运营企业名称"
-          @update:value="handleUpdateValue"
-          :options="options"
+          style="width: 300px"
+          filterable
+          v-model:value="queryValue.operationCompanyId"
+          placeholder="选择运营企业"
+          @update:value="handleUpdateCompany"
+          :options="companyData"
         />
       </n-form-item>
 
-      <n-form-item label="开通区域" path="openArea">
+      <n-form-item label="开通区域" path="areaCode">
         <n-select
           clearable
           filterable
           style="width: 150px"
-          v-model:value="queryValue.openArea"
+          v-model:value="queryValue.areaCode"
           placeholder="选择开通区域"
-          @update:value="handleUpdateValue"
-          :options="options"
+          :options="openAreaData"
         />
       </n-form-item>
 
@@ -48,28 +48,27 @@
       :loading="loading"
       :isBatchBtn="true"
       batchText="批量修改"
-      :itemCount="itemCount"
+      :row-key="getRowKeyId"
+      :itemCount="null"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
       @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
-      @on-page="handlePage"
-      @on-pagination="handlepagSize"
     />
+
     <OrderComDrawer ref="orderComDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import OrderComDrawer from "./orderComDrawer.vue";
-import { tableDataItem } from "./type";
-import { data } from "./data";
-// import { getUsers } from "@/api/system/user";
-import { PaginationState } from "@/api/type";
+import { TableDataInter } from "./type";
+import { getRatePage } from "@/api/capacity/capacity";
+import { getCompanyOpenArea } from "@/api/operate/operate";
+import { getAllOperateCompany } from "@/api/common/common";
 export default defineComponent({
   name: "OrderCommissions",
   components: { BasicTable, OrderComDrawer },
@@ -77,14 +76,18 @@ export default defineComponent({
     const loading = ref(false);
     const orderComDrawerRef = ref();
     const basicTableRef = ref();
-    const itemCount = ref(null);
+    const companyData = ref([]);
+    const openAreaData = ref([]);
+    const rowKeysData = ref<string[]>([]);
     const queryValue = ref({
-      companyName: null,
-      openArea: null,
+      // operationCompanyId: null,
+      // areaCode: null,
+
+      operationCompanyId: "75e642e0096b4a41a2b2ecf933c92247",
+      areaCode: "110000A01",
     });
 
-    // const data = ref<tableDataItem[]>([]);
-
+    const data = ref<TableDataInter[]>([]);
     const columns = [
       {
         type: "selection",
@@ -95,54 +98,58 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "流量方",
-        key: "agent",
+        key: "influxName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "订单业务类型",
-        key: "account",
+        key: "orderBusinessType",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "订单类型",
-        key: "contacts",
+        key: "orderType",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "流量方比率",
-        key: "sex",
-        width: 100,
+        key: "influxDivideRate",
         align: "center",
       },
 
       {
         title: "平台比率",
-        key: "phone",
-        width: 110,
+        key: "platformDivideRate",
         align: "center",
       },
       {
         title: "代理商比率",
-        key: "phone",
-        width: 110,
+        key: "agencyDivideRate",
         align: "center",
       },
       {
         title: "企业比例",
-        key: "phone",
-        width: 110,
+        key: "companyDivideRate",
         align: "center",
       },
       {
         title: "司机比率",
-        key: "phone",
-        width: 110,
+        key: "driverDivideRate",
         align: "center",
       },
 
@@ -151,7 +158,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "100px",
-        render(record: tableDataItem) {
+        render(record: TableDataInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -168,106 +175,140 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getAllCompanyData();
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+    const getData = async () => {
+      loading.value = true;
+      try {
+        let res = await getRatePage(queryValue.value);
+        console.log(res.data);
+        data.value = res.data;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
+      rowKeysData.value = rowKeys;
     }
 
     function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+      console.log("点击了编辑", record);
       const { openDrawer } = orderComDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer(record, false);
     }
     function handleBatch() {
-      console.log("点击了批量删除");
-    }
-    function handleAdd() {
-      console.log("点击了新增");
+      console.log("点击了批量");
+      //operationCompanyId areaCode influxCode orderType orderBusinessType
+      let dataArr = [];
+      for (let key of rowKeysData.value) {
+        let item = data.value.find((item: TableDataInter) => item.orderIncomeDivideRateId === key);
+        if (item) {
+          dataArr.push({
+            orderIncomeDivideRateId: item.orderIncomeDivideRateId,
+            areaCode: item.areaCode,
+            influxCode: item.influxCode,
+            orderType: item.orderType,
+            orderBusinessType: item.orderBusinessType,
+          });
+        }
+      }
+
       const { openDrawer } = orderComDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer(
+        {
+          operationCompany: { operationCompanyId: queryValue.value.operationCompanyId },
+        },
+        true,
+        dataArr
+      );
     }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
-      const { resetPagination } = basicTableRef.value;
-      resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData();
     };
+    async function handleUpdateCompany(companyId: string) {
+      console.log(companyId);
+      try {
+        openAreaData.value = [];
+        // queryValue.value.areaCode = null
+        let res = await getCompanyOpenArea({ companyId });
+        console.log(res);
+        openAreaData.value = res.data.map((item: { areaName: string; areaCode: string }) => {
+          let obj = {
+            label: item.areaName,
+            value: item.areaCode,
+          };
+          return obj;
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
     const reset = () => {
-      queryValue.value = { companyName: null, openArea: null };
-      const { resetPagination } = basicTableRef.value;
-      resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      // queryValue.value = { operationCompanyId: null, areaCode: null };
+      getData();
     };
 
     function reloadPage() {
-      const { resetPagination } = basicTableRef.value;
-      resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData();
     }
 
-    function handlePage(pagination: PaginationState) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
-    }
-    function handlepagSize(pagination: PaginationState) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
-    }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
       //   getData({ page: 1, pageSize: 10 });
     }
 
-    function handleUpdateValue() {}
-
     return {
       queryValue,
       data,
       loading,
+      companyData,
+      openAreaData,
       orderComDrawerRef,
+      getRowKeyId: (row: TableDataInter) => row.orderIncomeDivideRateId,
       basicTableRef,
       columns,
-      itemCount,
       rule: {
-        companyName: { required: true, trigger: ["blur", "input"], message: "请选择运营企业名称" },
-        openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
+        operationCompanyId: {
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请选择运营企业",
+        },
+        areaCode: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
-      options: [],
 
       reloadPage,
-      handleAdd,
       handleBatch,
       searchHandle,
+      handleUpdateCompany,
       reset,
       handleCheckRow,
-      handlePage,
-      handlepagSize,
       handleSaveAfter,
-      handleUpdateValue,
     };
   },
 });

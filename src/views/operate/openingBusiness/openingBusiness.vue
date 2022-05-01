@@ -50,7 +50,9 @@
           v-for="(vehicleType, index) in vehicleTypeData"
           :key="vehicleType.vehicleTypeId"
         >
-          <span class="busy-type-content-item">{{ vehicleType.vehicleTypeName }}</span>
+          <span class="busy-type-content-item" style="width: 16%">{{
+            vehicleType.vehicleTypeName
+          }}</span>
           <template v-if="index === 0">
             <span
               class="busy-type-content-item"

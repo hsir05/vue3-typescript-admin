@@ -103,7 +103,16 @@ export function removeArea(data: {areaCode: string | null}) {
     data
   });
 }
-
+/**
+ * 根据企业id查询开通区域
+*/
+export function getCompanyOpenArea(data: {companyId: string}) {
+  return http.request({
+    url: '/openArea/openAreaListByCompanyId',
+    method: 'post',
+    data
+  });
+}
 /**
  * 保存开通区域及下属的关键点信息
 */

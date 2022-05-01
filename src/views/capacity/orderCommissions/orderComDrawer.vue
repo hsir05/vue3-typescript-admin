@@ -1,77 +1,81 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" title="编辑订单抽成比率" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
       :rules="rules"
-      size="large"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '440px' }"
       require-mark-placement="right-hanging"
-      label-width="140"
+      label-width="120"
       :model="form"
     >
-      <n-form-item label="代理商" path="agent">
-        <n-input v-model:value="form.agent" clearable placeholder="输入代理商" />
-      </n-form-item>
-      <n-form-item label="运营企业编号" path="contacts">
-        <n-input v-model:value="form.contacts" clearable placeholder="输入运营企业编号" />
-      </n-form-item>
-      <n-form-item label="代理商登录账号" path="account">
-        <n-input v-model:value="form.account" clearable placeholder="输入代理商登录账号" />
-      </n-form-item>
-
-      <n-form-item label="代理商联系人" path="contacts">
-        <n-input v-model:value="form.contacts" clearable placeholder="输入代理商联系人" />
-      </n-form-item>
-
-      <n-form-item label="代理运营企业" path="operateCity">
-        <n-select
+      <n-form-item label="流量方比率" path="influxDivideRate">
+        <n-input-number
+          v-model:value="form.influxDivideRate"
           clearable
-          filterable
-          v-model:value="form.operateCity"
-          placeholder="选择代理运营企业"
-          @update:value="handleUpdateValue"
-          :options="openCityData"
+          :min="0"
+          :max="1"
+          placeholder="输入流量方比率"
+        />
+      </n-form-item>
+      <n-form-item label="平台比率" path="platformDivideRate">
+        <n-input-number
+          v-model:value="form.platformDivideRate"
+          clearable
+          :min="0"
+          :max="1"
+          placeholder="输入平台比率"
+        />
+      </n-form-item>
+      <n-form-item label="代理商比率" path="agencyDivideRate">
+        <n-input-number
+          v-model:value="form.agencyDivideRate"
+          clearable
+          :min="0"
+          :max="1"
+          placeholder="输入代理商比率"
         />
       </n-form-item>
 
-      <n-form-item label="联系人电话" path="phone">
-        <n-input
-          v-model:value="form.phone"
+      <n-form-item label="企业比率" path="companyDivideRate">
+        <n-input-number
+          v-model:value="form.companyDivideRate"
           clearable
-          placeholder="输入联系人电话"
-          :maxlength="11"
+          :min="0"
+          :max="1"
+          placeholder="输入企业比率"
+        />
+      </n-form-item>
+
+      <n-form-item label="司机比率" path="driverDivideRate">
+        <n-input-number
+          v-model:value="form.driverDivideRate"
+          clearable
+          :min="0"
+          :max="1"
+          placeholder="输入企业比率"
         />
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
-          >保存</n-button
-        >
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
-          >重置</n-button
-        >
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >保存
+        </n-button>
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
+import { FormInst, useMessage } from "naive-ui";
 import { rules } from "./data";
-import { tableDataItem } from "./type";
-
+import { FormInter, TableDataInter, OperationCompanyInter } from "./type";
+import { updateRate } from "@/api/capacity/capacity";
+import loading from "naive-ui/lib/_internal/loading";
 export default defineComponent({
   name: "OrderComDrawer",
   emits: ["on-save-after"],
@@ -80,28 +84,35 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
-      openCityData: [],
     });
-    const title = ref("菜单");
+    const orderIncomeDivideRatePDTOList = ref<OperationCompanyInter[]>([]);
+    const idsData = ref<OperationCompanyInter[]>([]);
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      agent: null,
-      contacts: null,
-      phone: null,
-      account: null,
-      operateCity: null,
-      sex: null,
-      create_time: null,
-      status: null,
+    const form = ref<FormInter>({
+      orderIncomeDivideRateId: null,
+      operationCompanyId: null,
+      areaCode: null,
+      orderBusinessType: null,
+      orderType: null,
+      influxCode: null,
+      influxDivideRate: null,
+      companyDivideRate: null,
+      platformDivideRate: null,
+      agencyDivideRate: null,
+      driverDivideRate: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    function openDrawer(record: TableDataInter, isBatch: boolean, ids?: OperationCompanyInter[]) {
       console.log(record);
-      if (record) {
+      if (!isBatch) {
         form.value = { ...form.value, ...record };
+        form.value.operationCompanyId = record.operationCompany.operationCompanyId;
+      } else if (ids && ids.length > 0) {
+        console.log(ids);
+        form.value.operationCompanyId = record.operationCompany.operationCompanyId;
+        idsData.value = ids;
       }
-      title.value = t;
       state.isDrawer = true;
     }
 
@@ -109,42 +120,96 @@ export default defineComponent({
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
-          state.loading = true;
-          state.disabled = true;
           console.log(unref(form));
-
-          handleSaveAfter();
-
-          message.success("验证成功");
+          updateData();
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
 
-    function handleUpdateValue(_: string, option: SelectOption) {
-      console.log(option);
-      // console.log(toRaw(form.value));
+    const updateData = async () => {
+      try {
+        loading.value = true;
 
-      //    form.value.city = unref(option).label
-      //    form.value.code = option.value
-    }
+        const {
+          orderIncomeDivideRateId,
+          areaCode,
+          orderBusinessType,
+          orderType,
+          influxCode,
+          influxDivideRate,
+          companyDivideRate,
+          platformDivideRate,
+          agencyDivideRate,
+          driverDivideRate,
+        } = form.value;
+        if (idsData.value.length > 0) {
+          for (let key of idsData.value) {
+            orderIncomeDivideRatePDTOList.value.push({
+              orderIncomeDivideRateId: key.orderIncomeDivideRateId,
+              areaCode: key.areaCode,
+              orderBusinessType: key.orderBusinessType,
+              orderType: key.orderType,
+              influxCode: key.influxCode,
+              influxDivideRate,
+              companyDivideRate,
+              platformDivideRate,
+              agencyDivideRate,
+              driverDivideRate,
+            });
+          }
+        } else {
+          orderIncomeDivideRatePDTOList.value.push({
+            orderIncomeDivideRateId,
+            areaCode,
+            orderBusinessType,
+            orderType,
+            influxCode,
+            influxDivideRate,
+            companyDivideRate,
+            platformDivideRate,
+            agencyDivideRate,
+            driverDivideRate,
+          });
+        }
+
+        let option = {
+          operationCompanyId: form.value.operationCompanyId as string,
+          orderIncomeDivideRatePDTOList: orderIncomeDivideRatePDTOList.value,
+        };
+        console.log(option);
+        let res = await updateRate(option);
+        console.log(res);
+        message.success(window.$tips(res.code));
+        handleSaveAfter();
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
 
     function handleSaveAfter() {
       emit("on-save-after");
     }
 
     function handleReset() {
+      orderIncomeDivideRatePDTOList.value = [];
+      let orderIncomeDivideRateId = form.value.orderIncomeDivideRateId;
+      let operationCompanyId = form.value.operationCompanyId;
       form.value = {
-        agent: null,
-        contacts: null,
-        phone: null,
-        account: null,
-        operateCity: null,
-        sex: null,
-        create_time: null,
-        status: null,
+        orderIncomeDivideRateId: orderIncomeDivideRateId,
+        operationCompanyId: operationCompanyId,
+        areaCode: null,
+        orderBusinessType: null,
+        orderType: null,
+        influxCode: null,
+        influxDivideRate: null,
+        companyDivideRate: null,
+        platformDivideRate: null,
+        agencyDivideRate: null,
+        driverDivideRate: null,
       };
       formRef.value?.restoreValidation();
     }
@@ -158,11 +223,9 @@ export default defineComponent({
     return {
       ...toRefs(state),
       formRef,
-      title,
       rules,
       form,
       openDrawer,
-      handleUpdateValue,
       handleReset,
       handleValidate,
       onCloseAfter,
