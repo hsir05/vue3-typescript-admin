@@ -6,7 +6,7 @@
       inline
       :rule="rule"
       label-placement="left"
-      label-width="100"
+      label-width="80"
       class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
@@ -23,11 +23,11 @@
       <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           clearable
-          style="width: 150px"
+          style="width: 280px"
           v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
           @update:value="handleUpdateValue"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -41,6 +41,16 @@
           @update:value="handleUpdateValue"
           :options="vehicleTypeData"
         />
+      </n-form-item>
+
+      <n-form-item label="是否锁定" path="vehicleStateEq">
+        <n-radio-group v-model:value="queryValue.vehicleStateEq">
+          <n-space>
+            <n-radio :value="item.value" v-for="item in stateOptions" :key="item.value">{{
+              item.label
+            }}</n-radio>
+          </n-space>
+        </n-radio-group>
       </n-form-item>
 
       <n-form-item>
@@ -85,7 +95,9 @@ import TraCerDrawer from "./traCerDrawer.vue";
 import { tableDataItem } from "./type";
 import { NTag } from "naive-ui";
 import { getVehiclePage } from "@/api/capacity/capacity";
+import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "Vehicles",
   components: { BasicTable, VehiclesDrawer, TraCerDrawer },
@@ -95,6 +107,7 @@ export default defineComponent({
     const traCerDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
+    const companyData = ref([]);
     const queryValue = ref({
       operationCompanyIdEq: null,
       plateNumberLike: null,
@@ -105,7 +118,7 @@ export default defineComponent({
     const data = ref<tableDataItem[]>([]);
 
     const columns = [
-      { type: "selection", align: "center" },
+      //   { type: "selection", align: "center" },
       {
         title: "序号",
         key: "index",
@@ -115,41 +128,41 @@ export default defineComponent({
           return h("span", `${rowIndex + 1}`);
         },
       },
-      { title: "车牌号", key: "plageNumber", width: 100, align: "center" },
+      { title: "车牌号", key: "plateNumber", width: 100, align: "center" },
       {
         title: "车辆品牌",
-        key: "brand",
+        key: "vehicleBrand",
         width: 100,
         align: "center",
       },
       {
         title: "车系",
-        key: "carSeies",
+        key: "vehicleSeries",
         width: 100,
         align: "center",
       },
       {
         title: "车辆型号",
-        key: "carType",
+        key: "vehicleTypeName",
         width: 100,
         align: "center",
       },
 
       {
         title: "车辆颜色",
-        key: "color",
+        key: "vehicleColor",
         width: 110,
         align: "center",
       },
       {
         title: "核定载客位",
-        key: "plate",
+        key: "vehicleSeats",
         width: 100,
         align: "center",
       },
       {
         title: "运营企业",
-        key: "companyName",
+        key: "operationCompanyName",
         width: 110,
         align: "center",
       },
@@ -160,29 +173,37 @@ export default defineComponent({
         align: "center",
       },
       {
+        title: "当前里程",
+        key: "vehicleCurrentMileage",
+        width: 110,
+        align: "center",
+      },
+      {
         title: "状态",
-        key: "lock",
+        key: "vehicleState",
         width: 70,
         align: "center",
         render(row: tableDataItem) {
           return h(
             NTag,
             {
-              type: row.lock === 1 ? "success" : "error",
+              type: row.vehicleState === 0 ? "success" : "error",
             },
             {
-              default: () => (row.lock === 1 ? "正常" : "锁定"),
+              default: () => (row.vehicleState === 0 ? "正常" : "锁定"),
             }
           );
         },
       },
       {
         title: "添加时间",
-        key: "create_time",
+        key: "createTime",
         width: 95,
         align: "center",
+        render(record: tableDataItem) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
-
       {
         title: "操作",
         key: "action",
@@ -239,7 +260,24 @@ export default defineComponent({
 
     onMounted(() => {
       getData({ pageIndex: 1, pageSize: 10 });
+      getAllCompanyData();
     });
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async (page: PaginationState) => {
       loading.value = true;
@@ -292,7 +330,12 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { plageNumber: null, companyName: null, vehicleType: null };
+      queryValue.value = {
+        operationCompanyIdEq: null,
+        plateNumberLike: null,
+        vehicleTypeIdEq: null,
+        vehicleStateEq: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       //   getData({ page: 1, pageSize: 10 });
@@ -337,6 +380,7 @@ export default defineComponent({
         openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
       options: [],
+      companyData,
       vehicleTypeData: [],
 
       reloadPage,

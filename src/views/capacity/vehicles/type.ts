@@ -6,13 +6,13 @@ export interface tableDataItem {
   color: null | string;
   carType: null | string;
   companyName: null | string;
-  create_time: null | string;
+  createTime: null | string;
   distance: null | string;
   plate: null | string;
   vehiclesType: null | string;
-  lock: null | number;
+  vehicleState: null | number;
   remark: null | string;
-  fuelType: null | string;
+  fuelType: null | string; 
   engineNumber: null | string;
   vin: null | string;
   engineDisplacement: null | string;

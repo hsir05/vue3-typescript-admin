@@ -80,11 +80,11 @@ export default defineComponent({
     const openAreaData = ref([]);
     const rowKeysData = ref<string[]>([]);
     const queryValue = ref({
-      // operationCompanyId: null,
-      // areaCode: null,
+      operationCompanyId: null,
+      areaCode: null,
 
-      operationCompanyId: "75e642e0096b4a41a2b2ecf933c92247",
-      areaCode: "110000A01",
+      //   operationCompanyId: "75e642e0096b4a41a2b2ecf933c92247",
+      //   areaCode: "110000A01",
     });
 
     const data = ref<TableDataInter[]>([]);
@@ -220,8 +220,6 @@ export default defineComponent({
       openDrawer(record, false);
     }
     function handleBatch() {
-      console.log("点击了批量");
-      //operationCompanyId areaCode influxCode orderType orderBusinessType
       let dataArr = [];
       for (let key of rowKeysData.value) {
         let item = data.value.find((item: TableDataInter) => item.orderIncomeDivideRateId === key);
