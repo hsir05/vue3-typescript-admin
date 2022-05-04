@@ -10,7 +10,7 @@ export function getGroupMemberDetail() {
     url: '/groupCustomerMember/detail',
     method: 'post',
   });
-}
+} 
 /**
  * 集团客户会员类型预编辑
 */
@@ -34,15 +34,21 @@ export function saveGroupMember() {
  * 集团客户会员类型列表
 */
 
-interface groupList extends PaginationState {
-    name: string
-    status: number
+/**
+ * 运营企业分页
+ */
+interface GroupPageInter{
+  page: PaginationState;
+  search: {
+    memberNameLike: string | null;
+    memberLockEq: number | null;
+  };
 }
-export function getGroupMemberList(data: groupList) {
+export function getGroupMemberList(data: GroupPageInter) {
   return http.request({
-    url: '/groupCustomerMember/list',
-    method: 'post',
-    data
+    url: "/groupCustomerMember/list",
+    method: "post",
+    data: data,
   });
 }
 

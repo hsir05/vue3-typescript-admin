@@ -61,7 +61,7 @@ export default defineComponent({
         title: "#",
         key: "index",
         align: "center",
-        width: 20,
+        width: 50,
         render(_: tableItemProps, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },

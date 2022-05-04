@@ -10,17 +10,17 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="会员名称" path="name">
+      <n-form-item label="会员名称" path="memberNameLike">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.memberNameLike"
           clearable
           placeholder="输入会员名称"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="会员状态" path="status">
-        <n-radio-group v-model:value="queryValue.status">
+      <n-form-item label="会员状态" path="memberLockEq">
+        <n-radio-group v-model:value="queryValue.memberLockEq">
           <n-radio :value="null">全部</n-radio>
           <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
             item.label
@@ -77,25 +77,11 @@ export default defineComponent({
 
     const itemCount = ref(null);
     const queryValue = ref({
-      name: "",
-      status: 1,
+      memberNameLike: "",
+      memberLockEq: 1,
     });
 
-    const data = ref<tableDataItem[]>([
-      {
-        id: "3123123123",
-        name: "普通客户",
-        specialDiscount: 1,
-        specialLimit: 100,
-        fastlDiscount: null,
-        fastlLimit: null,
-        taxilDiscount: null,
-        taxilLimit: null,
-        status: 1,
-        type: "其他会员",
-        descript: "普通客户",
-      },
-    ]);
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -171,14 +157,15 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (pagination: PaginationState) => {
+    const getData = async (page: PaginationState) => {
       loading.value = true;
       try {
-        let res = await getGroupMemberList({ ...pagination, ...queryValue.value });
-        data.value = res.data;
+        let search = { ...queryValue.value };
+        let res = await getGroupMemberList({ page, search: search });
+        data.value = res.data.content;
         itemCount.value = res.itemCount;
         loading.value = false;
       } catch (err) {
@@ -215,19 +202,19 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", status: 1 };
+      queryValue.value = { memberNameLike: "", memberLockEq: 1 };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
@@ -241,7 +228,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
