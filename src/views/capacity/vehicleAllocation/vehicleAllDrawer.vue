@@ -43,8 +43,8 @@
         class="ml-10px"
         type="primary"
         @click="handleValidate"
-        >搜索</n-button
-      >
+        >搜索
+      </n-button>
     </div>
 
     <n-divider title-placement="left">已分配司机</n-divider>
@@ -60,6 +60,8 @@ import { FormInst, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
 import { ApiFilled as ApiOutIcon } from "@vicons/antd";
 import DirverCard from "./dirverCard.vue";
+import { bindDriverList } from "@/api/capacity/capacity";
+import loading from "naive-ui/lib/_internal/loading";
 export default defineComponent({
   name: "VehicleAllDrawer",
   components: { DirverCard },
@@ -74,10 +76,24 @@ export default defineComponent({
     const formRef = ref<FormInst | null>(null);
     const driver = ref(null);
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record: tableDataItem) {
       console.log(record);
+      getData(record.operationCompanyVehicleId as string);
       state.isDrawer = true;
     }
+
+    const getData = async (operationCompanyVehicleId: string) => {
+      try {
+        loading.value = true;
+        let res = await bindDriverList({ operationCompanyVehicleId });
+        console.log(res);
+
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     async function handleValidate() {
       try {
@@ -136,14 +152,17 @@ export default defineComponent({
 .driver-show {
   display: flex;
   align-content: flex-start;
+
   .driver-item {
     padding: 5px;
     width: 50%;
     border: 1px solid #efeff5;
+
     .lable {
       font-weight: 500;
     }
   }
+
   .img-box {
     width: 100px;
     border-radius: 4px;

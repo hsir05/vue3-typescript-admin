@@ -6,40 +6,41 @@
       inline
       label-placement="left"
       label-width="80"
+      :show-feedback="false"
       :style="{ flexWrap: 'wrap', justifyContent: 'flex-start' }"
-      class="pt-15px pb-15px bg-white mb-5px"
+      class="pt-15px pb-10px bg-white mb-5px"
       :model="queryValue"
     >
-      <n-form-item label="车牌号" path="plate">
+      <n-form-item label="车牌号" path="plateNumberLike">
         <n-input
-          v-model:value="queryValue.plate"
+          v-model:value="queryValue.plateNumberLike"
           clearable
           placeholder="输入车牌号"
           style="width: 160px"
         />
       </n-form-item>
 
-      <n-form-item label="运营企业" path="companyName">
+      <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           clearable
           style="width: 160px"
-          v-model:value="queryValue.companyName"
+          v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
-      <n-form-item label="司机工号" path="number">
+      <n-form-item label="司机工号" path="driverNoLike">
         <n-input
-          v-model:value="queryValue.number"
+          v-model:value="queryValue.driverNoLike"
           clearable
           placeholder="输入司机工号"
           style="width: 160px"
         />
       </n-form-item>
-      <n-form-item label="司机姓名" path="name">
+      <n-form-item label="司机姓名" path="driverFullNameLike">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.driverFullNameLike"
           clearable
           placeholder="输入司机姓名"
           style="width: 160px"
@@ -61,8 +62,6 @@
       :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
-      @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
@@ -71,15 +70,15 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CarOutline as CarIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import AgentDrawer from "./vehicleAllDrawer.vue";
 import { NTag } from "naive-ui";
+import { getAllOperateCompany } from "@/api/common/common";
 import { tableDataItem } from "./type";
-import { data } from "./data";
-// import { getUsers } from "@/api/system/user";
+import { getVehicleBindingPage } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "VehicleAllocation",
@@ -89,14 +88,15 @@ export default defineComponent({
     const agentDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
+    const companyData = ref([]);
     const queryValue = ref({
-      companyName: "",
-      name: "",
-      number: "",
-      plate: "",
+      plateNumberLike: null,
+      operationCompanyIdEq: null,
+      driverFullNameLike: null,
+      driverNoLike: null,
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -114,41 +114,41 @@ export default defineComponent({
       },
       {
         title: "车牌号",
-        key: "agent",
+        key: "plateNumber",
         align: "center",
       },
       {
         title: "车辆品牌",
-        key: "account",
+        key: "vehicleBrand",
         align: "center",
       },
       {
         title: "车系",
-        key: "contacts",
+        key: "vehicleSeries",
         align: "center",
       },
       {
         title: "车辆型号",
-        key: "sex",
+        key: "vehicleModel",
         width: 100,
         align: "center",
       },
 
       {
         title: "车辆类型",
-        key: "phone",
+        key: "vehicleFuelTypes",
         width: 100,
         align: "center",
       },
       {
         title: "运营企业",
-        key: "phone",
+        key: "operationCompanyName",
         width: 110,
         align: "center",
       },
       {
         title: "当前绑定司机",
-        key: "phone",
+        key: "vehicleDrivingPermitType  ",
         width: 110,
         align: "center",
       },
@@ -160,10 +160,10 @@ export default defineComponent({
           return h(
             NTag,
             {
-              type: row.lock === 1 ? "success" : "error",
+              type: row.vehicleState === 1 ? "success" : "error",
             },
             {
-              default: () => (row.lock === 1 ? "正常" : "锁定"),
+              default: () => (row.vehicleState === 1 ? "正常" : "锁定"),
             }
           );
         },
@@ -190,44 +190,50 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getAllCompanyData();
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getVehicleBindingPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
 
     function handleAlloca(record: Recordable) {
-      console.log("点击了车辆分配", record.id);
+      console.log("点击了车辆分配", record);
       const { openDrawer } = agentDrawerRef.value;
       openDrawer("车辆分配", record);
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
-    function handleAdd() {
-      console.log("点击了新增");
-      const { openDrawer } = agentDrawerRef.value;
-      openDrawer("新增用户");
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -235,33 +241,38 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", number: "", companyName: "", plate: "" };
+      queryValue.value = {
+        plateNumberLike: null,
+        operationCompanyIdEq: null,
+        driverFullNameLike: null,
+        driverNoLike: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -269,15 +280,13 @@ export default defineComponent({
       data,
       loading,
       agentDrawerRef,
-      getRowKeyId: (row: tableDataItem) => row.id,
-      options: [],
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyVehicleId,
+      companyData,
       basicTableRef,
       columns,
       itemCount,
 
       reloadPage,
-      handleAdd,
-      handleBatch,
       searchHandle,
       reset,
       handleCheckRow,

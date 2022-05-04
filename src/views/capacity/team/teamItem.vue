@@ -3,19 +3,21 @@
     <div class="team-info">
       <p class="team-info-item">
         <span class="team-info-item-label">班级编码:</span>
-        <span class="team-info-item-text">{{ item.code }}</span>
+        <span class="team-info-item-text">{{ item.operationCompanyDriverClazzEntry }}</span>
       </p>
       <p class="team-info-item">
         <span class="team-info-item-label">班长名称:</span>
-        <span class="team-info-item-text">{{ item.name }}</span>
+        <span class="team-info-item-text">{{ item.operationCompanyDriverClazzName }}</span>
       </p>
       <p class="team-info-item">
         <span class="team-info-item-label">班长工号:</span>
-        <span class="team-info-item-text">{{ item.number }}</span>
+        <span class="team-info-item-text">{{ item.number ? item.number : "暂无" }}</span>
       </p>
       <p class="team-info-item">
         <span class="team-info-item-label">添加时间:</span>
-        <span class="team-info-item-text">{{ item.createTiem }}</span>
+        <span class="team-info-item-text">{{
+          dayjs(item.createTime).format("YYYY-MM-DD HH:mm")
+        }}</span>
       </p>
       <div class="team-info-item flex-align-start">
         <span class="team-info-item-label">操作:</span>
@@ -43,8 +45,8 @@
         </div>
       </div>
     </div>
-    <div class="ml-10px pt-15px">
-      <n-image width="120" :src="item.avatar" />
+    <div class="ml-10px pt-15px avatar">
+      <n-image width="120" :src="item.avatar ? item.avatar : avator" />
       <p class="monitor-title">班长照片</p>
     </div>
   </div>
@@ -52,17 +54,12 @@
 <script lang="ts" setup>
 import { EyeOutline as EyeIcon, PeopleOutline as PeopleIcon } from "@vicons/ionicons5";
 import { toRefs } from "vue";
-
-interface itemState {
-  code: string;
-  name: string;
-  number: number;
-  createTiem: string;
-  avatar: string;
-}
+import avator from "@/assets/image/default-avatar.png";
+import { ItemInter } from "./type";
+import dayjs from "dayjs";
 const props = defineProps({
   item: {
-    type: Object as PropType<itemState>,
+    type: Object as PropType<ItemInter>,
     require: true,
     default: () => {},
   },
@@ -81,7 +78,8 @@ const handleMember = () => {
 <style lang="scss" scoped>
 .team-info-wrap {
   border: 1px solid #efeff5;
-  width: 370px;
+  width: 24%;
+  min-width: 370px;
   max-width: 33%;
   margin: 5px 4px;
   .team-info-item {
@@ -116,5 +114,8 @@ const handleMember = () => {
     align-content: center;
     justify-content: center;
   }
+}
+.avatar {
+  margin: 0 auto;
 }
 </style>

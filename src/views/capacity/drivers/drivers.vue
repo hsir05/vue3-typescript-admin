@@ -6,65 +6,56 @@
       inline
       :rule="rule"
       label-placement="left"
+      :show-feedback="false"
       label-width="80"
-      class="pt-15px pb-15px bg-white mb-5px flex-wrap"
+      class="pt-15px bg-white pb-10px mb-5px flex-wrap"
       :model="queryValue"
     >
-      <n-form-item label="司机工号" path="number">
+      <n-form-item label="司机工号" path="driverNoLike">
         <n-input
-          v-model:value="queryValue.number"
+          v-model:value="queryValue.driverNoLike"
           clearable
           placeholder="输入司机工号"
-          style="width: 200px"
+          style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="司机姓名" path="name">
+      <n-form-item label="司机姓名" path="driverFullNameLike">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.driverFullNameLike"
           clearable
           placeholder="输入司机姓名"
-          style="width: 200px"
+          style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="司机手机号" path="phone">
-        <n-input
-          v-model:value="queryValue.phone"
-          clearable
-          :maxlength="11"
-          placeholder="输入司机手机号"
-          style="width: 200px"
-        />
-      </n-form-item>
-
-      <n-form-item label="运营企业" path="companyName">
+      <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           clearable
-          style="width: 200px"
-          v-model:value="queryValue.companyName"
+          style="width: 150px"
+          v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
           @update:value="handleUpdateValue"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
-      <n-form-item label="司机状态" path="status">
+      <n-form-item label="司机状态" path="driverStateEq">
         <n-select
           clearable
           filterable
-          style="width: 200px"
-          v-model:value="queryValue.status"
+          style="width: 150px"
+          v-model:value="queryValue.driverStateEq"
           placeholder="选择司机状态"
           @update:value="handleUpdateValue"
           :options="vehicleTypeData"
         />
       </n-form-item>
 
-      <n-form-item label="是否锁定" path="lock">
-        <n-radio-group v-model:value="queryValue.lock">
+      <n-form-item label="是否锁定" path="driverLockEq">
+        <n-radio-group v-model:value="queryValue.driverLockEq">
           <n-space>
-            <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+            <n-radio :value="item.value" v-for="item in stateOptions" :key="item.value">{{
               item.label
             }}</n-radio>
           </n-space>
@@ -84,6 +75,7 @@
       :columns="columns"
       :loading="loading"
       :scroll-x="1200"
+      :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -98,7 +90,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 
 import {
@@ -112,33 +104,36 @@ import BasicTable from "@/components/Table/Table.vue";
 import DriversDrawer from "./driversDrawer.vue";
 import AddressDrawer from "./addressDrawer.vue";
 import DriverCerDrawer from "./driverCerDrawer.vue";
-import { statusOptions } from "@/config/form";
+import { stateOptions } from "@/config/form";
+import { getAllOperateCompany } from "@/api/common/common";
 import { tableDataItem } from "./type";
-import { data } from "./data";
-import { NTag } from "naive-ui";
-// import { getUsers } from "@/api/system/user";
+import { useMessage, NTag } from "naive-ui";
+import { getDriverPage, initPassword } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "Drivers",
   components: { BasicTable, DriversDrawer, AddressDrawer, DriverCerDrawer },
   setup() {
     const loading = ref(false);
+    const message = useMessage();
     const driversDrawerRef = ref();
     const vehicleTypeData = ref([]);
+    const companyData = ref([]);
+
     const basicTableRef = ref();
     const addressDrawerRef = ref();
     const driverCerDrawerRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      number: null,
-      companyName: null,
-      phone: null,
-      name: null,
-      status: null,
-      lock: 1,
+      driverNoLike: null,
+      operationCompanyIdEq: null,
+      driverFullNameLike: null,
+      driverStateEq: null,
+      driverLockEq: null,
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       { type: "selection", align: "center" },
@@ -151,74 +146,86 @@ export default defineComponent({
           return h("span", `${rowIndex + 1}`);
         },
       },
-      { title: "司机工号", key: "number", width: 100, align: "center" },
+      { title: "司机工号", key: "driverNo", width: 100, align: "center" },
       {
         title: "司机姓名",
-        key: "name",
+        key: "driverFullName",
         width: 100,
         align: "center",
       },
       {
         title: "司机性别",
-        key: "sex",
+        key: "driverGender",
         width: 100,
         align: "center",
       },
       {
         title: "司机手机号",
-        key: "phone",
+        key: "driverPhone",
         width: 100,
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
 
       {
         title: "司机民族",
-        key: "nation",
+        key: "driverNation",
         width: 110,
         align: "center",
       },
       {
         title: "司机学历",
-        key: "education",
+        key: "driverEducation",
         width: 100,
         align: "center",
       },
       {
         title: "运营企业",
-        key: "companyName",
+        key: "operationCompany",
         width: 110,
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "是否锁定",
-        key: "lock",
+        key: "driverLock",
         width: 110,
         align: "center",
         render(row: tableDataItem) {
           return h(
             NTag,
             {
-              type: row.lock === 1 ? "success" : "error",
+              type: row.driverLock === 1 ? "success" : "error",
             },
             {
-              default: () => (row.lock === 1 ? "正常" : "锁定"),
+              default: () => (row.driverLock === 1 ? "正常" : "锁定"),
             }
           );
         },
       },
       {
         title: "司机状态",
-        key: "status",
+        key: "driverState",
         width: 80,
         align: "center",
       },
+
       {
         title: "添加时间",
-        key: "create_time",
+        key: "createTime",
         width: 95,
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render(record: tableDataItem) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
-
       {
         title: "操作",
         key: "action",
@@ -273,27 +280,41 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getAllCompanyData();
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getDriverPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
@@ -327,38 +348,48 @@ export default defineComponent({
       openDrawer("添加司机");
     }
 
-    function resetPassword() {}
+    async function resetPassword(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await initPassword({ driverId: record.driverId });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
-        number: null,
-        phone: null,
-        companyName: null,
-        status: null,
-        name: null,
-        lock: 1,
+        driverNoLike: null,
+        operationCompanyIdEq: null,
+        driverFullNameLike: null,
+        driverStateEq: null,
+        driverLockEq: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
@@ -367,7 +398,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
     function handleTraSaveAfter() {
       console.log("运输证处理");
@@ -385,12 +416,15 @@ export default defineComponent({
       basicTableRef,
       columns,
       itemCount,
+      getRowKeyId: (row: tableDataItem) => row.driverId,
+
       rule: {
         companyName: { required: true, trigger: ["blur", "input"], message: "请选择运营企业名称" },
         openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
       options: [],
-      statusOptions,
+      companyData,
+      stateOptions,
       vehicleTypeData,
 
       reloadPage,

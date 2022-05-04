@@ -1,5 +1,5 @@
 <template>
-  <div class>
+  <div class="h-full">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -11,31 +11,31 @@
       class="pt-15px pb-15px bg-white mb-5px flex-wrap"
       :model="queryValue"
     >
-      <n-form-item label="班级编码" path="teamCode">
+      <n-form-item label="班级编码" path="operationCompanyDriverClazzEntryLike">
         <n-input
-          v-model:value="queryValue.teamCode"
+          v-model:value="queryValue.operationCompanyDriverClazzEntryLike"
           clearable
           placeholder="输入班级编码"
           style="width: 200px"
         />
       </n-form-item>
 
-      <n-form-item label="班级名称" path="teamName">
+      <n-form-item label="班级名称" path="operationCompanyDriverClazzNameLike">
         <n-input
-          v-model:value="queryValue.teamName"
+          v-model:value="queryValue.operationCompanyDriverClazzNameLike"
           clearable
           placeholder="输入班级名称"
           style="width: 200px"
         />
       </n-form-item>
 
-      <n-form-item label="运营企业" path="companyName">
+      <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           clearable
           style="width: 200px"
-          v-model:value="queryValue.companyName"
+          v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -46,15 +46,16 @@
     </n-form>
 
     <div class="team-box">
-      <div class="team-content">
+      <div class="team-content" v-if="data.length">
         <TeamItem
           v-for="item in data"
-          :key="item.id"
+          :key="item.operationCompanyDriverClazzId"
           :item="item"
-          @on-member="handleMember"
+          @on-member="handleMember(item)"
           @on-see="handleSee"
         />
       </div>
+      <n-empty v-if="!data.length" class="empty" />
       <!-- 分页 -->
       <n-pagination
         v-if="itemCount"
@@ -72,15 +73,18 @@
         <template #prefix> 共 {{ itemCount }} 项 </template>
       </n-pagination>
     </div>
-
     <TeamDrawer ref="teamDrawerRef" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs } from "vue";
+import { defineComponent, ref, reactive, toRefs, onMounted } from "vue";
 import TeamItem from "./teamItem.vue";
 import TeamDrawer from "./teamDrawer.vue";
 import { pageSizes } from "@/config/table";
+import { getDriverClazzPage } from "@/api/capacity/capacity";
+import { getAllOperateCompany } from "@/api/common/common";
+import { PaginationState } from "@/api/type";
+import { ItemInter } from "./type";
 export default defineComponent({
   name: "Team",
   components: {
@@ -90,11 +94,13 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const teamDrawerRef = ref();
+    const companyData = ref([]);
     const queryValue = ref({
-      teamCode: null,
-      teamName: null,
-      companyName: null,
+      operationCompanyDriverClazzEntryLike: null,
+      operationCompanyDriverClazzNameLike: null,
+      operationCompanyIdEq: null,
     });
+    const data = ref<ItemInter[]>([]);
 
     const itemCount = ref(null);
     const pagination = reactive({
@@ -102,12 +108,57 @@ export default defineComponent({
       pageSize: 10,
     });
 
-    function searchHandle() {}
-    function reset() {}
+    onMounted(() => {
+      getAllCompanyData();
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    function handleMember() {
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getDriverClazzPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    function searchHandle() {
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
+    function reset() {
+      queryValue.value = {
+        operationCompanyDriverClazzEntryLike: null,
+        operationCompanyDriverClazzNameLike: null,
+        operationCompanyIdEq: null,
+      };
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
+
+    function handleMember(record: Recordable) {
       const { openDrawer } = teamDrawerRef.value;
-      openDrawer();
+      openDrawer(record);
     }
     function handleSee() {}
 
@@ -125,50 +176,9 @@ export default defineComponent({
       ...toRefs(pagination),
       itemCount,
       rule: {},
-      options: [],
+      companyData,
       queryValue,
-      data: [
-        {
-          code: "AT300",
-          name: "里斯",
-          id: "wrwer23423",
-          number: 13123,
-          createTiem: "2020-04-24 08:51",
-          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
-        },
-        {
-          code: "AT300",
-          name: "里斯22",
-          id: "wrwer23423",
-          number: 13144423,
-          createTiem: "2020-04-24 08:51",
-          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
-        },
-        {
-          code: "AT300",
-          name: "里斯33",
-          id: "wrwer23423",
-          number: 1313333344423,
-          createTiem: "2020-04-24 08:51",
-          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
-        },
-        {
-          code: "AT300",
-          name: "里斯444",
-          id: "wrwer23423",
-          number: 1314455555423,
-          createTiem: "2020-04-24 08:51",
-          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
-        },
-        {
-          code: "AT300",
-          name: "阿法纳西.阿法纳西耶维奇",
-          id: "wrwer23423",
-          number: 13144466666623,
-          createTiem: "2020-04-24 08:51",
-          avatar: "http://testcxpm.yiminyueche.com/resources/judf/images/default-header-image.png",
-        },
-      ],
+      data,
 
       searchHandle,
       reset,
@@ -184,13 +194,17 @@ export default defineComponent({
 <style lang="scss" scoped>
 .team-box {
   width: 100%;
+  height: calc(100% - 80px);
   background-color: $white;
   padding: 5px;
 }
+
 .team-content {
   display: flex;
   align-content: flex-start;
   justify-content: flex-start;
   flex-wrap: wrap;
+  height: 93%;
+  overflow: scroll;
 }
 </style>

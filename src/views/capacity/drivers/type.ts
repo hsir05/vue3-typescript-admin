@@ -1,35 +1,35 @@
 export interface tableDataItem {
-  id?: string | null;
-  number: null | string;
+  driverId?: string | null;
+  number: string | null;
   firstName?: null;
   secondName?: null;
-  name?: null | string;
-  sex: null | number;
-  phone: null | string;
-  nation: null | string;
-  education: null | string;
-  companyName: null | string;
-  lock: null | number;
-  status: null | string;
-  create_time?: null | string;
-  address?: null | string;
-  contacts?: null | string;
-  maritalStatus?: null | string;
+  name?: string | null;
+  sex: number | null;
+  phone: string | null;
+  nation: string | null;
+  education: string | null;
+  companyName: string | null;
+  driverLock: number | null;
+  driverState: string | null;
+  createTime?: string | null;
+  address?: string | null;
+  contacts?: string | null;
+  maritalStatus?: string | null;
   birthDay?: null | string
 }
 
 export interface addressState {
     address: null;
-    lat: null | number;
-    lng: null | number;
+    lat: number | null;
+    lng: number | null;
 }
 export interface certificatesState {
-    bareheadedPhoto: null | string;
-    takePhotos: null | string;
-    frontPhoto: null | string;
-    reversePhoto: null | string;
-    frontPage: null | string;
-    reversePage: null | string;
-    frontCer: null | string;
-    reverseCer: null | string;
+    bareheadedPhoto: string | null;
+    takePhotos: string | null;
+    frontPhoto: string | null;
+    reversePhoto: string | null;
+    frontPage: string | null;
+    reversePage: string | null;
+    frontCer: string | null;
+    reverseCer: string | null;
 }

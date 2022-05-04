@@ -1,5 +1,5 @@
 
 export interface tableDataItem {
-    id?: number | null | string;
-    lock: number | null;
+    operationCompanyVehicleId: string | null;
+    vehicleState: number | null;
 }

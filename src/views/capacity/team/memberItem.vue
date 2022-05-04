@@ -2,34 +2,29 @@
   <div class="team-info-wrap flex-align-start mb-10px">
     <div class="team-info">
       <p class="team-info-item">
-        <span class="team-info-item-label">班长工号:</span>
-        <span class="team-info-item-text">{{ item.number }}</span>
+        <span class="team-info-item-label">工号:</span>
+        <span class="team-info-item-text">{{ item.driverNo }}</span>
       </p>
       <p class="team-info-item">
-        <span class="team-info-item-label">班长名称:</span>
-        <span class="team-info-item-text">{{ item.name }}</span>
+        <span class="team-info-item-label">名称:</span>
+        <span class="team-info-item-text">{{ item.driverFullName }}</span>
       </p>
       <p class="team-info-item">
         <span class="team-info-item-label">性别:</span>
-        <span class="team-info-item-text">{{ item.sex === 1 ? "男" : "女" }}</span>
+        <span class="team-info-item-text">{{ item.driverGender === 1 ? "男" : "女" }}</span>
       </p>
     </div>
     <div class="ml-10px pt-5px">
-      <n-image width="90" :src="item.avatar" />
+      <n-image width="90" :src="item.driverPhotoPath" />
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { toRefs } from "vue";
-interface itemState {
-  name: string;
-  number: string;
-  sex: number;
-  avatar: string;
-}
+import { MemberItemIter } from "./type";
 const props = defineProps({
   item: {
-    type: Object as PropType<itemState>,
+    type: Object as PropType<MemberItemIter>,
     require: true,
     default: () => {},
   },

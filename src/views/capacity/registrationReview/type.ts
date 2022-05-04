@@ -1,3 +1,4 @@
 export interface tableDataItem{
-    id?: string
+    driverRegisterId: string
+    registerSubmitTime: string | null
 }

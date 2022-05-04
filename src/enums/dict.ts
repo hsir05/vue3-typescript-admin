@@ -61,4 +61,12 @@ export enum sexEnum {
     "女",
     "男",
     "未知"
+} 
+// * 申请状态 DRS0004 = 平台未审核
+ //  DRS0005 = 平台审核未通过
+ //  DRS0006 = 平台审核通过
+export enum registerStateEnum {
+    DRS0004,
+    DRS0005,
+    DRS0006,
 }

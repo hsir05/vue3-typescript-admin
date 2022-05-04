@@ -66,6 +66,7 @@
       :columns="columns"
       :loading="loading"
       :scroll-x="1200"
+      :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -92,9 +93,11 @@ import {
 import BasicTable from "@/components/Table/Table.vue";
 import VehiclesDrawer from "./vehiclesDrawer.vue";
 import TraCerDrawer from "./traCerDrawer.vue";
+import { stateOptions } from "@/config/form";
 import { tableDataItem } from "./type";
-import { NTag } from "naive-ui";
-import { getVehiclePage } from "@/api/capacity/capacity";
+import { useMessage, NTag } from "naive-ui";
+import { getVehiclePage, initMileage } from "@/api/capacity/capacity";
+import { getVehicleType } from "@/api/operate/operate";
 import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
@@ -103,11 +106,13 @@ export default defineComponent({
   components: { BasicTable, VehiclesDrawer, TraCerDrawer },
   setup() {
     const loading = ref(false);
+    const message = useMessage();
     const vehiclesDrawerRef = ref();
     const traCerDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const companyData = ref([]);
+    const vehicleTypeData = ref([]);
     const queryValue = ref({
       operationCompanyIdEq: null,
       plateNumberLike: null,
@@ -168,7 +173,7 @@ export default defineComponent({
       },
       {
         title: "车辆类型",
-        key: "vehiclesType",
+        key: "vehicleModel",
         width: 110,
         align: "center",
       },
@@ -241,7 +246,7 @@ export default defineComponent({
                 type: "primary",
                 icon: SyncCirIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleInitMileage.bind(null, record),
                 auth: ["dict001"],
               },
               {
@@ -259,8 +264,9 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
       getAllCompanyData();
+      getAllVehicleTypeData();
+      getData({ pageIndex: 1, pageSize: 10 });
     });
     const getAllCompanyData = async () => {
       try {
@@ -278,14 +284,28 @@ export default defineComponent({
         console.log(err);
       }
     };
+    const getAllVehicleTypeData = async () => {
+      try {
+        let res = await getVehicleType({ operationCompanyId: "" });
+        vehicleTypeData.value = res.data.map(
+          (item: { vehicleTypeName: string; vehicleTypeId: string }) => {
+            let obj = {
+              label: item.vehicleTypeName,
+              value: item.vehicleTypeId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async (page: PaginationState) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };
         let res = await getVehiclePage({ page, search: search });
-        console.log(res.data);
-
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -313,6 +333,19 @@ export default defineComponent({
       const { openDrawer } = traCerDrawerRef.value;
       openDrawer("编辑运输证照片信息", record);
     }
+    async function handleInitMileage(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await initMileage({
+          operationCompanyVehicleId: record.operationCompanyVehicleId,
+        });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
     function handleBatch() {
       console.log("点击了批量删除");
     }
@@ -327,7 +360,7 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
@@ -338,27 +371,26 @@ export default defineComponent({
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
-      console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
     function handleTraSaveAfter() {
       console.log("运输证处理");
@@ -373,15 +405,18 @@ export default defineComponent({
       vehiclesDrawerRef,
       traCerDrawerRef,
       basicTableRef,
+      stateOptions,
       columns,
       itemCount,
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyVehicleId,
+
       rule: {
         companyName: { required: true, trigger: ["blur", "input"], message: "请选择运营企业名称" },
         openArea: { required: true, trigger: ["blur", "input"], message: "请选择开通区域" },
       },
       options: [],
       companyData,
-      vehicleTypeData: [],
+      vehicleTypeData,
 
       reloadPage,
       handleAdd,

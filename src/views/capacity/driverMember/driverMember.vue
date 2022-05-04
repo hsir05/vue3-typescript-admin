@@ -5,18 +5,18 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="130"
+      label-width="100"
       class="pt-15px pb-15px bg-white mb-10px"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="运营城市名称" path="cityCode">
+      <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           clearable
-          filterable
-          v-model:value="queryValue.cityCode"
-          placeholder="选择运营城市"
-          :options="openCityData"
+          style="width: 320px"
+          v-model:value="queryValue.operationCompanyIdEq"
+          placeholder="选择运营企业"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -32,6 +32,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
@@ -47,15 +48,16 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DriMemDrawer from "./driMemDrawer.vue";
 import MemberList from "./memberList.vue";
+import { useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
-import { data } from "./data";
-// import { getUsers } from "@/api/system/user";
+import { getDriverMemberPage, removeMember } from "@/api/capacity/capacity";
+import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "DriverMember",
@@ -63,16 +65,17 @@ export default defineComponent({
 
   setup() {
     const loading = ref(false);
-    const openCityData = ref([]);
+    const message = useMessage();
+    const companyData = ref([]);
     const driMemDrawerRef = ref();
     const memberListRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      cityCode: null,
+      operationCompanyIdEq: null,
     });
 
-    // const data = ref<tableDataItem[]>([]);
+    const data = ref<tableDataItem[]>([]);
 
     const columns = [
       {
@@ -90,43 +93,61 @@ export default defineComponent({
       },
       {
         title: "运营企业",
-        key: "agent",
+        key: "operationCompanyName",
         align: "center",
+        width: 250,
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "开通时间",
-        key: "account",
+        key: "openTime",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "派单限制开始时间",
-        key: "contacts",
+        key: "dispatchOrderLimitBeginTime",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "即将生效产品个数",
-        key: "sex",
-        width: 100,
+        key: "comingIntoEffectGoodsNumber",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
 
       {
         title: "生效中产品个数",
-        key: "phone",
-        width: 110,
+        key: "inEffectGoodsNumber",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "会员有效期内司机个数",
-        key: "phone",
-        width: 110,
+        key: "validPeriodDriverNumber",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "会员有效期外司机个数",
-        key: "phone",
-        width: 110,
+        key: "outOfValidityDriverNumber",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "操作",
@@ -145,7 +166,7 @@ export default defineComponent({
                 auth: ["dict001"],
               },
               {
-                label: "关闭",
+                label: "删除",
                 type: "error",
                 icon: RemoveIcon,
                 isIconBtn: true,
@@ -162,27 +183,41 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getAllCompanyData();
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     // data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getDriverMemberPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
@@ -201,9 +236,19 @@ export default defineComponent({
       const { openDrawer } = driMemDrawerRef.value;
       openDrawer("新增用户");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    async function handleRemove(record: Recordable) {
+      loading.value = true;
+      try {
+        let res = await removeMember({
+          operationCompanyOpenedDriverMemberId: record.operationCompanyOpenedDriverMemberId,
+        });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -211,33 +256,33 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { cityCode: null };
+      queryValue.value = { operationCompanyIdEq: null };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handleSaveMemberAfter() {}
@@ -251,7 +296,8 @@ export default defineComponent({
       basicTableRef,
       columns,
       itemCount,
-      openCityData,
+      companyData,
+      getRowKeyId: (row: tableDataItem) => row.operationCompanyOpenedDriverMemberId,
 
       reloadPage,
       handleAdd,

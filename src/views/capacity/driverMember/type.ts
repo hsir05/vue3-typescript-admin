@@ -1,5 +1,5 @@
 export interface tableDataItem {
-  id?: string | null;
+  operationCompanyOpenedDriverMemberId: string | null;
   account: null | string;
   contacts: null | string;
   agent: null | string;

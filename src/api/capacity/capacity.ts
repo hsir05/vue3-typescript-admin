@@ -279,6 +279,9 @@ export function updateRate(data: UpdateRate) {
 }
 
 //----------------------车辆管理-----------------------
+/**
+ * 车辆分页
+ */
 interface vehiclePage {
   page: PaginationState;
   search: {
@@ -295,7 +298,138 @@ export function getVehiclePage(data: vehiclePage) {
     data: data,
   });
 }
+/**
+ * 里程清零
+ */
+export function initMileage(data: { operationCompanyVehicleId: string }) {
+  return http.request({
+    url: "/vehicle/initMileage",
+    method: "post",
+    data: data,
+  });
+}
+//----------------------司机管理-----------------------
 
+/**
+ * 司机分页
+ */
+interface DriverPageInter {
+  page: PaginationState;
+  search: {
+    driverNoLike: string | null;
+    operationCompanyIdEq: string | null;
+    driverFullNameLike: string | null;
+    driverStateEq: string | null;
+    driverLockEq: string | null;
+  };
+}
+export function getDriverPage(data: DriverPageInter) {
+  return http.request({
+    url: "/operationCompanyDriver/page",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 重置司机密码
+ */
+export function initPassword(data: { driverId: string }) {
+  return http.request({
+    url: "/operationCompanyDriver/initPassword",
+    method: "post",
+    data: data,
+  });
+}
+//----------------------车辆分配管理-----------------------
+/**
+ * 车辆分配分页
+ */
+interface VehicleBindingInter {
+  page: PaginationState;
+  search: {
+    plateNumberLike: string | null;
+    operationCompanyIdEq: string | null;
+    driverFullNameLike: string | null;
+    driverNoLike: string | null;
+  };
+}
+export function getVehicleBindingPage(data: VehicleBindingInter) {
+  return http.request({
+    url: "/operationCompanyVehicleBinding/page",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ * 根据车辆id查找该车辆当前绑定的司机列表
+ */
+
+export function bindDriverList(data: { operationCompanyVehicleId: string }) {
+  return http.request({
+    url: "/operationCompanyVehicleBinding/bindDriverList",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 车辆和司机绑定
+ */
+
+export function bindDriver(data: {
+  operationCompanyVehicleId: string;
+  operationCompanyDriverId: string;
+}) {
+  return http.request({
+    url: "/operationCompanyVehicleBinding/bindDriver",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 司机与车辆解绑
+ */
+
+export function unbindDriver(data: {
+  operationCompanyVehicleId: string;
+  operationCompanyDriverId: string;
+}) {
+  return http.request({
+    url: "/operationCompanyVehicleBinding/unbindDriver",
+    method: "post",
+    data: data,
+  });
+}
+//----------------------班级管理管理-----------------------
+
+/**
+ * 班级管理分页
+ */
+interface DriverClazzPageInter {
+  page: PaginationState;
+  search: {
+    operationCompanyDriverClazzEntryLike: string | null;
+    operationCompanyIdEq: string | null;
+    operationCompanyDriverClazzNameLike: string | null;
+  };
+}
+export function getDriverClazzPage(data: DriverClazzPageInter) {
+  return http.request({
+    url: "/operationCompanyDriverClazz/page",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 班级管理分页
+ */
+export function getMemberList(data: { operationCompanyDriverClazzId: string }) {
+  return http.request({
+    url: "/operationCompanyDriverClazz/memberList",
+    method: "post",
+    data: data,
+  });
+}
 //----------------------企业紧急联系人管理-----------------------
 /**
  * 企业紧急联系人分页
@@ -475,19 +609,61 @@ export function removeExpendContact(data: { operationCompanyExpendContactId: str
 }
 //----------------------司机注册审核管理-----------------------
 /**
- * 企业值班调度人分页
+ * 司机注册分页
+ * 申请状态 DRS0004 = 平台未审核
+ * DRS0005 = 平台审核未通过
+ * DRS0006 = 平台审核通过
  */
-interface driverRegisterState {
+interface DriverRegisterInter {
   page: PaginationState;
   search: {
-    registerStateEq: string;
+    registerStateEq: string | null;
     driverFullNameLike: string | null;
-    operationCompanyExpendContactPhoneLike: string | null;
+    driverPhoneLike: string | null;
+    operationCompanyIdEq: string | null;
+    plateNumberLike: string | null;
+    driverRegTimeGe: string | null;
+    driverRegTimeLe: string | null;
+    companyCheckTimeGe: string | null;
+    companyCheckTimeLe: string | null;
+    platformCheckTimeGe: string | null;
+    platformCheckTimeLe: string | null;
   };
 }
-export function getDriverRegisterPage(data: driverRegisterState) {
+export function getDriverRegisterPage(data: DriverRegisterInter) {
   return http.request({
     url: "/driverRegister/page",
+    method: "post",
+    data: data,
+  });
+}
+//----------------------司机注册审核管理-----------------------
+/**
+ * 司机注册分页
+ * 申请状态 DRS0004 = 平台未审核
+ * DRS0005 = 平台审核未通过
+ * DRS0006 = 平台审核通过
+ */
+interface DriverMemberPageInter {
+  page: PaginationState;
+  search: {
+    operationCompanyIdEq: string | null;
+  };
+}
+export function getDriverMemberPage(data: DriverMemberPageInter) {
+  return http.request({
+    url: "/driverMemberGoods/openedCompanyPage",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ *删除开通司机会员的企业
+*/
+export function removeMember(data: {operationCompanyOpenedDriverMemberId: string}) {
+  return http.request({
+    url: "/driverMemberGoods/deleteOpenedCompany",
     method: "post",
     data: data,
   });

@@ -2,6 +2,7 @@ import { http } from '@/utils/http';
 
 /**
  * 车辆类型管理
+ * 获取所有车辆类型传递 空字符串
 */
 export function getVehicleType(data: {operationCompanyId: string}) {
   return http.request({

@@ -1,13 +1,13 @@
 export interface tableDataItem {
-  id?: string | null;
+  operationCompanyVehicleId?: string | null;
   plageNumber: null | string;
   brand: null | string;
   carSeies: null | string;
   color: null | string;
   carType: null | string;
-  companyName: null | string;
-  createTime: null | string;
-  distance: null | string;
+  companyName: string | null;
+  createTime: string | null;
+  distance: string | null;
   plate: null | string;
   vehiclesType: null | string;
   vehicleState: null | number;
