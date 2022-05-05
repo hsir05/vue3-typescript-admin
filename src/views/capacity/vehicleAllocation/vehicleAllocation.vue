@@ -130,26 +130,22 @@ export default defineComponent({
       {
         title: "车辆型号",
         key: "vehicleModel",
-        width: 100,
         align: "center",
       },
 
       {
         title: "车辆类型",
         key: "vehicleFuelTypes",
-        width: 100,
         align: "center",
       },
       {
         title: "运营企业",
         key: "operationCompanyName",
-        width: 110,
         align: "center",
       },
       {
         title: "当前绑定司机",
         key: "vehicleDrivingPermitType  ",
-        width: 110,
         align: "center",
       },
       {
