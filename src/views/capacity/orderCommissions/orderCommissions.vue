@@ -252,7 +252,7 @@ export default defineComponent({
       console.log(companyId);
       try {
         openAreaData.value = [];
-        // queryValue.value.areaCode = null
+        queryValue.value.areaCode = null;
         let res = await getCompanyOpenArea({ companyId });
         console.log(res);
         openAreaData.value = res.data.map((item: { areaName: string; areaCode: string }) => {
@@ -267,7 +267,7 @@ export default defineComponent({
       }
     }
     const reset = () => {
-      // queryValue.value = { operationCompanyId: null, areaCode: null };
+      queryValue.value = { operationCompanyId: null, areaCode: null };
       getData();
     };
 

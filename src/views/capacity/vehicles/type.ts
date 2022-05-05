@@ -1,21 +1,22 @@
 export interface tableDataItem {
-  operationCompanyVehicleId?: string | null;
-  plageNumber: null | string;
-  brand: null | string;
-  carSeies: null | string;
-  color: null | string;
-  carType: null | string;
-  companyName: string | null;
-  createTime: string | null;
-  distance: string | null;
-  plate: null | string;
-  vehiclesType: null | string;
-  vehicleState: null | number;
-  remark: null | string;
-  fuelType: null | string; 
-  engineNumber: null | string;
-  vin: null | string;
-  engineDisplacement: null | string;
-  drivingPermitType: null | string;
-  vehiclesDate: null | string;
+  operationCompanyVehicleId: string | null
+    plateColor: string | null
+    plateNumber: string | null
+    vehicleBrand: string | null
+    vehicleCertifyDate: string | null
+    vehicleColor: string | null
+    vehicleDrivingPermitType: string | null
+    vehicleEngineDisplace: string | null
+    vehicleFuelType: string | null
+    vehicleModel: string | null
+    vehicleNote: string | null
+    vehicleSeats: number | null
+    vehicleSeries: string | null
+    vehicleState: number | null
+    vehicleTypeId: string | null
+    vehicleVin: string | null
+    vehilceEngineId: string | null
+    createTime?: string | null
+    vehicleTypeName?: string | null
+    operationCompanyName?:string | null
 }

@@ -308,6 +308,65 @@ export function initMileage(data: { operationCompanyVehicleId: string }) {
     data: data,
   });
 }
+/**
+ * 车辆编辑
+ */
+
+interface VehicleEditInter {
+    operationCompanyVehicleId: string | null
+    plateColor: string | null
+    plateNumber: string | null
+    vehicleBrand: string | null
+    vehicleCertifyDate: string | null
+    vehicleColor: string | null
+    vehicleDrivingPermitType: string | null
+    vehicleEngineDisplace: string | null
+    vehicleFuelType: string | null
+    vehicleModel: string | null
+    vehicleNote: string | null
+    vehicleSeats: number | null
+    vehicleSeries: string | null
+    vehicleState: number | null
+    vehicleTypeId: string | null
+    vehicleVin: string | null
+    vehilceEngineId: string | null
+}
+export function vehicleEdit(data: VehicleEditInter) {
+  return http.request({
+    url: "/vehicle/edit",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ * 车辆运输证信息保存
+ */
+interface TranLicenseInter {
+
+}
+export function transportLicenseEdit(data: TranLicenseInter) {
+  return http.request({
+    url: "/vehicle/updateVehicleTransportLicense",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 车辆转移所在企业
+ */
+interface TransferInter {
+    operationCompanyVehicleId: string
+    vehicleTransferCompanyId: string
+}
+export function transfer(data: TransferInter) {
+  return http.request({
+    url: "/vehicle/vehicleTransfer",
+    method: "post",
+    data: data,
+  });
+}
+
 //----------------------司机管理-----------------------
 
 /**

@@ -16,7 +16,7 @@
           v-model:value="queryValue.plateNumberLike"
           clearable
           placeholder="输入车牌号"
-          style="width: 200px"
+          style="width: 150px"
         />
       </n-form-item>
 
@@ -69,14 +69,13 @@
       :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
-      @on-batch="handleBatch"
       @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
     <VehiclesDrawer ref="vehiclesDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
     <TraCerDrawer ref="traCerDrawerRef" :width="500" @on-save-after="handleTraSaveAfter" />
+    <TransferDrawer ref="TransferDrawerRef" :width="650" @on-save-after="handleTraSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -100,16 +99,18 @@ import { getVehiclePage, initMileage } from "@/api/capacity/capacity";
 import { getVehicleType } from "@/api/operate/operate";
 import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
+import TransferDrawer from "./transferDrawer.vue";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "Vehicles",
-  components: { BasicTable, VehiclesDrawer, TraCerDrawer },
+  components: { BasicTable, VehiclesDrawer, TraCerDrawer, TransferDrawer },
   setup() {
     const loading = ref(false);
     const message = useMessage();
     const vehiclesDrawerRef = ref();
     const traCerDrawerRef = ref();
     const basicTableRef = ref();
+    const TransferDrawerRef = ref();
     const itemCount = ref(null);
     const companyData = ref([]);
     const vehicleTypeData = ref([]);
@@ -148,7 +149,7 @@ export default defineComponent({
       },
       {
         title: "车辆型号",
-        key: "vehicleTypeName",
+        key: "vehicleModel",
         width: 100,
         align: "center",
       },
@@ -173,7 +174,7 @@ export default defineComponent({
       },
       {
         title: "车辆类型",
-        key: "vehicleModel",
+        key: "vehicleTypeName",
         width: 110,
         align: "center",
       },
@@ -254,7 +255,7 @@ export default defineComponent({
                 type: "primary",
                 icon: GitCompareIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleTransfer.bind(null, record),
                 auth: ["dict001"],
               },
             ],
@@ -321,13 +322,18 @@ export default defineComponent({
     function hanldleSee(record: Recordable) {
       console.log(record);
       const { openDrawer } = vehiclesDrawerRef.value;
-      openDrawer("查看", "see");
+      openDrawer("查看车辆", record, "see");
     }
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = vehiclesDrawerRef.value;
-      openDrawer("编辑车辆", record);
+      openDrawer("编辑车辆", record, "edit");
+    }
+    async function handleTransfer(record: Recordable) {
+      console.log("点击了编辑", record.id);
+      const { openDrawer } = TransferDrawerRef.value;
+      openDrawer(record);
     }
     function handleTraCert(record: Recordable) {
       const { openDrawer } = traCerDrawerRef.value;
@@ -345,14 +351,6 @@ export default defineComponent({
         console.log(err);
         loading.value = false;
       }
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
-    function handleAdd() {
-      console.log("点击了新增");
-      const { openDrawer } = vehiclesDrawerRef.value;
-      openDrawer("新增用户");
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -403,6 +401,7 @@ export default defineComponent({
       data,
       loading,
       vehiclesDrawerRef,
+      TransferDrawerRef,
       traCerDrawerRef,
       basicTableRef,
       stateOptions,
@@ -419,8 +418,6 @@ export default defineComponent({
       vehicleTypeData,
 
       reloadPage,
-      handleAdd,
-      handleBatch,
       searchHandle,
       reset,
       handleCheckRow,

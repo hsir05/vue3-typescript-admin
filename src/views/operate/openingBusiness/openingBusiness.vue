@@ -296,7 +296,7 @@ export default defineComponent({
       data,
       openCityList,
       queryRule: {
-        trigger: ["input", "blur"],
+        trigger: ["change", "blur"],
         validator() {
           if (cityCode.value === null) {
             return new Error("选择开通城市");
