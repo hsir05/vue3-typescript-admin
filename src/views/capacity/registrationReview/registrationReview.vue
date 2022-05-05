@@ -92,26 +92,41 @@ export default defineComponent({
         title: "司机手机号",
         key: "driverPhone",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "司机身份证号",
         key: "driverIdentityCardNo",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "运营企业",
         key: "operationCompanyName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "车牌号",
         key: "plateNumber",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "车辆类型",
         key: "vehicleBrand",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "注册时间",
@@ -125,11 +140,17 @@ export default defineComponent({
         title: "司机注册状态",
         key: "driverState",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "企业审核时间",
         key: "companyCheckTime",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
     ];
 

@@ -79,7 +79,7 @@ const handleMember = () => {
 .team-info-wrap {
   border: 1px solid #efeff5;
   width: 24%;
-  min-width: 370px;
+  min-width: 365px;
   max-width: 33%;
   margin: 5px 4px;
   .team-info-item {
