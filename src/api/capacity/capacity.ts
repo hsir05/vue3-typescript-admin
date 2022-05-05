@@ -399,6 +399,34 @@ export function initPassword(data: { driverId: string }) {
     data: data,
   });
 }
+/**
+ * 司机信息编辑
+ */
+interface DriverInter{
+    driverId: string | null
+    driverLastName: string | null
+    driverFirstName: string | null
+    driverGender: number | null
+    driverPhone: string | null
+    driverNation: string | null
+    driverEducation: string | null
+    driverMaritalStatus: string | null
+    driverBirth: number | null
+    driverRegisteredResidence: string | null
+    driverEmergencyContactName: string | null
+    driverEmergencyContactPhone: string | null
+    driverLock: string | null
+}
+export function editDriver(data: DriverInter) {
+  return http.request({
+    url: "/operationCompanyDriver/save",
+    method: "post",
+    data: data,
+  });
+}
+
+
+
 //----------------------车辆分配管理-----------------------
 /**
  * 车辆分配分页

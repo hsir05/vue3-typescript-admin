@@ -78,9 +78,6 @@
       :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -136,7 +133,7 @@ export default defineComponent({
     const data = ref<tableDataItem[]>([]);
 
     const columns = [
-      { type: "selection", align: "center" },
+      //   { type: "selection", align: "center" },
       {
         title: "序号",
         key: "index",
@@ -158,6 +155,12 @@ export default defineComponent({
         key: "driverGender",
         width: 100,
         align: "center",
+        render(row: tableDataItem) {
+          return h(
+            "span",
+            `${row.driverGender === 1 ? "男" : row.driverGender === 0 ? "女" : "未知"}`
+          );
+        },
       },
       {
         title: "司机手机号",
@@ -199,10 +202,10 @@ export default defineComponent({
           return h(
             NTag,
             {
-              type: row.driverLock === 1 ? "success" : "error",
+              type: row.driverLock === "正常" ? "success" : "error",
             },
             {
-              default: () => (row.driverLock === 1 ? "正常" : "锁定"),
+              default: () => row.driverLock,
             }
           );
         },
@@ -213,7 +216,6 @@ export default defineComponent({
         width: 80,
         align: "center",
       },
-
       {
         title: "添加时间",
         key: "createTime",
@@ -316,19 +318,16 @@ export default defineComponent({
       }
     };
 
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
     function hanldleSee(record: Recordable) {
       console.log(record);
       const { openDrawer } = driversDrawerRef.value;
-      openDrawer("查看", "see");
+      openDrawer("查看司机信息", record, true);
     }
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = driversDrawerRef.value;
-      openDrawer("编辑司机信息", record);
+      openDrawer("编辑司机信息", record, false);
     }
     function handleCert(record: Recordable) {
       console.log("点击了证件", record.id);
@@ -338,14 +337,6 @@ export default defineComponent({
     function handleAddress(record: Recordable) {
       const { openDrawer } = addressDrawerRef.value;
       openDrawer("司机家庭地址编辑", record);
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
-    function handleAdd() {
-      console.log("点击了新增");
-      const { openDrawer } = driversDrawerRef.value;
-      openDrawer("添加司机");
     }
 
     async function resetPassword(record: Recordable) {
@@ -428,11 +419,8 @@ export default defineComponent({
       vehicleTypeData,
 
       reloadPage,
-      handleAdd,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       resetPassword,
