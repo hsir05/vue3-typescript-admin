@@ -1,11 +1,28 @@
 
-//车辆品牌	车系	车辆型号	核定载客位	运营企业	车辆类型	当前里程	是否锁定
 export const rules = {
-  plageNumber: { required: true, trigger: ["blur", "input"], message: "请输入车牌号" },
-  brand: { required: true, trigger: ["blur", "input"], message: "请输入车辆品牌" },
-  adminName: { required: true, trigger: ["blur", "input"], message: "请输入管理名称" },
-  socityCode: { required: true, trigger: ["blur", "input"], message: "请输入社会统一信用代码" },
-  companyCode: { required: true, trigger: ["blur", "input"], message: "请输入运营企业编号" },
-  cityCode: { required: true, trigger: ["blur", "input"], message: "选择运营城市" },
-  carType: { required: true, type: "number", trigger: ["blur", "change"], message: "请选择车辆类型" },
+  plateNumber: { required: true, trigger: ["blur", "input"], message: "请输入车牌号" },
+  vehicleBrand: { required: true, trigger: ["blur", "input"], message: "请输入车辆品牌" },
+  plateColor: { required: true, trigger: ["blur", "input"], message: "请输入车牌颜色" },
+  vehicleDrivingPermitType: { required: true, trigger: ["blur", "input"], message: "请输入行驶证类型" },
+  vehicleEngineDisplace: { required: true, trigger: ["blur", "input"], message: "请输入发动机排量" },
+  vehicleFuelType: { required: true, trigger: ["blur", "change"], message: "请输入燃料类型" },
+  vehicleModel: { required: true, trigger: ["blur", "change"], message: "请输入车辆型号" },
+  vehicleSeats: { required: true, trigger: ["blur", "change"], message: "请输入座位" },
+  vehicleState: { required: true, trigger: ["blur", "change"], message: "请选择车辆状态" },
+  vehicleVin: { required: true, trigger: ["blur", "change"], message: "请输入车辆VIN码" },
+  vehilceEngineId: { required: true, trigger: ["blur", "change"], message: "请输入发动机编号" },
+  vehicleTypeId: { required: true, trigger: ["blur", "change"], message: "请选择车辆类型" },
+  vehicleCertifyDate: { required: true, trigger: ["blur", "change"], message: "请选择车辆注册日期" },
+  vehicleSeries: { required: true, trigger: ["blur", "change"], message: "请输入车系" },
 };
+
+export const trcRules = {
+    vehicleTransportLicenseNo: { required: true, trigger: ["blur", "input"], message: "请输入运输证字号" },
+  vehicleTransportLicenseIssueOrganization: { required: true, trigger: ["blur", "input"], message: "请输入运输证发证机关" },
+  vehicleTransportLicenseEffectiveBegin: { required: true,type: "number", trigger: ["blur", "input"], message: "请选择运输证有效期开始时间" },
+  vehicleTransportLicenseEffectiveEnd: { required: true,type: "number", trigger: ["blur", "input"], message: "请选择运输证有效期结束时间" },
+  vehicleTransportLicenseOperationScope: { required: true, trigger: ["blur", "input"], message: "请输入运输证经营范围 " },
+  vehiclePhotoId: { required: true,  trigger: ["blur", "change"], message: "请上传车辆照片" },
+  vehicleTransportLicenseId: { required: true,  trigger: ["blur", "change"], message: "请上传运输证照片" },
+
+}

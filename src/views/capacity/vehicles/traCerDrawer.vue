@@ -1,8 +1,8 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" title="编辑运输证照片信息" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
-      :rules="rules"
+      :rules="trcRules"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '460px' }"
@@ -10,53 +10,68 @@
       label-width="120"
       :model="form"
     >
-      <n-form-item label="运输证字号" path="plageNumber">
+      <n-form-item label="运输证字号" path="vehicleTransportLicenseNo">
         <n-input
-          v-model:value="form.plageNumber"
+          v-model:value="form.vehicleTransportLicenseNo"
           clearable
           placeholder="请输入运输证字号，如X交运管许可XX字XXX号"
         />
       </n-form-item>
-      <n-form-item label="运输证发证机关" path="color">
+      <n-form-item label="运输证发证机关" path="vehicleTransportLicenseIssueOrganization">
         <n-input
-          v-model:value="form.color"
+          v-model:value="form.vehicleTransportLicenseIssueOrganization"
           clearable
           placeholder="请输入运输证发证机关，如XX交通运输管理处"
         />
       </n-form-item>
-      <n-form-item label="车辆品牌" path="brand">
-        <n-input v-model:value="form.brand" clearable placeholder="输入车辆品牌" />
-      </n-form-item>
 
-      <n-form-item label="运输证有效期始" path="vehiclesDate">
-        <n-date-picker v-model:value="form.vehiclesDate" type="date" clearable />
-      </n-form-item>
-
-      <n-form-item label="运输证有效期止" path="vehiclesDate">
-        <n-date-picker v-model:value="form.vehiclesDate" type="date" clearable />
-      </n-form-item>
-
-      <n-form-item label="车辆照片" path="lock">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="310"
-          :height="130"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-          helpText="单个文件不超过2MB，最多只能上传1个文件"
+      <n-form-item label="运输证有效期始" path="vehicleTransportLicenseEffectiveBegin">
+        <n-date-picker
+          v-model:value="form.vehicleTransportLicenseEffectiveBegin"
+          type="date"
+          clearable
         />
       </n-form-item>
 
-      <n-form-item label="运输证" path="lock">
+      <n-form-item label="运输证有效期止" path="vehicleTransportLicenseEffectiveEnd">
+        <n-date-picker
+          v-model:value="form.vehicleTransportLicenseEffectiveEnd"
+          type="date"
+          clearable
+        />
+      </n-form-item>
+
+      <n-form-item label="运输证经营范围" path="vehicleTransportLicenseOperationScope">
+        <n-input
+          v-model:value="form.vehicleTransportLicenseOperationScope"
+          clearable
+          placeholder="请输入运输证发证机关，如XX交通运输管理处"
+        />
+      </n-form-item>
+
+      <n-form-item label="车辆照片" path="vehiclePhotoId">
         <BasicUpload
-          :data="{}"
+          :data="{ uploadType: UploadTypeEnum.VEHICLEPHOTO }"
           name="file"
+          :disabled="disabled"
           :width="310"
           :height="130"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-          helpText="单个文件不超过2MB，最多只能上传1个文件"
+          @delete-upload="vehiclePhotoRemove"
+          @upload-change="vehiclePhotoChange"
+          v-model:value="vehiclePhotoList"
+        />
+      </n-form-item>
+
+      <n-form-item label="运输证" path="vehicleTransportLicenseId">
+        <BasicUpload
+          :data="{ uploadType: UploadTypeEnum.DRIVERLICENSE }"
+          name="file"
+          :disabled="disabled"
+          :width="310"
+          :height="130"
+          @delete-upload="transportRemove"
+          @upload-change="transportChange"
+          v-model:value="transportList"
         />
       </n-form-item>
 
@@ -65,7 +80,6 @@
           attr-type="button"
           :loading="loading"
           :disabled="disabled"
-          size="large"
           type="primary"
           @click="handleValidate"
           >保存</n-button
@@ -74,20 +88,20 @@
           attr-type="button"
           type="warning"
           :disabled="disabled"
-          size="large"
           class="ml-10px"
           @click="handleReset"
-          >重置</n-button
-        >
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
-import { rules } from "./data";
-import { tableDataItem } from "./type";
+import { FormInst, useMessage } from "naive-ui";
+import { trcRules } from "./data";
+import { TraCerInter } from "./type";
+import { UploadTypeEnum } from "@/enums/httpEnum";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { uploadUrl } from "@/config/config";
 export default defineComponent({
@@ -101,47 +115,47 @@ export default defineComponent({
       disabled: false,
       openCityData: [],
     });
-    const title = ref("菜单");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      plageNumber: null,
-      brand: null,
-      carSeies: null,
-      color: null,
-      carType: null,
-      companyName: null,
-      create_time: null,
-      distance: null,
-      plate: null,
-      vehiclesType: null,
-      lock: 1,
-      remark: null,
-      fuelType: null,
-      engineNumber: null,
-      vin: null,
-      engineDisplacement: null,
-      drivingPermitType: null,
-      vehiclesDate: null,
+    const form = ref<TraCerInter>({
+      vehicleTransportLicenseNo: null,
+      vehicleTransportLicenseIssueOrganization: null,
+      vehicleTransportLicenseEffectiveBegin: null,
+      vehicleTransportLicenseEffectiveEnd: null,
+      vehicleTransportLicenseOperationScope: null,
+      vehiclePhotoId: null,
+      vehicleTransportLicenseId: null,
     });
 
-    const uploadList = ref([
-      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    ]);
+    const uploadList = ref([]);
 
-    function openDrawer(t: string, item?: tableDataItem | String) {
-      console.log(item);
-      if (item === "see") {
-        state.disabled = true;
-      } else if (item) {
-        form.value = { ...form.value, ...item };
-      }
-      title.value = t;
+    const vehiclePhotoList = ref<string[]>([]);
+    const transportList = ref<string[]>([]);
+
+    function openDrawer(record: TraCerInter) {
+      console.log(record);
+      form.value = record;
       state.isDrawer = true;
     }
 
-    function uploadChange(list: string[]) {
-      console.log(list);
+    function vehiclePhotoRemove(file: string[]) {
+      form.value.vehiclePhotoId = file[0];
+      vehiclePhotoList.value = file;
+    }
+
+    function vehiclePhotoChange(file: { filePath: string; fileId: string }) {
+      form.value.vehiclePhotoId = file.fileId;
+      vehiclePhotoList.value = [file.filePath];
+    }
+
+    function transportRemove(file: string[]) {
+      form.value.vehicleTransportLicenseId = file[0];
+      transportList.value = file;
+    }
+
+    function transportChange(file: { filePath: string; fileId: string }) {
+      form.value.vehicleTransportLicenseId = file.fileId;
+      transportList.value = [file.filePath];
     }
 
     function handleValidate(e: MouseEvent) {
@@ -162,38 +176,19 @@ export default defineComponent({
       });
     }
 
-    function handleUpdateValue(_: string, option: SelectOption) {
-      console.log(option);
-      // console.log(toRaw(form.value));
-
-      //    form.value.city = unref(option).label
-      //    form.value.code = option.value
-    }
-
     function handleSaveAfter() {
       emit("on-save-after");
     }
 
     function handleReset() {
       form.value = {
-        plageNumber: null,
-        brand: null,
-        carSeies: null,
-        color: null,
-        carType: null,
-        companyName: null,
-        create_time: null,
-        distance: null,
-        plate: null,
-        vehiclesType: null,
-        lock: 1,
-        remark: null,
-        fuelType: null,
-        engineNumber: null,
-        vin: null,
-        engineDisplacement: null,
-        drivingPermitType: null,
-        vehiclesDate: null,
+        vehicleTransportLicenseNo: null,
+        vehicleTransportLicenseIssueOrganization: null,
+        vehicleTransportLicenseEffectiveBegin: null,
+        vehicleTransportLicenseEffectiveEnd: null,
+        vehicleTransportLicenseOperationScope: null,
+        vehiclePhotoId: null,
+        vehicleTransportLicenseId: null,
       };
       formRef.value?.restoreValidation();
     }
@@ -207,17 +202,21 @@ export default defineComponent({
     return {
       ...toRefs(state),
       formRef,
-      title,
-      rules,
+      trcRules,
       uploadUrl,
+      vehiclePhotoList,
+      transportList,
       form,
       uploadList,
+      UploadTypeEnum,
       openDrawer,
-      handleUpdateValue,
-      uploadChange,
+      transportRemove,
+      transportChange,
       handleReset,
       handleValidate,
       onCloseAfter,
+      vehiclePhotoChange,
+      vehiclePhotoRemove,
     };
   },
 });

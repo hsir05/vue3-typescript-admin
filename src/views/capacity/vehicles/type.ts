@@ -1,3 +1,4 @@
+
 export interface tableDataItem {
   operationCompanyVehicleId: string | null
     plateColor: string | null
@@ -19,4 +20,15 @@ export interface tableDataItem {
     createTime?: string | null
     vehicleTypeName?: string | null
     operationCompanyName?:string | null
+}
+
+export interface TraCerInter{
+    operationCompanyVehicleId?: string
+    vehicleTransportLicenseNo: string | null
+    vehicleTransportLicenseIssueOrganization: string | null
+    vehicleTransportLicenseEffectiveBegin: number | null
+    vehicleTransportLicenseEffectiveEnd: number | null
+    vehicleTransportLicenseOperationScope: string | null
+    vehiclePhotoId: string | null
+    vehicleTransportLicenseId: string | null
 }

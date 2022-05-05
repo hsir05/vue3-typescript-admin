@@ -326,18 +326,16 @@ export default defineComponent({
     }
 
     function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
       const { openDrawer } = vehiclesDrawerRef.value;
       openDrawer("编辑车辆", record, "edit");
     }
     async function handleTransfer(record: Recordable) {
-      console.log("点击了编辑", record.id);
       const { openDrawer } = TransferDrawerRef.value;
       openDrawer(record);
     }
     function handleTraCert(record: Recordable) {
       const { openDrawer } = traCerDrawerRef.value;
-      openDrawer("编辑运输证照片信息", record);
+      openDrawer(record);
     }
     async function handleInitMileage(record: Recordable) {
       try {
