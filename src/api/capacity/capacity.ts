@@ -313,23 +313,23 @@ export function initMileage(data: { operationCompanyVehicleId: string }) {
  */
 
 interface VehicleEditInter {
-    operationCompanyVehicleId: string | null
-    plateColor: string | null
-    plateNumber: string | null
-    vehicleBrand: string | null
-    vehicleCertifyDate: string | null
-    vehicleColor: string | null
-    vehicleDrivingPermitType: string | null
-    vehicleEngineDisplace: string | null
-    vehicleFuelType: string | null
-    vehicleModel: string | null
-    vehicleNote: string | null
-    vehicleSeats: number | null
-    vehicleSeries: string | null
-    vehicleState: number | null
-    vehicleTypeId: string | null
-    vehicleVin: string | null
-    vehilceEngineId: string | null
+  operationCompanyVehicleId: string | null;
+  plateColor: string | null;
+  plateNumber: string | null;
+  vehicleBrand: string | null;
+  vehicleCertifyDate: string | null;
+  vehicleColor: string | null;
+  vehicleDrivingPermitType: string | null;
+  vehicleEngineDisplace: string | null;
+  vehicleFuelType: string | null;
+  vehicleModel: string | null;
+  vehicleNote: string | null;
+  vehicleSeats: number | null;
+  vehicleSeries: string | null;
+  vehicleState: number | null;
+  vehicleTypeId: string | null;
+  vehicleVin: string | null;
+  vehilceEngineId: string | null;
 }
 export function vehicleEdit(data: VehicleEditInter) {
   return http.request({
@@ -342,9 +342,7 @@ export function vehicleEdit(data: VehicleEditInter) {
 /**
  * 车辆运输证信息保存
  */
-interface TranLicenseInter {
-
-}
+interface TranLicenseInter {}
 export function transportLicenseEdit(data: TranLicenseInter) {
   return http.request({
     url: "/vehicle/updateVehicleTransportLicense",
@@ -356,8 +354,8 @@ export function transportLicenseEdit(data: TranLicenseInter) {
  * 车辆转移所在企业
  */
 interface TransferInter {
-    operationCompanyVehicleId: string
-    vehicleTransferCompanyId: string
+  operationCompanyVehicleId: string;
+  vehicleTransferCompanyId: string;
 }
 export function transfer(data: TransferInter) {
   return http.request({
@@ -402,20 +400,20 @@ export function initPassword(data: { driverId: string }) {
 /**
  * 司机信息编辑
  */
-interface DriverInter{
-    driverId: string | null
-    driverLastName: string | null
-    driverFirstName: string | null
-    driverGender: number | null
-    driverPhone: string | null
-    driverNation: string | null
-    driverEducation: string | null
-    driverMaritalStatus: string | null
-    driverBirth: number | null
-    driverRegisteredResidence: string | null
-    driverEmergencyContactName: string | null
-    driverEmergencyContactPhone: string | null
-    driverLock: string | null
+interface DriverInter {
+  driverId: string | null;
+  driverLastName: string | null;
+  driverFirstName: string | null;
+  driverGender: number | null;
+  driverPhone: string | null;
+  driverNation: string | null;
+  driverEducation: string | null;
+  driverMaritalStatus: string | null;
+  driverBirth: number | null;
+  driverRegisteredResidence: string | null;
+  driverEmergencyContactName: string | null;
+  driverEmergencyContactPhone: string | null;
+  driverLock: number | null;
 }
 export function editDriver(data: DriverInter) {
   return http.request({
@@ -425,8 +423,103 @@ export function editDriver(data: DriverInter) {
   });
 }
 
+/**
+ * 司机信息详情
+ */
+export function getDriverDetail(data: { driverId: string }) {
+  return http.request({
+    url: "/operationCompanyDriver/detail",
+    method: "post",
+    data: data,
+  });
+}
 
+/**
+ * 更新司机证件头像
+ */
+export function updateDriverPhoto(data: { driverId: string; fileId: string }) {
+  return http.request({
+    url: "/operationCompanyDriver/uploadDriverIdentificationPhoto",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 更新司机人脸采集图像
+ */
+export function updateDriverFacePhoto(data: { driverId: string; fileId: string }) {
+  return http.request({
+    url: "/operationCompanyDriver/updateDriverBaiduFaceRecognPhoto",
+    method: "post",
+    data: data,
+  });
+}
 
+/**
+ * 更新司机身份证照片信息
+ */
+interface FiledInter {
+  field: string;
+}
+interface IdentityInter {
+  driverId: string;
+  driverIdentityCardNo: string;
+  driverIdentityCardIssueOrganization: string;
+  driverIdentityCardEffectiveDateBegin: string;
+  driverIdentityCardEffectiveDateEnd: string;
+  driverIdentityFaceSide: FiledInter;
+  driverIdentityOtherSide: FiledInter;
+}
+export function updateDriverIdentity(data: IdentityInter) {
+  return http.request({
+    url: "/operationCompanyDriver/updateDriverIdentity",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 更新司机驾驶证照片信息
+ */
+
+interface LicenseInter {
+  driverId: string;
+  driverLicenseNo: string;
+  driverLicenseArchivesNo: string;
+  driverPermitVehicleModel: string;
+  driverLicenseGetDate: string;
+  driverLicenseEffectiveDateBegin: string;
+  driverLicenseEffectiveDateEnd: string;
+  driverLicenseFaceSide: FiledInter;
+  driverLicenseOtherSide: FiledInter;
+}
+export function updateDriverLicense(data: LicenseInter) {
+  return http.request({
+    url: "/operationCompanyDriver/updateDriverLicense",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ * 更新司机网约车资格证
+ */
+interface CertificateInter {
+  driverId: string;
+  driverNetworkVehicleCertificateNo: string;
+  driverNetworkVehicleCertificateIssueOrganization: string;
+  driverNetworkVehicleCertificateGetDate: string;
+  driverNetworkVehicleCertificateEffectiveDateBegin: string;
+  driverNetworkVehicleCertificateEffectiveDateEnd: string;
+  driverNetworkVehicleCertificateFaceSide: FiledInter;
+  driverNetworkVehicleCertificateOtherSide: FiledInter;
+}
+export function updateCertificate(data: CertificateInter) {
+  return http.request({
+    url: "/operationCompanyDriver/updateDriverNetworkVehicleCertificate",
+    method: "post",
+    data: data,
+  });
+}
 //----------------------车辆分配管理-----------------------
 /**
  * 车辆分配分页
@@ -747,8 +840,8 @@ export function getDriverMemberPage(data: DriverMemberPageInter) {
 
 /**
  *删除开通司机会员的企业
-*/
-export function removeMember(data: {operationCompanyOpenedDriverMemberId: string}) {
+ */
+export function removeMember(data: { operationCompanyOpenedDriverMemberId: string }) {
   return http.request({
     url: "/driverMemberGoods/deleteOpenedCompany",
     method: "post",

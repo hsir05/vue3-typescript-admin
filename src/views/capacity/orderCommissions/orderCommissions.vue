@@ -104,7 +104,7 @@ export default defineComponent({
       },
       {
         title: "流量方",
-        key: "influxName",
+        key: "influxCode",
         align: "center",
         ellipsis: {
           tooltip: true,

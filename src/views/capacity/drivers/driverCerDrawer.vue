@@ -1,183 +1,194 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" :width="1000" @on-close-after="onCloseAfter">
-    <n-alert title="提示" type="warning" class="mb-10px">
-      单个文件不超过2MB，最多只能上传1个文件
-    </n-alert>
+  <BasicDrawer
+    v-model:show="isDrawer"
+    title="司机证件照片信息"
+    :width="1000"
+    @on-close-after="onCloseAfter"
+  >
+    <n-spin :show="loading">
+      <div class="img-info">
+        <div class="img-box" v-if="!loading">
+          <p class="title mt-10px mb-10px">司机免冠照片</p>
+          <div class="">
+            <n-image width="100" height="130" :src="driverHeaderImage" />
+          </div>
+          <n-button
+            attr-type="button"
+            :loading="loading"
+            :disabled="disabled"
+            size="small"
+            type="primary"
+            @click="editDriverHead(driverHeaderImage)"
+            >编辑司机免冠照片
+          </n-button>
+        </div>
 
-    <n-form
-      inline
-      ref="formRef"
-      :rules="rules"
-      :disabled="disabled"
-      label-placement="top"
-      :style="{ flexWrap: 'wrap', justifyContent: 'space-around' }"
-      require-mark-placement="right-hanging"
-      label-width="120"
-      :model="form"
-    >
-      <n-form-item label="司机免冠照片" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
+        <div class="img-box" v-if="!loading">
+          <p class="title mt-10px mb-10px">人脸识别采集图片</p>
+          <div class="">
+            <n-image width="100" height="130" :src="driverBaiduFaceRecognitionPhoto" />
+          </div>
 
-      <n-form-item label="人脸识别采集图片" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
+          <n-button
+            attr-type="button"
+            :loading="loading"
+            :disabled="disabled"
+            size="small"
+            type="primary"
+            @click="editDriverFace(driverBaiduFaceRecognitionPhoto)"
+            >编辑人脸识别采集图片
+          </n-button>
+        </div>
+      </div>
 
-      <n-form-item label="司机身份证头像面" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
-      <n-form-item label="司机身份证国徽面" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
-      <n-form-item label="司机驾驶证正页" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
-      <n-form-item label="司机驾驶证副页" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
-      <n-form-item label="司机网约车资格证正页" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
-      <n-form-item label="司机网约车资格证副页" path="bareheadedPhoto">
-        <BasicUpload
-          :data="{}"
-          name="file"
-          :width="100"
-          :height="100"
-          @upload-change="uploadChange"
-          v-model:value="uploadList"
-        />
-      </n-form-item>
-    </n-form>
-    <div class="text-center flex-center">
-      <n-button
-        attr-type="button"
-        :loading="loading"
-        size="large"
-        type="primary"
-        @click="handleValidate"
-        >保存</n-button
-      >
-    </div>
+      <PhotoItem
+        v-if="!loading"
+        :positivePhoto="driverIdentificationPhoto"
+        :reversePhoto="driverIdentityOtherSide"
+        positiveText="司机身份证头像面"
+        reverseText="司机身份证国徽面"
+        btnText="编辑司机身份证照片信息"
+        @edit-photo="editIdentity"
+      />
+
+      <PhotoItem
+        v-if="!loading"
+        :positivePhoto="driverLicenseFaceSide"
+        :reversePhoto="driverLicenseOtherSide"
+        positiveText="司机驾驶证正页"
+        reverseText="司机驾驶证副页"
+        btnText="编辑司机驾驶照片信息"
+      />
+
+      <PhotoItem
+        v-if="!loading"
+        :width="140"
+        :positivePhoto="driverNetworkVehicleCertificateFaceSide"
+        :reversePhoto="driverNetworkVehicleCertificateOtherSide"
+        positiveText="司机网约车资格证正页"
+        reverseText="司机网约车资格证副页"
+        btnText="编辑网约车资格证照片信息"
+      />
+    </n-spin>
+
+    <UploadModal
+      ref="driverHeaderModalRef"
+      @on-remove="handleHeaderRemove"
+      @on-sucess="handleHeader"
+    />
+    <UploadModal ref="driverFaceModalRef" @on-remove="handleFaceRemove" @on-sucess="handleFace" />
+
+    <LicenseDrawer ref="licenseDrawerRef" />
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, unref, toRefs } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-import { certificatesState } from "./type";
-import { uploadUrl } from "@/config/config";
-import BasicUpload from "@/components/Upload/Upload.vue";
-
+import { defineComponent, ref, reactive, toRefs } from "vue";
+import { useMessage } from "naive-ui";
+import { getDriverDetail, updateDriverPhoto, updateDriverFacePhoto } from "@/api/capacity/capacity";
+import PhotoItem from "./photoItem.vue";
+import UploadModal from "@/components/UploadModal/UploadModal.vue";
+import LicenseDrawer from "./licenseDrawer.vue";
+import { UploadTypeEnum } from "@/enums/httpEnum";
 export default defineComponent({
   name: "DriverCerDrawer",
-  components: { BasicUpload },
+  components: { PhotoItem, UploadModal, LicenseDrawer },
   emits: ["on-save-after"],
   setup(_, { emit }) {
+    const driverHeaderModalRef = ref();
+    const driverFaceModalRef = ref();
+    const licenseDrawerRef = ref();
     const state = reactive({
       isDrawer: false,
       loading: false,
       disabled: false,
+      data: {},
+      driverId: "",
+      uploadModalRef: "",
+      driverHeaderImage: "",
+      driverBaiduFaceRecognitionPhoto: "",
+      driverIdentificationPhoto: "",
+      driverIdentityOtherSide: "",
+      driverLicenseFaceSide: "",
+      driverLicenseOtherSide: "",
+      driverNetworkVehicleCertificateFaceSide: "",
+      driverNetworkVehicleCertificateOtherSide: "",
     });
-    const title = ref("司机证件照片信息");
-    const uploadList = ref([
-      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    ]);
-
-    const formRef = ref<FormInst | null>(null);
     const message = useMessage();
 
-    const form = ref<certificatesState>({
-      bareheadedPhoto: null,
-      takePhotos: null,
-      frontPhoto: null,
-      reversePhoto: null,
-      frontPage: null,
-      reversePage: null,
-      frontCer: null,
-      reverseCer: null,
-    });
-
-    function openDrawer(t: string, record?: certificatesState) {
-      console.log(record);
-      if (!record) {
-        state.disabled = true;
-        state.isDrawer = true;
-      } else if (record) {
-        form.value = { ...form.value, ...record };
-      }
-      title.value = t;
+    function openDrawer(driverId: string) {
+      getDetail(driverId);
+      state.driverId = driverId;
       state.isDrawer = true;
     }
+    const getDetail = async (driverId: string) => {
+      state.loading = true;
+      try {
+        let res = await getDriverDetail({ driverId });
+        console.log(res);
+        state.data = res.data;
+        state.driverHeaderImage = res.data.driver.driverHeaderImage.filePath;
+        state.driverBaiduFaceRecognitionPhoto =
+          res.data.driver.driverBaiduFaceRecognitionPhoto.filePath;
 
-    function uploadChange(list: string[]) {
-      console.log(list);
+        state.driverIdentificationPhoto = res.data.driver.driverIdentificationPhoto.filePath;
+        state.driverIdentityOtherSide = res.data.driver.driverIdentityOtherSide.filePath;
+
+        state.driverLicenseFaceSide = res.data.driver.driverLicenseFaceSide.filePath;
+        state.driverLicenseOtherSide = res.data.driver.driverLicenseOtherSide.filePath;
+
+        state.driverNetworkVehicleCertificateFaceSide =
+          res.data.driver.driverNetworkVehicleCertificateFaceSide.filePath;
+        state.driverNetworkVehicleCertificateOtherSide =
+          res.data.driver.driverNetworkVehicleCertificateOtherSide.filePath;
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+
+    function editDriverHead(filePath: string) {
+      const { handleModal } = driverHeaderModalRef.value;
+      handleModal("编辑司机免冠照片", UploadTypeEnum.DRIVERIDENTIFICATION, filePath);
+    }
+    function handleHeaderRemove(filePath: string) {
+      console.log(filePath);
+      state.driverHeaderImage = "";
+    }
+    async function handleHeader(filePath: string) {
+      console.log(filePath);
+      try {
+        let res = await updateDriverPhoto({ driverId: state.driverId, fileId: filePath });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
-    function handleValidate(e: MouseEvent) {
-      e.preventDefault();
-      formRef.value?.validate((errors) => {
-        if (!errors) {
-          state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
+    function editDriverFace(filePath: string) {
+      const { handleModal } = driverFaceModalRef.value;
+      handleModal("编辑人脸识别采集图片", UploadTypeEnum.DRIVERIDENTIFICATION, filePath);
+    }
+    function handleFaceRemove(filePath: string) {
+      console.log(filePath);
+      state.driverIdentificationPhoto = "";
+    }
 
-          handleSaveAfter();
-
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
+    function editIdentity() {
+      const { handleModal } = licenseDrawerRef.value;
+      handleModal(state.data);
+    }
+    async function handleFace(filePath: string) {
+      console.log(filePath);
+      console.log(filePath);
+      try {
+        let res = await updateDriverFacePhoto({ driverId: state.driverId, fileId: filePath });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     function handleSaveAfter() {
@@ -192,55 +203,42 @@ export default defineComponent({
 
     return {
       ...toRefs(state),
-      uploadUrl,
-      formRef,
-      uploadList,
-      form,
-      title,
-      rules: {
-        bareheadedPhoto: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传司机免冠照片",
-        },
-        takePhotos: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传人脸识别采集图片",
-        },
-        frontPhoto: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传司机身份证头像面",
-        },
-        reversePhoto: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传司机身份证国徽面",
-        },
-        frontPage: { required: true, trigger: ["blur", "input"], message: "请上传司机驾驶证正页" },
-        reversePage: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传司机驾驶证副页",
-        },
-        frontCer: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传司机网约车资格证正页",
-        },
-        reverseCer: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请上传司机网约车资格证副页",
-        },
-      },
+      driverFaceModalRef,
+      driverHeaderModalRef,
+      licenseDrawerRef,
       handleSaveAfter,
-      handleValidate,
+      handleHeaderRemove,
+      handleHeader,
+      handleFaceRemove,
+      handleFace,
+      editIdentity,
       openDrawer,
-      uploadChange,
+      editDriverHead,
+      editDriverFace,
       onCloseAfter,
     };
   },
 });
 </script>
+<style scoped lang="scss">
+.img-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.photot-box {
+  height: 180px;
+  overflow: hidden;
+}
+
+.img-box {
+  width: 150px;
+  text-align: center;
+}
+
+.title {
+  font-size: 14px;
+  text-align: center;
+}
+</style>

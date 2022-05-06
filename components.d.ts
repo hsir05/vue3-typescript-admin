@@ -59,6 +59,7 @@ declare module 'vue' {
     NSelect: typeof import('naive-ui')['NSelect']
     NSkeleton: typeof import('naive-ui')['NSkeleton']
     NSpace: typeof import('naive-ui')['NSpace']
+    NSpan: typeof import('naive-ui')['NSpan']
     NSpin: typeof import('naive-ui')['NSpin']
     NStatistic: typeof import('naive-ui')['NStatistic']
     NStep: typeof import('naive-ui')['NStep']
@@ -77,6 +78,7 @@ declare module 'vue' {
     Table: typeof import('./src/components/Table/Table.vue')['default']
     TableActions: typeof import('./src/components/TableActions/TableActions.vue')['default']
     Upload: typeof import('./src/components/Upload/Upload.vue')['default']
+    UploadModal: typeof import('./src/components/UploadModal/UploadModal.vue')['default']
     WalletItem: typeof import('./src/components/walletItem/walletItem.vue')['default']
   }
 }

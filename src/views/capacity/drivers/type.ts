@@ -11,7 +11,7 @@ export interface tableDataItem {
   driverRegisteredResidence: string | null;
   driverEmergencyContactName: string | null;
   driverEmergencyContactPhone: string | null;
-  driverLock: string | null;
+  driverLock: number | null;
   createTime?: number | null
 }
 

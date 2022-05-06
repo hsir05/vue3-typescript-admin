@@ -202,10 +202,10 @@ export default defineComponent({
           return h(
             NTag,
             {
-              type: row.driverLock === "正常" ? "success" : "error",
+              type: row.driverLock === 0 ? "success" : "error",
             },
             {
-              default: () => row.driverLock,
+              default: () => (row.driverLock === 0 ? "正常" : "锁定"),
             }
           );
         },
@@ -330,9 +330,8 @@ export default defineComponent({
       openDrawer("编辑司机信息", record, false);
     }
     function handleCert(record: Recordable) {
-      console.log("点击了证件", record.id);
       const { openDrawer } = driverCerDrawerRef.value;
-      openDrawer("编辑司机证件信息", record);
+      openDrawer(record.driverId);
     }
     function handleAddress(record: Recordable) {
       const { openDrawer } = addressDrawerRef.value;

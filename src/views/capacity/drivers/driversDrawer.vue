@@ -82,8 +82,8 @@
       <n-form-item label="是否锁定" path="driverLock">
         <n-radio-group v-model:value="form.driverLock">
           <n-space>
-            <n-radio value="正常">正常</n-radio>
-            <n-radio value="锁定">锁定</n-radio>
+            <n-radio :value="0">正常</n-radio>
+            <n-radio :value="1">锁定</n-radio>
           </n-space>
         </n-radio-group>
       </n-form-item>
@@ -103,8 +103,8 @@
           :disabled="loading"
           class="ml-10px"
           @click="handleReset"
-          >重置</n-button
-        >
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
@@ -148,7 +148,7 @@ export default defineComponent({
       driverRegisteredResidence: null,
       driverEmergencyContactName: null,
       driverEmergencyContactPhone: null,
-      driverLock: "正常",
+      driverLock: 0,
     });
 
     function openDrawer(t: string, record: tableDataItem, bool: boolean) {

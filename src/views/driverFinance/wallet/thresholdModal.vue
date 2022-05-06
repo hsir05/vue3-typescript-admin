@@ -59,7 +59,6 @@ export default defineComponent({
       formRef.value?.validate((errors) => {
         if (!errors) {
           console.log(unref(form));
-
           message.success("验证成功");
         } else {
           console.log(errors);
