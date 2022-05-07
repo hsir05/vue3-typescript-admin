@@ -1,21 +1,15 @@
 <template>
-  <BasicModal
-    :title="title"
-    ref="ModalRef"
-    :maskClosable="true"
-    @on-cancel="handleReset"
-    @on-ok="handleValidate"
-  >
+  <BasicModal title="图片上传" ref="ModalRef" :maskClosable="true">
     <n-form
       ref="formRef"
       :rules="rules"
-      label-placement="top"
+      label-placement="left"
       :style="{ maxWidth: '520px' }"
       require-mark-placement="right-hanging"
       label-width="100"
       :model="form"
     >
-      <n-form-item path="filePath" style="margin: 0 auto">
+      <n-form-item :label="title" path="filePath" style="margin: 0 auto">
         <BasicUpload
           :data="{ uploadType: uploadType }"
           name="file"
@@ -26,6 +20,12 @@
           v-model:value="uploadList"
         />
       </n-form-item>
+
+      <div class="text-center">
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >保存
+        </n-button>
+      </div>
     </n-form>
   </BasicModal>
 </template>
@@ -37,25 +37,29 @@ import BasicUpload from "@/components/Upload/Upload.vue";
 export default defineComponent({
   name: "UplodModal",
   components: { BasicModal, BasicUpload },
-  emits: ["on-remove", "on-sucess"],
+  emits: ["on-remove", "on-sucess", "on-submit"],
   setup(_, { emit }) {
-    interface FormInter {
-      filePath: string | null;
-    }
     const ModalRef = ref();
     const title = ref("图片上传");
     const uploadType = ref("");
     const loading = ref(false);
     const uploadList = ref<string[]>([]);
-    const form = ref<FormInter>({
-      filePath: null,
+    interface FileInter {
+      filePath: string;
+      fileId: string;
+    }
+    const form = ref<FileInter>({
+      filePath: "",
+      fileId: "",
     });
     const formRef = ref<FormInst | null>(null);
 
-    const handleModal = (t: string, type: string, filePath: string) => {
+    const handleModal = (t: string, type: string, file: { filePath: string; fileId: string }) => {
       title.value = t;
       uploadType.value = type;
-      uploadList.value = [filePath];
+
+      form.value = file;
+      uploadList.value = [file.filePath];
       const { showModal } = ModalRef.value;
       showModal();
     };
@@ -65,35 +69,39 @@ export default defineComponent({
       uploadList.value = file;
       emit("on-remove", file[0]);
     }
-    function uploadChange(file: { filePath: string; fileId: string }) {
-      form.value.filePath = file.fileId;
-      uploadList.value = [file.filePath];
-      emit("on-sucess", file.filePath);
+    function uploadChange(fileData: { filePath: string; fileId: string }) {
+      form.value = fileData;
+      uploadList.value = [fileData.filePath];
+      emit("on-sucess", form.value);
     }
 
     function handleValidate() {
       formRef.value?.validate((errors) => {
         if (!errors) {
-          //   loading.value = true
+          emit("on-submit", form.value);
         } else {
           console.log(errors);
         }
       });
     }
     function handleReset() {
-      form.value = { filePath: null };
+      form.value = {
+        filePath: "",
+        fileId: "",
+      };
       formRef.value?.restoreValidation();
     }
 
     return {
       ModalRef,
+      formRef,
       uploadType,
       title,
       form,
       loading,
       uploadList,
       rules: {
-        filePath: { required: true, trigger: ["blur", "change"], message: "请上传图片" },
+        filePath: { required: true, trigger: ["blur", "input"], message: "请上传图片" },
       },
       imageRemove,
       handleModal,

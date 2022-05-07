@@ -12,7 +12,7 @@ export interface tableDataItem {
   driverEmergencyContactName: string | null;
   driverEmergencyContactPhone: string | null;
   driverLock: number | null;
-  createTime?: number | null
+  createTime?: number | null;
 }
 
 export interface certificatesState {
@@ -24,4 +24,34 @@ export interface certificatesState {
   reversePage: string | null;
   frontCer: string | null;
   reverseCer: string | null;
+}
+
+// interface FiledInter {
+//   field: string;
+// }
+export interface FileInter {
+        fileId: string
+        filePath: string
+    }
+export interface FormInter {
+  driverId: string | null;
+  driverIdentityCardNo: string | null;
+  driverIdentityCardIssueOrganization: string | null;
+  driverIdentityCardEffectiveDateBegin: string | null;
+  driverIdentityCardEffectiveDateEnd: string | null;
+  driverIdentityFaceSide: string | null;
+  driverIdentityOtherSide: string | null;
+
+  //   driverIdentityFaceSide: FiledInter;
+  //   driverIdentityOtherSide: FiledInter;
+}
+export interface CertificateInter {
+  driverId: string;
+  driverNetworkVehicleCertificateNo: string;
+  driverNetworkVehicleCertificateIssueOrganization: string;
+  driverNetworkVehicleCertificateGetDate: string;
+  driverNetworkVehicleCertificateEffectiveDateBegin: string;
+  driverNetworkVehicleCertificateEffectiveDateEnd: string;
+  driverNetworkVehicleCertificateFaceSide: string;
+  driverNetworkVehicleCertificateOtherSide: string;
 }

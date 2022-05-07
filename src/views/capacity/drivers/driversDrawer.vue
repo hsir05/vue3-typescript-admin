@@ -5,9 +5,8 @@
       :rules="rules"
       :disabled="disabled"
       label-placement="left"
-      :style="{ maxWidth: '440px' }"
       require-mark-placement="right-hanging"
-      label-width="140"
+      label-width="120"
       :model="form"
     >
       <n-form-item label="司机姓氏" path="driverFirstName">
@@ -17,7 +16,13 @@
         <n-input v-model:value="form.driverLastName" clearable placeholder="输入司机名" />
       </n-form-item>
       <n-form-item label="司机性别" path="driverGender">
-        <n-select v-model:value="form.driverGender" placeholder="司机性别" :options="sexOptions" />
+        <n-select
+          v-model:value="form.driverGender"
+          clearable
+          filterable
+          placeholder="司机性别"
+          :options="sexOptions"
+        />
       </n-form-item>
       <n-form-item label="司机手机号" path="driverPhone">
         <n-input v-model:value="form.driverPhone" clearable placeholder="输入司机手机号" />

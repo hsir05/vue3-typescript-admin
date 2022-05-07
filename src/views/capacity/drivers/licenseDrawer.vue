@@ -1,7 +1,7 @@
 <template>
   <BasicModal
     title="编辑司机身份证照片信息"
-    width="700px"
+    width="750px"
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
@@ -33,7 +33,7 @@
         />
       </n-form-item>
 
-      <div class="flex">
+      <div class="flex-align-start">
         <n-form-item label="准驾车型" path="driverIdentityCardEffectiveDateBegin">
           <n-input
             style="width: 170px"
@@ -53,7 +53,7 @@
         </n-form-item>
       </div>
 
-      <div class="flex">
+      <div class="flex-align-start">
         <n-form-item label="驾驶证有效期始" path="driverIdentityCardEffectiveDateBegin">
           <n-date-picker
             style="width: 170px"
@@ -73,12 +73,12 @@
         </n-form-item>
       </div>
 
-      <div class="flex">
+      <div class="flex-align-start">
         <n-form-item label="驾驶证正页" path="driverIdentityFaceSide">
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.DIRIVERIDENTITY }"
             name="file"
-            :width="120"
+            :width="150"
             :height="120"
             @delete-upload="imageRemove"
             @upload-change="uploadChange"
@@ -90,7 +90,7 @@
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.DIRIVERIDENTITY }"
             name="file"
-            :width="120"
+            :width="150"
             :height="120"
             @delete-upload="imageRemove"
             @upload-change="uploadChange"
@@ -106,8 +106,8 @@
           size="large"
           type="primary"
           @click="handleValidate"
-          >保存</n-button
-        >
+          >保存
+        </n-button>
       </div>
     </n-form>
   </BasicModal>
@@ -239,7 +239,7 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .n-form-item-blank {
   margin: 0 auto;
 }

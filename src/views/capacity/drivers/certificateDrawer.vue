@@ -11,63 +11,69 @@
       ref="formRef"
       :rules="licenseRules"
       label-placement="left"
-      label-width="170"
+      label-width="160"
       require-mark-placement="right-hanging"
       :model="form"
     >
-      <n-form-item label="网约车资格证号" path="driverIdentityCardNo">
+      <n-form-item label="网约车资格证号" path="driverNetworkVehicleCertificateNo">
         <n-input
-          v-model:value="form.driverIdentityCardNo"
+          v-model:value="form.driverNetworkVehicleCertificateNo"
           style="width: 540px"
           clearable
           placeholder="输入网约车资格证号"
         />
       </n-form-item>
 
-      <n-form-item label="身份证签发机关" path="driverIdentityCardIssueOrganization">
+      <n-form-item label="身份证签发机关" path="driverNetworkVehicleCertificateIssueOrganization">
         <n-input
           style="width: 540px"
-          v-model:value="form.driverIdentityCardIssueOrganization"
+          v-model:value="form.driverNetworkVehicleCertificateIssueOrganization"
           clearable
           placeholder="输入身份证身份证签发机关"
         />
       </n-form-item>
 
-      <n-form-item label="网约车资格证初领日期" path="driverIdentityCardEffectiveDateBegin">
+      <n-form-item label="网约车资格证初领日期" path="driverNetworkVehicleCertificateGetDate">
         <n-date-picker
           style="width: 540px"
-          v-model:value="form.driverIdentityCardEffectiveDateBegin"
+          v-model:value="form.driverNetworkVehicleCertificateGetDate"
           type="date"
           clearable
         />
       </n-form-item>
 
-      <div class="flex">
-        <n-form-item label="网约车资格证有效期始" path="driverIdentityCardEffectiveDateBegin">
+      <div class="flex-align-start">
+        <n-form-item
+          label="网约车资格证有效期始"
+          path="driverNetworkVehicleCertificateEffectiveDateBegin"
+        >
           <n-date-picker
             style="width: 170px"
-            v-model:value="form.driverIdentityCardEffectiveDateBegin"
+            v-model:value="form.driverNetworkVehicleCertificateEffectiveDateBegin"
             type="date"
             clearable
           />
         </n-form-item>
 
-        <n-form-item label="网约车资格证有效期止" path="driverIdentityCardEffectiveDateEnd">
+        <n-form-item
+          label="网约车资格证有效期止"
+          path="driverNetworkVehicleCertificateEffectiveDateEnd"
+        >
           <n-date-picker
             style="width: 170px"
-            v-model:value="form.driverIdentityCardEffectiveDateEnd"
+            v-model:value="form.driverNetworkVehicleCertificateEffectiveDateEnd"
             type="date"
             clearable
           />
         </n-form-item>
       </div>
 
-      <div class="flex">
-        <n-form-item label="网约车资格证正页" path="driverIdentityFaceSide">
+      <div class="flex-align-start">
+        <n-form-item label="网约车资格证正页" path="driverNetworkVehicleCertificateFaceSide">
           <BasicUpload
-            :data="{ uploadType: UploadTypeEnum.DIRIVERIDENTITY }"
+            :data="{ uploadType: UploadTypeEnum.CERTIFICATE }"
             name="file"
-            :width="120"
+            :width="140"
             :height="120"
             @delete-upload="imageRemove"
             @upload-change="uploadChange"
@@ -75,9 +81,9 @@
           />
         </n-form-item>
 
-        <n-form-item label="网约车资格证副页" path="driverIdentityOtherSide">
+        <n-form-item label="网约车资格证副页" path="driverNetworkVehicleCertificateOtherSide">
           <BasicUpload
-            :data="{ uploadType: UploadTypeEnum.DIRIVERIDENTITY }"
+            :data="{ uploadType: UploadTypeEnum.CERTIFICATE }"
             name="file"
             :width="120"
             :height="120"
@@ -95,8 +101,8 @@
           size="large"
           type="primary"
           @click="handleValidate"
-          >保存</n-button
-        >
+          >保存
+        </n-button>
       </div>
     </n-form>
   </BasicModal>
@@ -107,39 +113,26 @@ import { FormInst } from "naive-ui";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import BasicModal from "@/components/Modal/Modal.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
-import { updateDriverIdentity } from "@/api/capacity/capacity";
+import { updateCertificate } from "@/api/capacity/capacity";
 import { licenseRules } from "./data";
+import { CertificateInter } from "./type";
 export default defineComponent({
   name: "CertificateDrawer",
   components: { BasicModal, BasicUpload },
   setup() {
-    // interface FiledInter {
-    //   field: string;
-    // }
-    interface FormInter {
-      driverId: string | null;
-      driverIdentityCardNo: string | null;
-      driverIdentityCardIssueOrganization: string | null;
-      driverIdentityCardEffectiveDateBegin: string | null;
-      driverIdentityCardEffectiveDateEnd: string | null;
-      driverIdentityFaceSide: string | null;
-      driverIdentityOtherSide: string | null;
-
-      //   driverIdentityFaceSide: FiledInter;
-      //   driverIdentityOtherSide: FiledInter;
-    }
     const ModalRef = ref();
     const uploadType = ref("");
     const loading = ref(false);
     const uploadList = ref<string[]>([]);
-    const form = ref<FormInter>({
-      driverId: null,
-      driverIdentityCardNo: null,
-      driverIdentityCardIssueOrganization: null,
-      driverIdentityCardEffectiveDateBegin: null,
-      driverIdentityCardEffectiveDateEnd: null,
-      driverIdentityFaceSide: null,
-      driverIdentityOtherSide: null,
+    const form = ref<CertificateInter>({
+      driverId: "",
+      driverNetworkVehicleCertificateNo: "",
+      driverNetworkVehicleCertificateIssueOrganization: "",
+      driverNetworkVehicleCertificateGetDate: "",
+      driverNetworkVehicleCertificateEffectiveDateBegin: "",
+      driverNetworkVehicleCertificateEffectiveDateEnd: "",
+      driverNetworkVehicleCertificateFaceSide: "",
+      driverNetworkVehicleCertificateOtherSide: "",
     });
     const formRef = ref<FormInst | null>(null);
 
@@ -166,24 +159,26 @@ export default defineComponent({
           try {
             const {
               driverId,
-              driverIdentityCardNo,
-              driverIdentityCardIssueOrganization,
-              driverIdentityCardEffectiveDateBegin,
-              driverIdentityCardEffectiveDateEnd,
-              driverIdentityFaceSide,
-              driverIdentityOtherSide,
+              driverNetworkVehicleCertificateNo,
+              driverNetworkVehicleCertificateIssueOrganization,
+              driverNetworkVehicleCertificateGetDate,
+              driverNetworkVehicleCertificateEffectiveDateBegin,
+              driverNetworkVehicleCertificateEffectiveDateEnd,
+              driverNetworkVehicleCertificateFaceSide,
+              driverNetworkVehicleCertificateOtherSide,
             } = form.value;
-            let res = await updateDriverIdentity({
+            let res = await updateCertificate({
               driverId,
-              driverIdentityCardNo,
-              driverIdentityCardIssueOrganization,
-              driverIdentityCardEffectiveDateBegin,
-              driverIdentityCardEffectiveDateEnd,
-              driverIdentityFaceSide: {
-                field: driverIdentityFaceSide as string,
+              driverNetworkVehicleCertificateNo,
+              driverNetworkVehicleCertificateIssueOrganization,
+              driverNetworkVehicleCertificateGetDate,
+              driverNetworkVehicleCertificateEffectiveDateBegin,
+              driverNetworkVehicleCertificateEffectiveDateEnd,
+              driverNetworkVehicleCertificateOtherSide: {
+                field: driverNetworkVehicleCertificateFaceSide,
               },
-              driverIdentityOtherSide: {
-                field: driverIdentityOtherSide as string,
+              driverNetworkVehicleCertificateFaceSide: {
+                field: driverNetworkVehicleCertificateOtherSide,
               },
             });
             console.log(res);
@@ -199,13 +194,14 @@ export default defineComponent({
     }
     function handleReset() {
       form.value = {
-        driverId: null,
-        driverIdentityCardNo: null,
-        driverIdentityCardIssueOrganization: null,
-        driverIdentityCardEffectiveDateBegin: null,
-        driverIdentityCardEffectiveDateEnd: null,
-        driverIdentityFaceSide: null,
-        driverIdentityOtherSide: null,
+        driverId: "",
+        driverNetworkVehicleCertificateNo: "",
+        driverNetworkVehicleCertificateIssueOrganization: "",
+        driverNetworkVehicleCertificateGetDate: "",
+        driverNetworkVehicleCertificateEffectiveDateBegin: "",
+        driverNetworkVehicleCertificateEffectiveDateEnd: "",
+        driverNetworkVehicleCertificateFaceSide: "",
+        driverNetworkVehicleCertificateOtherSide: "",
       };
       formRef.value?.restoreValidation();
     }
@@ -228,7 +224,7 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .n-form-item-blank {
   margin: 0 auto;
 }

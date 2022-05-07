@@ -435,7 +435,7 @@ export function getDriverDetail(data: { driverId: string }) {
 }
 
 /**
- * 更新司机证件头像
+ * 更新司机证件头像----免冠
  */
 export function updateDriverPhoto(data: { driverId: string; fileId: string }) {
   return http.request({

@@ -10,7 +10,7 @@
         <div class="img-box" v-if="!loading">
           <p class="title mt-10px mb-10px">司机免冠照片</p>
           <div class="">
-            <n-image width="100" height="130" :src="driverHeaderImage" />
+            <n-image width="100" height="130" :src="driverIdentificationPhoto.filePath" />
           </div>
           <n-button
             attr-type="button"
@@ -18,7 +18,7 @@
             :disabled="disabled"
             size="small"
             type="primary"
-            @click="editDriverHead(driverHeaderImage)"
+            @click="editDriverHead"
             >编辑司机免冠照片
           </n-button>
         </div>
@@ -26,7 +26,7 @@
         <div class="img-box" v-if="!loading">
           <p class="title mt-10px mb-10px">人脸识别采集图片</p>
           <div class="">
-            <n-image width="100" height="130" :src="driverBaiduFaceRecognitionPhoto" />
+            <n-image width="100" height="130" :src="driverBaiduFaceRecognitionPhoto.filePath" />
           </div>
 
           <n-button
@@ -35,7 +35,7 @@
             :disabled="disabled"
             size="small"
             type="primary"
-            @click="editDriverFace(driverBaiduFaceRecognitionPhoto)"
+            @click="editDriverFace"
             >编辑人脸识别采集图片
           </n-button>
         </div>
@@ -43,7 +43,7 @@
 
       <PhotoItem
         v-if="!loading"
-        :positivePhoto="driverIdentificationPhoto"
+        :positivePhoto="driverIdentityFaceSide"
         :reversePhoto="driverIdentityOtherSide"
         positiveText="司机身份证头像面"
         reverseText="司机身份证国徽面"
@@ -75,10 +75,16 @@
 
     <UploadModal
       ref="driverHeaderModalRef"
-      @on-remove="handleHeaderRemove"
-      @on-sucess="handleHeader"
+      @on-remove="driverBareheadedRemove"
+      @on-sucess="driverBareheadedSuccess"
+      @on-submit="driverBareheadedSubmit"
     />
-    <UploadModal ref="driverFaceModalRef" @on-remove="handleFaceRemove" @on-sucess="handleFace" />
+    <UploadModal
+      ref="driverFaceModalRef"
+      @on-remove="handleFaceRemove"
+      @on-sucess="handleFaceSuccess"
+      @on-submit="driverFaceSubmit"
+    />
 
     <IdentityDrawer ref="identityDrawerRef" />
     <LicenseDrawer ref="licenseDrawerRef" />
@@ -96,6 +102,7 @@ import IdentityDrawer from "./identityDrawer.vue";
 import LicenseDrawer from "./licenseDrawer.vue";
 import CertificateDrawer from "./certificateDrawer.vue";
 import { UploadTypeEnum } from "@/enums/httpEnum";
+import { FileInter } from "./type";
 export default defineComponent({
   name: "DriverCerDrawer",
   components: { PhotoItem, UploadModal, IdentityDrawer, LicenseDrawer, CertificateDrawer },
@@ -113,9 +120,15 @@ export default defineComponent({
       data: {},
       driverId: "",
       uploadModalRef: "",
-      driverHeaderImage: "",
-      driverBaiduFaceRecognitionPhoto: "",
-      driverIdentificationPhoto: "",
+      driverIdentificationPhoto: {
+        filePath: "",
+        fileId: "",
+      },
+      driverBaiduFaceRecognitionPhoto: {
+        filePath: "",
+        fileId: "",
+      },
+      driverIdentityFaceSide: "",
       driverIdentityOtherSide: "",
       driverLicenseFaceSide: "",
       driverLicenseOtherSide: "",
@@ -135,11 +148,12 @@ export default defineComponent({
         let res = await getDriverDetail({ driverId });
         console.log(res);
         state.data = res.data;
-        state.driverHeaderImage = res.data.driver.driverHeaderImage.filePath;
-        state.driverBaiduFaceRecognitionPhoto =
-          res.data.driver.driverBaiduFaceRecognitionPhoto.filePath;
 
-        state.driverIdentificationPhoto = res.data.driver.driverIdentificationPhoto.filePath;
+        state.driverIdentificationPhoto = res.data.driver.driverIdentificationPhoto;
+
+        state.driverBaiduFaceRecognitionPhoto = res.data.driver.driverBaiduFaceRecognitionPhoto;
+
+        state.driverIdentityFaceSide = res.data.driver.driverIdentityFaceSide.filePath;
         state.driverIdentityOtherSide = res.data.driver.driverIdentityOtherSide.filePath;
 
         state.driverLicenseFaceSide = res.data.driver.driverLicenseFaceSide.filePath;
@@ -155,19 +169,56 @@ export default defineComponent({
         state.loading = false;
       }
     };
-
-    function editDriverHead(filePath: string) {
+    // 司机免冠照片
+    function editDriverHead() {
       const { handleModal } = driverHeaderModalRef.value;
-      handleModal("编辑司机免冠照片", UploadTypeEnum.DRIVERIDENTIFICATION, filePath);
+      handleModal(
+        "司机免冠照片",
+        UploadTypeEnum.DRIVERIDENTIFICATION,
+        state.driverIdentificationPhoto
+      );
     }
-    function handleHeaderRemove(filePath: string) {
+    function driverBareheadedRemove(filePath: string) {
       console.log(filePath);
-      state.driverHeaderImage = "";
+      state.driverIdentificationPhoto = {
+        filePath: "",
+        fileId: "",
+      };
     }
-    async function handleHeader(filePath: string) {
-      console.log(filePath);
+    async function driverBareheadedSuccess(file: FileInter) {
+      state.driverIdentificationPhoto = file;
+    }
+    async function driverBareheadedSubmit(file: FileInter) {
       try {
-        let res = await updateDriverPhoto({ driverId: state.driverId, fileId: filePath });
+        let res = await updateDriverPhoto({ driverId: state.driverId, fileId: file.fileId });
+        console.log(res);
+        message.success(window.$tips[res.code]);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    // 司机人脸识别照片
+    function editDriverFace() {
+      const { handleModal } = driverFaceModalRef.value;
+      handleModal(
+        "人脸识别采集图片",
+        UploadTypeEnum.DRIVERIDENTIFICATION,
+        state.driverBaiduFaceRecognitionPhoto
+      );
+    }
+    function handleFaceRemove(filePath: string) {
+      console.log(filePath);
+      state.driverBaiduFaceRecognitionPhoto = {
+        filePath: "",
+        fileId: "",
+      };
+    }
+    function handleFaceSuccess(file: FileInter) {
+      state.driverBaiduFaceRecognitionPhoto = file;
+    }
+    async function driverFaceSubmit(file: FileInter) {
+      try {
+        let res = await updateDriverFacePhoto({ driverId: state.driverId, fileId: file.fileId });
         console.log(res);
         message.success(window.$tips[res.code]);
       } catch (err) {
@@ -175,38 +226,20 @@ export default defineComponent({
       }
     }
 
-    function editDriverFace(filePath: string) {
-      const { handleModal } = driverFaceModalRef.value;
-      handleModal("编辑人脸识别采集图片", UploadTypeEnum.DRIVERIDENTIFICATION, filePath);
-    }
-    function handleFaceRemove(filePath: string) {
-      console.log(filePath);
-      state.driverIdentificationPhoto = "";
-    }
-
+    // 身份证
     function editIdentity() {
       const { handleModal } = identityDrawerRef.value;
       handleModal(state.data);
     }
-
+    //驾驶证
     function editLicense() {
       const { handleModal } = licenseDrawerRef.value;
       handleModal(state.data);
     }
+    //网约车资格证
     function editCertificate() {
       const { handleModal } = certificateDrawerRef.value;
       handleModal(state.data);
-    }
-    async function handleFace(filePath: string) {
-      console.log(filePath);
-      console.log(filePath);
-      try {
-        let res = await updateDriverFacePhoto({ driverId: state.driverId, fileId: filePath });
-        console.log(res);
-        message.success(window.$tips[res.code]);
-      } catch (err) {
-        console.log(err);
-      }
     }
 
     function handleSaveAfter() {
@@ -227,10 +260,12 @@ export default defineComponent({
       licenseDrawerRef,
       certificateDrawerRef,
       handleSaveAfter,
-      handleHeaderRemove,
-      handleHeader,
+      driverBareheadedRemove,
+      driverBareheadedSuccess,
+      driverBareheadedSubmit,
       handleFaceRemove,
-      handleFace,
+      handleFaceSuccess,
+      driverFaceSubmit,
       editIdentity,
       editLicense,
       openDrawer,
