@@ -15,35 +15,35 @@
       require-mark-placement="right-hanging"
       :model="form"
     >
-      <n-form-item label="驾驶证号" path="driverIdentityCardNo">
+      <n-form-item label="身份证号码" path="driverIdentityCardNo">
         <n-input
           v-model:value="form.driverIdentityCardNo"
           style="width: 480px"
           clearable
-          placeholder="输入驾驶证号"
+          placeholder="输入身份证号码"
         />
       </n-form-item>
 
-      <n-form-item label="驾驶证档案编号" path="driverIdentityCardIssueOrganization">
+      <n-form-item label="身份证签发机关" path="driverIdentityCardIssueOrganization">
         <n-input
           style="width: 480px"
           v-model:value="form.driverIdentityCardIssueOrganization"
           clearable
-          placeholder="输入身份证驾驶证档案编号"
+          placeholder="输入身份证身份证签发机关"
         />
       </n-form-item>
 
       <div class="flex">
-        <n-form-item label="准驾车型" path="driverIdentityCardEffectiveDateBegin">
-          <n-input
+        <n-form-item label="身份证有效期始" path="driverIdentityCardEffectiveDateBegin">
+          <n-date-picker
             style="width: 170px"
-            v-model:value="form.driverIdentityCardIssueOrganization"
+            v-model:value="form.driverIdentityCardEffectiveDateBegin"
+            type="date"
             clearable
-            placeholder="输入准驾车型"
           />
         </n-form-item>
 
-        <n-form-item label="驾驶证初领日期" path="driverIdentityCardEffectiveDateEnd">
+        <n-form-item label="身份证有效期止" path="driverIdentityCardEffectiveDateEnd">
           <n-date-picker
             style="width: 170px"
             v-model:value="form.driverIdentityCardEffectiveDateEnd"
@@ -54,27 +54,7 @@
       </div>
 
       <div class="flex">
-        <n-form-item label="驾驶证有效期始" path="driverIdentityCardEffectiveDateBegin">
-          <n-date-picker
-            style="width: 170px"
-            v-model:value="form.driverIdentityCardEffectiveDateEnd"
-            type="date"
-            clearable
-          />
-        </n-form-item>
-
-        <n-form-item label="驾驶证有效期止" path="driverIdentityCardEffectiveDateEnd">
-          <n-date-picker
-            style="width: 170px"
-            v-model:value="form.driverIdentityCardEffectiveDateEnd"
-            type="date"
-            clearable
-          />
-        </n-form-item>
-      </div>
-
-      <div class="flex">
-        <n-form-item label="驾驶证正页" path="driverIdentityFaceSide">
+        <n-form-item label="司机身份证头像面" path="driverIdentityFaceSide">
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.DIRIVERIDENTITY }"
             name="file"
@@ -86,7 +66,7 @@
           />
         </n-form-item>
 
-        <n-form-item label="驾驶证副页" path="driverIdentityOtherSide">
+        <n-form-item label="司机身份证国徽面" path="driverIdentityOtherSide">
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.DIRIVERIDENTITY }"
             name="file"
@@ -121,7 +101,7 @@ import BasicUpload from "@/components/Upload/Upload.vue";
 import { updateDriverIdentity } from "@/api/capacity/capacity";
 import { licenseRules } from "./data";
 export default defineComponent({
-  name: "LicenseDrawer",
+  name: "IdentityDrawer",
   components: { BasicModal, BasicUpload },
   setup() {
     // interface FiledInter {

@@ -462,11 +462,11 @@ interface FiledInter {
   field: string;
 }
 interface IdentityInter {
-  driverId: string;
-  driverIdentityCardNo: string;
-  driverIdentityCardIssueOrganization: string;
-  driverIdentityCardEffectiveDateBegin: string;
-  driverIdentityCardEffectiveDateEnd: string;
+  driverId: string | null;
+  driverIdentityCardNo: string | null;
+  driverIdentityCardIssueOrganization: string | null;
+  driverIdentityCardEffectiveDateBegin: string | null;
+  driverIdentityCardEffectiveDateEnd: string | null;
   driverIdentityFaceSide: FiledInter;
   driverIdentityOtherSide: FiledInter;
 }

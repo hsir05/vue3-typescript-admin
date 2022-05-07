@@ -5,7 +5,7 @@
     :width="1000"
     @on-close-after="onCloseAfter"
   >
-    <n-spin :show="loading">
+    <n-spin :show="loading" class="mt-30px">
       <div class="img-info">
         <div class="img-box" v-if="!loading">
           <p class="title mt-10px mb-10px">司机免冠照片</p>
@@ -58,6 +58,7 @@
         positiveText="司机驾驶证正页"
         reverseText="司机驾驶证副页"
         btnText="编辑司机驾驶照片信息"
+        @edit-photo="editLicense"
       />
 
       <PhotoItem
@@ -68,6 +69,7 @@
         positiveText="司机网约车资格证正页"
         reverseText="司机网约车资格证副页"
         btnText="编辑网约车资格证照片信息"
+        @edit-photo="editCertificate"
       />
     </n-spin>
 
@@ -78,7 +80,10 @@
     />
     <UploadModal ref="driverFaceModalRef" @on-remove="handleFaceRemove" @on-sucess="handleFace" />
 
+    <IdentityDrawer ref="identityDrawerRef" />
     <LicenseDrawer ref="licenseDrawerRef" />
+
+    <CertificateDrawer ref="certificateDrawerRef" />
   </BasicDrawer>
 </template>
 <script lang="ts">
@@ -87,16 +92,20 @@ import { useMessage } from "naive-ui";
 import { getDriverDetail, updateDriverPhoto, updateDriverFacePhoto } from "@/api/capacity/capacity";
 import PhotoItem from "./photoItem.vue";
 import UploadModal from "@/components/UploadModal/UploadModal.vue";
+import IdentityDrawer from "./identityDrawer.vue";
 import LicenseDrawer from "./licenseDrawer.vue";
+import CertificateDrawer from "./certificateDrawer.vue";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 export default defineComponent({
   name: "DriverCerDrawer",
-  components: { PhotoItem, UploadModal, LicenseDrawer },
+  components: { PhotoItem, UploadModal, IdentityDrawer, LicenseDrawer, CertificateDrawer },
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const driverHeaderModalRef = ref();
     const driverFaceModalRef = ref();
     const licenseDrawerRef = ref();
+    const identityDrawerRef = ref();
+    const certificateDrawerRef = ref();
     const state = reactive({
       isDrawer: false,
       loading: false,
@@ -176,7 +185,16 @@ export default defineComponent({
     }
 
     function editIdentity() {
+      const { handleModal } = identityDrawerRef.value;
+      handleModal(state.data);
+    }
+
+    function editLicense() {
       const { handleModal } = licenseDrawerRef.value;
+      handleModal(state.data);
+    }
+    function editCertificate() {
+      const { handleModal } = certificateDrawerRef.value;
       handleModal(state.data);
     }
     async function handleFace(filePath: string) {
@@ -205,16 +223,20 @@ export default defineComponent({
       ...toRefs(state),
       driverFaceModalRef,
       driverHeaderModalRef,
+      identityDrawerRef,
       licenseDrawerRef,
+      certificateDrawerRef,
       handleSaveAfter,
       handleHeaderRemove,
       handleHeader,
       handleFaceRemove,
       handleFace,
       editIdentity,
+      editLicense,
       openDrawer,
       editDriverHead,
       editDriverFace,
+      editCertificate,
       onCloseAfter,
     };
   },

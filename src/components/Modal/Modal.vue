@@ -22,10 +22,10 @@
       </template>
       <slot></slot>
 
-      <template #footer>
-        <n-button @click="cancel">取消</n-button>
-        <n-button type="primary" class="ml-10px" :loading="loading" @click="ok">确认</n-button>
-      </template>
+      <!-- <template #footer>
+                <n-button @click="cancel">取消</n-button>
+                <n-button type="primary" class="ml-10px" :loading="loading" @click="ok">确认</n-button>
+            </template> -->
     </n-card>
   </n-modal>
 </template>

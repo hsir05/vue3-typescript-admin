@@ -1,6 +1,6 @@
 <template>
   <BasicDrawer v-model:show="isDrawer" :title="title" :width="800" @on-close-after="onCloseAfter">
-    <n-descriptions label-placement="left" bordered title="班级信息">
+    <n-descriptions label-placement="left" bordered>
       <n-descriptions-item label="班级编码">{{
         classInfo?.operationCompanyDriverClazzEntry
       }}</n-descriptions-item>
