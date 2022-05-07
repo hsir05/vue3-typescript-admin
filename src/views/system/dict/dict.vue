@@ -60,7 +60,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -109,7 +109,7 @@ export default defineComponent({
       name: "",
     });
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
     const itemCount = ref(null);
@@ -118,15 +118,15 @@ export default defineComponent({
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       unref(queryValue).name = "";
-      getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     onMounted(() => {
-      getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     });
 
     const getData = async (pagination: PaginationState) => {
@@ -175,8 +175,7 @@ export default defineComponent({
     }
 
     function handlePage(page: number) {
-      console.log(page);
-      pagination.page = page;
+      pagination.pageIndex = page;
       getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
@@ -263,7 +262,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {

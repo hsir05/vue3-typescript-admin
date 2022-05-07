@@ -2,7 +2,6 @@ import type { MenuOption } from "naive-ui";
 import {
   SpeedometerOutline as SpeedomeIcon,
   AlbumsOutline as AlbumIcon,
-  SettingsOutline as SettingsIcon,
   EaselOutline,
   CafeOutline as CafeIcon,
   PeopleOutline as PeopleIcon,
