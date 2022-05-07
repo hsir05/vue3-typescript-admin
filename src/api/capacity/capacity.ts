@@ -465,8 +465,8 @@ interface IdentityInter {
   driverId: string | null;
   driverIdentityCardNo: string | null;
   driverIdentityCardIssueOrganization: string | null;
-  driverIdentityCardEffectiveDateBegin: string | null;
-  driverIdentityCardEffectiveDateEnd: string | null;
+  driverIdentityCardEffectiveDateBegin: number | null;
+  driverIdentityCardEffectiveDateEnd: number | null;
   driverIdentityFaceSide: FiledInter;
   driverIdentityOtherSide: FiledInter;
 }

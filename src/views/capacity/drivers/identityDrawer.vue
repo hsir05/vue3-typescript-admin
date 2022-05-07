@@ -61,9 +61,9 @@
             name="file"
             :width="150"
             :height="120"
-            @delete-upload="imageRemove"
-            @upload-change="uploadChange"
-            v-model:value="uploadList"
+            @delete-upload="faceRemove"
+            @upload-change="faceChange"
+            v-model:value="faceUploadList"
           />
         </n-form-item>
 
@@ -73,9 +73,9 @@
             name="file"
             :width="150"
             :height="120"
-            @delete-upload="imageRemove"
-            @upload-change="uploadChange"
-            v-model:value="uploadList"
+            @delete-upload="otherRemove"
+            @upload-change="otherdChange"
+            v-model:value="otherUploadList"
           />
         </n-form-item>
       </div>
@@ -101,47 +101,74 @@ import BasicModal from "@/components/Modal/Modal.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { updateDriverIdentity } from "@/api/capacity/capacity";
 import { licenseRules } from "./data";
+import { IdentFormInter, RecordInter } from "./type";
 export default defineComponent({
   name: "IdentityDrawer",
   components: { BasicModal, BasicUpload },
   setup() {
-    interface FormInter {
-      driverId: string | null;
-      driverIdentityCardNo: string | null;
-      driverIdentityCardIssueOrganization: string | null;
-      driverIdentityCardEffectiveDateBegin: string | null;
-      driverIdentityCardEffectiveDateEnd: string | null;
-      driverIdentityFaceSide: string | null;
-      driverIdentityOtherSide: string | null;
-    }
     const ModalRef = ref();
     const uploadType = ref("");
     const loading = ref(false);
-    const uploadList = ref<string[]>([]);
-    const form = ref<FormInter>({
-      driverId: null,
-      driverIdentityCardNo: null,
-      driverIdentityCardIssueOrganization: null,
-      driverIdentityCardEffectiveDateBegin: null,
-      driverIdentityCardEffectiveDateEnd: null,
-      driverIdentityFaceSide: null,
-      driverIdentityOtherSide: null,
+    const faceUploadList = ref<string[]>([]);
+    const otherUploadList = ref<string[]>([]);
+
+    const form = ref<IdentFormInter>({
+      driverId: "",
+      driverIdentityCardNo: "",
+      driverIdentityCardIssueOrganization: "",
+      driverIdentityCardEffectiveDateBegin: 0,
+      driverIdentityCardEffectiveDateEnd: 0,
+      driverIdentityFaceSide: "",
+      driverIdentityOtherSide: "",
     });
     const formRef = ref<FormInst | null>(null);
 
-    const handleModal = () => {
-      //   console.log(record);
+    const handleModal = (record: RecordInter) => {
+      const {
+        driverId,
+        driverIdentityCardNo,
+        driverIdentityCardIssueOrganization,
+        driverIdentityCardEffectiveDateBegin,
+        driverIdentityCardEffectiveDateEnd,
+        driverIdentityFaceSide,
+        driverIdentityOtherSide,
+      } = record;
+      form.value = {
+        driverId,
+        driverIdentityCardNo,
+        driverIdentityCardIssueOrganization,
+        driverIdentityCardEffectiveDateBegin: new Date(
+          driverIdentityCardEffectiveDateBegin
+        ).getTime(),
+        driverIdentityCardEffectiveDateEnd: new Date(driverIdentityCardEffectiveDateEnd).getTime(),
+        driverIdentityFaceSide: driverIdentityFaceSide.fileId,
+        driverIdentityOtherSide: driverIdentityOtherSide.fileId,
+      };
+
+      faceUploadList.value = [driverIdentityFaceSide.filePath];
+      otherUploadList.value = [driverIdentityOtherSide.filePath];
+      console.log(form.value);
+
       const { showModal } = ModalRef.value;
       showModal();
     };
 
-    function imageRemove(file: string[]) {
-      // form.value.filePath = file[0];
-      uploadList.value = file;
+    function faceRemove(file: string[]) {
+      console.log(file);
+      faceUploadList.value = [];
     }
-    function uploadChange(file: { filePath: string; fileId: string }) {
-      // form.value.filePath = file.fileId;
-      uploadList.value = [file.filePath];
+    function faceChange(file: { filePath: string; fileId: string }) {
+      form.value.driverIdentityFaceSide = file.fileId;
+      faceUploadList.value = [file.filePath];
+    }
+
+    function otherRemove(file: string[]) {
+      console.log(file);
+      otherUploadList.value = [];
+    }
+    function otherdChange(file: { filePath: string; fileId: string }) {
+      form.value.driverIdentityOtherSide = file.fileId;
+      otherUploadList.value = [file.filePath];
     }
 
     function handleValidate(e: MouseEvent) {
@@ -185,13 +212,13 @@ export default defineComponent({
     }
     function handleReset() {
       form.value = {
-        driverId: null,
-        driverIdentityCardNo: null,
-        driverIdentityCardIssueOrganization: null,
-        driverIdentityCardEffectiveDateBegin: null,
-        driverIdentityCardEffectiveDateEnd: null,
-        driverIdentityFaceSide: null,
-        driverIdentityOtherSide: null,
+        driverId: "",
+        driverIdentityCardNo: "",
+        driverIdentityCardIssueOrganization: "",
+        driverIdentityCardEffectiveDateBegin: 0,
+        driverIdentityCardEffectiveDateEnd: 0,
+        driverIdentityFaceSide: "",
+        driverIdentityOtherSide: "",
       };
       formRef.value?.restoreValidation();
     }
@@ -203,11 +230,14 @@ export default defineComponent({
       UploadTypeEnum,
       form,
       loading,
-      uploadList,
+      faceUploadList,
+      faceChange,
+      faceRemove,
+      otherUploadList,
       licenseRules,
-      imageRemove,
+      otherRemove,
       handleModal,
-      uploadChange,
+      otherdChange,
       handleReset,
       handleValidate,
     };

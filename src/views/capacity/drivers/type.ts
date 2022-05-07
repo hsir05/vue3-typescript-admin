@@ -30,9 +30,9 @@ export interface certificatesState {
 //   field: string;
 // }
 export interface FileInter {
-        fileId: string
-        filePath: string
-    }
+  fileId: string;
+  filePath: string;
+}
 export interface FormInter {
   driverId: string | null;
   driverIdentityCardNo: string | null;
@@ -54,4 +54,21 @@ export interface CertificateInter {
   driverNetworkVehicleCertificateEffectiveDateEnd: string;
   driverNetworkVehicleCertificateFaceSide: string;
   driverNetworkVehicleCertificateOtherSide: string;
+}
+
+interface DataInter {
+  driverId: string;
+  driverIdentityCardNo: string;
+  driverIdentityCardIssueOrganization: string;
+  driverIdentityCardEffectiveDateBegin: number;
+  driverIdentityCardEffectiveDateEnd: number;
+}
+export interface IdentFormInter extends DataInter {
+  driverIdentityFaceSide: string;
+  driverIdentityOtherSide: string;
+}
+
+export interface RecordInter extends DataInter {
+  driverIdentityFaceSide: FileInter;
+  driverIdentityOtherSide: FileInter;
 }

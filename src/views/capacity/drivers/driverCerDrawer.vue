@@ -117,7 +117,9 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
       disabled: false,
-      data: {},
+      data: {
+        driver: {},
+      },
       driverId: "",
       uploadModalRef: "",
       driverIdentificationPhoto: {
@@ -229,7 +231,7 @@ export default defineComponent({
     // 身份证
     function editIdentity() {
       const { handleModal } = identityDrawerRef.value;
-      handleModal(state.data);
+      handleModal(state.data.driver);
     }
     //驾驶证
     function editLicense() {
