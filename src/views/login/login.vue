@@ -73,14 +73,15 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, unref } from "vue";
+import { defineComponent, ref, reactive, unref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
 import { getCaptcha } from "@/api/login/login";
 import { useAppUserStore } from "@/store/modules/useUserStore";
-// import { ACCESS_TOKEN_KEY } from "@/config/constant";
-// import { locStorage } from "@/utils/storage";
+import md5 from "blueimp-md5";
+import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";
+import { locStorage } from "@/utils/storage";
 
 export default defineComponent({
   name: "Login",
@@ -109,18 +110,37 @@ export default defineComponent({
       captcha: "123456",
     });
 
-    const getCapt = async () => {
+    onMounted(() => {
+      const expirTime = locStorage.get(CAPTCHA_EXPIRATION_TIME_KEY);
+      const currentDate = new Date().getTime();
+      if (expirTime && currentDate < expirTime) {
+        isCaptcha.value = true;
+        return false;
+      }
+    });
+
+    const getCaptchaData = async () => {
       try {
-        // let token =
-        //   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTc4MGZjZWM3ZGY0ZGJlYjUzYTk1YmNhYTA3OGE0NSIsInJvbGVzIjpbIjdkZDc5NWY3YTE2ZjQ4YjliNzY4MmM5NmQ3NzM0NTRlIl0sImlhdCI6MTY1MDgwNjk3MjE0NywiZXhwIjoxNjUwOTg2OTcyMTQ3fQ.OReBmoqDLAtTo4UPqmDKO7F69MUzR3KoAtYHML5ux0U";
-        // locStorage.set(ACCESS_TOKEN_KEY, token);
+        const expirTime = locStorage.get(CAPTCHA_EXPIRATION_TIME_KEY);
+        const currentDate = new Date().getTime();
+        if (expirTime && currentDate < expirTime) {
+          isCaptcha.value = true;
+          return false;
+        }
         loading.value = true;
-        let res = await getCaptcha(unref(formValue));
-        console.log(res);
+        let res = await getCaptcha({
+          account: unref(formValue).account,
+          password: md5(unref(formValue).password),
+        });
+
+        if (res.data.expirationTime) {
+          locStorage.set(CAPTCHA_EXPIRATION_TIME_KEY, res.data.expirationTime, 180);
+        }
+
         isCaptcha.value = true;
         loading.value = false;
       } catch (err) {
-        //    isCaptcha.value = true;
+        isCaptcha.value = false;
         console.log(err);
         loading.value = false;
       }
@@ -130,7 +150,11 @@ export default defineComponent({
     const loginUser = async () => {
       loading.value = true;
       try {
-        await login(unref(formValue));
+        await login({
+          account: unref(formValue).account,
+          password: md5(unref(formValue).password),
+          captcha: unref(formValue).captcha,
+        });
         message.success("登录成功，即将进入系统");
         setTimeout(() => {
           loading.value = false;
@@ -146,7 +170,7 @@ export default defineComponent({
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
-          isCaptcha.value ? loginUser() : getCapt();
+          isCaptcha.value ? loginUser() : getCaptchaData();
         } else {
           console.log(errors);
         }
@@ -157,7 +181,6 @@ export default defineComponent({
       rules,
       isCaptcha,
       autoLogin,
-      getCapt,
       formValue,
       loading,
 
@@ -172,13 +195,16 @@ export default defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
+
   .login-mobile-logo {
     display: none;
   }
+
   .login-btn {
     // background-color: #0082fc;
     width: 100%;
   }
+
   .login {
     position: absolute;
     top: 50%;
@@ -192,6 +218,7 @@ export default defineComponent({
     justify-content: space-between;
     align-items: stretch;
   }
+
   .login-left {
     width: 45%;
     background: url("../../assets/image/login-bg2.png") center no-repeat;
@@ -209,15 +236,18 @@ export default defineComponent({
     width: 100%;
     text-align: center;
   }
+
   .login-title-img {
     width: 130px;
     margin: 0 auto;
   }
+
   .login-left-img {
     width: 200px;
     margin: 0 auto;
     margin-top: 20px;
   }
+
   .login-info {
     color: #fff;
     font-size: 12px;
@@ -226,6 +256,7 @@ export default defineComponent({
     text-align: center;
     margin-top: 15px;
   }
+
   .login-form {
     width: 55%;
     background-color: #ffffff;
@@ -233,6 +264,7 @@ export default defineComponent({
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
+
   .login-form-title {
     font-size: 20px;
     font-family: PingFangSC;
@@ -242,34 +274,41 @@ export default defineComponent({
     display: inline-block;
     margin-bottom: 30px;
   }
+
   .captcha {
     height: 35px;
     width: 22%;
     border-radius: 2px;
     overflow: hidden;
   }
+
   .tips {
     color: #617288;
   }
 }
+
 @media screen and (max-width: 768px) {
   .login-container {
     background-color: #fff;
     background: url("../../assets/image/login-bg2-m.png") top no-repeat;
     background-size: contain;
+
     .login-mobile-logo {
       display: block;
       text-align: center;
       padding-top: 70px;
     }
+
     .login-form-title,
     .tips {
       display: block;
       text-align: center;
     }
+
     .login-left {
       display: none;
     }
+
     .login-form {
       width: 80%;
       border-radius: 8px;

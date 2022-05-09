@@ -9,7 +9,7 @@
   >
     <n-form
       ref="formRef"
-      :rules="licenseRules"
+      :rules="identityRules"
       label-placement="left"
       label-width="140"
       style="width: 640px"
@@ -38,6 +38,7 @@
         <n-form-item label="身份证有效期始" path="driverIdentityCardEffectiveDateBegin">
           <n-date-picker
             style="width: 170px"
+            format="yyyy-MM-dd"
             v-model:value="form.driverIdentityCardEffectiveDateBegin"
             type="date"
             clearable
@@ -100,8 +101,9 @@ import { UploadTypeEnum } from "@/enums/httpEnum";
 import BasicModal from "@/components/Modal/Modal.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { updateDriverIdentity } from "@/api/capacity/capacity";
-import { licenseRules } from "./data";
+import { identityRules } from "./data";
 import { IdentFormInter, RecordInter } from "./type";
+// import dayjs from "dayjs";
 export default defineComponent({
   name: "IdentityDrawer",
   components: { BasicModal, BasicUpload },
@@ -234,7 +236,7 @@ export default defineComponent({
       faceChange,
       faceRemove,
       otherUploadList,
-      licenseRules,
+      identityRules,
       otherRemove,
       handleModal,
       otherdChange,

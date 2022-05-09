@@ -14,11 +14,20 @@ export const rules = {
 };
 
 
+export const identityRules = {
+    driverIdentityCardNo:{ required: true, trigger: ["blur", "input"], message: "请输入正确格式的身份证号码" },
+    driverIdentityCardIssueOrganization:{ required: true, trigger: ["blur", "input"], message: "请输入身份证签发机关" },
+    driverIdentityCardEffectiveDateBegin:{ type:"number", required: true, trigger: ["blur", "change"], message: "请选择身份证有效期开始时间" },
+    driverIdentityCardEffectiveDateEnd:{ type:"number", required: true, trigger: ["blur", "change"], message: "请选择身份证有效期结束时间" },
+    driverIdentityFaceSide:{ required: true, trigger: ["blur", "change"], message: "请上传身份证头像面" },
+    driverIdentityOtherSide:{ required: true, trigger: ["blur", "change"], message: "请上传身份证国徽面" },
+}
+
 export const licenseRules = {
     driverIdentityCardNo:{ required: true, trigger: ["blur", "input"], message: "请输入正确格式的身份证号码" },
     driverIdentityCardIssueOrganization:{ required: true, trigger: ["blur", "input"], message: "请输入身份证签发机关" },
-    driverIdentityCardEffectiveDateBegin:{ required: true, trigger: ["blur", "change"], message: "请选择身份证有效期开始时间" },
-    driverIdentityCardEffectiveDateEnd:{ required: true, trigger: ["blur", "change"], message: "请选择身份证有效期结束时间" },
+    driverIdentityCardEffectiveDateBegin:{ type:"number", required: true, trigger: ["blur", "change"], message: "请选择身份证有效期开始时间" },
+    driverIdentityCardEffectiveDateEnd:{ type:"number", required: true, trigger: ["blur", "change"], message: "请选择身份证有效期结束时间" },
     driverIdentityFaceSide:{ required: true, trigger: ["blur", "change"], message: "请上传身份证头像面" },
     driverIdentityOtherSide:{ required: true, trigger: ["blur", "change"], message: "请上传身份证国徽面" },
 }

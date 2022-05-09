@@ -18,7 +18,7 @@
           filterable
           placeholder="选择开通城市"
           style="width: 260px"
-          :options="openCityList.result"
+          :options="openCityData"
         />
       </n-form-item>
 
