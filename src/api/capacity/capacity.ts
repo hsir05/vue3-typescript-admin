@@ -459,14 +459,14 @@ export function updateDriverFacePhoto(data: { driverId: string; fileId: string }
  * 更新司机身份证照片信息
  */
 interface FiledInter {
-  field: string;
-}
+  fileId: string;
+} 
 interface IdentityInter {
   driverId: string | null;
   driverIdentityCardNo: string | null;
   driverIdentityCardIssueOrganization: string | null;
-  driverIdentityCardEffectiveDateBegin: number | null;
-  driverIdentityCardEffectiveDateEnd: number | null;
+  driverIdentityCardEffectiveDateBegin: string | null;
+  driverIdentityCardEffectiveDateEnd: string | null;
   driverIdentityFaceSide: FiledInter;
   driverIdentityOtherSide: FiledInter;
 }

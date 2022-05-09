@@ -41,9 +41,6 @@ export interface FormInter {
   driverIdentityCardEffectiveDateEnd: string | null;
   driverIdentityFaceSide: string | null;
   driverIdentityOtherSide: string | null;
-
-  //   driverIdentityFaceSide: FiledInter;
-  //   driverIdentityOtherSide: FiledInter;
 }
 export interface CertificateInter {
   driverId: string;
@@ -56,19 +53,57 @@ export interface CertificateInter {
   driverNetworkVehicleCertificateOtherSide: string;
 }
 
-interface DataInter {
+interface IdentDataInter {
   driverId: string;
   driverIdentityCardNo: string;
   driverIdentityCardIssueOrganization: string;
   driverIdentityCardEffectiveDateBegin: number;
   driverIdentityCardEffectiveDateEnd: number;
 }
-export interface IdentFormInter extends DataInter {
+export interface IdentFormInter extends IdentDataInter {
   driverIdentityFaceSide: string;
   driverIdentityOtherSide: string;
 }
 
-export interface RecordInter extends DataInter {
+export interface IdentRecordInter extends IdentDataInter {
   driverIdentityFaceSide: FileInter;
   driverIdentityOtherSide: FileInter;
+}
+// 驾驶证件
+interface LienceDataInter {
+  driverId: string;
+  driverLicenseNo: string;
+  driverLicenseArchivesNo: string;
+  driverPermitVehicleModel: string;
+  driverLicenseGetDate: number;
+  driverLicenseEffectiveDateBegin: number;
+  driverLicenseEffectiveDateEnd: number;
+}
+export interface LienceFormInter extends LienceDataInter {
+  driverLicenseFaceSide: string;
+  driverLicenseOtherSide: string;
+}
+
+export interface LienceRecordInter extends LienceDataInter {
+  driverLicenseFaceSide: FileInter;
+  driverLicenseOtherSide: FileInter;
+}
+//----
+
+interface CertDataInter {
+  driverId: string;
+  driverNetworkVehicleCertificateNo: string;
+  driverNetworkVehicleCertificateIssueOrganization: string;
+  driverNetworkVehicleCertificateGetDate: number;
+  driverNetworkVehicleCertificateEffectiveDateBegin: number;
+  driverNetworkVehicleCertificateEffectiveDateEnd: number;
+}
+export interface CertInter extends CertDataInter {
+  driverNetworkVehicleCertificateFaceSide: string;
+  driverNetworkVehicleCertificateOtherSide: string;
+}
+
+export interface CertRecordInter extends CertDataInter {
+  driverNetworkVehicleCertificateFaceSide: FileInter;
+  driverNetworkVehicleCertificateOtherSide: FileInter;
 }

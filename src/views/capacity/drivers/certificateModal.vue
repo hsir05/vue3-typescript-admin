@@ -1,7 +1,7 @@
 <template>
   <BasicModal
-    title="编辑司机身份证照片信息"
-    width="800px"
+    title="编辑网约车资格证照片信息"
+    width="860px"
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
@@ -9,16 +9,16 @@
   >
     <n-form
       ref="formRef"
-      :rules="licenseRules"
+      :rules="certRules"
       label-placement="left"
-      label-width="160"
+      label-width="180"
       require-mark-placement="right-hanging"
       :model="form"
     >
       <n-form-item label="网约车资格证号" path="driverNetworkVehicleCertificateNo">
         <n-input
           v-model:value="form.driverNetworkVehicleCertificateNo"
-          style="width: 540px"
+          style="width: 520px"
           clearable
           placeholder="输入网约车资格证号"
         />
@@ -26,7 +26,7 @@
 
       <n-form-item label="身份证签发机关" path="driverNetworkVehicleCertificateIssueOrganization">
         <n-input
-          style="width: 540px"
+          style="width: 520px"
           v-model:value="form.driverNetworkVehicleCertificateIssueOrganization"
           clearable
           placeholder="输入身份证身份证签发机关"
@@ -35,7 +35,7 @@
 
       <n-form-item label="网约车资格证初领日期" path="driverNetworkVehicleCertificateGetDate">
         <n-date-picker
-          style="width: 540px"
+          style="width: 520px"
           v-model:value="form.driverNetworkVehicleCertificateGetDate"
           type="date"
           clearable
@@ -73,10 +73,10 @@
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.CERTIFICATE }"
             name="file"
-            :width="140"
-            :height="120"
-            @delete-upload="imageRemove"
-            @upload-change="uploadChange"
+            :width="145"
+            :height="100"
+            @delete-upload="remove"
+            @upload-change="change"
             v-model:value="uploadList"
           />
         </n-form-item>
@@ -85,11 +85,11 @@
           <BasicUpload
             :data="{ uploadType: UploadTypeEnum.CERTIFICATE }"
             name="file"
-            :width="120"
-            :height="120"
-            @delete-upload="imageRemove"
-            @upload-change="uploadChange"
-            v-model:value="uploadList"
+            :width="145"
+            :height="100"
+            @delete-upload="otherRemove"
+            @upload-change="otherChange"
+            v-model:value="otherUploadList"
           />
         </n-form-item>
       </div>
@@ -109,46 +109,90 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { FormInst } from "naive-ui";
+import { FormInst, useMessage } from "naive-ui";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import BasicModal from "@/components/Modal/Modal.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { updateCertificate } from "@/api/capacity/capacity";
-import { licenseRules } from "./data";
-import { CertificateInter } from "./type";
+import { certRules } from "./data";
+import { CertRecordInter, CertInter } from "./type";
+import dayjs from "dayjs";
 export default defineComponent({
-  name: "CertificateDrawer",
+  name: "CertificateModal",
   components: { BasicModal, BasicUpload },
   setup() {
     const ModalRef = ref();
     const uploadType = ref("");
+    const message = useMessage();
     const loading = ref(false);
     const uploadList = ref<string[]>([]);
-    const form = ref<CertificateInter>({
+    const otherUploadList = ref<string[]>([]);
+    const form = ref<CertInter>({
       driverId: "",
       driverNetworkVehicleCertificateNo: "",
       driverNetworkVehicleCertificateIssueOrganization: "",
-      driverNetworkVehicleCertificateGetDate: "",
-      driverNetworkVehicleCertificateEffectiveDateBegin: "",
-      driverNetworkVehicleCertificateEffectiveDateEnd: "",
+      driverNetworkVehicleCertificateGetDate: 0,
+      driverNetworkVehicleCertificateEffectiveDateBegin: 0,
+      driverNetworkVehicleCertificateEffectiveDateEnd: 0,
       driverNetworkVehicleCertificateFaceSide: "",
       driverNetworkVehicleCertificateOtherSide: "",
     });
     const formRef = ref<FormInst | null>(null);
 
-    const handleModal = () => {
-      //   console.log(record);
+    const handleModal = (record: CertRecordInter) => {
+      console.log(record);
+      const {
+        driverId,
+        driverNetworkVehicleCertificateNo,
+        driverNetworkVehicleCertificateIssueOrganization,
+        driverNetworkVehicleCertificateGetDate,
+        driverNetworkVehicleCertificateEffectiveDateBegin,
+        driverNetworkVehicleCertificateEffectiveDateEnd,
+        driverNetworkVehicleCertificateFaceSide,
+        driverNetworkVehicleCertificateOtherSide,
+      } = record;
+
+      form.value = {
+        driverId,
+        driverNetworkVehicleCertificateNo,
+        driverNetworkVehicleCertificateIssueOrganization,
+        driverNetworkVehicleCertificateGetDate: new Date(
+          driverNetworkVehicleCertificateGetDate
+        ).getTime(),
+        driverNetworkVehicleCertificateEffectiveDateBegin: new Date(
+          driverNetworkVehicleCertificateEffectiveDateBegin
+        ).getTime(),
+        driverNetworkVehicleCertificateEffectiveDateEnd: new Date(
+          driverNetworkVehicleCertificateEffectiveDateEnd
+        ).getTime(),
+        driverNetworkVehicleCertificateFaceSide: driverNetworkVehicleCertificateFaceSide.fileId,
+        driverNetworkVehicleCertificateOtherSide: driverNetworkVehicleCertificateOtherSide.fileId,
+      };
+
+      uploadList.value = [driverNetworkVehicleCertificateFaceSide.filePath];
+      otherUploadList.value = [driverNetworkVehicleCertificateOtherSide.filePath];
       const { showModal } = ModalRef.value;
       showModal();
     };
 
-    function imageRemove(file: string[]) {
-      // form.value.filePath = file[0];
-      uploadList.value = file;
+    function remove(file: string[]) {
+      console.log(file);
+      form.value.driverNetworkVehicleCertificateFaceSide = "";
+      uploadList.value = [];
     }
-    function uploadChange(file: { filePath: string; fileId: string }) {
-      // form.value.filePath = file.fileId;
+    function change(file: { filePath: string; fileId: string }) {
+      form.value.driverNetworkVehicleCertificateFaceSide = file.fileId;
       uploadList.value = [file.filePath];
+    }
+
+    function otherRemove(file: string[]) {
+      console.log(file);
+      form.value.driverNetworkVehicleCertificateOtherSide = "";
+      otherUploadList.value = [];
+    }
+    function otherChange(file: { filePath: string; fileId: string }) {
+      form.value.driverNetworkVehicleCertificateOtherSide = file.fileId;
+      otherUploadList.value = [file.filePath];
     }
 
     function handleValidate(e: MouseEvent) {
@@ -171,17 +215,24 @@ export default defineComponent({
               driverId,
               driverNetworkVehicleCertificateNo,
               driverNetworkVehicleCertificateIssueOrganization,
-              driverNetworkVehicleCertificateGetDate,
-              driverNetworkVehicleCertificateEffectiveDateBegin,
-              driverNetworkVehicleCertificateEffectiveDateEnd,
+              driverNetworkVehicleCertificateGetDate: dayjs(
+                driverNetworkVehicleCertificateGetDate
+              ).format("YYYY-MM-DD"),
+              driverNetworkVehicleCertificateEffectiveDateBegin: dayjs(
+                driverNetworkVehicleCertificateEffectiveDateBegin
+              ).format("YYYY-MM-DD"),
+              driverNetworkVehicleCertificateEffectiveDateEnd: dayjs(
+                driverNetworkVehicleCertificateEffectiveDateEnd
+              ).format("YYYY-MM-DD"),
               driverNetworkVehicleCertificateOtherSide: {
-                field: driverNetworkVehicleCertificateFaceSide,
+                fileId: driverNetworkVehicleCertificateFaceSide,
               },
               driverNetworkVehicleCertificateFaceSide: {
-                field: driverNetworkVehicleCertificateOtherSide,
+                fileId: driverNetworkVehicleCertificateOtherSide,
               },
             });
             console.log(res);
+            message.success(window.$tips[res.code]);
             loading.value = false;
           } catch (err) {
             console.log(err);
@@ -197,9 +248,9 @@ export default defineComponent({
         driverId: "",
         driverNetworkVehicleCertificateNo: "",
         driverNetworkVehicleCertificateIssueOrganization: "",
-        driverNetworkVehicleCertificateGetDate: "",
-        driverNetworkVehicleCertificateEffectiveDateBegin: "",
-        driverNetworkVehicleCertificateEffectiveDateEnd: "",
+        driverNetworkVehicleCertificateGetDate: 0,
+        driverNetworkVehicleCertificateEffectiveDateBegin: 0,
+        driverNetworkVehicleCertificateEffectiveDateEnd: 0,
         driverNetworkVehicleCertificateFaceSide: "",
         driverNetworkVehicleCertificateOtherSide: "",
       };
@@ -213,19 +264,17 @@ export default defineComponent({
       UploadTypeEnum,
       form,
       loading,
+      certRules,
       uploadList,
-      licenseRules,
-      imageRemove,
+      otherUploadList,
+      remove,
+      change,
       handleModal,
-      uploadChange,
+      otherRemove,
+      otherChange,
       handleReset,
       handleValidate,
     };
   },
 });
 </script>
-<style lang="scss" scoped>
-.n-form-item-blank {
-  margin: 0 auto;
-}
-</style>

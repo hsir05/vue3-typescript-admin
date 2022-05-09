@@ -50,7 +50,44 @@ export const stateOptions = [
     value: 1,
   },
 ];
-
+export const drivingLicense = [
+    {
+        label: "A1",
+        value: "A1"
+    },
+    {
+        label: "A2",
+        value: "A2"
+    },
+    {
+        label: "A3",
+        value: "A3"
+    },
+    {
+        label: "B1",
+        value: "B1"
+    },
+    {
+        label: "B2",
+        value: "B2"
+    },
+    {
+        label: "C1",
+        value: "C1"
+    },
+    {
+        label: "C2",
+        value: "C2"
+    },
+    {
+        label: "C3",
+        value: "C3"
+    },
+    {
+        label: "C4",
+        value: "C4"
+    }
+]
 export const nationData = [
   { value: "汉族", label: "汉族" },
   { value: "蒙古族", label: "蒙古族" },
@@ -111,9 +148,9 @@ export const nationData = [
 ];
 
 export const educationData = [
-      { value: "初中", label: "初中" },
-      { value: "高中", label: "高中" },
-      { value: "大专", label: "大专" },
-      { value: "本科", label: "本科" },
-      { value: "研究生", label: "研究生" },
-]
+  { value: "初中", label: "初中" },
+  { value: "高中", label: "高中" },
+  { value: "大专", label: "大专" },
+  { value: "本科", label: "本科" },
+  { value: "研究生", label: "研究生" },
+];

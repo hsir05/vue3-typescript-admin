@@ -4,14 +4,23 @@
       <div class="img-box">
         <p class="title mt-10px mb-10px">{{ positiveText }}</p>
         <div class="">
-          <n-image :width="width" :height="height" :src="positivePhoto" />
+          <n-image
+            :width="width"
+            :fallback-src="ErrorImg"
+            :preview-disabled="positivePhoto ? true : false"
+            :src="positivePhoto"
+          />
         </div>
       </div>
-
       <div class="img-box">
         <p class="title mt-10px mb-10px">{{ reverseText }}</p>
         <div class="">
-          <n-image :width="width" :src="reversePhoto" />
+          <n-image
+            :width="width"
+            :fallback-src="ErrorImg"
+            :preview-disabled="reversePhoto ? true : false"
+            :src="reversePhoto"
+          />
         </div>
       </div>
     </div>
@@ -23,6 +32,7 @@
 </template>
 <script lang="ts" setup>
 import { toRefs } from "vue";
+import ErrorImg from "@/assets/image/image.png";
 const props = defineProps({
   positivePhoto: {
     type: String,
@@ -56,8 +66,7 @@ const props = defineProps({
   },
 });
 
-const { positivePhoto, reversePhoto, positiveText, reverseText, btnText, width, height } =
-  toRefs(props);
+const { positivePhoto, reversePhoto, positiveText, reverseText, btnText, width } = toRefs(props);
 
 const emit = defineEmits(["edit-photo"]);
 

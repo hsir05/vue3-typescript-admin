@@ -112,7 +112,7 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .n-form-item-blank {
   margin: 0 auto;
 }

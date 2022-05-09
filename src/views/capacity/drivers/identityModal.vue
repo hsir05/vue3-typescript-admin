@@ -38,7 +38,6 @@
         <n-form-item label="身份证有效期始" path="driverIdentityCardEffectiveDateBegin">
           <n-date-picker
             style="width: 170px"
-            format="yyyy-MM-dd"
             v-model:value="form.driverIdentityCardEffectiveDateBegin"
             type="date"
             clearable
@@ -96,19 +95,20 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { FormInst } from "naive-ui";
+import { useMessage, FormInst } from "naive-ui";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import BasicModal from "@/components/Modal/Modal.vue";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { updateDriverIdentity } from "@/api/capacity/capacity";
 import { identityRules } from "./data";
-import { IdentFormInter, RecordInter } from "./type";
-// import dayjs from "dayjs";
+import { IdentFormInter, IdentRecordInter } from "./type";
+import dayjs from "dayjs";
 export default defineComponent({
-  name: "IdentityDrawer",
+  name: "IdentityModal",
   components: { BasicModal, BasicUpload },
   setup() {
     const ModalRef = ref();
+    const message = useMessage();
     const uploadType = ref("");
     const loading = ref(false);
     const faceUploadList = ref<string[]>([]);
@@ -125,7 +125,7 @@ export default defineComponent({
     });
     const formRef = ref<FormInst | null>(null);
 
-    const handleModal = (record: RecordInter) => {
+    const handleModal = (record: IdentRecordInter) => {
       const {
         driverId,
         driverIdentityCardNo,
@@ -157,6 +157,7 @@ export default defineComponent({
 
     function faceRemove(file: string[]) {
       console.log(file);
+      form.value.driverIdentityFaceSide = "";
       faceUploadList.value = [];
     }
     function faceChange(file: { filePath: string; fileId: string }) {
@@ -166,6 +167,7 @@ export default defineComponent({
 
     function otherRemove(file: string[]) {
       console.log(file);
+      form.value.driverIdentityOtherSide = "";
       otherUploadList.value = [];
     }
     function otherdChange(file: { filePath: string; fileId: string }) {
@@ -192,19 +194,26 @@ export default defineComponent({
               driverId,
               driverIdentityCardNo,
               driverIdentityCardIssueOrganization,
-              driverIdentityCardEffectiveDateBegin,
-              driverIdentityCardEffectiveDateEnd,
+              driverIdentityCardEffectiveDateBegin: dayjs(
+                driverIdentityCardEffectiveDateBegin
+              ).format("YYYY-MM-DD"),
+              driverIdentityCardEffectiveDateEnd: dayjs(driverIdentityCardEffectiveDateEnd).format(
+                "YYYY-MM-DD"
+              ),
               driverIdentityFaceSide: {
-                field: driverIdentityFaceSide as string,
+                fileId: driverIdentityFaceSide as string,
               },
               driverIdentityOtherSide: {
-                field: driverIdentityOtherSide as string,
+                fileId: driverIdentityOtherSide as string,
               },
             });
+
             console.log(res);
+            message.success(window.$tips[res.code]);
             loading.value = false;
           } catch (err) {
             console.log(err);
+            message.error("保存失败,请稍候重试!");
             loading.value = false;
           }
         } else {
@@ -213,6 +222,8 @@ export default defineComponent({
       });
     }
     function handleReset() {
+      faceUploadList.value = [];
+      otherUploadList.value = [];
       form.value = {
         driverId: "",
         driverIdentityCardNo: "",
@@ -246,8 +257,3 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="scss" scoped>
-.n-form-item-blank {
-  margin: 0 auto;
-}
-</style>

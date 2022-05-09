@@ -5,12 +5,16 @@
     :width="1000"
     @on-close-after="onCloseAfter"
   >
-    <n-spin :show="loading" class="mt-30px">
+    <n-spin :show="loading">
       <div class="img-info">
         <div class="img-box" v-if="!loading">
           <p class="title mt-10px mb-10px">司机免冠照片</p>
           <div class="">
-            <n-image width="100" height="130" :src="driverIdentificationPhoto.filePath" />
+            <n-image
+              width="100"
+              :fallback-src="ErrorImg"
+              :src="driverIdentificationPhoto.filePath"
+            />
           </div>
           <n-button
             attr-type="button"
@@ -26,7 +30,11 @@
         <div class="img-box" v-if="!loading">
           <p class="title mt-10px mb-10px">人脸识别采集图片</p>
           <div class="">
-            <n-image width="100" height="130" :src="driverBaiduFaceRecognitionPhoto.filePath" />
+            <n-image
+              width="100"
+              :fallback-src="ErrorImg"
+              :src="driverBaiduFaceRecognitionPhoto.filePath"
+            />
           </div>
 
           <n-button
@@ -40,7 +48,6 @@
           </n-button>
         </div>
       </div>
-
       <PhotoItem
         v-if="!loading"
         :positivePhoto="driverIdentityFaceSide"
@@ -86,10 +93,10 @@
       @on-submit="driverFaceSubmit"
     />
 
-    <IdentityDrawer ref="identityDrawerRef" />
-    <LicenseDrawer ref="licenseDrawerRef" />
+    <IdentityModal ref="identityModalRef" />
+    <LicenseModal ref="licenseModalRef" />
 
-    <CertificateDrawer ref="certificateDrawerRef" />
+    <CertificateModal ref="certificateModalRef" />
   </BasicDrawer>
 </template>
 <script lang="ts">
@@ -98,21 +105,22 @@ import { useMessage } from "naive-ui";
 import { getDriverDetail, updateDriverPhoto, updateDriverFacePhoto } from "@/api/capacity/capacity";
 import PhotoItem from "./photoItem.vue";
 import UploadModal from "@/components/UploadModal/UploadModal.vue";
-import IdentityDrawer from "./identityDrawer.vue";
-import LicenseDrawer from "./licenseDrawer.vue";
-import CertificateDrawer from "./certificateDrawer.vue";
+import IdentityModal from "./identityModal.vue";
+import LicenseModal from "./licenseModal.vue";
+import CertificateModal from "./certificateModal.vue";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import { FileInter } from "./type";
+import ErrorImg from "@/assets/image/image.png";
 export default defineComponent({
   name: "DriverCerDrawer",
-  components: { PhotoItem, UploadModal, IdentityDrawer, LicenseDrawer, CertificateDrawer },
+  components: { PhotoItem, UploadModal, IdentityModal, LicenseModal, CertificateModal },
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const driverHeaderModalRef = ref();
     const driverFaceModalRef = ref();
-    const licenseDrawerRef = ref();
-    const identityDrawerRef = ref();
-    const certificateDrawerRef = ref();
+    const licenseModalRef = ref();
+    const identityModalRef = ref();
+    const certificateModalRef = ref();
     const state = reactive({
       isDrawer: false,
       loading: false,
@@ -121,22 +129,22 @@ export default defineComponent({
         driver: {},
       },
       driverId: "",
-      uploadModalRef: "",
       driverIdentificationPhoto: {
-        filePath: "",
+        filePath: " ",
         fileId: "",
       },
       driverBaiduFaceRecognitionPhoto: {
-        filePath: "",
+        filePath: " ",
         fileId: "",
       },
-      driverIdentityFaceSide: "",
-      driverIdentityOtherSide: "",
-      driverLicenseFaceSide: "",
-      driverLicenseOtherSide: "",
-      driverNetworkVehicleCertificateFaceSide: "",
-      driverNetworkVehicleCertificateOtherSide: "",
+      driverIdentityFaceSide: " ",
+      driverIdentityOtherSide: " ",
+      driverLicenseFaceSide: " ",
+      driverLicenseOtherSide: " ",
+      driverNetworkVehicleCertificateFaceSide: " ",
+      driverNetworkVehicleCertificateOtherSide: " ",
     });
+
     const message = useMessage();
 
     function openDrawer(driverId: string) {
@@ -168,6 +176,7 @@ export default defineComponent({
         state.loading = false;
       } catch (err) {
         console.log(err);
+        message.error("证件信息获取失败,请稍候重试");
         state.loading = false;
       }
     };
@@ -230,18 +239,18 @@ export default defineComponent({
 
     // 身份证
     function editIdentity() {
-      const { handleModal } = identityDrawerRef.value;
+      const { handleModal } = identityModalRef.value;
       handleModal(state.data.driver);
     }
     //驾驶证
     function editLicense() {
-      const { handleModal } = licenseDrawerRef.value;
-      handleModal(state.data);
+      const { handleModal } = licenseModalRef.value;
+      handleModal(state.data.driver);
     }
     //网约车资格证
     function editCertificate() {
-      const { handleModal } = certificateDrawerRef.value;
-      handleModal(state.data);
+      const { handleModal } = certificateModalRef.value;
+      handleModal(state.data.driver);
     }
 
     function handleSaveAfter() {
@@ -252,15 +261,31 @@ export default defineComponent({
       state.isDrawer = false;
       state.loading = false;
       state.disabled = false;
+      state.driverId = "";
+      state.driverIdentificationPhoto = {
+        filePath: " ",
+        fileId: "",
+      };
+      state.driverBaiduFaceRecognitionPhoto = {
+        filePath: " ",
+        fileId: "",
+      };
+      state.driverIdentityFaceSide = " ";
+      state.driverIdentityOtherSide = " ";
+      state.driverLicenseFaceSide = " ";
+      state.driverLicenseOtherSide = " ";
+      state.driverNetworkVehicleCertificateFaceSide = " ";
+      state.driverNetworkVehicleCertificateOtherSide = " ";
     }
 
     return {
       ...toRefs(state),
       driverFaceModalRef,
       driverHeaderModalRef,
-      identityDrawerRef,
-      licenseDrawerRef,
-      certificateDrawerRef,
+      identityModalRef,
+      licenseModalRef,
+      certificateModalRef,
+      ErrorImg,
       handleSaveAfter,
       driverBareheadedRemove,
       driverBareheadedSuccess,
