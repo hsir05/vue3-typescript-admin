@@ -154,3 +154,29 @@ export const educationData = [
   { value: "本科", label: "本科" },
   { value: "研究生", label: "研究生" },
 ];
+// 订单处理了状态
+export const processStateData = [
+    {
+        label: "未处理",
+        value: 0
+    },
+    {
+        label: "已处理",
+        value: 1
+    },
+]
+// 订单状态
+export const refundTypeData = [
+    {
+        label: "不涉及退款",
+        value: 0
+    },
+    {
+        label: "部分退",
+        value: 1
+    },
+    {
+        label: "全额退",
+        value: 2
+    },
+]

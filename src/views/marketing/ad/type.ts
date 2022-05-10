@@ -1,12 +1,15 @@
 export interface tableDataItem{
-    id?: string
-    title: null | string;
-    adUrl: null | string
-    cityName?: null | string
-    cityCode?: null | string
-    startTime: null | string
-    endTime: null | string
-    h5Url: null | string;
-    sort: null | number
-    status?: number 
+    openCityAdvertisementId?: string
+    advertisementTitle: string | null;
+    advertisementImageUrl: string | null
+    cityName: string | null
+    cityCode: string | null
+    advertisementEffectiveTimeBegin: number | null
+    advertisementEffectiveTimeEnd: number | null
+    advertisementH5Url: string | null;
+    advertisementSeq: number | null
 }
+export  interface CityItemInter {
+            label: string;
+            value: string
+        }

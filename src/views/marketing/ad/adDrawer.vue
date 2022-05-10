@@ -1,9 +1,8 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" title="广告编辑" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
       :rules="rules"
-      size="large"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '400px' }"
@@ -11,36 +10,52 @@
       label-width="120"
       :model="form"
     >
-      <n-form-item label="广告标题" path="title">
-        <n-input v-model:value="form.title" :maxlength="20" clearable placeholder="输入广告标题" />
+      <n-form-item label="广告标题" path="advertisementTitle">
+        <n-input
+          v-model:value="form.advertisementTitle"
+          :maxlength="20"
+          clearable
+          placeholder="输入广告标题"
+        />
       </n-form-item>
       <n-form-item label="广告开通城市" path="cityName">
-        <n-input
-          v-model:value="form.cityName"
-          :disabled="true"
+        <n-select
+          v-model:value="form.cityCode"
           clearable
-          placeholder="输入广告开通城市"
+          filterable
+          placeholder="选择开通城市"
+          style="width: 260px"
+          :options="openCityData"
         />
       </n-form-item>
 
-      <n-form-item label="广告生效时间" path="startTime">
-        <n-date-picker v-model:value="form.startTime" type="datetime" clearable />
+      <n-form-item label="广告生效时间" path="advertisementEffectiveTimeBegin">
+        <n-date-picker
+          v-model:value="form.advertisementEffectiveTimeBegin"
+          type="datetime"
+          clearable
+        />
       </n-form-item>
 
-      <n-form-item label="广告失效时间" path="endTime">
-        <n-date-picker v-model:value="form.endTime" type="datetime" clearable />
+      <n-form-item label="广告失效时间" path="advertisementEffectiveTimeEnd">
+        <n-date-picker
+          v-model:value="form.advertisementEffectiveTimeEnd"
+          type="datetime"
+          clearable
+        />
       </n-form-item>
 
-      <n-form-item label="广告H5url" path="h5Url">
-        <n-input v-model:value="form.h5Url" clearable placeholder="输入广告H5url" />
+      <n-form-item label="广告H5url" path="advertisementH5Url">
+        <n-input v-model:value="form.advertisementH5Url" clearable placeholder="输入广告H5url" />
       </n-form-item>
 
-      <n-form-item label="广告照片" path="adUrl">
+      <n-form-item label="广告照片" path="advertisementImageUrl">
         <BasicUpload
-          :data="{}"
+          :data="{ uploadType: UploadTypeEnum.CERTIFICATE }"
           name="file"
-          :width="100"
+          :width="85"
           :height="100"
+          @delete-upload="remove"
           @upload-change="uploadChange"
           v-model:value="uploadList"
         />
@@ -58,11 +73,15 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref } from "vue";
+import { defineComponent, reactive, toRefs, ref, onMounted, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { uploadUrl } from "@/config/config";
-import { tableDataItem } from "./type";
+import { UploadTypeEnum } from "@/enums/httpEnum";
+import { getAllOpenCity } from "@/api/common/common";
+import { itemState } from "@/interface/common/common";
+import { tableDataItem, CityItemInter } from "./type";
+import { getAdDetail } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "AdDrawer",
   components: {
@@ -75,32 +94,81 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
+    const openCityData = ref<CityItemInter[]>([]);
 
     const uploadList = ref<string[]>([]);
 
-    const title = ref("");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<tableDataItem>({
-      title: null,
-      adUrl: null,
+      advertisementTitle: null,
+      advertisementImageUrl: null,
       cityName: null,
       cityCode: null,
-      startTime: null,
-      endTime: null,
-      h5Url: null,
-      sort: null,
-      status: 1,
+      advertisementEffectiveTimeBegin: null,
+      advertisementEffectiveTimeEnd: null,
+      advertisementH5Url: null,
+      advertisementSeq: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem | string) {
-      console.log(record);
-      if (record) {
-        // form.value = { ...form.value, ...record };
+    onMounted(() => {
+      getOpenCity();
+    });
+
+    async function getOpenCity() {
+      try {
+        let res = await getAllOpenCity();
+        openCityData.value = res.data.map((item: itemState) => {
+          let obj = {
+            label: item.cityName,
+            value: item.cityCode,
+          };
+          return obj;
+        });
+        openCityData.value.unshift({ label: "不限", value: "all" });
+      } catch (err) {
+        console.log(err);
       }
-      title.value = t;
+    }
+
+    function openDrawer(openCityAdvertisementId: string) {
+      getDetail(openCityAdvertisementId);
+
       state.isDrawer = true;
     }
+
+    const getDetail = async (id: string) => {
+      try {
+        let res = await getAdDetail({ openCityAdvertisementId: id });
+        console.log(res);
+        const {
+          openCityAdvertisementId,
+          advertisementTitle,
+          advertisementImageUrl,
+          cityName,
+          cityCode,
+          advertisementEffectiveTimeBegin,
+          advertisementEffectiveTimeEnd,
+          advertisementH5Url,
+          advertisementSeq,
+        } = res.data;
+
+        form.value = {
+          openCityAdvertisementId,
+          advertisementTitle,
+          advertisementImageUrl,
+          cityName,
+          cityCode,
+          advertisementEffectiveTimeBegin,
+          advertisementEffectiveTimeEnd,
+          advertisementH5Url,
+          advertisementSeq,
+        };
+        uploadList.value = [advertisementImageUrl];
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
@@ -125,8 +193,17 @@ export default defineComponent({
     }
 
     function handleReset() {
-      //   form.value = { name: null, account: null, email: null, sex: null, phone: null, status: 1 };
-      //   formRef.value?.restoreValidation();
+      form.value = {
+        advertisementTitle: null,
+        advertisementImageUrl: null,
+        cityName: null,
+        cityCode: null,
+        advertisementEffectiveTimeBegin: null,
+        advertisementEffectiveTimeEnd: null,
+        advertisementH5Url: null,
+        advertisementSeq: null,
+      };
+      formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
       state.isDrawer = false;
@@ -135,22 +212,50 @@ export default defineComponent({
       handleReset();
     }
 
-    function uploadChange(list: string[]) {
-      console.log(list);
+    function uploadChange(file: { filePath: string; fileId: string }) {
+      form.value.advertisementImageUrl = file.filePath;
+      uploadList.value = [file.filePath];
+    }
+
+    function remove(file: string[]) {
+      console.log(file);
+      form.value.advertisementImageUrl = "";
+      uploadList.value = [];
     }
 
     return {
       ...toRefs(state),
-      title,
       formRef,
+      openCityData,
       form,
       uploadUrl,
+      UploadTypeEnum,
       rules: {
-        startTime: { required: true, trigger: ["blur", "input"], message: "请选择广告生效时间" },
-        endTime: { required: true, trigger: ["blur", "input"], message: "请选择广告失效时间" },
-        adUrl: { required: true, trigger: ["blur", "input"], message: "请上传广告" },
+        advertisementEffectiveTimeBegin: {
+          type: "number",
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请选择广告生效时间",
+        },
+        advertisementEffectiveTimeEnd: {
+          type: "number",
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请选择广告失效时间",
+        },
+        advertisementImageUrl: {
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请上传广告图片",
+        },
+        advertisementTitle: {
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请输入广告标题",
+        },
       },
       uploadList,
+      remove,
 
       openDrawer,
       handleReset,

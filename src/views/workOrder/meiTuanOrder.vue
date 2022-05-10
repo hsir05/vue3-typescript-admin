@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full overflow-hidden box-border">
     <!-- 检索 -->
     <n-form
       ref="queryFormRef"
@@ -27,7 +27,7 @@
           filterable
           placeholder="处理状态"
           style="width: 150px"
-          :options="options"
+          :options="processStateData"
         />
       </n-form-item>
 
@@ -38,7 +38,7 @@
           filterable
           placeholder="退款状态"
           style="width: 150px"
-          :options="options"
+          :options="refundTypeData"
         />
       </n-form-item>
 
@@ -47,73 +47,42 @@
       >
     </n-form>
 
-    <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
-      <n-data-table
-        :loading="loading"
-        ref="table"
-        striped
-        :columns="columns"
-        class="box-border"
-        :row-key="getRowKeyId"
-        :data="data"
-        :pagination="pagination"
-      />
-    </div>
+    <BasicTable
+      :data="data"
+      ref="basicTableRef"
+      :row-key="getRowKeyId"
+      :columns="columns"
+      :loading="loading"
+      :itemCount="itemCount"
+      @reload-page="reloadPage"
+      @on-page="handlePage"
+      @on-pagination="handlepagSize"
+    />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, onMounted } from "vue";
+import { defineComponent, ref, h, unref, toRaw, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
+import BasicTable from "@/components/Table/Table.vue";
 import { PaginationState } from "@/api/type";
 import { getMeiTuanPage } from "@/api/workOrder/workOrder";
+import { processStateData, refundTypeData } from "@/config/form";
 export default defineComponent({
   name: "MeiTuanOrder",
+  components: { BasicTable },
   setup() {
     const loading = ref(false);
     const queryFormRef = ref<FormInst | null>(null);
     const itemCount = ref(null);
-
+    const basicTableRef = ref();
+    const data = ref([]);
     const queryForm = ref({
       mtOrderIdEq: null,
       processStateEq: null,
       refundTypeEq: null,
     });
     const message = useMessage();
-
-    onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
-    });
-
-    const getData = async (page: PaginationState) => {
-      loading.value = true;
-      try {
-        let search = { ...queryForm.value };
-        let res = await getMeiTuanPage({ page, search: search });
-        data.value = res.data.content;
-        itemCount.value = res.data.totalElements;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    };
-
-    function query(e: MouseEvent) {
-      e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
-    }
-
-    const data = ref([]);
-
     const columns = [
       {
         title: "序号",
@@ -143,11 +112,20 @@ export default defineComponent({
         title: "处理状态",
         key: "processState",
         align: "center",
+        render(row: tableDataItem) {
+          return h("span", row.processState === 0 ? "未处理" : "未处理");
+        },
       },
       {
         title: "退款类型",
-        key: "sourceType",
+        key: "refundType",
         align: "center",
+        render(row: tableDataItem) {
+          return h(
+            "span",
+            row.processState === 0 ? "不涉及退款" : row.processState === 1 ? "部分退" : "全额退"
+          );
+        },
       },
       {
         title: "退款金额(元)",
@@ -161,18 +139,73 @@ export default defineComponent({
       },
     ];
 
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
+
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryForm.value };
+        let res = await getMeiTuanPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    function query(e: MouseEvent) {
+      e.preventDefault();
+      queryFormRef.value?.validate((errors) => {
+        console.log(2222);
+        if (!errors) {
+          console.log(2222);
+
+          console.log(unref(queryForm));
+          getData({ pageIndex: 1, pageSize: 10 });
+        } else {
+          console.log(errors);
+          message.error("验证失败");
+        }
+      });
+    }
+
+    function reloadPage() {
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
+
+    function handlePage(pagination: PaginationState) {
+      console.log(toRaw(pagination));
+      getData(toRaw(pagination));
+    }
+    function handlepagSize(pagination: PaginationState) {
+      console.log(toRaw(pagination));
+      getData(toRaw(pagination));
+    }
+
     return {
       queryForm,
+      queryFormRef,
       itemCount,
       loading,
       columns,
       data,
+      processStateData,
+      refundTypeData,
       getRowKeyId: (row: tableDataItem) => row.id,
 
       pagination: {
         pageSize: 10,
       },
       options: [],
+      handlePage,
+      handlepagSize,
+      reloadPage,
       query,
     };
   },
