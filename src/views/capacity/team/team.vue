@@ -158,7 +158,7 @@ export default defineComponent({
 
     function handleMember(record: Recordable) {
       const { openDrawer } = teamDrawerRef.value;
-      openDrawer(record);
+      openDrawer(record.operationCompanyDriverClazzId);
     }
     function handleSee() {}
 

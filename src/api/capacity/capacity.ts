@@ -636,6 +636,16 @@ export function getDriverClazzPage(data: DriverClazzPageInter) {
   });
 }
 /**
+ * 班级详情
+ */
+export function getTeamDetail(data: { operationCompanyDriverClazzId: string }) {
+  return http.request({
+    url: "/operationCompanyDriverClazz/detail",
+    method: "post",
+    data: data,
+  });
+}
+/**
  * 班级管理分页
  */
 export function getMemberList(data: { operationCompanyDriverClazzId: string }) {
