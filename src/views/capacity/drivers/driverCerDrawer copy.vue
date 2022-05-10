@@ -5,7 +5,7 @@
     :width="1000"
     @on-close-after="onCloseAfter"
   >
-    <n-spin :show="loading" class="h-full">
+    <n-spin :show="loading" class="mt-70px">
       <div class="img-info">
         <div class="img-box" v-if="!loading">
           <p class="title mt-10px mb-10px">司机免冠照片</p>
@@ -157,32 +157,36 @@ export default defineComponent({
       try {
         let res = await getDriverDetail({ driverId });
         console.log(res);
+        console.log("-------------------------------------");
+        // console.log(res.data.driver);
+
         state.data = res.data;
 
-        state.driverIdentificationPhoto = res.data.driver.driverIdentificationPhoto || {
-          filePath: " ",
-          fileId: "",
-        };
+        state.driverIdentificationPhoto = res.data.driver.driverIdentificationPhoto;
         state.driverBaiduFaceRecognitionPhoto = res.data.driver.driverBaiduFaceRecognitionPhoto || {
           filePath: " ",
-          fileId: "",
         };
 
-        let iFilePath = res.data.driver.driverIdentityFaceSide;
-        let iOFilePath = res.data.driver.driverIdentityOtherSide;
-        state.driverIdentityFaceSide = iFilePath ? iFilePath.filePath : " ";
-        state.driverIdentityOtherSide = iOFilePath ? iOFilePath.filePath : " ";
+        state.driverIdentityFaceSide = res.data.driver.driverIdentityFaceSide;
+        state.driverIdentityOtherSide = res.data.driver.driverIdentityOtherSide || {
+          filePath: " ",
+        };
 
-        let lFilePath = res.data.driver.driverLicenseFaceSide;
-        let lOFilePath = res.data.driver.driverLicenseOtherSide;
-        state.driverLicenseFaceSide = lFilePath ? lFilePath.filePath : " ";
-        state.driverLicenseOtherSide = lOFilePath ? lOFilePath.filePath : " ";
+        state.driverLicenseFaceSide = res.data.driver.driverLicenseFaceSide || { filePath: " " };
+        state.driverLicenseOtherSide = res.data.driver.driverLicenseOtherSide || { filePath: " " };
 
-        let cFilePath = res.data.driver.driverNetworkVehicleCertificateFaceSide;
-        let cOFilePath = res.data.driver.driverNetworkVehicleCertificateFaceSide;
+        // let filePath = res.data.driver.driverNetworkVehicleCertificateFaceSide
+        // let otherFilePath = res.data.driver.driverNetworkVehicleCertificateOtherSide
 
-        state.driverNetworkVehicleCertificateFaceSide = cFilePath ? cFilePath.filePath : " ";
-        state.driverNetworkVehicleCertificateOtherSide = cOFilePath ? cOFilePath.filePath : " ";
+        state.driverNetworkVehicleCertificateFaceSide = res.data.driver
+          .driverNetworkVehicleCertificateFaceSide || { filePath: " " };
+        // state.driverNetworkVehicleCertificateFaceSide = otherFilePath ? otherFilePath.filePath : " ";
+        state.driverNetworkVehicleCertificateFaceSide = res.data.driver
+          .driverNetworkVehicleCertificateOtherSide || { filePath: " " };
+        // state.driverNetworkVehicleCertificateOtherSide =
+        //     res.data.driver.driverNetworkVehicleCertificateOtherSide.filePath;
+
+        console.log(state);
 
         state.loading = false;
       } catch (err) {

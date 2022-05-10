@@ -48,7 +48,7 @@
           v-model:value="queryValue.driverStateEq"
           placeholder="选择司机状态"
           @update:value="handleUpdateValue"
-          :options="vehicleTypeData"
+          :options="driverStateData"
         />
       </n-form-item>
 
@@ -107,6 +107,7 @@ import { tableDataItem } from "./type";
 import { useMessage, NTag } from "naive-ui";
 import { getDriverPage, initPassword } from "@/api/capacity/capacity";
 import { PaginationState } from "@/api/type";
+import { getDict } from "@/api/common/common";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "Drivers",
@@ -115,6 +116,7 @@ export default defineComponent({
     const loading = ref(false);
     const message = useMessage();
     const driversDrawerRef = ref();
+    const driverStateData = ref();
     const vehicleTypeData = ref([]);
     const companyData = ref([]);
 
@@ -186,7 +188,7 @@ export default defineComponent({
       },
       {
         title: "运营企业",
-        key: "operationCompany",
+        key: "operationCompanyName",
         width: 110,
         align: "center",
         ellipsis: {
@@ -283,9 +285,23 @@ export default defineComponent({
     ];
 
     onMounted(() => {
+      getDriverSrtate();
       getAllCompanyData();
       getData({ pageIndex: 1, pageSize: 10 });
     });
+
+    const getDriverSrtate = async () => {
+      try {
+        let res = await getDict({ parentEntryCode: "DS00000" });
+        console.log(res);
+
+        driverStateData.value = res.data.map((item: { entryName: string; entryCode: string }) => {
+          return { label: item.entryName, value: item.entryCode };
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getAllCompanyData = async () => {
       try {
@@ -398,6 +414,7 @@ export default defineComponent({
 
     return {
       queryValue,
+      driverStateData,
       data,
       loading,
       driversDrawerRef,
