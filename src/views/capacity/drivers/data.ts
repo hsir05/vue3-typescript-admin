@@ -13,6 +13,11 @@ export const rules = {
   driverEmergencyContactPhone: { required: true, trigger: ["blur", "input"], message: "请输入联系人电话" },
 };
 
+export const addressRules = {
+    driverHomeAddress: {required: true,trigger: ["blur", "input"],message: "请输入司机家庭地址"},
+    driverHomeAddressDetail: { required: true, trigger: ["blur", "input"], message: "请输入司机详细家庭地址",}
+}
+
 
 export const identityRules = {
     driverIdentityCardNo:{ required: true, trigger: ["blur", "input"], message: "请输入正确格式的身份证号码" },

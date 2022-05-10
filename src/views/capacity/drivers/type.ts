@@ -15,7 +15,15 @@ export interface tableDataItem {
   createTime?: number | null;
 }
 
-export interface certificatesState {
+export interface DriverAddressInter{
+    driverId: string
+    driverHomeAddress: string
+    driverHomeAddressDetail: string
+    lng: number
+    lat: number
+}
+
+export interface CertificatesState {
   bareheadedPhoto: string | null;
   takePhotos: string | null;
   frontPhoto: string | null;

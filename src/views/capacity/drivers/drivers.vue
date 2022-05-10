@@ -351,7 +351,7 @@ export default defineComponent({
     }
     function handleAddress(record: Recordable) {
       const { openDrawer } = addressDrawerRef.value;
-      openDrawer("司机家庭地址编辑", record);
+      openDrawer(record.driverId);
     }
 
     async function resetPassword(record: Recordable) {

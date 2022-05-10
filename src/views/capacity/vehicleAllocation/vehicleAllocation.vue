@@ -62,11 +62,10 @@
       :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <AgentDrawer ref="agentDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <AgentDrawer ref="agentDrawerRef" :width="700" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -99,10 +98,10 @@ export default defineComponent({
     const data = ref<tableDataItem[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
+      //   {
+      //     type: "selection",
+      //     align: "center",
+      //   },
       {
         title: "序号",
         key: "index",
@@ -135,13 +134,16 @@ export default defineComponent({
 
       {
         title: "车辆类型",
-        key: "vehicleFuelTypes",
+        key: "vehicleTypeName",
         align: "center",
       },
       {
         title: "运营企业",
         key: "operationCompanyName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "当前绑定司机",
@@ -156,10 +158,10 @@ export default defineComponent({
           return h(
             NTag,
             {
-              type: row.vehicleState === 1 ? "success" : "error",
+              type: row.vehicleState === 0 ? "success" : "error",
             },
             {
-              default: () => (row.vehicleState === 1 ? "正常" : "锁定"),
+              default: () => (row.vehicleState === 0 ? "正常" : "锁定"),
             }
           );
         },
@@ -213,6 +215,8 @@ export default defineComponent({
       try {
         let search = { ...queryValue.value };
         let res = await getVehicleBindingPage({ page, search: search });
+        console.log(res);
+
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -222,14 +226,10 @@ export default defineComponent({
       }
     };
 
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
     function handleAlloca(record: Recordable) {
       console.log("点击了车辆分配", record);
       const { openDrawer } = agentDrawerRef.value;
-      openDrawer("车辆分配", record);
+      openDrawer(record);
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -285,7 +285,6 @@ export default defineComponent({
       reloadPage,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

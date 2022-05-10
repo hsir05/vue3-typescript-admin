@@ -1,39 +1,38 @@
 <template>
-  <BasicDrawer
-    v-model:show="isDrawer"
-    :width="1200"
-    title="车辆分配"
-    @on-close-after="onCloseAfter"
-  >
+  <BasicDrawer v-model:show="isDrawer" title="车辆分配" @on-close-after="onCloseAfter">
     <n-descriptions label-placement="left" :column="1" bordered title="车辆信息">
-      <n-descriptions-item label="运营企业"
-        >兰州益民出行汽车服务有限公司大庆分公司</n-descriptions-item
-      >
+      <n-descriptions-item label="运营企业">{{
+        vehicleData.operationCompanyName
+      }}</n-descriptions-item>
     </n-descriptions>
     <n-descriptions label-placement="left" :column="2" bordered style="margin-top: -1px">
-      <n-descriptions-item label="车牌号">黒E135CW</n-descriptions-item>
-      <n-descriptions-item label="车辆品牌">东风日产</n-descriptions-item>
-      <n-descriptions-item label="车系">暂无</n-descriptions-item>
-      <n-descriptions-item label="车辆型号">FV7126BADBB</n-descriptions-item>
-      <n-descriptions-item label="车辆颜色">黑</n-descriptions-item>
-      <n-descriptions-item label="车辆类型">专车-经济型</n-descriptions-item>
-      <n-descriptions-item label="添加时间">2020-03-04 00:00:00</n-descriptions-item>
+      <n-descriptions-item label="车牌号">{{ vehicleData.plateNumber }}</n-descriptions-item>
+      <n-descriptions-item label="车辆品牌">{{ vehicleData.vehicleBrand }}</n-descriptions-item>
+      <n-descriptions-item label="车系">{{ vehicleData.vehicleSeries }}</n-descriptions-item>
+      <n-descriptions-item label="车辆型号">{{ vehicleData.vehicleModel }}</n-descriptions-item>
+      <n-descriptions-item label="车辆颜色">{{ vehicleData.vehicleColor }}</n-descriptions-item>
+      <n-descriptions-item label="车辆类型">{{ vehicleData.vehicleTypeName }}</n-descriptions-item>
+      <n-descriptions-item label="添加时间">{{ vehicleData.createTime }}</n-descriptions-item>
     </n-descriptions>
     <!-- 搜索司机 -->
-    <div class="m-10px flex-align-start">
+    <div class="m-10px flex-align-start mt-30px">
       <n-form-item
         ref="formRef"
+        :loading="selectLoading"
+        path="driverNo"
         label-width="70"
         label="搜索司机"
         label-placement="left"
         :rule="rule"
       >
         <n-select
-          v-model:value="driver"
+          v-model:value="driverId"
+          remote
           clearable
           filterable
           placeholder="选择司机"
-          style="width: 260px"
+          style="width: 320px"
+          @search="handleSearch"
           :options="options"
         />
       </n-form-item>
@@ -47,21 +46,39 @@
       </n-button>
     </div>
 
-    <n-divider title-placement="left">已分配司机</n-divider>
+    <DirverCard
+      :driverInfo="queryDriverData"
+      v-if="queryDriverData"
+      :isBind="false"
+      @on-update="handleBindDriver"
+    />
+
+    <n-divider title-placement="left" style="margin-top: 10px">已分配司机</n-divider>
     <div class="driver-show">
-      <DirverCard :driverInfo="driverInfo" @on-update="handle" />
-      <DirverCard :driverInfo="driverInfo" @on-update="handle" />
+      <DirverCard
+        :driverInfo="item"
+        :isBind="true"
+        v-for="item in bindDriverData"
+        :key="item.operationCompanyDriverId"
+        @on-update="handleUnbindDriver"
+      />
     </div>
   </BasicDrawer>
 </template>
 <script lang="ts">
 import { defineComponent, ref, reactive, toRefs } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { FormInst, useMessage, SelectOption } from "naive-ui";
+import { tableDataItem, DriverInfoInter } from "./type";
 import { ApiFilled as ApiOutIcon } from "@vicons/antd";
 import DirverCard from "./dirverCard.vue";
-import { bindDriverList } from "@/api/capacity/capacity";
-import loading from "naive-ui/lib/_internal/loading";
+import {
+  bindDriverList,
+  bindDriver,
+  findNoDriver,
+  getDriverSimple,
+  unbindDriver,
+} from "@/api/capacity/capacity";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "VehicleAllDrawer",
   components: { DirverCard },
@@ -71,79 +88,175 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
     });
-    const title = ref("车辆分配");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const driver = ref(null);
+    const operationCompanyDriverId = ref();
+    const driverId = ref();
+
+    const vehicleData = ref();
+    const selectLoading = ref(false);
+    const options = ref<SelectOption[]>([]);
+
+    const bindDriverData = ref();
+    const queryDriverData = ref<DriverInfoInter | null>(null);
 
     function openDrawer(record: tableDataItem) {
-      console.log(record);
-      getData(record.operationCompanyVehicleId as string);
+      const {
+        operationCompanyName,
+        operationCompanyId,
+        plateNumber,
+        operationCompanyVehicleId,
+        vehicleTypeName,
+        vehicleColor,
+        vehicleBrand,
+        vehicleSeries,
+        vehicleModel,
+        createTime,
+      } = record;
+
+      vehicleData.value = {
+        operationCompanyName,
+        plateNumber,
+        operationCompanyId,
+        vehicleTypeName,
+        operationCompanyVehicleId,
+        vehicleColor,
+        vehicleBrand,
+        vehicleSeries,
+        vehicleModel,
+        createTime: dayjs(createTime).format("YYYY-MM-DD HH:mm"),
+      };
+      getData();
       state.isDrawer = true;
     }
 
-    const getData = async (operationCompanyVehicleId: string) => {
+    const getData = async () => {
       try {
-        loading.value = true;
-        let res = await bindDriverList({ operationCompanyVehicleId });
+        state.loading = true;
+        let res = await bindDriverList({
+          operationCompanyVehicleId: vehicleData.value.operationCompanyVehicleId,
+        });
         console.log(res);
+        bindDriverData.value = res.data;
 
-        loading.value = false;
+        state.loading = false;
       } catch (err) {
         console.log(err);
-        loading.value = false;
+        state.loading = false;
+      }
+    };
+
+    const handleSearch = async (query: string) => {
+      if (!query.length) {
+        options.value = [];
+        return;
+      }
+      selectLoading.value = true;
+      try {
+        let res = await findNoDriver({
+          driverNoHeader: query,
+          operationCompanyId: vehicleData.value.operationCompanyId,
+        });
+        options.value = res.data.map((item: { driverId: string; driverNo: string }) => {
+          return {
+            label: item.driverNo,
+            value: item.driverId,
+          };
+        });
+        selectLoading.value = false;
+      } catch (err) {
+        console.log(err);
+        selectLoading.value = false;
       }
     };
 
     async function handleValidate() {
       try {
-        await formRef.value?.validate();
-        console.log(driver.value);
-        handleSaveAfter();
+        await formRef.value?.validate(driverId.value);
+        formRef.value?.restoreValidation();
+        getDriverSimple;
+        let res = await getDriverSimple({ driverId: driverId.value });
+        queryDriverData.value = res.data;
+        console.log(res);
       } catch (err) {
         console.log(err);
-        message.error("验证失败");
       }
     }
 
+    const handleBindDriver = async (operationCompanyDriverId: string) => {
+      try {
+        state.loading = true;
+        let res = await bindDriver({
+          operationCompanyVehicleId: vehicleData.value.operationCompanyVehicleId,
+          operationCompanyDriverId: operationCompanyDriverId,
+        });
+        console.log(res);
+
+        options.value = [];
+        driverId.value = null;
+        queryDriverData.value = null;
+        getData();
+        message.success(window.$tips[res.code]);
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+    async function handleUnbindDriver(operationCompanyDriverId: string) {
+      try {
+        state.loading = true;
+        let res = await unbindDriver({
+          operationCompanyVehicleId: vehicleData.value.operationCompanyVehicleId,
+          operationCompanyDriverId: operationCompanyDriverId,
+        });
+        getData();
+        message.success(window.$tips[res.code]);
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    }
     function handleSaveAfter() {
       emit("on-save-after");
     }
-    function handle(id: number) {
-      console.log(id);
-    }
 
     function handleReset() {
-      driver.value = null;
+      bindDriverData.value = [];
+      options.value = [];
+      driverId.value = null;
+      queryDriverData.value = null;
+      operationCompanyDriverId.value = null;
       formRef.value?.restoreValidation();
     }
 
     function onCloseAfter() {
       state.isDrawer = false;
       state.loading = false;
+
       handleReset();
     }
 
     return {
       ...toRefs(state),
-      driverInfo: {
-        number: 12312,
-        name: "里斯",
-        sex: "男",
-        id: 313123123,
-      },
-      driver,
+      bindDriverData,
+      operationCompanyDriverId,
+      driverId,
       formRef,
-      title,
-      options: [],
-      rule: {
-        driver: { required: true, trigger: ["blur", "change"], message: "请选择司机" },
-      },
+      options,
+      vehicleData,
+      queryDriverData,
+      selectLoading,
+      rule: { required: true, trigger: ["blur", "change"], message: "请选择司机" },
       onCloseAfter,
+      handleSearch,
+      handleBindDriver,
       openDrawer,
-      handle,
+      handleUnbindDriver,
       ApiOutIcon,
       handleValidate,
+      handleSaveAfter,
     };
   },
 });

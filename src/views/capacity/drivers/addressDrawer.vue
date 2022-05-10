@@ -1,42 +1,70 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" :width="700" @on-close-after="onCloseAfter">
+  <BasicDrawer
+    v-model:show="isDrawer"
+    title="司机家庭地址编辑"
+    :width="700"
+    @on-close-after="onCloseAfter"
+  >
     <n-form
       ref="formRef"
-      :rules="rules"
-      size="large"
+      :rules="addressRules"
       :disabled="disabled"
       label-placement="left"
-      :style="{ maxWidth: '440px' }"
+      :style="{ maxWidth: '540px' }"
       require-mark-placement="right-hanging"
-      label-width="140"
+      label-width="170"
       :model="form"
     >
-      <n-form-item label="司机详细家庭地址" path="address">
-        <n-input v-model:value="form.address" clearable placeholder="输入司机详细家庭地址" />
+      <n-form-item label="司机家庭地址" path="driverHomeAddress">
+        <n-input
+          v-model:value="form.driverHomeAddress"
+          clearable
+          :maxlength="100"
+          placeholder="输入司机详细家庭地址"
+        />
+      </n-form-item>
+
+      <n-form-item label="司机详细家庭地址" path="driverHomeAddressDetail">
+        <n-input
+          v-model:value="form.driverHomeAddressDetail"
+          clearable
+          :maxlength="100"
+          placeholder="输入司机详细家庭地址"
+        />
+      </n-form-item>
+
+      <n-form-item label="司机家庭地址地图位置">
+        <n-input-group>
+          <n-input-number v-model:value="form.lng" :disabled="true" :style="{ width: '50%' }" />
+          <n-input-number v-model:value="form.lat" :disabled="true" :style="{ width: '50%' }" />
+        </n-input-group>
       </n-form-item>
     </n-form>
 
-    <div class="text-center flex-center">
-      <n-button
-        attr-type="button"
-        :loading="loading"
-        size="large"
-        type="primary"
-        @click="handleValidate"
-        >保存</n-button
-      >
-      <n-button attr-type="button" type="warning" size="large" class="ml-10px" @click="handleReset"
+    <div class="map-box">
+      <BaiduMap ref="baiduMapRef" />
+    </div>
+
+    <div class="text-center flex-center mt-20px">
+      <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+        >保存
+      </n-button>
+      <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
         >重置</n-button
       >
     </div>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs, unref } from "vue";
+import { defineComponent, reactive, ref, toRefs } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { addressState } from "./type";
+import { saveDriverAddress, getDriverDetail } from "@/api/capacity/capacity";
+import BaiduMap from "@/components/Map/BaiduMap.vue";
+import { DriverAddressInter } from "./type";
+import { addressRules } from "./data";
 export default defineComponent({
   name: "AddressDrawer",
+  components: { BaiduMap },
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const state = reactive({
@@ -44,45 +72,81 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
-    const title = ref("司机家庭地址编辑");
     const message = useMessage();
+    const baiduMapRef = ref();
 
     const formRef = ref<FormInst | null>(null);
-    const form = ref<addressState>({
-      address: null,
-      lng: null,
-      lat: null,
+    const form = ref<DriverAddressInter>({
+      driverId: " ",
+      driverHomeAddress: " ",
+      driverHomeAddressDetail: " ",
+      lng: 0,
+      lat: 0,
     });
-
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
-
-          handleSaveAfter();
-
-          message.success("验证成功");
+          try {
+            let res = await saveDriverAddress(form.value);
+            console.log(res);
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+            state.loading = false;
+          } catch (err) {
+            console.log(err);
+            state.loading = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
 
-    function openDrawer(t: string, record?: addressState) {
-      console.log(record);
-      if (!record) {
-        state.disabled = true;
-        state.isDrawer = true;
-      } else if (record) {
-        form.value = { ...form.value, ...record };
-      }
-      title.value = t;
+    function openDrawer(driverId: string) {
+      getDetail(driverId);
       state.isDrawer = true;
     }
+
+    const getDetail = async (driverId: string) => {
+      state.loading = true;
+      try {
+        let res = await getDriverDetail({ driverId });
+        const {
+          driverHomeAddress,
+          driverHomeAddressDetail,
+          driverHomeAddressLongitude,
+          driverHomeAddressLatitude,
+        } = res.data.driver;
+        console.log(
+          driverHomeAddress,
+          driverHomeAddressDetail,
+          driverHomeAddressLongitude,
+          driverHomeAddressLatitude
+        );
+        form.value = {
+          driverId,
+          driverHomeAddress,
+          driverHomeAddressDetail,
+          lng: driverHomeAddressLongitude || 103.824048,
+          lat: driverHomeAddressLatitude || 36.061509,
+        };
+        console.log(form.value);
+
+        const { renderBaiduMap } = baiduMapRef.value;
+        const { createMarker } = await renderBaiduMap(form.value.lng, form.value.lat);
+        createMarker((lng: number, lat: number) => {
+          console.log(lng, lat);
+        });
+
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        message.error("司机信息获取失败,请稍候重试");
+        state.loading = false;
+      }
+    };
 
     function handleReset() {}
 
@@ -98,17 +162,10 @@ export default defineComponent({
 
     return {
       ...toRefs(state),
-      title,
       formRef,
       form,
-      rules: {
-        address: {
-          required: true,
-          trigger: ["blur", "input"],
-          message: "请输入司机的详细家庭地址",
-        },
-      },
-
+      baiduMapRef,
+      addressRules,
       onCloseAfter,
       openDrawer,
       handleReset,
@@ -117,3 +174,8 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss" scoped>
+.map-box {
+  height: 600px;
+}
+</style>

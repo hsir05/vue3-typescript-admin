@@ -47,6 +47,7 @@ async function renderBaiduMap(lng: number, lat: number) {
     marker.enableDragging();
     //@ts-ignore
     marker.addEventListener("dragend", function (e) {
+      console.log(e);
       console.log("当前位置：" + e.point.lng + ", " + e.point.lat);
       callback(e.point.lng, e.point.lat);
     });

@@ -398,6 +398,23 @@ export function initPassword(data: { driverId: string }) {
   });
 }
 /**
+ * 保存家庭住址
+ */
+interface DriverAddress {
+    driverId: string
+    driverHomeAddress: string
+    driverHomeAddressDetail: string
+    lng: number
+    lat: number
+}
+export function saveDriverAddress(data: DriverAddress) {
+  return http.request({
+    url: "/operationCompanyDriver/saveHomeAddress",
+    method: "post",
+    data: data,
+  });
+}
+/**
  * 司机信息编辑
  */
 interface DriverInter {
@@ -540,11 +557,29 @@ export function getVehicleBindingPage(data: VehicleBindingInter) {
     data: data,
   });
 }
-
+/**
+ * 根据输入的司机工号前4位加企业id查询匹配司机
+ */
+export function findNoDriver(data: { driverNoHeader: string; operationCompanyId: string }) {
+  return http.request({
+    url: "/operationCompanyDriver/findByDriverNoHeader",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 查找简单的司机信息
+ */
+export function getDriverSimple(data: { driverId: string }) {
+  return http.request({
+    url: "/operationCompanyDriver/simpleJsonDetail",
+    method: "post",
+    data: data,
+  });
+}
 /**
  * 根据车辆id查找该车辆当前绑定的司机列表
  */
-
 export function bindDriverList(data: { operationCompanyVehicleId: string }) {
   return http.request({
     url: "/operationCompanyVehicleBinding/bindDriverList",
