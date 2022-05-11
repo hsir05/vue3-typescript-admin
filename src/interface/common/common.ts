@@ -4,3 +4,8 @@ export interface itemState {
   lng: number;
   lat: number;
 }
+
+export interface CityItemInter {
+  label: string;
+  value: string;
+}

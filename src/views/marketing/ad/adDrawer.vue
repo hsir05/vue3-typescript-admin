@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" title="广告编辑" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
       :rules="rules"
@@ -23,10 +23,14 @@
           v-model:value="form.cityCode"
           clearable
           filterable
+          :disabled="form.openCityAdvertisementId && form.cityCode ? true : false"
           placeholder="选择开通城市"
-          style="width: 260px"
           :options="openCityData"
         />
+      </n-form-item>
+
+      <n-form-item label="广告H5url" path="advertisementH5Url">
+        <n-input v-model:value="form.advertisementH5Url" clearable placeholder="输入广告H5url" />
       </n-form-item>
 
       <n-form-item label="广告生效时间" path="advertisementEffectiveTimeBegin">
@@ -43,10 +47,6 @@
           type="datetime"
           clearable
         />
-      </n-form-item>
-
-      <n-form-item label="广告H5url" path="advertisementH5Url">
-        <n-input v-model:value="form.advertisementH5Url" clearable placeholder="输入广告H5url" />
       </n-form-item>
 
       <n-form-item label="广告照片" path="advertisementImageUrl">
@@ -73,15 +73,16 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, onMounted, unref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, reactive, toRefs, ref, onMounted } from "vue";
+import { FormInst, useMessage, SelectOption } from "naive-ui";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { uploadUrl } from "@/config/config";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import { getAllOpenCity } from "@/api/common/common";
 import { itemState } from "@/interface/common/common";
-import { tableDataItem, CityItemInter } from "./type";
-import { getAdDetail } from "@/api/marketing/marketing";
+import { FormInter } from "./type";
+import dayjs from "dayjs";
+import { getAdDetail, addAdvertisement, editAdvertisement } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "AdDrawer",
   components: {
@@ -94,13 +95,14 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
-    const openCityData = ref<CityItemInter[]>([]);
+    const title = ref();
+    const openCityData = ref<SelectOption[]>([]);
 
     const uploadList = ref<string[]>([]);
 
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
+    const form = ref<FormInter>({
       advertisementTitle: null,
       advertisementImageUrl: null,
       cityName: null,
@@ -131,9 +133,12 @@ export default defineComponent({
       }
     }
 
-    function openDrawer(openCityAdvertisementId: string) {
-      getDetail(openCityAdvertisementId);
-
+    function openDrawer(t: string, openCityAdvertisementId: string) {
+      title.value = t;
+      uploadList.value = [];
+      if (openCityAdvertisementId) {
+        getDetail(openCityAdvertisementId);
+      }
       state.isDrawer = true;
     }
 
@@ -172,18 +177,59 @@ export default defineComponent({
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
+          try {
+            let res;
+            const {
+              openCityAdvertisementId,
+              cityCode,
+              advertisementTitle,
+              advertisementImageUrl,
+              advertisementH5Url,
+              advertisementEffectiveTimeBegin,
+              advertisementEffectiveTimeEnd,
+            } = form.value;
 
-          handleSaveAfter();
-
-          message.success("验证成功");
+            if (!form.value.openCityAdvertisementId) {
+              res = await addAdvertisement({
+                cityCode,
+                advertisementTitle,
+                advertisementImageUrl,
+                advertisementH5Url,
+                advertisementEffectiveTimeBegin: dayjs(advertisementEffectiveTimeBegin).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                ),
+                advertisementEffectiveTimeEnd: dayjs(advertisementEffectiveTimeEnd).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                ),
+              });
+              console.log(res);
+            } else {
+              res = await editAdvertisement({
+                openCityAdvertisementId,
+                cityCode,
+                advertisementTitle,
+                advertisementImageUrl,
+                advertisementH5Url,
+                advertisementEffectiveTimeBegin: dayjs(advertisementEffectiveTimeBegin).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                ),
+                advertisementEffectiveTimeEnd: dayjs(advertisementEffectiveTimeEnd).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                ),
+              });
+            }
+            state.loading = false;
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+          } catch (err) {
+            console.log(err);
+            state.loading = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -193,7 +239,9 @@ export default defineComponent({
     }
 
     function handleReset() {
+      const openCityAdvertisementId = form.value.openCityAdvertisementId;
       form.value = {
+        openCityAdvertisementId,
         advertisementTitle: null,
         advertisementImageUrl: null,
         cityName: null,
@@ -203,12 +251,14 @@ export default defineComponent({
         advertisementH5Url: null,
         advertisementSeq: null,
       };
+      uploadList.value = [];
       formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
       state.isDrawer = false;
       state.loading = false;
       state.disabled = false;
+      form.value.openCityAdvertisementId = "";
       handleReset();
     }
 
@@ -219,7 +269,7 @@ export default defineComponent({
 
     function remove(file: string[]) {
       console.log(file);
-      form.value.advertisementImageUrl = "";
+      form.value.advertisementImageUrl = null;
       uploadList.value = [];
     }
 
@@ -253,8 +303,14 @@ export default defineComponent({
           trigger: ["blur", "input"],
           message: "请输入广告标题",
         },
+        advertisementH5Url: {
+          required: false,
+          trigger: ["blur", "input"],
+          message: "请输入广告H5url",
+        },
       },
       uploadList,
+      title,
       remove,
 
       openDrawer,

@@ -1,6 +1,10 @@
 
-export interface tableDataItem{
-    id?: string
+interface VouchersInter {
+
+}
+
+export interface TableDataItemInter{
+    customerCouponConsumeRuleId: string
     phone: null | string
     startTime: null | string
     endTime: null | string

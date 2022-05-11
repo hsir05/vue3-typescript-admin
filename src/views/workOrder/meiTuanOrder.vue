@@ -8,7 +8,7 @@
       class="pt-15px pb-15px bg-white mb-5px"
       require-mark-placement="right-hanging"
       :show-feedback="false"
-      label-width="130"
+      label-width="120"
       :model="queryForm"
     >
       <n-form-item label="美团订单编号" path="mtOrderIdEq">
@@ -16,7 +16,7 @@
           v-model:value="queryForm.mtOrderIdEq"
           clearable
           placeholder="输入美团订单编号"
-          style="width: 150px"
+          style="width: 190px"
         />
       </n-form-item>
 
@@ -61,8 +61,8 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, toRaw, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
+import { FormInst } from "naive-ui";
 import { tableDataItem } from "./type";
 import BasicTable from "@/components/Table/Table.vue";
 import { PaginationState } from "@/api/type";
@@ -82,7 +82,7 @@ export default defineComponent({
       processStateEq: null,
       refundTypeEq: null,
     });
-    const message = useMessage();
+    // const message = useMessage();
     const columns = [
       {
         title: "序号",
@@ -113,7 +113,7 @@ export default defineComponent({
         key: "processState",
         align: "center",
         render(row: tableDataItem) {
-          return h("span", row.processState === 0 ? "未处理" : "未处理");
+          return h("span", row.processState === 0 ? "未处理" : "已处理");
         },
       },
       {
@@ -123,7 +123,7 @@ export default defineComponent({
         render(row: tableDataItem) {
           return h(
             "span",
-            row.processState === 0 ? "不涉及退款" : row.processState === 1 ? "部分退" : "全额退"
+            row.refundType === 0 ? "不涉及退款" : row.refundType === 1 ? "部分退" : "全额退"
           );
         },
       },
@@ -160,15 +160,10 @@ export default defineComponent({
     function query(e: MouseEvent) {
       e.preventDefault();
       queryFormRef.value?.validate((errors) => {
-        console.log(2222);
         if (!errors) {
-          console.log(2222);
-
-          console.log(unref(queryForm));
           getData({ pageIndex: 1, pageSize: 10 });
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -196,13 +191,9 @@ export default defineComponent({
       columns,
       data,
       processStateData,
+      basicTableRef,
       refundTypeData,
       getRowKeyId: (row: tableDataItem) => row.id,
-
-      pagination: {
-        pageSize: 10,
-      },
-      options: [],
       handlePage,
       handlepagSize,
       reloadPage,

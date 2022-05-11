@@ -57,7 +57,7 @@
               <span :class="['border-item', 'width-70', index % 2 === 0 ? '' : 'striped']">{{
                 getValResult(val.entryCode, item.entryCode).result
                   ? getValResult(val.entryCode, item.entryCode).operationCompany
-                      .operationCompanyName
+                      ?.operationCompanyName
                   : "暂未开通"
               }}</span>
             </div>
@@ -148,7 +148,7 @@
           </n-button>
         </div>
       </template>
-      <n-empty v-if="!isShow & !isEdit" class="empty" />
+      <n-empty v-if="!(isShow && isEdit)" class="empty" />
     </div>
   </div>
 </template>
@@ -378,7 +378,7 @@ export default defineComponent({
       }
     }
 
-    const toggle = (orderType: string, orderBusinessType: string, editObj?: formState) => {
+    const toggle = (orderType: string, orderBusinessType: string, editObj?: resutlState) => {
       if (!operationCompanyId.value) {
         message.warning("请选择运营企业后添加");
         return false;

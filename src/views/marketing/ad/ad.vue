@@ -49,6 +49,7 @@
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import { FormInst, useMessage, NImage } from "naive-ui";
 import {
   TrashOutline as RemoveIcon,
   CreateOutline as CreateIcon,
@@ -57,13 +58,15 @@ import {
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import AdDrawer from "./adDrawer.vue";
-import { tableDataItem, CityItemInter } from "./type";
-import { itemState } from "@/interface/common/common";
+import { TableDataItemInter } from "./type";
+import { itemState, CityItemInter } from "@/interface/common/common";
+
 import { statusOptions } from "@/config/form";
-import { getAdPage } from "@/api/marketing/marketing";
+import { getAdPage, removeAd, upAdvertisement, downAdvertisement } from "@/api/marketing/marketing";
 import { getAllOpenCity } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
-import { FormInst, NImage } from "naive-ui";
+import dayjs from "dayjs";
+
 export default defineComponent({
   name: "Ad",
   components: { BasicTable, AdDrawer },
@@ -77,8 +80,8 @@ export default defineComponent({
 
     const cityCodeEq = ref("all");
     const queryFormRef = ref<FormInst | null>(null);
-    // const message = useMessage();
-    const data = ref<tableDataItem[]>([]);
+    const message = useMessage();
+    const data = ref<TableDataItemInter[]>([]);
 
     const columns = [
       {
@@ -86,7 +89,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -97,7 +100,7 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
-        render(row: tableDataItem) {
+        render(row: TableDataItemInter) {
           return h(NImage as any, {
             src: row.advertisementImageUrl,
             width: 30,
@@ -127,16 +130,31 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
+        render(record: TableDataItemInter) {
+          return h(
+            "span",
+            dayjs(record.advertisementEffectiveTimeBegin).format("YYYY-MM-DD HH:mm")
+          );
+        },
       },
       {
         title: "广告失效时间",
         key: "advertisementEffectiveTimeEnd",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.advertisementEffectiveTimeEnd).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "广告H5url",
         key: "advertisementH5Url",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "排序",
@@ -151,7 +169,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -159,7 +177,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowBackIcon,
-                onClick: handleUp.bind(null, record),
+                onClick: handleUp.bind(null, record.openCityAdvertisementId),
                 auth: ["dict001"],
               },
               {
@@ -167,7 +185,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowIcon,
-                onClick: handleDown.bind(null, record),
+                onClick: handleDown.bind(null, record.openCityAdvertisementId),
                 auth: ["dict001"],
               },
               {
@@ -240,26 +258,49 @@ export default defineComponent({
       }
     };
 
-    function handleUp(record: Recordable) {
-      console.log("点击了编辑", record.openCityAdvertisementId);
+    async function handleUp(openCityAdvertisementId: string) {
+      try {
+        let res = await upAdvertisement({ openCityAdvertisementId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
-    function handleDown(record: Recordable) {
-      console.log("点击了编辑", record.openCityAdvertisementId);
+    async function handleDown(openCityAdvertisementId: string) {
+      try {
+        let res = await downAdvertisement({ openCityAdvertisementId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.openCityAdvertisementId);
       const { openDrawer } = adDrawerRef.value;
-      openDrawer(record.openCityAdvertisementId);
+      openDrawer("编辑城市广告", record.openCityAdvertisementId);
     }
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = adDrawerRef.value;
-      openDrawer("添加城市广告", cityCodeEq.value);
+      openDrawer("添加城市广告");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    async function handleRemove(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await removeAd({ openCityAdvertisementId: record.openCityAdvertisementId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     function reloadPage() {
@@ -293,7 +334,6 @@ export default defineComponent({
       statusOptions,
       columns,
       itemCount,
-      getRowKeyId: (row: tableDataItem) => row.openCityAdvertisementId,
       queryRule: {
         trigger: ["input", "blur"],
         validator() {

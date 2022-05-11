@@ -19,9 +19,6 @@ interface companyState {
 }
 export interface formState {
     areaCode: string
-    // operationCompany: companyState
-    // operationCompanyOrderDistanceId: string
-    // operationCompanyUndertakeBusinessId: string
     orderBusinessType: string
     orderType: string
 }
