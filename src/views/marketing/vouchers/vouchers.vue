@@ -54,7 +54,7 @@
       :row-key="getRowKeyId"
       :loading="loading"
       :itemCount="itemCount"
-      @isAddBtn="true"
+      :isAddBtn="true"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-page="handlePage"
