@@ -5,14 +5,30 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="120"
+      label-width="90"
       class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="客户手机号" path="phone">
-        <n-input v-model:value="queryValue.phone" clearable placeholder="输入客户手机号" />
+      <n-form-item label="司机工号" path="driverNoLike">
+        <n-input
+          v-model:value="queryValue.driverNoLike"
+          clearable
+          placeholder="输入司机工号"
+          style="width: 200px"
+        />
       </n-form-item>
+
+      <n-form-item label="所在企业名称" path="operationCompanyIdEq">
+        <n-select
+          clearable
+          filterable
+          v-model:value="queryValue.operationCompanyIdEq"
+          placeholder="选择所在企业名称"
+          :options="companyData"
+        />
+      </n-form-item>
+
       <n-form-item>
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
@@ -34,7 +50,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -54,102 +70,121 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, reactive } from "vue";
+import { defineComponent, ref, toRaw, h, onMounted, reactive } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import TransactionRecord from "./transactionRecordDrawer.vue";
 import ThresholdModal from "./thresholdModal.vue";
-import { tableDataItem } from "./type";
+import { TableItemInter } from "./type";
+import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 import { pageSizes } from "@/config/table";
 import { ReaderOutline as ReaderIcon } from "@vicons/ionicons5";
 import { PayCircleOutlined as PayCircleIcon } from "@vicons/antd";
+import { getAllOperateCompany } from "@/api/common/common";
+
+import { getWalletPage } from "@/api/driverFinance/driverFinance";
 export default defineComponent({
   name: "Wallet",
   components: { TransactionRecord, ThresholdModal },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
-      phone: "",
+      driverNoLike: null,
+      operationCompanyIdEq: null,
     });
     const loading = ref(false);
     const itemCount = ref(null);
     const transactionRecordRef = ref();
     const thresholdModalRef = ref();
+    const companyData = ref([]);
+
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
     const message = useMessage();
 
     const columns = [
-      {
-        type: "selection",
-      },
+      // {
+      //     type: "selection",
+      // },
       {
         title: "序号",
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
-        title: "客户昵称",
-        key: "nickname",
+        title: "司机工号",
+        key: "driverNo",
         align: "center",
       },
       {
-        title: "客户姓名",
-        key: "name",
+        title: "司机姓名",
+        key: "driverFullName",
         align: "center",
       },
       {
-        title: "客户手机号",
-        key: "phone",
+        title: "司机性别",
+        key: "driverGender",
+        align: "center",
+        render(row: TableItemInter) {
+          return h(
+            "span",
+            `${row.driverGender === 1 ? "男" : row.driverGender === 0 ? "女" : "未知"}`
+          );
+        },
+      },
+      {
+        title: "司机手机号",
+        key: "driverPhone",
         align: "center",
       },
       {
-        title: "实充余额",
-        key: "actualAmount",
+        title: "运营企业",
+        key: "operationCompanyName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
-        title: "赠送余额",
-        key: "giveAmount",
-        width: 90,
+        title: "总金额",
+        key: "totalBalance",
         align: "center",
       },
-
       {
         title: "冻结金额",
         key: "frozenAmount",
-        width: 90,
         align: "center",
       },
       {
         title: "可用余额",
-        key: "availableAmount",
+        key: "availablealance",
         align: "center",
       },
       {
-        title: "总余额",
-        key: "totalAmount",
-        width: 90,
+        title: "预留阈值",
+        key: "reserveBalanceLimit",
         align: "center",
       },
       {
         title: "钱包创建时间",
-        key: "amountCreatetime",
-        width: 90,
+        key: "createTime",
         align: "center",
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
-        width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -174,31 +209,57 @@ export default defineComponent({
       },
     ];
 
-    const data = ref([
-      {
-        id: "12313123",
-        nickname: "string",
-        name: "string",
-        phone: "1809798797",
-        actualAmount: "string",
-        giveAmount: "string",
-        frozenAmount: "string",
-        availableAmount: "string",
-        totalAmount: "string",
-        amountCreatetime: "string",
-        create_time: "string",
-      },
-    ]);
+    const data = ref([]);
+
+    onMounted(() => {
+      getAllCompanyData();
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
+
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        console.log(res);
+        companyData.value = res.data.map(
+          (item: { operationCityName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCityName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getWalletPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     const reset = () => {
-      unref(queryValue).phone = "";
+      queryValue.value = {
+        driverNoLike: null,
+        operationCompanyIdEq: null,
+      };
       message.info("点击了删除");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function handleRecord(record: Recordable) {
@@ -213,18 +274,18 @@ export default defineComponent({
     }
     function handlePage(page: number) {
       console.log(page);
-      pagination.page = page;
-      //   getData(toRaw(pagination));
+      pagination.pageIndex = page;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
       console.log(pageSize);
       pagination.pageSize = pageSize;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
 
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -237,7 +298,8 @@ export default defineComponent({
       loading,
       pageSizes,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      companyData,
+      getRowKeyId: (row: TableItemInter) => row.driverWalletId,
       itemCount,
 
       searchHandle,

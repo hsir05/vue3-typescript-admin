@@ -1,5 +1,7 @@
-export interface tableDataItem {
-    id?: string
+export interface TableItemInter {
+    driverWalletId: string
+    createTime: string
+    driverGender: number
 }
 
 export interface formState {

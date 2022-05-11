@@ -13,6 +13,7 @@ declare module 'vue' {
     MemberDetailDrawer: typeof import('./src/components/memberDetail/memberDetailDrawer.vue')['default']
     MessageContent: typeof import('./src/components/MessageContent/index.vue')['default']
     Modal: typeof import('./src/components/Modal/Modal.vue')['default']
+    NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBadge: typeof import('naive-ui')['NBadge']
     NBreadcrumb: typeof import('naive-ui')['NBreadcrumb']
