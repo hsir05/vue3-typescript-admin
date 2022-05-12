@@ -65,7 +65,7 @@
       </n-pagination>
     </div>
 
-    <TransactionRecord ref="transactionRecordRef" :width="800" @on-save-after="handleSaveAfter" />
+    <TransactionRecord ref="transactionRecordRef" :width="900" @on-save-after="handleSaveAfter" />
     <ThresholdModal ref="thresholdModalRef" />
   </div>
 </template>
@@ -82,7 +82,6 @@ import { pageSizes } from "@/config/table";
 import { ReaderOutline as ReaderIcon } from "@vicons/ionicons5";
 import { PayCircleOutlined as PayCircleIcon } from "@vicons/antd";
 import { getAllOperateCompany } from "@/api/common/common";
-
 import { getWalletPage } from "@/api/driverFinance/driverFinance";
 export default defineComponent({
   name: "Wallet",
@@ -153,17 +152,17 @@ export default defineComponent({
         },
       },
       {
-        title: "总金额",
+        title: "总金额(元)",
         key: "totalBalance",
         align: "center",
       },
       {
-        title: "冻结金额",
+        title: "冻结金额(元)",
         key: "frozenAmount",
         align: "center",
       },
       {
-        title: "可用余额",
+        title: "可用余额(元)",
         key: "availablealance",
         align: "center",
       },
@@ -263,14 +262,16 @@ export default defineComponent({
     };
 
     function handleRecord(record: Recordable) {
-      console.log(record);
       const { openDrawer } = transactionRecordRef.value;
-      openDrawer();
+      openDrawer(record.driverWalletId);
     }
     function handleThreshold(record: Recordable) {
       console.log(record);
       const { handleModal } = thresholdModalRef.value;
-      handleModal();
+      handleModal({
+        reserveBalanceLimit: record.reserveBalanceLimit,
+        driverWalletId: record.driverWalletId,
+      });
     }
     function handlePage(page: number) {
       console.log(page);

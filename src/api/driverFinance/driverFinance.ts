@@ -53,7 +53,7 @@ export function getWalletDetail(data: {driverWalletId: string}) {
 /**
  * 修改司机钱包预留阈值
  */
-export function getBalanceLimit(data: { driverWalletId: string;reserveBalanceLimit: string }) {
+export function updateBalanceLimit(data: { driverWalletId: string;reserveBalanceLimit: number }) {
     return http.request({
         url: "/driverWallet/updateReserveBalanceLimit",
         method: "post",
