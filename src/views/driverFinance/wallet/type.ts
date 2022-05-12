@@ -35,6 +35,4 @@ export interface WalletInfoInter {
   reserveBalanceLimit: number | null;
 }
 
-export interface DealWayIner {
-  [symbol: string]: string;
-}
+

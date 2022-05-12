@@ -1,16 +1,33 @@
-export interface tableDataItem {
-  id?: string;
-  name: null | string;
 
-  specialDiscount: number | null;
-  specialLimit: number | null;
+interface BusRateInter {
+    orderBusinessType: string
+    groupCustomerMemberDiscountRate: number
+}
 
-  fastlDiscount: number | null;
-  fastlLimit: number | null;
+export interface TableItemInter {
+    groupCustomerMemberId: string
+    groupCustomerMemberType:string
+    groupCustomerMemberName:string
+    groupCustomerMemberDesc:string
+    groupCustomerMemberLock: number
+    groupCustomerMemberDiscountRateList: string
+    groupCustomerMemberCreateOrderLimitList:string
+}
 
-  taxilDiscount: number | null;
-  taxilLimit: number | null;
-  descript: null | string;
-  status: number | null;
-  type: string | null;
+
+export interface FormInter {
+    groupCustomerMemberId?: string | null
+    groupCustomerMemberType: string | null
+    groupCustomerMemberName: string | null
+    groupCustomerMemberDesc: string | null
+    groupCustomerMemberLock: number  | null
+    groupCustomerMemberDiscountRateList: string | null
+    groupCustomerMemberCreateOrderLimitList: string | null
+
+    // groupCustomerMemberDiscountRateList: BusRateInter
+    // groupCustomerMemberCreateOrderLimitList: BusRateInter
+}
+export interface FormItem {
+    rate: number | null;
+    limit: number | null
 }

@@ -1,3 +1,5 @@
+import { objIner } from "@/interface/common/common"
+
 export const pageSizes = [
   { label: "每页10条", value: 10 },
   { label: "每页20条", value: 20 },
@@ -40,3 +42,16 @@ export const rangeShortcuts = {
     return [cur - 2 * 60 * 60 * 1000, cur];
   },
 };
+
+export const dealWay: objIner = {
+    DDW0001: "订单收入",
+    DDW0002: "订单奖励收入",
+    DDW0003: "司机提现",
+};
+
+export const memberType: objIner = {
+    CMT0000: "客户会员类型", 
+    CMT0001: "注册会员",
+    CMT0002: "升级会员",
+    CMT0003: "其他会员"
+}

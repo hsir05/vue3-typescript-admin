@@ -9,3 +9,7 @@ export interface CityItemInter {
   label: string;
   value: string;
 }
+
+export interface objIner { 
+  [symbol: string]: string;
+}

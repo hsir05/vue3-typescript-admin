@@ -61,9 +61,10 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, h, ref } from "vue";
-import { RecordTableItemInter, RecordFormInter, DealWayIner } from "./type";
+import { RecordTableItemInter, RecordFormInter } from "./type";
 import WalletDetail from "./walletDetail.vue";
 import { FormInst } from "naive-ui";
+import { dealWay } from "@/config/table";
 import { getRecordPage, getWalletDetail } from "@/api/driverFinance/driverFinance";
 import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
@@ -97,11 +98,6 @@ export default defineComponent({
     });
     const data = ref<RecordTableItemInter[]>([]);
 
-    const dealWay: DealWayIner = {
-      DDW0001: "订单收入",
-      DDW0002: "订单奖励收入",
-      DDW0003: "司机提现",
-    };
     const columns = [
       {
         title: "序号",

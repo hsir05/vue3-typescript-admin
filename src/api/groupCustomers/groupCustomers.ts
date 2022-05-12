@@ -3,12 +3,31 @@ import { PaginationState, } from "../type"
 
 /**---------集团客户会员类型-----------*/
 /**
+ * 集团客户会员类型列表
+*/
+
+interface GroupPageInter{
+  page: PaginationState;
+  search: {
+    groupCustomerMemberNameLike: string | null;
+    groupCustomerMemberLockEq: number | null;
+  };
+}
+export function getGroupMemberPage(data:GroupPageInter) {
+  return http.request({
+    url: "/groupCustomerMember/page",
+    method: "post",
+    data: data
+  });
+}
+/**
  * 集团客户会员类型详情
 */
-export function getGroupMemberDetail() {
+export function getGroupMemberDetail(data: {groupCustomerMemberId: string}) {
   return http.request({
     url: '/groupCustomerMember/detail',
     method: 'post',
+    data:data
   });
 } 
 /**
@@ -21,36 +40,57 @@ export function getGroupPreEdit() {
   });
 }
 /**
- * 集团客户会员类型保存
+ * 集团客户会员类型新增
 */
-export function saveGroupMember() {
+interface BusRateInter {
+    orderBusinessType: string
+    groupCustomerMemberDiscountRate: number
+}
+export interface FormInter {
+    groupCustomerMemberId?: string | null
+    groupCustomerMemberType: string | null
+    groupCustomerMemberName: string | null
+    groupCustomerMemberDesc: string | null
+    groupCustomerMemberLock: number  | null
+    groupCustomerMemberDiscountRateList: BusRateInter
+    groupCustomerMemberCreateOrderLimitList: BusRateInter
+}
+export function addGroupMember(data: FormInter) {
   return http.request({
-    url: '/groupCustomerMember/save',
+    url: '/groupCustomerMember/add',
     method: 'post',
+    data: data
   });
 }
-
 /**
- * 集团客户会员类型列表
+ * 集团客户会员类型编辑
 */
-
-/**
- * 运营企业分页
- */
-interface GroupPageInter{
-  page: PaginationState;
-  search: {
-    memberNameLike: string | null;
-    memberLockEq: number | null;
-  };
-}
-export function getGroupMemberList(data: GroupPageInter) {
+export function editGroupMember(data: FormInter) {
   return http.request({
-    url: "/groupCustomerMember/list",
-    method: "post",
-    data: data,
+    url: '/groupCustomerMember/add',
+    method: 'post',
+    data: data
   });
 }
+
+// /**
+//  * 集团客户会员类型列表
+// */
+
+// interface GroupPageInter{
+//   page: PaginationState;
+//   search: {
+//     customerMemberNameLike: string | null;
+//     customerMemberLockEq: number | null;
+//   };
+// }
+// export function getGroupMemberPage(data:GroupPageInter) {
+//   return http.request({
+//     url: "/groupCustomerMember/list",
+//     method: "post",
+//     data: data
+//   });
+// }
 
 /**-------------集团客户管理--------------*/
 /**
