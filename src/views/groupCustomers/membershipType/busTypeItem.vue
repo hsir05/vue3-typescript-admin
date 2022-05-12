@@ -4,12 +4,12 @@
     :rules="rules"
     :disabled="disabled"
     label-placement="left"
-    :style="{ maxWidth: '350px' }"
+    :style="{ maxWidth: '380px' }"
     require-mark-placement="right-hanging"
     label-width="100"
     :model="form"
   >
-    <n-divider title-placement="left">{{ title }}</n-divider>
+    <n-divider title-placement="left">{{ `业务类型-${orderBusinessTypeName}` }}</n-divider>
     <n-form-item label="会员折扣" path="rate">
       <n-input-number v-model:value="form.rate" :min="0" clearable placeholder="输入会员折扣" />
     </n-form-item>
@@ -33,19 +33,25 @@ import { FormInst } from "naive-ui";
 // import { FormItem } from "./type"
 
 const props = defineProps({
-  title: {
-    type: String,
-    require: true,
-    default: null,
-  },
   rate: {
     type: Number,
+    require: true,
     default: null,
   },
   limit: {
     type: Number,
     require: true,
     default: null,
+  },
+  orderBusinessType: {
+    type: String,
+    require: true,
+    default: " ",
+  },
+  orderBusinessTypeName: {
+    type: String,
+    require: true,
+    default: "",
   },
   disabled: {
     type: Boolean,
@@ -56,7 +62,7 @@ const props = defineProps({
     default: false,
   },
 });
-const { title, disabled, loading, rate, limit } = toRefs(props);
+const { disabled, loading, rate, limit, orderBusinessTypeName } = toRefs(props);
 
 const emit = defineEmits(["validate"]);
 

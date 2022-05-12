@@ -10,19 +10,38 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="会员名称" path="name">
+      <n-form-item label="集团客户名称" path="groupCustomerNameLike">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.groupCustomerNameLike"
           clearable
-          placeholder="输入会员名称"
+          placeholder="输入集团客户名称"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="会员状态" path="radioGroupValue">
-        <n-radio-group v-model:value="queryValue.status">
+      <n-form-item label="联系人姓名" path="contactNameLike">
+        <n-input
+          v-model:value="queryValue.contactNameLike"
+          clearable
+          placeholder="输入联系人姓名"
+          style="width: 150px"
+        />
+      </n-form-item>
+
+      <n-form-item label="联系人手机号" path="contactNameLike">
+        <n-input
+          v-model:value="queryValue.contactNameLike"
+          clearable
+          :maxlength="11"
+          placeholder="输入联系人手机号"
+          style="width: 150px"
+        />
+      </n-form-item>
+
+      <n-form-item label="集团客户状态" path="groupCustomerLockEq">
+        <n-radio-group v-model:value="queryValue.groupCustomerLockEq">
           <n-radio :value="null">全部</n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+          <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">{{
             item.label
           }}</n-radio>
         </n-radio-group>
@@ -41,10 +60,9 @@
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"
+      :rowKey="getRowKeyId"
       @reload-page="reloadPage"
       @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -53,7 +71,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, onMounted, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import {
   EyeOutline as EyeIcon,
@@ -64,9 +82,9 @@ import BasicTable from "@/components/Table/Table.vue";
 import { NTag } from "naive-ui";
 import DetailDrawer from "./detailDrawer.vue";
 import TypeModal from "./typeModal.vue";
-import { tableDataItem } from "./type";
-import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { TableItemInter } from "./type";
+import { lockOptions } from "@/config/form";
+import { getGroupCustomerPage } from "@/api/groupCustomers/groupCustomers";
 import { PaginationState } from "@/api/type";
 export default defineComponent({
   name: "Customer",
@@ -78,61 +96,61 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      name: null,
-      status: null,
+      groupCustomerNameLike: null,
+      contactNameLike: null,
+      contactPhoneLike: null,
+      groupCustomerLockEq: null,
     });
 
-    const data = ref<tableDataItem[]>([
-      {
-        id: "string",
-        status: 1,
-        name: "string",
-        membershipType: "string",
-        descript: "string",
-      },
-    ]);
+    const data = ref<TableItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
-        title: "会员名称",
-        key: "name",
+        title: "集团客户名称",
+        key: "groupCustomerName",
         align: "center",
       },
       {
-        title: "会员描述",
-        key: "descript",
+        title: "联系人姓名",
+        key: "contactName",
         align: "center",
       },
       {
-        title: "会员类型",
-        key: "membershipType",
+        title: "联系人手机号",
+        key: "contactPhone",
         align: "center",
       },
       {
-        title: "会员状态",
-        key: "status",
+        title: "集团会员名称",
+        key: "groupCustomerMemberName",
         align: "center",
-        render(row: tableDataItem) {
+      },
+      {
+        title: "集团客户注册时间",
+        key: "groupCustomerRegTime",
+        align: "center",
+      },
+      {
+        title: "集团客户状态",
+        key: "groupCustomerLock",
+        align: "center",
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: row.status === 1 ? "success" : "error",
+              type: row.groupCustomerLock === 0 ? "success" : "error",
             },
             {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
+              default: () => (row.groupCustomerLock === 0 ? "正常" : "锁定"),
             }
           );
         },
@@ -143,7 +161,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -176,31 +194,25 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationState) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getGroupCustomerPage({ page, search: search });
+        console.log(res);
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
-
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleEdit(record: Recordable) {
       console.log("点击了编辑", record.id);
@@ -215,9 +227,6 @@ export default defineComponent({
     function handleLock(record: Recordable) {
       console.log("点击了编辑", record.id);
     }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
     function handleAdd() {
       console.log("点击了新增");
       const { openDrawer } = detailDrawerRef.value;
@@ -229,33 +238,38 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: null, status: null };
+      queryValue.value = {
+        groupCustomerNameLike: null,
+        contactNameLike: null,
+        contactPhoneLike: null,
+        groupCustomerLockEq: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -264,17 +278,16 @@ export default defineComponent({
       loading,
       detailDrawerRef,
       basicTableRef,
-      statusOptions,
+      lockOptions,
       columns,
+      getRowKeyId: (row: TableItemInter) => row.groupCustomerId,
       itemCount,
 
       reloadPage,
       handleAdd,
       typeModalRef,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

@@ -94,6 +94,26 @@ export function editGroupMember(data: FormInter) {
 
 /**-------------集团客户管理--------------*/
 /**
+ * 集团客户会员类型列表
+*/
+
+interface CustomerPageInter{
+  page: PaginationState;
+  search: {
+    groupCustomerNameLike: string | null;
+    contactNameLike: string | null;
+    contactPhoneLike: string | null;
+    groupCustomerLockEq: string | null;
+  };
+}
+export function getGroupCustomerPage(data:CustomerPageInter) {
+  return http.request({
+    url: "/groupCustomer/page",
+    method: "post",
+    data: data
+  });
+}
+/**
  * 集团客户锁定
 */
 export function lockGroupCustomer() {

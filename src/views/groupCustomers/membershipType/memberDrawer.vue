@@ -5,7 +5,7 @@
       :rules="rules"
       :disabled="disabled"
       label-placement="left"
-      :style="{ maxWidth: '350px' }"
+      :style="{ maxWidth: '380px' }"
       require-mark-placement="right-hanging"
       label-width="100"
       :model="form"
@@ -29,28 +29,15 @@
         />
       </n-form-item>
 
-      <!-- <n-divider title-placement="left">业务类型-快车业务</n-divider>
-            <n-form-item label="会员折扣" path="fastlDiscount">
-                <n-input-number v-model:value="form.fastlDiscount" :min="0" clearable placeholder="输入会员折扣" />
-            </n-form-item>
-            <n-form-item label="下单限制" path="fastlLimit">
-                <n-input-number v-model:value="form.fastlLimit" :min="0" clearable placeholder="输入下单限制" />
-            </n-form-item>
-
-            <n-divider title-placement="left">业务类型-出租车业务</n-divider>
-            <n-form-item label="会员折扣" path="taxilDiscount">
-                <n-input-number v-model:value="form.taxilDiscount" :min="0" clearable placeholder="输入会员折扣" />
-            </n-form-item>
-            <n-form-item label="下单限制" path="taxilLimit">
-                <n-input-number v-model:value="form.taxilLimit" :min="0" clearable placeholder="输入下单限制" />
-            </n-form-item> -->
-
       <BusTypeItem
         :disabled="disabled"
-        :rate="0"
-        :limit="3"
+        :orderBusinessType="item.orderBusinessType"
+        :orderBusinessTypeName="item.orderBusinessTypeName"
+        :rate="item.rate"
+        :limit="item.limit"
+        v-for="(item, index) in form.rateLimitData"
         :loading="loading"
-        title="业务类型-快车业务"
+        :key="index"
         @validate="handleFormItemValite"
       />
 
@@ -92,7 +79,7 @@ import { lockOptions } from "@/config/form";
 import { getGroupMemberDetail } from "@/api/groupCustomers/groupCustomers";
 // import { addGroupMember, editGroupMember } from "@/api/groupCustomers/groupCustomers";
 import BusTypeItem from "./busTypeItem.vue";
-import { FormInter } from "./type";
+import { FormInter, busTypeItem } from "./type";
 export default defineComponent({
   name: "MemberDrawer",
   components: { BusTypeItem },
@@ -111,8 +98,7 @@ export default defineComponent({
       groupCustomerMemberName: null,
       groupCustomerMemberDesc: null,
       groupCustomerMemberLock: null,
-      groupCustomerMemberDiscountRateList: null,
-      groupCustomerMemberCreateOrderLimitList: null,
+      rateLimitData: [],
     });
 
     function openDrawer(t: string, groupCustomerMemberId: string) {
@@ -127,26 +113,38 @@ export default defineComponent({
       try {
         state.loading = true;
         let res = await getGroupMemberDetail({ groupCustomerMemberId });
-        console.log(res);
+        console.log(res.data);
+
         const {
           groupCustomerMemberType,
           groupCustomerMemberName,
           groupCustomerMemberDesc,
           groupCustomerMemberLock,
+          groupCustomerMemberCreateOrderLimitList,
+          groupCustomerMemberDiscountRateList,
         } = res.data;
-        console.log(
+
+        let dataArr: busTypeItem[] = [];
+        for (let key = 0; key < groupCustomerMemberDiscountRateList.length; key++) {
+          console.log(key);
+          let item = {
+            rate: groupCustomerMemberDiscountRateList[key].groupCustomerMemberDiscountRate,
+            limit: groupCustomerMemberCreateOrderLimitList[key].groupCustomerMemberCreateOrderLimit,
+            // orderBusinessType: groupCustomerMemberDiscountRateList[key].groupCustomerMemberDiscountRate,
+            orderBusinessType: "OBT0001",
+            orderBusinessTypeName: groupCustomerMemberDiscountRateList[key].orderBusinessType,
+          };
+          dataArr.push(item);
+        }
+        console.log(dataArr);
+
+        form.value = {
           groupCustomerMemberType,
           groupCustomerMemberName,
           groupCustomerMemberDesc,
-          groupCustomerMemberLock
-        );
-
-        // form.value = {
-        //   groupCustomerMemberType,
-        //   groupCustomerMemberName,
-        //   groupCustomerMemberDesc,
-        //   groupCustomerMemberLock,
-        // };
+          groupCustomerMemberLock,
+          rateLimitData: dataArr,
+        };
         state.loading = false;
       } catch (err) {
         console.log(err);
@@ -171,8 +169,6 @@ export default defineComponent({
               groupCustomerMemberName,
               groupCustomerMemberDesc,
               groupCustomerMemberLock,
-              groupCustomerMemberDiscountRateList,
-              groupCustomerMemberCreateOrderLimitList,
             } = form.value;
 
             console.log(
@@ -180,9 +176,7 @@ export default defineComponent({
               groupCustomerMemberType,
               groupCustomerMemberName,
               groupCustomerMemberDesc,
-              groupCustomerMemberLock,
-              groupCustomerMemberDiscountRateList,
-              groupCustomerMemberCreateOrderLimitList
+              groupCustomerMemberLock
             );
 
             if (!form.value.groupCustomerMemberId) {
@@ -234,8 +228,7 @@ export default defineComponent({
         groupCustomerMemberName: null,
         groupCustomerMemberDesc: null,
         groupCustomerMemberLock: null,
-        groupCustomerMemberDiscountRateList: null,
-        groupCustomerMemberCreateOrderLimitList: null,
+        rateLimitData: [],
       };
       formRef.value?.restoreValidation();
     }
