@@ -1,9 +1,9 @@
-export interface tableDataItem{
-    id?: string
-    time: null | string[]
-    time_start: null | string
-    time_end: null | string
-    count: null | number
-    limit: null | number
-    descript: null | string
+export interface FormInter{
+    driverWalletWithdrawalRuleId: string | null
+    withdrawalWeek: number[]
+    effectiveTimeBegin:  string | null
+    effectiveTimeEnd:  string | null
+    withdrawalCount: number | null
+    withdrawalUpperLimit: number | null
+    withdrawalDisableDescribe: string | null
 }
