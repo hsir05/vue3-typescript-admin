@@ -74,17 +74,17 @@
 import { defineComponent, ref, h, onMounted, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import {
-  EyeOutline as EyeIcon,
+  TrashOutline as RemoveIcon,
   CreateOutline as CreateIcon,
   LockClosedOutline as LockClosedIcon,
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import { NTag } from "naive-ui";
+import { NTag, useMessage } from "naive-ui";
 import DetailDrawer from "./detailDrawer.vue";
 import TypeModal from "./typeModal.vue";
 import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
-import { getGroupCustomerPage } from "@/api/groupCustomers/groupCustomers";
+import { getGroupCustomerPage, removeGroupCustomer } from "@/api/groupCustomers/groupCustomers";
 import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
@@ -92,6 +92,7 @@ export default defineComponent({
   components: { BasicTable, DetailDrawer, TypeModal },
   setup() {
     const loading = ref(false);
+    const message = useMessage();
     const detailDrawerRef = ref();
     const typeModalRef = ref();
     const basicTableRef = ref();
@@ -169,14 +170,6 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
-                label: "详情",
-                type: "primary",
-                icon: EyeIcon,
-                isIconBtn: true,
-                onClick: handleSee.bind(null, record),
-                auth: ["dict001"],
-              },
-              {
                 label: "锁定",
                 type: "primary",
                 icon: LockClosedIcon,
@@ -191,6 +184,18 @@ export default defineComponent({
                 isIconBtn: true,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
+              },
+              {
+                label: "删除",
+                type: "error",
+                icon: RemoveIcon,
+                isIconBtn: true,
+                secondary: true,
+                auth: ["dict002"],
+                popConfirm: {
+                  onPositiveClick: handleRemove.bind(null, record),
+                  title: "您确定删除?",
+                },
               },
             ],
           });
@@ -208,7 +213,6 @@ export default defineComponent({
         let search = { ...queryValue.value };
         let res = await getGroupCustomerPage({ page, search: search });
         console.log(res);
-
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -223,11 +227,7 @@ export default defineComponent({
       const { handleModal } = typeModalRef.value;
       handleModal(record);
     }
-    function handleSee(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      const { openDrawer } = detailDrawerRef.value;
-      openDrawer("编辑会员", record);
-    }
+
     function handleLock(record: Recordable) {
       console.log("点击了编辑", record);
     }
@@ -235,6 +235,20 @@ export default defineComponent({
       console.log("点击了新增");
       const { openDrawer } = detailDrawerRef.value;
       openDrawer("新增用户");
+    }
+
+    async function handleRemove(record: Recordable) {
+      try {
+        loading.value = true;
+        let res = await removeGroupCustomer({ groupCustomerId: record.groupCustomerId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     const searchHandle = (e: MouseEvent) => {

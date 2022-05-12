@@ -1,11 +1,10 @@
 <template>
   <BasicModal
-    width="650px"
+    width="600px"
     title="更改会员类型"
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
-    @on-ok="handleValidate"
   >
     <n-form
       ref="formRef"
@@ -25,13 +24,20 @@
           :options="options"
         />
       </n-form-item>
+
+      <div class="text-center flex-center">
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >保存</n-button
+        >
+      </div>
     </n-form>
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
+import { getAllGroupMember } from "@/api/groupCustomers/groupCustomers";
 import { formState } from "./type";
 export default defineComponent({
   name: "TypeModal",
@@ -40,11 +46,36 @@ export default defineComponent({
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
+    const options = ref([]);
 
     const form = ref<formState>({
       membershipType: null,
     });
     const formRef = ref<FormInst | null>(null);
+
+    onMounted(() => {
+      getAllGroupMemberData();
+    });
+
+    const getAllGroupMemberData = async () => {
+      loading.value = true;
+      try {
+        let res = await getAllGroupMember();
+        console.log(res);
+        options.value = res.data.map(
+          (item: { groupCustomerMemberName: string; groupCustomerMemberId: string }) => {
+            return {
+              label: item.groupCustomerMemberName,
+              value: item.groupCustomerMemberId,
+            };
+          }
+        );
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const handleModal = () => {
       const { showModal } = ModalRef.value;
@@ -54,8 +85,6 @@ export default defineComponent({
     function handleValidate() {
       formRef.value?.validate((errors) => {
         if (!errors) {
-          console.log(unref(form));
-
           message.success("验证成功");
         } else {
           console.log(errors);

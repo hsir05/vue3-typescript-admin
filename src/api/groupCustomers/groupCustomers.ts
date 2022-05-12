@@ -77,20 +77,12 @@ export function editGroupMember(data: FormInter) {
 //  * 集团客户会员类型列表
 // */
 
-// interface GroupPageInter{
-//   page: PaginationState;
-//   search: {
-//     customerMemberNameLike: string | null;
-//     customerMemberLockEq: number | null;
-//   };
-// }
-// export function getGroupMemberPage(data:GroupPageInter) {
-//   return http.request({
-//     url: "/groupCustomerMember/list",
-//     method: "post",
-//     data: data
-//   });
-// }
+export function getAllGroupMember() {
+  return http.request({
+    url: "/groupCustomerMember/list",
+    method: "post",
+  });
+}
 
 /**-------------集团客户管理--------------*/
 /**
@@ -144,9 +136,10 @@ export function preEdit() {
 /**
  * 集团客户删除
 */
-export function removeGroupCustomer() {
+export function removeGroupCustomer(data:{ groupCustomerId: string}) {
   return http.request({
     url: '/groupCustomer/delete',
     method: 'post',
+    data:data
   });
 }
