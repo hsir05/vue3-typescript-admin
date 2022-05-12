@@ -19,7 +19,6 @@
           style="width: 200px"
         />
       </n-form-item>
-
       <n-form-item label="班级名称" path="operationCompanyDriverClazzNameLike">
         <n-input
           v-model:value="queryValue.operationCompanyDriverClazzNameLike"
@@ -33,6 +32,7 @@
         <n-select
           clearable
           style="width: 200px"
+          filterable
           v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
           :options="companyData"
@@ -105,12 +105,12 @@ export default defineComponent({
     const itemCount = ref(null);
     const pagination = reactive({
       page: 1,
-      pageSize: 10,
+      pageSize: 12,
     });
 
     onMounted(() => {
       getAllCompanyData();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 12 });
     });
 
     const getAllCompanyData = async () => {
@@ -135,6 +135,8 @@ export default defineComponent({
       try {
         let search = { ...queryValue.value };
         let res = await getDriverClazzPage({ page, search: search });
+        console.log(res);
+
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;

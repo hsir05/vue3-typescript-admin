@@ -11,7 +11,7 @@
         dayjs(classInfo?.createTime).format("YYYY-MM-DD HH:mm")
       }}</n-descriptions-item>
       <n-descriptions-item label="所属企业名称" :span="2">{{
-        classInfo?.operationCompany
+        classInfo?.operationCompanyName
       }}</n-descriptions-item>
     </n-descriptions>
     <n-divider title-placement="left">成员信息</n-divider>
