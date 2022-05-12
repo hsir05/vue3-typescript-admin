@@ -5,7 +5,7 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="70"
+      label-width="100"
       class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="queryValue"
@@ -86,6 +86,7 @@ import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
 import { getGroupCustomerPage } from "@/api/groupCustomers/groupCustomers";
 import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "Customer",
   components: { BasicTable, DetailDrawer, TypeModal },
@@ -138,6 +139,9 @@ export default defineComponent({
         title: "集团客户注册时间",
         key: "groupCustomerRegTime",
         align: "center",
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.groupCustomerRegTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "集团客户状态",
@@ -148,6 +152,7 @@ export default defineComponent({
             NTag,
             {
               type: row.groupCustomerLock === 0 ? "success" : "error",
+              onClick: handleLock.bind(null, row),
             },
             {
               default: () => (row.groupCustomerLock === 0 ? "正常" : "锁定"),
@@ -160,7 +165,6 @@ export default defineComponent({
         title: "操作",
         key: "action",
         align: "center",
-        width: "200px",
         render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
@@ -225,7 +229,7 @@ export default defineComponent({
       openDrawer("编辑会员", record);
     }
     function handleLock(record: Recordable) {
-      console.log("点击了编辑", record.id);
+      console.log("点击了编辑", record);
     }
     function handleAdd() {
       console.log("点击了新增");

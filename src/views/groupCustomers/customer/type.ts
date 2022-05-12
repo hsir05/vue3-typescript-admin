@@ -2,9 +2,8 @@
 export interface TableItemInter{
     groupCustomerId: string
     groupCustomerLock: number | null 
-    name: string | null
     membershipType: string | null
-    descript: string | null
+    groupCustomerRegTime: number
 }
 
 export interface formState{
