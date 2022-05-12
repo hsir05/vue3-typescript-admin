@@ -99,22 +99,12 @@
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
-          >保存</n-button
-        >
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
-          >重置</n-button
-        >
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >保存
+        </n-button>
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
@@ -123,7 +113,7 @@
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { statusOptions } from "@/config/form";
-import { tableDataItem } from "./type";
+import { FormInter } from "./type";
 export default defineComponent({
   name: "MemberDrawer",
   setup(_, { emit }) {
@@ -135,7 +125,7 @@ export default defineComponent({
     const title = ref("");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
+    const form = ref({
       name: null,
       specialDiscount: null,
       specialLimit: null,
@@ -148,7 +138,7 @@ export default defineComponent({
       type: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    function openDrawer(t: string, record: FormInter) {
       console.log(record);
       if (record) {
         form.value = { ...form.value, ...record };

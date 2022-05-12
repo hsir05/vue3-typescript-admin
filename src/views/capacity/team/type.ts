@@ -2,7 +2,8 @@ export interface ItemInter {
   operationCompanyDriverClazzId: string;
   operationCompanyDriverClazzEntry: string;
   operationCompanyDriverClazzName: string;
-  operationCompany: string
+  operationCompanyLeaderClazzDriver?:MemberItemIter
+  operationCompanyName: string
   number: number;
   createTime: string;
   avatar: string;
@@ -13,6 +14,7 @@ export interface MemberItemIter {
     driverGender: string
     driverNo: string
     driverPhotoPath: string
+    driverIdentificationPhoto: string
     operationCompanyDriverId:string
 }
 

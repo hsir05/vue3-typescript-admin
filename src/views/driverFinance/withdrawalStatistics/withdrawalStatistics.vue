@@ -4,20 +4,21 @@
     <n-form
       ref="queryFormRef"
       :rules="queryRules"
+      :show-feedback="false"
       inline
       label-placement="left"
       class="pt-15px pb-15px bg-white mb-5px"
       require-mark-placement="right-hanging"
-      label-width="100"
+      label-width="130"
       :model="queryForm"
     >
-      <n-form-item label="运营企业" path="operatingEnterprise">
+      <n-form-item label="所在企业名称" path="operationCompanyIdEq">
         <n-select
           clearable
           filterable
-          v-model:value="queryForm.operatingEnterprise"
-          placeholder="选择运营企业"
-          :options="options"
+          v-model:value="queryForm.operationCompanyIdEq"
+          placeholder="选择所在企业名称"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -38,12 +39,12 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
-    <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
+    <div class="bg-white mt-10px p-10px" style="height: calc(100% - 105px)">
       <n-data-table
         :loading="loading"
         ref="table"
@@ -69,17 +70,20 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref } from "vue";
+import { defineComponent, ref, h, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { queryFormState, tableDataItem } from "./type";
+import { FormInter, TableItemInter } from "./type";
+import { getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
 export default defineComponent({
   name: "WithdrawalStatistics",
   setup() {
     const loading = ref(false);
     const queryFormRef = ref<FormInst | null>(null);
-    const queryForm = ref<queryFormState>({
-      operatingEnterprise: null,
+    const companyData = ref([]);
+
+    const queryForm = ref<FormInter>({
+      operationCompanyIdEq: null,
       section: null,
     });
 
@@ -100,7 +104,7 @@ export default defineComponent({
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -161,6 +165,28 @@ export default defineComponent({
       },
     ];
 
+    onMounted(() => {
+      getAllCompanyData();
+    });
+
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        console.log(res);
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     function query(e: MouseEvent) {
       e.preventDefault();
       queryFormRef.value?.validate((errors) => {
@@ -183,11 +209,12 @@ export default defineComponent({
       totalColumns,
       detailData,
       detailColumns,
+      companyData,
       pagination: {
         pageSize: 10,
       },
       rangeShortcuts,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableItemInter) => row.id,
       queryRules: {
         operatingEnterprise: {
           required: true,
@@ -209,6 +236,7 @@ export default defineComponent({
   &-left {
     width: 400px;
   }
+
   &-right {
     width: calc(100% - 400px - 10px);
   }

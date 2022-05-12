@@ -1,6 +1,7 @@
 <template>
   <BasicDrawer v-model:show="isDrawer" title="交易记录" @on-close-after="onCloseAfter">
-    <WalletItem title="个人客户钱包信息" />
+    <WalletDetail title="个人客户钱包信息" :walletInfo="walletInfo" />
+
     <n-divider title-placement="left"> 个人客户钱包交易记录</n-divider>
     <!-- 搜索 -->
     <n-form
@@ -12,24 +13,31 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="交易时间(起始)" path="start">
+      <n-form-item label="交易时间(起始)" path="dealTimeGe">
         <n-date-picker
-          v-model:value="queryValue.start"
-          type="date"
-          style="width: 160px"
+          v-model:value="queryValue.dealTimeGe"
+          :is-date-disabled="disablePreviousDate"
+          type="datetime"
+          style="width: 180px"
           clearable
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(结束)" path="end">
-        <n-date-picker v-model:value="queryValue.end" type="date" style="width: 160px" clearable />
+      <n-form-item label="交易时间(结束)" path="dealTimeLe">
+        <n-date-picker
+          v-model:value="queryValue.dealTimeLe"
+          :is-date-disabled="disablePreviousDate"
+          type="datetime"
+          style="width: 180px"
+          clearable
+        />
       </n-form-item>
 
-      <n-form-item label="会员状态" path="type">
-        <n-radio-group v-model:value="queryValue.type">
+      <n-form-item label="交易类型" path="dealTypeEq">
+        <n-radio-group v-model:value="queryValue.dealTypeEq">
           <n-radio :value="null">全部</n-radio>
-          <n-radio :value="1">入帐</n-radio>
-          <n-radio :value="0">出帐</n-radio>
+          <n-radio :value="0">入帐</n-radio>
+          <n-radio :value="1">出帐</n-radio>
         </n-radio-group>
       </n-form-item>
 
@@ -44,7 +52,7 @@
       ref="table"
       striped
       :columns="columns"
-      class="box-border"
+      class="box-border pb-40px"
       :row-key="getRowKeyId"
       :data="data"
       :pagination="pagination"
@@ -53,26 +61,42 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, h, ref } from "vue";
-import { TableItemInter } from "./type";
-import WalletItem from "@/components/walletItem/walletItem.vue";
+import { RecordTableItemInter, RecordFormInter } from "./type";
+import WalletDetail from "./walletDetail.vue";
 import { FormInst } from "naive-ui";
+import { dealWay } from "@/config/table";
+import { getRecordPage, getWalletDetail } from "@/api/driverFinance/driverFinance";
+import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "TransactionRecord",
   components: {
-    WalletItem,
+    WalletDetail,
   },
   setup() {
     const formRef = ref<FormInst | null>(null);
-    const queryValue = ref({
-      type: null,
-      start: null,
-      end: null,
+    const queryValue = ref<RecordFormInter>({
+      driverWalletIdEq: null,
+      dealTypeEq: null,
+      dealTimeGe: null,
+      dealTimeLe: null,
     });
     const loading = ref(false);
     const state = reactive({
       isDrawer: false,
       loading: false,
     });
+    const walletInfo = ref({
+      createTime: null,
+      driverNo: null,
+      driverFullName: null,
+      driverPhone: null,
+      totalBalance: null,
+      frozenAmount: null,
+      availablealance: null,
+      reserveBalanceLimit: null,
+    });
+    const data = ref<RecordTableItemInter[]>([]);
 
     const columns = [
       {
@@ -80,96 +104,137 @@ export default defineComponent({
         key: "index",
         width: 70,
         align: "center",
-        render(_: TableItemInter, rowIndex: number) {
+        render(_: RecordTableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "交易流水号",
-        key: "transactionCode",
+        key: "dealSerialNumber",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "交易类型",
-        key: "transactionType",
+        key: "dealType",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render(row: RecordTableItemInter) {
+          return h("span", row.dealType === 0 ? "入帐" : "出帐");
+        },
       },
       {
-        title: "实充交易金额",
-        key: "rechargeAmount",
+        title: "交易方式",
+        key: "dealWay",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render(row: RecordTableItemInter) {
+          return h("span", dealWay[row.dealWay]);
+        },
       },
       {
-        title: "赠送交易金额",
-        key: "giveAmount",
+        title: "交易金额(元)",
+        key: "dealAmount",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
-        title: "交易总金额",
-        key: "transactionTotalAmount",
+        title: "钱包余额(元)",
+        key: "driverWalletBalance",
         align: "center",
-      },
-      {
-        title: "钱包余额",
-        key: "walletBalence",
-        align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "交易时间",
-        key: "create_time",
+        key: "dealTime",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render(record: RecordTableItemInter) {
+          return h("span", dayjs(record.dealTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "交易备注",
-        key: "remark",
+        key: "dealNote",
+        ellipsis: {
+          tooltip: true,
+        },
         align: "center",
       },
     ];
 
-    const data = ref([
-      {
-        id: "12313123",
-        transactionCode: "string",
-        transactionType: "string",
-        rechargeAmount: "1809798797",
-        giveAmount: "string",
-        transactionTotalAmount: "string",
-        walletBalence: "string",
-        create_time: "string",
-        remark: "string",
-      },
-    ]);
-
-    function openDrawer(record?: TableItemInter) {
-      console.log(record);
-      if (record) {
-        console.log(record);
-      }
+    function openDrawer(driverWalletId: string) {
+      queryValue.value.driverWalletIdEq = driverWalletId;
+      getWalletDetailData(driverWalletId);
+      getData({ pageIndex: 1, pageSize: 10 });
       state.isDrawer = true;
     }
 
+    const getData = async (page: PaginationState) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        // let search = {
+        //     driverWalletIdEq: queryValue.value.driverWalletIdEq,
+        //     dealTypeEq: queryValue.value.dealTypeEq,
+        //     dealTimeGe: dayjs(queryValue.value.dealTimeGe).format("YYYY-MM-DD HH:mm:ss"),
+        //     dealTimeLe: dayjs(queryValue.value.dealTimeLe).format("YYYY-MM-DD HH:mm:ss")
+        //  };
+        let res = await getRecordPage({ page, search: search });
+        data.value = res.data.content;
+        console.log(res);
+        // itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+    const getWalletDetailData = async (driverWalletId: string) => {
+      try {
+        let res = await getWalletDetail({ driverWalletId });
+        console.log(res);
+        walletInfo.value = res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    };
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     const reset = () => {
       queryValue.value = {
-        type: null,
-        start: null,
-        end: null,
+        driverWalletIdEq: null,
+        dealTypeEq: null,
+        dealTimeGe: null,
+        dealTimeLe: null,
       };
-      //   getData({ page: 1, pageSize: 10 });
     };
 
     function onCloseAfter() {
       state.isDrawer = false;
       state.loading = false;
+      reset();
     }
 
     return {
       ...toRefs(state),
       columns,
+      walletInfo,
       formRef,
       queryValue,
       loading,
@@ -177,7 +242,10 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: TableItemInter) => row.driverWalletId,
+      disablePreviousDate(ts: number) {
+        return ts > Date.now();
+      },
+      getRowKeyId: (row: RecordTableItemInter) => row.driverWalletDealRecordId,
 
       openDrawer,
       onCloseAfter,

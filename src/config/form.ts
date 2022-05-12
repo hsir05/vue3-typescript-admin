@@ -8,6 +8,17 @@ export const statusOptions = [
     value: 0,
   },
 ];
+
+export const lockOptions = [
+  {
+    label: "锁定",
+    value: 1,
+  },
+  {
+    label: "正常",
+    value: 0,
+  },
+];
 export const maritalStatusOptions = [
   {
     label: "未婚",
@@ -51,43 +62,43 @@ export const stateOptions = [
   },
 ];
 export const drivingLicense = [
-    {
-        label: "A1",
-        value: "A1"
-    },
-    {
-        label: "A2",
-        value: "A2"
-    },
-    {
-        label: "A3",
-        value: "A3"
-    },
-    {
-        label: "B1",
-        value: "B1"
-    },
-    {
-        label: "B2",
-        value: "B2"
-    },
-    {
-        label: "C1",
-        value: "C1"
-    },
-    {
-        label: "C2",
-        value: "C2"
-    },
-    {
-        label: "C3",
-        value: "C3"
-    },
-    {
-        label: "C4",
-        value: "C4"
-    }
-]
+  {
+    label: "A1",
+    value: "A1",
+  },
+  {
+    label: "A2",
+    value: "A2",
+  },
+  {
+    label: "A3",
+    value: "A3",
+  },
+  {
+    label: "B1",
+    value: "B1",
+  },
+  {
+    label: "B2",
+    value: "B2",
+  },
+  {
+    label: "C1",
+    value: "C1",
+  },
+  {
+    label: "C2",
+    value: "C2",
+  },
+  {
+    label: "C3",
+    value: "C3",
+  },
+  {
+    label: "C4",
+    value: "C4",
+  },
+];
 export const nationData = [
   { value: "汉族", label: "汉族" },
   { value: "蒙古族", label: "蒙古族" },
@@ -156,27 +167,27 @@ export const educationData = [
 ];
 // 订单处理了状态
 export const processStateData = [
-    {
-        label: "未处理",
-        value: 0
-    },
-    {
-        label: "已处理",
-        value: 1
-    },
-]
+  {
+    label: "未处理",
+    value: 0,
+  },
+  {
+    label: "已处理",
+    value: 1,
+  },
+];
 // 订单状态
 export const refundTypeData = [
-    {
-        label: "不涉及退款",
-        value: 0
-    },
-    {
-        label: "部分退",
-        value: 1
-    },
-    {
-        label: "全额退",
-        value: 2
-    },
-]
+  {
+    label: "不涉及退款",
+    value: 0,
+  },
+  {
+    label: "部分退",
+    value: 1,
+  },
+  {
+    label: "全额退",
+    value: 2,
+  },
+];

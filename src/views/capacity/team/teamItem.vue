@@ -6,12 +6,20 @@
         <span class="team-info-item-text">{{ item.operationCompanyDriverClazzEntry }}</span>
       </p>
       <p class="team-info-item">
-        <span class="team-info-item-label">班长名称:</span>
+        <span class="team-info-item-label">班级名称:</span>
         <span class="team-info-item-text">{{ item.operationCompanyDriverClazzName }}</span>
       </p>
       <p class="team-info-item">
+        <span class="team-info-item-label">班长名称:</span>
+        <span class="team-info-item-text">{{
+          item.operationCompanyLeaderClazzDriver?.driverFullName || "暂无"
+        }}</span>
+      </p>
+      <p class="team-info-item">
         <span class="team-info-item-label">班长工号:</span>
-        <span class="team-info-item-text">{{ item.number ? item.number : "暂无" }}</span>
+        <span class="team-info-item-text">{{
+          item.operationCompanyLeaderClazzDriver?.driverNo || "暂无"
+        }}</span>
       </p>
       <p class="team-info-item">
         <span class="team-info-item-label">添加时间:</span>
@@ -46,7 +54,10 @@
       </div>
     </div>
     <div class="ml-10px pt-15px avatar">
-      <n-image width="120" :src="item.avatar ? item.avatar : avator" />
+      <n-image
+        width="120"
+        :src="item.operationCompanyLeaderClazzDriver?.driverIdentificationPhoto || avatar"
+      />
       <p class="monitor-title">班长照片</p>
     </div>
   </div>
@@ -54,7 +65,7 @@
 <script lang="ts" setup>
 import { EyeOutline as EyeIcon, PeopleOutline as PeopleIcon } from "@vicons/ionicons5";
 import { toRefs } from "vue";
-import avator from "@/assets/image/default-avatar.png";
+import avatar from "@/assets/image/default-avatar.png";
 import { ItemInter } from "./type";
 import dayjs from "dayjs";
 const props = defineProps({

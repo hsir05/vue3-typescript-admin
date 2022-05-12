@@ -53,13 +53,15 @@ export function getWalletDetail(data: {driverWalletId: string}) {
 /**
  * 修改司机钱包预留阈值
  */
-export function getBalanceLimit(data: { driverWalletId: string;reserveBalanceLimit: string }) {
+export function updateBalanceLimit(data: { driverWalletId: string;reserveBalanceLimit: number }) {
     return http.request({
         url: "/driverWallet/updateReserveBalanceLimit",
         method: "post",
         data: data,
     });
 }
+
+//-------------------司机体现设置-------------------------
 /**
  * 获取司机提现规则
  */
@@ -71,16 +73,16 @@ export function getWithdrawalRule() {
 }
 
 /**
- * 获取司机提现规则
+ * 保存司机提现规则
  */
 interface RuleIner{
-    driverWalletWithdrawalRuleId:string;
-    withdrawalWeek:string;
-    effectiveTimeBegin:string;
-    effectiveTimeEnd:string;
-    withdrawalCount:number;
-    withdrawalUpperLimit:number;
-    withdrawalDisableDescribe:string;
+    driverWalletWithdrawalRuleId:string | null;
+    withdrawalWeek:string | null;
+    effectiveTimeBegin:string | null;
+    effectiveTimeEnd:string | null;
+    withdrawalCount:number | null;
+    withdrawalUpperLimit:number | null;
+    withdrawalDisableDescribe:string | null;
 }
 export function editRule(data: RuleIner) {
     return http.request({
@@ -89,3 +91,7 @@ export function editRule(data: RuleIner) {
         data:data
     });
 }
+
+//-------------------司机体现统计-------------------------
+
+
