@@ -53,7 +53,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, h, ref } from "vue";
-import { tableDataItem } from "./type";
+import { TableItemInter } from "./type";
 import WalletItem from "@/components/walletItem/walletItem.vue";
 import { FormInst } from "naive-ui";
 export default defineComponent({
@@ -80,7 +80,7 @@ export default defineComponent({
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -140,7 +140,7 @@ export default defineComponent({
       },
     ]);
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record?: TableItemInter) {
       console.log(record);
       if (record) {
         console.log(record);
@@ -177,7 +177,7 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableItemInter) => row.driverWalletId,
 
       openDrawer,
       onCloseAfter,

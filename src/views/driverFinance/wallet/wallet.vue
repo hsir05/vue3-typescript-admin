@@ -221,9 +221,9 @@ export default defineComponent({
         let res = await getAllOperateCompany();
         console.log(res);
         companyData.value = res.data.map(
-          (item: { operationCityName: string; operationCompanyId: string }) => {
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
             let obj = {
-              label: item.operationCityName,
+              label: item.operationCompanyName,
               value: item.operationCompanyId,
             };
             return obj;
