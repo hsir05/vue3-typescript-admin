@@ -1,8 +1,8 @@
-export interface tableDataItem{
-    id?: string
+export interface TableItemInter{
+    id: string
 }
 
-export interface queryFormState{
-    operatingEnterprise: null | string
-    section: null | string
+export interface FormInter{
+    operationCompanyIdEq: string | null
+    section: string | null
 }
