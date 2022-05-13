@@ -92,6 +92,37 @@ export function editRule(data: RuleIner) {
     });
 }
 
-//-------------------司机体现统计-------------------------
-
-
+//-------------------司机提现统计-------------------------
+/**
+ * 司机提现分页
+ */
+interface DrawalPageInter {
+    page: PaginationState;
+    search: {
+        operationCompanyIdEq: string | null;
+        dealTimeGe: string | null;
+        dealTimeLe: string | null;
+    };
+}
+export function getDriverDrawalPage(data: DrawalPageInter) {
+    return http.request({
+        url: "/driverWithdrawalStatistics/page",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 司机提现分页
+ */
+interface OverviewInter {
+    operationCompanyId: string | null;
+    beginDate: string | null; //yyyy-MM-dd
+    endDate: string | null;
+}
+export function getDriverOverview(data: OverviewInter) {
+    return http.request({
+        url: "/driverWithdrawalStatistics/overview",
+        method: "post",
+        data: data,
+    });
+}

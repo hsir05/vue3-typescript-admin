@@ -4,5 +4,5 @@ export interface TableItemInter{
 
 export interface FormInter{
     operationCompanyIdEq: string | null
-    section: string | null
+    timeRange: number[]
 }

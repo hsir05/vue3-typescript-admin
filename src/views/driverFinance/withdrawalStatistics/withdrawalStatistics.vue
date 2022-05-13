@@ -23,9 +23,9 @@
       </n-form-item>
 
       <div class="flex-center">
-        <n-form-item label="时间区间" path="section">
+        <n-form-item label="时间区间" path="timeRange">
           <n-date-picker
-            v-model:value="queryForm.section"
+            v-model:value="queryForm.timeRange"
             style="width: 250px"
             type="daterange"
             :shortcuts="rangeShortcuts"
@@ -71,33 +71,26 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, unref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { FormInter, TableItemInter } from "./type";
 import { getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
+import dayjs from "dayjs";
+import { getDriverOverview, getDriverDrawalPage } from "@/api/driverFinance/driverFinance";
 export default defineComponent({
   name: "WithdrawalStatistics",
   setup() {
     const loading = ref(false);
     const queryFormRef = ref<FormInst | null>(null);
-    const companyData = ref([]);
+    const companyData = ref<SelectOption[]>([]);
 
     const queryForm = ref<FormInter>({
-      operationCompanyIdEq: null,
-      section: null,
+      operationCompanyIdEq: "all",
+      timeRange: [new Date().getTime(), new Date().getTime() + 60 * 1000 * 60 * 24 * 7],
     });
 
     const message = useMessage();
-
-    const totalData = ref([
-      {
-        id: "123123123",
-        driverCount: 2,
-        totalCount: 20,
-        totalAmount: 200,
-      },
-    ]);
-
+    const totalData = ref([]);
     const totalColumns = [
       {
         title: "序号",
@@ -126,16 +119,7 @@ export default defineComponent({
       },
     ];
 
-    const detailData = ref([
-      {
-        id: "123123123",
-        name: 2,
-        number: 20,
-        amount: 200,
-        balance: 200,
-        create_time: "2022-02-02",
-      },
-    ]);
+    const detailData = ref([]);
 
     const detailColumns = [
       {
@@ -167,6 +151,8 @@ export default defineComponent({
 
     onMounted(() => {
       getAllCompanyData();
+      getData();
+      getOvererData();
     });
 
     const getAllCompanyData = async () => {
@@ -182,6 +168,36 @@ export default defineComponent({
             return obj;
           }
         );
+        companyData.value.unshift({ label: "不限", value: "all" });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const getData = async () => {
+      try {
+        let search = {
+          operationCompanyIdEq: queryForm.value.operationCompanyIdEq,
+          dealTimeGe: dayjs(queryForm.value.timeRange[0]).format("YYYY-MM-DD"),
+          dealTimeLe: dayjs(queryForm.value.timeRange[1]).format("YYYY-MM-DD"),
+        };
+        let res = await getDriverDrawalPage({
+          page: { pageIndex: 1, pageSize: 10 },
+          search: search,
+        });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const getOvererData = async () => {
+      try {
+        let option = {
+          operationCompanyId: queryForm.value.operationCompanyIdEq,
+          beginDate: dayjs(queryForm.value.timeRange[0]).format("YYYY-MM-DD"), //yyyy-MM-dd
+          endDate: dayjs(queryForm.value.timeRange[1]).format("YYYY-MM-DD"),
+        };
+        let res = await getDriverOverview(option);
+        console.log(res);
       } catch (err) {
         console.log(err);
       }
