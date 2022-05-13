@@ -84,7 +84,11 @@ import { NTag, useMessage } from "naive-ui";
 import CustomerModal from "./customerModal.vue";
 import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
-import { getGroupCustomerPage, removeGroupCustomer } from "@/api/groupCustomers/groupCustomers";
+import {
+  getGroupCustomerPage,
+  lockGroupCustomer,
+  removeGroupCustomer,
+} from "@/api/groupCustomers/groupCustomers";
 import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
@@ -232,11 +236,21 @@ export default defineComponent({
       handleModal("编辑集团客户", groupCustomerId);
     }
 
-    function handleLock(groupCustomerId: string) {
+    async function handleLock(groupCustomerId: string) {
       console.log("点击了编辑", groupCustomerId);
+      try {
+        loading.value = true;
+        let res = await lockGroupCustomer({ groupCustomerId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
     function handleAdd() {
-      console.log("点击了新增");
       const { handleModal } = customerModalRef.value;
       handleModal("新增集团客户");
     }
