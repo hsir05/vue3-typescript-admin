@@ -57,6 +57,7 @@
     <BasicTable
       :data="data"
       ref="basicTableRef"
+      :isAddBtn="true"
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"
@@ -66,8 +67,8 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <DetailDrawer ref="detailDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
-    <TypeModal ref="typeModalRef" />
+
+    <CustomerModal ref="customerModalRef" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -80,8 +81,7 @@ import {
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { NTag, useMessage } from "naive-ui";
-import DetailDrawer from "./detailDrawer.vue";
-import TypeModal from "./typeModal.vue";
+import CustomerModal from "./customerModal.vue";
 import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
 import { getGroupCustomerPage, removeGroupCustomer } from "@/api/groupCustomers/groupCustomers";
@@ -89,12 +89,11 @@ import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "Customer",
-  components: { BasicTable, DetailDrawer, TypeModal },
+  components: { BasicTable, CustomerModal },
   setup() {
     const loading = ref(false);
     const message = useMessage();
-    const detailDrawerRef = ref();
-    const typeModalRef = ref();
+    const customerModalRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
@@ -120,6 +119,9 @@ export default defineComponent({
         title: "集团客户名称",
         key: "groupCustomerName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "联系人姓名",
@@ -135,6 +137,9 @@ export default defineComponent({
         title: "集团会员名称",
         key: "groupCustomerMemberName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "集团客户注册时间",
@@ -153,7 +158,7 @@ export default defineComponent({
             NTag,
             {
               type: row.groupCustomerLock === 0 ? "success" : "error",
-              onClick: handleLock.bind(null, row),
+              onClick: handleLock.bind(null, row.groupCustomerId),
             },
             {
               default: () => (row.groupCustomerLock === 0 ? "正常" : "锁定"),
@@ -174,7 +179,7 @@ export default defineComponent({
                 type: "primary",
                 icon: LockClosedIcon,
                 isIconBtn: true,
-                onClick: handleLock.bind(null, record),
+                onClick: handleLock.bind(null, record.groupCustomerId),
                 auth: ["dict001"],
               },
               {
@@ -182,7 +187,7 @@ export default defineComponent({
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record.groupCustomerId),
                 auth: ["dict001"],
               },
               {
@@ -193,7 +198,7 @@ export default defineComponent({
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
+                  onPositiveClick: handleRemove.bind(null, record.groupCustomerId),
                   title: "您确定删除?",
                 },
               },
@@ -222,25 +227,24 @@ export default defineComponent({
       }
     };
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      const { handleModal } = typeModalRef.value;
-      handleModal(record);
+    function handleEdit(groupCustomerId: string) {
+      const { handleModal } = customerModalRef.value;
+      handleModal("编辑集团客户", groupCustomerId);
     }
 
-    function handleLock(record: Recordable) {
-      console.log("点击了编辑", record);
+    function handleLock(groupCustomerId: string) {
+      console.log("点击了编辑", groupCustomerId);
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = detailDrawerRef.value;
-      openDrawer("新增用户");
+      const { handleModal } = customerModalRef.value;
+      handleModal("新增集团客户");
     }
 
-    async function handleRemove(record: Recordable) {
+    async function handleRemove(groupCustomerId: string) {
       try {
         loading.value = true;
-        let res = await removeGroupCustomer({ groupCustomerId: record.groupCustomerId });
+        let res = await removeGroupCustomer({ groupCustomerId: groupCustomerId });
         console.log(res);
         getData({ pageIndex: 1, pageSize: 10 });
         message.success(window.$tips[res.code]);
@@ -253,7 +257,6 @@ export default defineComponent({
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       getData({ pageIndex: 1, pageSize: 10 });
@@ -294,7 +297,6 @@ export default defineComponent({
       queryValue,
       data,
       loading,
-      detailDrawerRef,
       basicTableRef,
       lockOptions,
       columns,
@@ -303,7 +305,7 @@ export default defineComponent({
 
       reloadPage,
       handleAdd,
-      typeModalRef,
+      customerModalRef,
       searchHandle,
       reset,
       handlePage,

@@ -168,15 +168,19 @@ export default defineComponent({
       formRef.value?.validate(async (errors) => {
         if (!errors) {
           state.loading = true;
-          let res = null;
-          if (form.value.operationCompanyAgencyId) {
-            res = await editAgency(form.value);
-          } else {
-            res = await addAgency(form.value);
+          try {
+            let res = null;
+            if (form.value.operationCompanyAgencyId) {
+              res = await editAgency(form.value);
+            } else {
+              res = await addAgency(form.value);
+            }
+            console.log(res);
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+          } catch (err) {
+            console.log(err);
           }
-          console.log(res);
-          message.success(window.$tips[res.code]);
-          handleSaveAfter();
           state.loading = false;
         } else {
           console.log(errors);

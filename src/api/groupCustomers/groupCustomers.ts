@@ -88,7 +88,7 @@ export function getAllGroupMember() {
   });
 }
 
-/**-------------集团客户管理--------------*/
+/**-------------集团客户管理--------------------*/
 /**
  * 集团客户会员类型列表
 */
@@ -110,22 +110,51 @@ export function getGroupCustomerPage(data:CustomerPageInter) {
   });
 }
 /**
- * 集团客户锁定
+ * 集团客户详情
 */
-export function lockGroupCustomer() {
+export function getGroupCustomerDetail(data:{groupCustomerId: string}) {
   return http.request({
-    url: '/groupCustomer/lockGroupCustomer',
+    url: '/groupCustomer/detail',
     method: 'post',
+    data:data
   });
 }
-
 /**
  * 集团客户锁定
 */
-export function saveGroupCustomer() {
+export function lockGroupCustomer(data:{groupCustomerId:string}) {
   return http.request({
-    url: '/groupCustomer/save',
+    url: '/groupCustomer/lockGroupCustomer',
     method: 'post',
+    data:data
+  });
+}
+/**
+ * 集团客户新增
+*/
+export interface CustomerInter {
+    groupCustomerId?: string | null
+    groupCustomerName: string | null
+    groupCustomerMemberId: string | null
+    groupCustomerLoginAccount: string | null
+    contactName: string  | null
+    contactPhone: string | null
+}
+export function addGroupCustomer(data: CustomerInter) {
+  return http.request({
+    url: '/groupCustomer/add',
+    method: 'post',
+    data: data
+  });
+}
+/**
+ * 集团客户编辑
+*/
+export function editGroupCustomer(data: CustomerInter) {
+  return http.request({
+    url: '/groupCustomer/edit',
+    method: 'post',
+    data: data
   });
 }
 /**
