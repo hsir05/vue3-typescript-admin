@@ -1,28 +1,35 @@
 <template>
   <n-form
-    ref="formRef"
+    ref="formItemRef"
     :rules="rules"
     :disabled="disabled"
     label-placement="left"
     :style="{ maxWidth: '380px' }"
     require-mark-placement="right-hanging"
     label-width="100"
-    :model="form"
+    :model="formItem"
   >
-    <n-divider title-placement="left">{{ `业务类型-${orderBusinessTypeName}` }}</n-divider>
+    <n-divider title-placement="left" style="margin-top: 10px">{{
+      `业务类型-${orderBusinessTypeName}`
+    }}</n-divider>
     <n-form-item label="会员折扣" path="rate">
-      <n-input-number v-model:value="form.rate" :min="0" clearable placeholder="输入会员折扣" />
+      <n-input-number v-model:value="formItem.rate" :min="0" clearable placeholder="输入会员折扣" />
     </n-form-item>
     <n-form-item label="下单限制" path="limit">
-      <n-input-number v-model:value="form.limit" :min="0" clearable placeholder="输入下单限制" />
+      <n-input-number
+        v-model:value="formItem.limit"
+        :min="0"
+        clearable
+        placeholder="输入下单限制"
+      />
     </n-form-item>
 
     <n-button
       attr-type="button"
       :loading="loading"
-      type="primary"
-      @click="handleValidate"
       style="display: none"
+      type="primary"
+      @click="formItemSubmit"
       >保存</n-button
     >
   </n-form>
@@ -30,16 +37,16 @@
 <script lang="ts" setup>
 import { ref, toRefs } from "vue";
 import { FormInst } from "naive-ui";
-// import { FormItem } from "./type"
+import { FormItemInter } from "./type";
 
 const props = defineProps({
   rate: {
-    type: Number,
+    type: Number as PropType<number | null>,
     require: true,
     default: null,
   },
   limit: {
-    type: Number,
+    type: Number as PropType<number | null>,
     require: true,
     default: null,
   },
@@ -62,25 +69,38 @@ const props = defineProps({
     default: false,
   },
 });
-const { disabled, loading, rate, limit, orderBusinessTypeName } = toRefs(props);
+const { disabled, loading, orderBusinessTypeName } = toRefs(props);
 
 const emit = defineEmits(["validate"]);
 
-const formRef = ref<FormInst | null>(null);
-const form = ref({
-  rate: rate,
-  limit: limit,
+const formItemRef = ref<FormInst | null>(null);
+const formItem = ref<FormItemInter>({
+  rate: props.rate,
+  limit: props.limit,
+  orderBusinessType: props.orderBusinessType,
 });
+
 const rules = {
   rate: { type: "number", required: true, trigger: ["blur", "input"], message: "请输入下单限制" },
   limit: { type: "number", required: true, trigger: ["blur", "input"], message: "请输入会员描述" },
 };
-function handleValidate(e: MouseEvent) {
-  e.preventDefault();
-  formRef.value?.validate(async (errors) => {
+
+function formItemSubmit() {
+  formItemRef.value?.validate((errors) => {
     if (!errors) {
-      emit("validate");
+      emit("validate", true, {
+        rate: formItem.value.rate,
+        limit: formItem.value.limit,
+        orderBusinessType: formItem.value.orderBusinessType,
+        orderBusinessTypeName: props.orderBusinessTypeName,
+      });
+    } else {
+      emit("validate", false, {});
     }
   });
 }
+
+defineExpose({
+  formItemSubmit,
+});
 </script>

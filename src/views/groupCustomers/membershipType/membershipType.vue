@@ -49,7 +49,7 @@
       @on-pagination="handlepagSize"
     />
     <MemberDrawer ref="memberDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
-    <DetailDrawer ref="detailDrawerRef" :width="650" @on-save-after="handleSaveAfter" />
+    <!-- <DetailDrawer ref="detailDrawerRef" :width="650" @on-save-after="handleSaveAfter" /> -->
   </div>
 </template>
 <script lang="ts">
@@ -57,7 +57,7 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import DetailDrawer from "@/components/memberDetail/memberDetailDrawer.vue";
+// import DetailDrawer from "@/components/memberDetail/memberDetailDrawer.vue";
 import { NTag } from "naive-ui";
 import MemberDrawer from "./memberDrawer.vue";
 import { TableItemInter } from "./type";
@@ -67,7 +67,7 @@ import { PaginationState } from "@/api/type";
 // import { memberType } from "@/config/table"
 export default defineComponent({
   name: "MembershipType",
-  components: { MemberDrawer, BasicTable, DetailDrawer },
+  components: { MemberDrawer, BasicTable },
   setup() {
     const loading = ref(false);
     const memberDrawerRef = ref();
@@ -140,7 +140,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleSee.bind(null, record),
+                onClick: handleEdit.bind(null, record, true),
                 auth: ["dict001"],
               },
               {
@@ -148,7 +148,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record, false),
                 auth: ["dict001"],
               },
             ],
@@ -177,21 +177,18 @@ export default defineComponent({
       }
     };
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.groupCustomerMemberId);
+    function handleEdit(record: Recordable, bool: boolean) {
       const { openDrawer } = memberDrawerRef.value;
-      openDrawer("编辑用户", record.groupCustomerMemberId);
-    }
-    function handleSee(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      const { openDrawer } = detailDrawerRef.value;
-      openDrawer("编辑会员", record);
+      openDrawer(
+        bool ? "查看集团客户会员类型" : "编辑集团客户会员类型",
+        record.groupCustomerMemberId,
+        bool
+      );
     }
 
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = memberDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer("新增集团客户会员类型");
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -217,11 +214,9 @@ export default defineComponent({
     }
 
     function handlePage(pagination: PaginationState) {
-      console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationState) {
-      console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理

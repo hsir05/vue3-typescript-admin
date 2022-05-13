@@ -1,8 +1,12 @@
-interface BusRateInter {
+export interface BusRateInter {
   orderBusinessType: string;
   groupCustomerMemberDiscountRate: number;
 }
 
+export interface BusLimitInter {
+  orderBusinessType: string;
+  groupCustomerMemberCreateOrderLimit: number;
+}
 export interface TableItemInter {
   groupCustomerMemberId: string;
   groupCustomerMemberType: string;
@@ -13,26 +17,23 @@ export interface TableItemInter {
   groupCustomerMemberCreateOrderLimitList: string;
 }
 
-export interface busTypeItem {
-  limit: number;
-  rate: number;
-  orderBusinessType: string;
+export interface busTypeInter {
+  limit: number | null
+  rate: number | null
+  orderBusinessType: string
   orderBusinessTypeName: string
 }
 export interface FormInter {
   groupCustomerMemberId?: string | null;
   groupCustomerMemberType: string | null;
   groupCustomerMemberName: string | null;
-  groupCustomerMemberDesc: string | null;
   groupCustomerMemberLock: number | null;
-  rateLimitData: busTypeItem[];
-  // groupCustomerMemberDiscountRateList: string | null
-  // groupCustomerMemberCreateOrderLimitList: string | null
+  groupCustomerMemberDesc: string | null
+  rateLimitData: busTypeInter[];
 
-  // groupCustomerMemberDiscountRateList: BusRateInter
-  // groupCustomerMemberCreateOrderLimitList: BusRateInter
 }
-export interface FormItem {
+export interface FormItemInter {
   rate: number | null;
   limit: number | null;
+  orderBusinessType: string | null
 }

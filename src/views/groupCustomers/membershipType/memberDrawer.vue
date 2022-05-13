@@ -1,85 +1,98 @@
 <template>
   <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
-    <n-form
-      ref="formRef"
-      :rules="rules"
-      :disabled="disabled"
-      label-placement="left"
-      :style="{ maxWidth: '380px' }"
-      require-mark-placement="right-hanging"
-      label-width="100"
-      :model="form"
-    >
-      <n-form-item label="会员名称" path="groupCustomerMemberName">
-        <n-input
-          v-model:value="form.groupCustomerMemberName"
-          clearable
-          :maxlength="12"
-          placeholder="输入会员名称"
-        />
-      </n-form-item>
-
-      <n-form-item label="会员类型" path="groupCustomerMemberType">
-        <n-select
-          clearable
-          filterable
-          v-model:value="form.groupCustomerMemberType"
-          placeholder="选择会员类型"
-          :options="memberOption"
-        />
-      </n-form-item>
-
-      <BusTypeItem
+    <n-spin :show="loading">
+      <n-form
+        ref="formRef"
+        :rules="rules"
         :disabled="disabled"
-        :orderBusinessType="item.orderBusinessType"
-        :orderBusinessTypeName="item.orderBusinessTypeName"
-        :rate="item.rate"
-        :limit="item.limit"
-        v-for="(item, index) in form.rateLimitData"
-        :loading="loading"
-        :key="index"
-        @validate="handleFormItemValite"
-      />
+        label-placement="left"
+        :style="{ maxWidth: '380px' }"
+        require-mark-placement="right-hanging"
+        label-width="100"
+        :model="form"
+      >
+        <n-form-item label="会员名称" path="groupCustomerMemberName">
+          <n-input
+            v-model:value="form.groupCustomerMemberName"
+            clearable
+            :maxlength="12"
+            placeholder="输入会员名称"
+          />
+        </n-form-item>
 
-      <n-form-item label="会员状态" path="groupCustomerMemberLock">
-        <n-radio-group v-model:value="form.groupCustomerMemberLock">
-          <n-space>
-            <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">
-              {{ item.label }}
-            </n-radio>
-          </n-space>
-        </n-radio-group>
-      </n-form-item>
+        <n-form-item label="会员类型" path="groupCustomerMemberType">
+          <n-select
+            clearable
+            filterable
+            v-model:value="form.groupCustomerMemberType"
+            placeholder="选择会员类型"
+            :options="memberOption"
+          />
+        </n-form-item>
 
-      <n-form-item label="会员描述" path="groupCustomerMemberDesc">
-        <n-input
-          v-model:value="form.groupCustomerMemberDesc"
-          type="textarea"
-          placeholder="输入会员描述"
-          round
-          clearable
+        <BusTypeItem
+          :disabled="disabled"
+          :ref="setItemRef"
+          :orderBusinessType="item.orderBusinessType"
+          :orderBusinessTypeName="item.orderBusinessTypeName"
+          :rate="item.rate"
+          :limit="item.limit"
+          v-for="(item, index) in form.rateLimitData"
+          :loading="loading"
+          :key="index"
+          @validate="handleFormItemValite"
         />
-      </n-form-item>
 
-      <div class="text-center flex-center">
-        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
-          >保存</n-button
-        >
-        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
-          >重置</n-button
-        >
-      </div>
-    </n-form>
+        <n-form-item label="会员状态" path="groupCustomerMemberLock">
+          <n-radio-group v-model:value="form.groupCustomerMemberLock">
+            <n-space>
+              <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">
+                {{ item.label }}
+              </n-radio>
+            </n-space>
+          </n-radio-group>
+        </n-form-item>
+
+        <n-form-item label="会员描述" path="groupCustomerMemberDesc">
+          <n-input
+            v-model:value="form.groupCustomerMemberDesc"
+            type="textarea"
+            placeholder="输入会员描述"
+            round
+            clearable
+          />
+        </n-form-item>
+
+        <div class="text-center flex-center">
+          <n-button
+            attr-type="button"
+            :loading="loading"
+            :disabled="disabled"
+            type="primary"
+            @click="handleValidate"
+            >保存</n-button
+          >
+          <n-button
+            attr-type="button"
+            type="warning"
+            :disabled="disabled"
+            class="ml-10px"
+            @click="handleReset"
+            >重置</n-button
+          >
+        </div>
+      </n-form>
+    </n-spin>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
+import { defineComponent, reactive, toRefs, ref, onBeforeUpdate } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { lockOptions } from "@/config/form";
 import { getGroupMemberDetail } from "@/api/groupCustomers/groupCustomers";
-// import { addGroupMember, editGroupMember } from "@/api/groupCustomers/groupCustomers";
+import { addGroupMember, editGroupMember } from "@/api/groupCustomers/groupCustomers";
 import BusTypeItem from "./busTypeItem.vue";
-import { FormInter, busTypeItem } from "./type";
+import { FormInter, busTypeInter, BusLimitInter, BusRateInter } from "./type";
 export default defineComponent({
   name: "MemberDrawer",
   components: { BusTypeItem },
@@ -91,6 +104,9 @@ export default defineComponent({
       disabled: false,
     });
     const title = ref("");
+    const formItemRef = ref([]);
+    const resultBool = ref(true);
+    const resultArr = ref<busTypeInter[]>([]);
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<FormInter>({
@@ -98,23 +114,57 @@ export default defineComponent({
       groupCustomerMemberName: null,
       groupCustomerMemberDesc: null,
       groupCustomerMemberLock: null,
-      rateLimitData: [],
+      rateLimitData: [
+        {
+          limit: null,
+          orderBusinessType: "OBT0001",
+          orderBusinessTypeName: "专车业务",
+          rate: null,
+        },
+        {
+          limit: null,
+          orderBusinessType: "OBT0002",
+          orderBusinessTypeName: "快车业务",
+          rate: null,
+        },
+        {
+          limit: null,
+          orderBusinessType: "OBT0003",
+          orderBusinessTypeName: "出租车业务",
+          rate: null,
+        },
+      ],
     });
 
-    function openDrawer(t: string, groupCustomerMemberId: string) {
+    const setItemRef = (el: any) => {
+      if (el) {
+        //@ts-ignore
+        formItemRef.value.push(el);
+      }
+    };
+
+    onBeforeUpdate(() => {
+      formItemRef.value = [];
+    });
+
+    function openDrawer(t: string, groupCustomerMemberId: string, bool: boolean) {
+      console.log(bool);
+
       if (groupCustomerMemberId) {
         getDetail(groupCustomerMemberId);
+      } else {
+        state.isDrawer = true;
+      }
+      if (bool) {
+        state.disabled = bool;
       }
       title.value = t;
-      state.isDrawer = true;
     }
 
     const getDetail = async (groupCustomerMemberId: string) => {
       try {
         state.loading = true;
         let res = await getGroupMemberDetail({ groupCustomerMemberId });
-        console.log(res.data);
-
         const {
           groupCustomerMemberType,
           groupCustomerMemberName,
@@ -124,9 +174,8 @@ export default defineComponent({
           groupCustomerMemberDiscountRateList,
         } = res.data;
 
-        let dataArr: busTypeItem[] = [];
+        let dataArr: busTypeInter[] = [];
         for (let key = 0; key < groupCustomerMemberDiscountRateList.length; key++) {
-          console.log(key);
           let item = {
             rate: groupCustomerMemberDiscountRateList[key].groupCustomerMemberDiscountRate,
             limit: groupCustomerMemberCreateOrderLimitList[key].groupCustomerMemberCreateOrderLimit,
@@ -146,20 +195,50 @@ export default defineComponent({
           rateLimitData: dataArr,
         };
         state.loading = false;
+        state.isDrawer = true;
       } catch (err) {
         console.log(err);
         state.loading = false;
       }
     };
 
-    function handleFormItemValite(value: { rate: number | null; limit: number | null }) {
-      console.log(value);
+    function handleFormItemValite(bool: boolean, value: busTypeInter) {
+      if (!bool) {
+        resultBool.value = bool;
+      }
+      if (bool) {
+        resultArr.value.push(value);
+      }
     }
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
+
+      for (let i = 0; i < formItemRef.value.length; i++) {
+        const { formItemSubmit } = formItemRef.value[i];
+        //@ts-ignore
+        formItemSubmit();
+      }
+
       formRef.value?.validate(async (errors) => {
         if (!errors) {
+          if (!resultBool.value) {
+            resultBool.value = true;
+            return false;
+          }
+          let groupCustomerMemberDiscountRateList: BusRateInter[] = [];
+          let groupCustomerMemberCreateOrderLimitList: BusLimitInter[] = [];
+
+          for (let key of resultArr.value) {
+            groupCustomerMemberDiscountRateList.push({
+              orderBusinessType: key.orderBusinessType as string,
+              groupCustomerMemberDiscountRate: key.rate as number,
+            });
+            groupCustomerMemberCreateOrderLimitList.push({
+              orderBusinessType: key.orderBusinessType as string,
+              groupCustomerMemberCreateOrderLimit: key.limit as number,
+            });
+          }
           state.loading = true;
           try {
             let res;
@@ -170,41 +249,23 @@ export default defineComponent({
               groupCustomerMemberDesc,
               groupCustomerMemberLock,
             } = form.value;
-
-            console.log(
-              groupCustomerMemberId,
+            let option = {
               groupCustomerMemberType,
               groupCustomerMemberName,
               groupCustomerMemberDesc,
-              groupCustomerMemberLock
-            );
+              groupCustomerMemberLock,
+              groupCustomerMemberDiscountRateList,
+              groupCustomerMemberCreateOrderLimitList,
+            };
+            console.log(option);
 
             if (!form.value.groupCustomerMemberId) {
-              //   res = await addGroupMember({
-              //     groupCustomerMemberId,
-              //     groupCustomerMemberType,
-              //     groupCustomerMemberName,
-              //     groupCustomerMemberDesc,
-              //     groupCustomerMemberLock,
-              //     groupCustomerMemberDiscountRateList,
-              //     groupCustomerMemberCreateOrderLimitList,
-              //   });
-              console.log(res);
+              res = await addGroupMember(option);
             } else {
-              //   res = await editGroupMember({
-              //     groupCustomerMemberId,
-              //     groupCustomerMemberType,
-              //     groupCustomerMemberName,
-              //     groupCustomerMemberDesc,
-              //     groupCustomerMemberLock,
-              //     groupCustomerMemberDiscountRateList,
-              //     groupCustomerMemberCreateOrderLimitList,
-              //   });
+              res = await editGroupMember({ groupCustomerMemberId, ...option });
             }
             state.loading = false;
-            // message.success(window.$tips[res.code]);
-            message.success("window.$tips[res.code]");
-
+            message.success(window.$tips[res.code]);
             handleSaveAfter();
           } catch (err) {
             console.log(err);
@@ -228,8 +289,29 @@ export default defineComponent({
         groupCustomerMemberName: null,
         groupCustomerMemberDesc: null,
         groupCustomerMemberLock: null,
-        rateLimitData: [],
+        rateLimitData: [
+          {
+            limit: null,
+            orderBusinessType: "OBT0001",
+            orderBusinessTypeName: "专车业务",
+            rate: null,
+          },
+          {
+            limit: null,
+            orderBusinessType: "OBT0002",
+            orderBusinessTypeName: "快车业务",
+            rate: null,
+          },
+          {
+            limit: null,
+            orderBusinessType: "OBT0003",
+            orderBusinessTypeName: "出租车业务",
+            rate: null,
+          },
+        ],
       };
+      resultArr.value = [];
+      resultBool.value = true;
       formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
@@ -242,6 +324,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       formRef,
+      setItemRef,
       title,
       rules: {
         groupCustomerMemberName: {
@@ -273,6 +356,7 @@ export default defineComponent({
       ],
       form,
       handleFormItemValite,
+      handleSaveAfter,
       openDrawer,
       handleReset,
       handleValidate,

@@ -28,17 +28,7 @@
     </n-form-item>
 
     <div class="form-item ml-25px" v-for="(item, index) in form.vhchileData" :key="index">
-      <!-- <FormItem
-        :item="item"
-        :ref="
-          (el) => {
-            if (el) formItemRef[index] = el;
-          }
-        "
-      /> -->
-
       <FormItem :item="item" />
-
       <n-button
         attr-type="button"
         type="primary"
@@ -64,45 +54,6 @@
         </template>
       </n-button>
     </div>
-
-    <!-- <n-table :bordered="true" class="ml-15px" :single-line="false" style="width: 420px; text-align: center">
-            <thead>
-                <tr>
-                    <th>车型</th>
-                    <th>单量上限</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in form.vhchileData" :key="index">
-                    <td>
-                        <n-select clearable filterable style="width: 140px" v-model:value="item.vehicleType"
-                            placeholder="选择车型" :options="options" />
-                    </td>
-                    <td>
-                        <n-input v-model:value="item.orderLimit" clearable placeholder="输入单量上限" style="width: 140px" />
-                    </td>
-                    <td>
-                       <FormItem :item="item" ref="formItemRef" /> 
-                    </td>
-
-                    <td>
-                        <n-icon @click="handleRemove(index)" size="22" style="cursor: pointer;">
-                            <RemoveIcon />
-                        </n-icon>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <n-button attr-type="button" type="primary" size="small" @click="handleAdd"><template #icon>
-                                <n-icon>
-                                    <AddIcon />
-                                </n-icon>
-                            </template>点击添加单量上限配置</n-button>
-                    </td>
-                </tr>
-            </tbody>
-        </n-table> -->
 
     <div class="text-center mt-15px">
       <n-button attr-type="button" type="primary" size="small" @click="submit">查询</n-button>

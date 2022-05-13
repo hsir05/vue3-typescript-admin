@@ -46,14 +46,18 @@ interface BusRateInter {
     orderBusinessType: string
     groupCustomerMemberDiscountRate: number
 }
+interface BusLimitInter {
+    orderBusinessType: string
+    groupCustomerMemberCreateOrderLimit: number
+}
 export interface FormInter {
     groupCustomerMemberId?: string | null
     groupCustomerMemberType: string | null
     groupCustomerMemberName: string | null
     groupCustomerMemberDesc: string | null
     groupCustomerMemberLock: number  | null
-    groupCustomerMemberDiscountRateList: BusRateInter
-    groupCustomerMemberCreateOrderLimitList: BusRateInter
+    groupCustomerMemberDiscountRateList: BusRateInter[]
+    groupCustomerMemberCreateOrderLimitList: BusLimitInter[]
 }
 export function addGroupMember(data: FormInter) {
   return http.request({
