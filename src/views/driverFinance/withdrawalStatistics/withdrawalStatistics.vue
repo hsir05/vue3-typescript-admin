@@ -3,7 +3,6 @@
     <!-- 检索 -->
     <n-form
       ref="queryFormRef"
-      :rules="queryRules"
       :show-feedback="false"
       inline
       label-placement="left"
@@ -45,33 +44,34 @@
     </n-form>
 
     <div class="bg-white mt-10px p-10px" style="height: calc(100% - 105px)">
-      <n-data-table
-        :loading="loading"
-        ref="table"
-        striped
-        :columns="totalColumns"
-        class="box-border"
-        :row-key="getRowKeyId"
-        :data="totalData"
-        :pagination="false"
-      />
+      <n-descriptions bordered label-align="center" content-style="text-align:center">
+        <n-descriptions-item label="提现司机个数">{{
+          withdrawal.totalWithdrawalDriver
+        }}</n-descriptions-item>
+        <n-descriptions-item label="提现总次数">{{
+          withdrawal.totalWithdrawalCount
+        }}</n-descriptions-item>
+        <n-descriptions-item label="提现总金额(元)"
+          >{{ withdrawal.totalWithdrawalAmount || "暂无" }}
+        </n-descriptions-item>
+      </n-descriptions>
 
       <n-data-table
         :loading="loading"
         ref="table"
         striped
-        :columns="detailColumns"
-        class="box-border mt-10px"
+        :columns="columns"
+        class="box-border mt-20px"
         :row-key="getRowKeyId"
-        :data="detailData"
+        :data="data"
         :pagination="pagination"
       />
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, onMounted } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
+import { defineComponent, ref, h, onMounted } from "vue";
+import { FormInst, SelectOption } from "naive-ui";
 import { FormInter, TableItemInter } from "./type";
 import { getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
@@ -86,11 +86,14 @@ export default defineComponent({
 
     const queryForm = ref<FormInter>({
       operationCompanyIdEq: "all",
-      timeRange: [new Date().getTime(), new Date().getTime() + 60 * 1000 * 60 * 24 * 7],
+      timeRange: [new Date().getTime() - 60 * 1000 * 60 * 24 * 7, new Date().getTime()],
     });
 
-    const message = useMessage();
-    const totalData = ref([]);
+    const withdrawal = ref({
+      totalWithdrawalDriver: null,
+      totalWithdrawalCount: null,
+      totalWithdrawalAmount: null,
+    });
     const totalColumns = [
       {
         title: "序号",
@@ -119,9 +122,9 @@ export default defineComponent({
       },
     ];
 
-    const detailData = ref([]);
+    const data = ref([]);
 
-    const detailColumns = [
+    const columns = [
       {
         title: "司机姓名",
         key: "name",
@@ -152,13 +155,11 @@ export default defineComponent({
     onMounted(() => {
       getAllCompanyData();
       getData();
-      getOvererData();
     });
 
     const getAllCompanyData = async () => {
       try {
         let res = await getAllOperateCompany();
-        console.log(res);
         companyData.value = res.data.map(
           (item: { operationCompanyName: string; operationCompanyId: string }) => {
             let obj = {
@@ -174,44 +175,43 @@ export default defineComponent({
       }
     };
     const getData = async () => {
-      try {
-        let search = {
-          operationCompanyIdEq: queryForm.value.operationCompanyIdEq,
-          dealTimeGe: dayjs(queryForm.value.timeRange[0]).format("YYYY-MM-DD"),
-          dealTimeLe: dayjs(queryForm.value.timeRange[1]).format("YYYY-MM-DD"),
-        };
-        let res = await getDriverDrawalPage({
+      let search = {
+        operationCompanyIdEq: queryForm.value.operationCompanyIdEq,
+        dealTimeGe: dayjs(queryForm.value.timeRange[0]).format("YYYY-MM-DD"),
+        dealTimeLe: dayjs(queryForm.value.timeRange[1]).format("YYYY-MM-DD"),
+      };
+      let option = {
+        operationCompanyId: queryForm.value.operationCompanyIdEq,
+        beginDate: dayjs(queryForm.value.timeRange[0]).format("YYYY-MM-DD"), //yyyy-MM-dd
+        endDate: dayjs(queryForm.value.timeRange[1]).format("YYYY-MM-DD"),
+      };
+      loading.value = true;
+      Promise.all([
+        getDriverDrawalPage({
           page: { pageIndex: 1, pageSize: 10 },
           search: search,
+        }),
+        getDriverOverview(option),
+      ])
+        .then((res) => {
+          console.log(res);
+          data.value = res[0].data.content;
+          withdrawal.value = res[1].data;
+          loading.value = false;
+        })
+        .catch((err) => {
+          console.log(err);
+          loading.value = false;
         });
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const getOvererData = async () => {
-      try {
-        let option = {
-          operationCompanyId: queryForm.value.operationCompanyIdEq,
-          beginDate: dayjs(queryForm.value.timeRange[0]).format("YYYY-MM-DD"), //yyyy-MM-dd
-          endDate: dayjs(queryForm.value.timeRange[1]).format("YYYY-MM-DD"),
-        };
-        let res = await getDriverOverview(option);
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
     };
 
     function query(e: MouseEvent) {
       e.preventDefault();
       queryFormRef.value?.validate((errors) => {
         if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
+          getData();
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -221,25 +221,16 @@ export default defineComponent({
       queryFormRef,
       queryForm,
       options: [],
-      totalData,
+      withdrawal,
       totalColumns,
-      detailData,
-      detailColumns,
+      data,
+      columns,
       companyData,
       pagination: {
         pageSize: 10,
       },
       rangeShortcuts,
       getRowKeyId: (row: TableItemInter) => row.id,
-      queryRules: {
-        operatingEnterprise: {
-          required: true,
-          trigger: ["blur", "change"],
-          message: "请选择流量方",
-        },
-        section: { required: true, trigger: ["blur", "change"], message: "请选择开通城市" },
-      },
-
       query,
     };
   },
