@@ -96,7 +96,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, unref, toRefs, reactive, onMounted } from "vue";
-import { formState } from "./type";
+import { FormInter } from "./type";
 import { FormInst, useMessage } from "naive-ui";
 import { saveBusiness } from "@/api/operate/operate";
 import { removeBusiness } from "@/api/operate/operate";
@@ -113,7 +113,7 @@ export default defineComponent({
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const formRef = ref<FormInst | null>(null);
-    const form = ref<formState>({
+    const form = ref<FormInter>({
       openBusinessId: null,
       areaCode: null,
       orderType: null,
@@ -259,7 +259,7 @@ export default defineComponent({
         });
     };
 
-    function openDrawer(data: formState) {
+    function openDrawer(data: FormInter) {
       form.value = data;
       stateDrawer.isDrawer = true;
     }
