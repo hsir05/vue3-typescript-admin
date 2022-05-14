@@ -27,7 +27,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from "vue";
-import { tableDataItem } from "./type";
+import { TableItemInter } from "./type";
 export default defineComponent({
   name: "DetailDrawer",
   setup() {
@@ -37,7 +37,7 @@ export default defineComponent({
       disabled: false,
     });
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record?: TableItemInter) {
       console.log(record);
       if (record) {
         console.log(record);

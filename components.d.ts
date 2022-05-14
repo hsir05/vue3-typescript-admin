@@ -6,11 +6,9 @@ declare module 'vue' {
   export interface GlobalComponents {
     Application: typeof import('./src/components/Application/Application.vue')['default']
     BaiduMap: typeof import('./src/components/Map/BaiduMap.vue')['default']
-    'BaiduMap copy': typeof import('./src/components/Map/BaiduMap copy.vue')['default']
     BasicDrawer: typeof import('./src/components/BasicDrawer/BasicDrawer.vue')['default']
     Density: typeof import('./src/components/Density/Density.vue')['default']
     Explain: typeof import('./src/components/Explain/Explain.vue')['default']
-    MemberDetailDrawer: typeof import('./src/components/memberDetail/memberDetailDrawer.vue')['default']
     MessageContent: typeof import('./src/components/MessageContent/index.vue')['default']
     Modal: typeof import('./src/components/Modal/Modal.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
