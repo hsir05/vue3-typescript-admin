@@ -71,7 +71,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 export default defineComponent({
   name: "VouchersDrawer",
   setup(_, { emit }) {
@@ -92,7 +92,7 @@ export default defineComponent({
       voucher: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    function openDrawer(t: string, record?: TableDataItemInter) {
       console.log(record);
       if (record) {
         // form.value = { ...form.value, ...record };

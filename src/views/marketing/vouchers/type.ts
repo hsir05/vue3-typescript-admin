@@ -1,8 +1,5 @@
 
-interface VouchersInter {
-
-}
-
+ 
 export interface TableDataItemInter{
     customerCouponConsumeRuleId: string
     phone: null | string

@@ -25,7 +25,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from "vue";
 import { useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 export default defineComponent({
   name: "DetailDrawer",
   setup(_, { emit }) {
@@ -38,7 +38,7 @@ export default defineComponent({
     const title = ref("");
     const message = useMessage();
 
-    function openDrawer(t: string, record?: tableDataItem | string) {
+    function openDrawer(t: string, record?: TableDataItemInter | string) {
       console.log(record);
       if (record) {
         // form.value = { ...form.value, ...record };

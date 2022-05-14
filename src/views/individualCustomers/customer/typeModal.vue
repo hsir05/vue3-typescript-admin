@@ -16,11 +16,11 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="会员类型" path="membershipType">
+      <n-form-item label="会员类型" path="customerMemberId">
         <n-select
           clearable
           filterable
-          v-model:value="form.membershipType"
+          v-model:value="form.customerMemberId"
           placeholder="选择会员类型"
           :options="options"
         />
@@ -29,10 +29,11 @@
   </BasicModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
+import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { formState } from "./type";
+import { getAllCustomerMember } from "@/api/individualCustomers/individualCustomers";
+import { FormInter } from "./type";
 export default defineComponent({
   name: "TypeModal",
   components: { BasicModal },
@@ -40,13 +41,41 @@ export default defineComponent({
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
+    const options = ref([]);
 
-    const form = ref<formState>({
-      membershipType: null,
+    const form = ref<FormInter>({
+      customerId: null,
+      customerMemberId: null,
     });
     const formRef = ref<FormInst | null>(null);
 
-    const handleModal = () => {
+    onMounted(() => {
+      getAllGroupMemberData();
+    });
+
+    const getAllGroupMemberData = async () => {
+      loading.value = true;
+      try {
+        let res = await getAllCustomerMember();
+        console.log(res.data);
+        options.value = res.data.map(
+          (item: { groupCustomerMemberName: string; groupCustomerMemberId: string }) => {
+            return {
+              label: item.groupCustomerMemberName,
+              value: item.groupCustomerMemberId,
+            };
+          }
+        );
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    const handleModal = (customerMemberId: string, customerId: string) => {
+      form.value.customerId = customerId;
+      form.value.customerMemberId = customerMemberId;
       const { showModal } = ModalRef.value;
       showModal();
     };
@@ -65,7 +94,7 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { membershipType: null };
+      form.value = { customerId: null, customerMemberId: null };
       formRef.value?.restoreValidation();
     }
 
@@ -81,7 +110,7 @@ export default defineComponent({
       ],
       loading,
       rules: {
-        membershipType: { required: true, trigger: ["blur", "change"], message: "请选择会员类型" },
+        customerId: { required: true, trigger: ["blur", "change"], message: "请选择会员类型" },
       },
 
       handleModal,

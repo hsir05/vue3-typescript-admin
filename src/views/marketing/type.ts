@@ -1,4 +1,4 @@
-export interface tableDataItem{
+export interface TableDataItemInter{
     id?: string;
     status?: null | number
 }

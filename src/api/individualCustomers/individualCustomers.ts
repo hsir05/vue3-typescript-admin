@@ -21,52 +21,89 @@ export function getCustomerMemberPage(data: CustomerPageInter) {
     });
 }
 /**
- * 新增广告
+ * 个人会员类型获取所有
  */
-// interface AdvertisementInter {
-//     customerMemberType: string | null
-//     customerMemberName: string | null
-//     customerMemberDesc: string | null
-//     customerMemberLock: number | null
-//     customerMemberDiscountRateMap: string | null
-//     customerMemberCreateOrderLimitMap: string | null
-//     customerMemberId: string | null
-// }
-// export function addAdvertisement(data: AdvertisementInter) {
-//     return http.request({
-//         url: "/openCityAdvertisement/add",
-//         method: "post",
-//         data: data,
-//     });
-// }
-// /**
-//  * 编辑广告
-//  */
-// export function editAdvertisement(data: AdvertisementInter) {
-//     return http.request({
-//         url: "/openCityAdvertisement/edit",
-//         method: "post",
-//         data: data,
-//     });
-// }
-
-// /**
-//  * 广告详情
-//  */
-// export function getAdDetail(data: { openCityAdvertisementId: string }) {
-//     return http.request({
-//         url: "/openCityAdvertisement/detail",
-//         method: "post",
-//         data: data,
-//     });
-// }
-// /**
-//  * 删除
-//  */
-// export function removeAd(data: { openCityAdvertisementId: string }) {
-//     return http.request({
-//         url: "/openCityAdvertisement/delete",
-//         method: "post",
-//         data: data,
-//     });
-// }
+export function getAllCustomerMember() {
+    return http.request({
+        url: "/customerMember/page",
+        method: "post",
+    });
+}
+/**
+ * 新增个人会员
+ */
+interface BusRateInter {
+    orderBusinessType: string
+    customerMemberDiscountRate: number
+}
+interface BusLimitInter {
+    orderBusinessType: string
+    customerMemberCreateOrderLimit: number
+}
+interface CustomerMemberInter {
+    customerMemberId?: string | null
+    customerMemberType: string | null
+    customerMemberName: string | null
+    customerMemberDesc: string | null
+    customerMemberLock: number | null
+    customerMemberDiscountRateMap: BusRateInter[]
+    customerMemberCreateOrderLimitMap: BusLimitInter[]
+}
+export function addCustomerMember(data: CustomerMemberInter) {
+    return http.request({
+        url: "/customerMember/save",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 编辑个人会员
+ */
+export function editCustomerMember(data: CustomerMemberInter) {
+    return http.request({
+        url: "/customerMember/edit",
+        method: "post",
+        data: data,
+    });
+}
+// ----------------个人客户管理--------------------
+/**
+ * 个人客户分页列表
+*/
+interface InCustomerPageInter{
+  page: PaginationState;
+  search: {
+    customerPhoneLike: string | null;
+    customerMemberNameEq: string | null;
+    customerLockEq: string | null;
+    customerRegTimeGE: string | null;
+    customerRegTimeLE: string | null;
+  };
+}
+export function getCustomerPage(data:InCustomerPageInter) {
+  return http.request({
+    url: "/customer/page",
+    method: "post",
+    data: data
+  });
+}
+/**
+ * 个人客户详情
+*/
+export function getGroupCustomerDetail(data:{groupCustomerId: string}) {
+  return http.request({
+    url: '/groupCustomer/detail',
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 个人客户锁定
+*/
+export function lockCustomer(data:{groupCustomerId:string}) {
+  return http.request({
+    url: '/groupCustomer/lockGroupCustomer',
+    method: 'post',
+    data:data
+  });
+}

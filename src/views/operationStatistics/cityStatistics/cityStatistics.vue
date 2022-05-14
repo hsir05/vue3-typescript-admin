@@ -18,7 +18,7 @@
           filterable
           placeholder="选择开通城市"
           style="width: 260px"
-          :options="openCityList.result"
+          :options="openCityData"
         />
       </n-form-item>
 
@@ -86,6 +86,7 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const status = ref("finished");
+    const openCityData = ref([]);
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
       section: [new Date("2022-03-16"), new Date("2022-03-18")],
@@ -178,7 +179,7 @@ export default defineComponent({
 
     return {
       loading,
-      openCityList: [],
+      openCityData,
       status,
       option: [
         {

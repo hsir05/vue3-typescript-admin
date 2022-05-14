@@ -27,8 +27,7 @@ import { defineComponent, ref, onMounted } from "vue";
 import { useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
-import { getCityOder } from "@/api/operationStatistics/operationStatistics";
-import { getInfluxList, getOpenCity } from "@/api/common/common";
+// import { getInfluxList } from "@/api/common/common";
 export default defineComponent({
   name: "UsersStatistics",
   components: {
@@ -75,24 +74,24 @@ export default defineComponent({
 
     const getData = async () => {
       loading.value = true;
-      try {
-        let openCity = await getOpenCity();
-        console.log(openCity);
+      //   try {
+      //     let openCity = await getOpenCity();
+      //     console.log(openCity);
 
-        let influx = await getInfluxList();
-        console.log(influx);
+      //     let influx = await getInfluxList();
+      //     console.log(influx);
 
-        let res = await getCityOder({
-          cityCode: "allCity",
-          beginDate: "2022-03-16",
-          endDate: "2022-03-18",
-        });
-        console.log(res);
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
+      //     let res = await getCityOder({
+      //       cityCode: "allCity",
+      //       beginDate: "2022-03-16",
+      //       endDate: "2022-03-18",
+      //     });
+      //     console.log(res);
+      //     loading.value = false;
+      //   } catch (err) {
+      //     console.log(err);
+      //     loading.value = false;
+      //   }
     };
 
     function handleDate(value: string) {

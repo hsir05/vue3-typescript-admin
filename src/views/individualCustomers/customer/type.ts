@@ -1,12 +1,12 @@
 
-export interface tableDataItem{
-    id?: string
-    status: number | null 
-    name: string | null
-    membershipType: string | null
-    descript: string | null
+export interface TableItemInter{
+    customerMemberId: string
+    customerRegTime: number | null 
+    customerLock:number | null
+    customerId:string
 }
 
-export interface formState{
-    membershipType: null | string
+export interface FormInter{
+    customerId: string | null
+    customerMemberId: string | null
 }

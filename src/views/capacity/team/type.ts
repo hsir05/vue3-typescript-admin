@@ -11,7 +11,7 @@ export interface ItemInter {
 
 export interface MemberItemIter {
     driverFullName: string
-    driverGender: string
+    driverGender: number
     driverNo: string
     driverPhotoPath: string
     driverIdentificationPhoto: string
