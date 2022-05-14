@@ -9,7 +9,7 @@ export interface tableDataItem {
   lock?: number | null;
 }
 
-export interface formState {
+export interface FormInter {
   openBusinessId?: string | null;
   areaCode: string | null;
   orderType: string | null;
@@ -47,4 +47,10 @@ export interface orderTypeState {
 export interface itemState {
   vehicleTypeId: string;
   orderType: string;
+}
+
+
+export interface BackResultInter {
+    obj:FormInter,
+    result: boolean
 }

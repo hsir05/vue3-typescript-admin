@@ -111,14 +111,21 @@
 import { defineComponent, ref, h, reactive, toRefs, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { tableItemProps, tableDataItem, busTypeState, vehicleState, orderTypeState } from "./type";
+import {
+  tableItemProps,
+  tableDataItem,
+  busTypeState,
+  vehicleState,
+  orderTypeState,
+  BackResultInter,
+  FormInter,
+} from "./type";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import { getCityOpenArea } from "@/api/operate/operate";
 import ChargeFormDrawer from "./chargeFrom.vue";
 import { getAllOpenCity, getDict } from "@/api/common/common";
 // import { getOpenAreaBuss, delBusiness, getVehicleType } from "@/api/operate/operate";
 import { getOpenAreaBuss, getVehicleType } from "@/api/operate/operate";
-import { formState } from "./type";
 export default defineComponent({
   name: "OpeningBusiness",
   components: {
@@ -210,9 +217,13 @@ export default defineComponent({
         });
     };
 
-    const getValResult = (vehicleTypeId: string, entryCode: string) => {
-      let obj = {};
-      let result = bussinessData.value.some((item: formState) => {
+    const getValResult = (vehicleTypeId: string, entryCode: string): BackResultInter => {
+      let obj: FormInter = {
+        areaCode: null,
+        orderType: null,
+        vehicleTypeId: null,
+      };
+      let result = bussinessData.value.some((item: FormInter) => {
         if (item.vehicleTypeId === vehicleTypeId && item.orderType === entryCode) {
           obj = item;
           return true;
@@ -262,7 +273,7 @@ export default defineComponent({
       }
     }
 
-    const toggle = (vehicleType: vehicleState, orderType: orderTypeState, editObj?: formState) => {
+    const toggle = (vehicleType: vehicleState, orderType: orderTypeState, editObj?: FormInter) => {
       let option = {
         orderType: orderType.entryCode,
         vehicleTypeId: vehicleType.vehicleTypeId,
