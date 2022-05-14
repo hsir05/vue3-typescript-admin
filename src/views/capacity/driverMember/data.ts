@@ -1,17 +1,5 @@
 import { FormItemRule } from "naive-ui";
 
-export const data = [
-  {
- id: 131123,
-    agent: "西安鸿旭阳",
-    account: "111@qq.com",
-    contacts: '代理商',
-    sex: 1,
-    phone: '18093765456',
-    status: 1,
-  },
-];
-
 export const rules = {
   companyName: { required: true, trigger: ["blur", "input"], message: "请输入运营企业名称" },
   agent: { required: true, trigger: ["blur", "input"], message: "请输入代理商名称" },

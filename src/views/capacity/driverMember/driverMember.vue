@@ -55,7 +55,7 @@ import BasicTable from "@/components/Table/Table.vue";
 import DriMemDrawer from "./driMemDrawer.vue";
 import MemberList from "./memberList.vue";
 import { useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableItemInter } from "./type";
 import { getDriverMemberPage, removeMember } from "@/api/capacity/capacity";
 import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
@@ -75,7 +75,7 @@ export default defineComponent({
       operationCompanyIdEq: null,
     });
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<TableItemInter[]>([]);
 
     const columns = [
       {
@@ -87,7 +87,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -154,7 +154,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "130px",
-        render(record: tableDataItem) {
+        render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -297,7 +297,7 @@ export default defineComponent({
       columns,
       itemCount,
       companyData,
-      getRowKeyId: (row: tableDataItem) => row.operationCompanyOpenedDriverMemberId,
+      getRowKeyId: (row: TableItemInter) => row.operationCompanyOpenedDriverMemberId,
 
       reloadPage,
       handleAdd,

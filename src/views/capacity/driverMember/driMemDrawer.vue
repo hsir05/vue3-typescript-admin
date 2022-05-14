@@ -11,51 +11,57 @@
       label-width="140"
       :model="form"
     >
-      <n-form-item label="代理商" path="agent">
-        <n-input v-model:value="form.agent" clearable placeholder="输入代理商" />
+      <n-form-item label="产品名称" path="goodsName">
+        <n-input v-model:value="form.goodsName" clearable placeholder="输入产品名称" />
       </n-form-item>
-      <n-form-item label="运营企业编号" path="contacts">
-        <n-input v-model:value="form.contacts" clearable placeholder="输入运营企业编号" />
+      <n-form-item label="产品类型" path="goodsType">
+        <n-input v-model:value="form.goodsType" clearable placeholder="输入产品类型" />
       </n-form-item>
-      <n-form-item label="代理商登录账号" path="account">
-        <n-input v-model:value="form.account" clearable placeholder="输入代理商登录账号" />
-      </n-form-item>
-
-      <n-form-item label="代理商联系人" path="contacts">
-        <n-input v-model:value="form.contacts" clearable placeholder="输入代理商联系人" />
-      </n-form-item>
-
-      <n-form-item label="代理运营企业" path="operateCity">
-        <n-select
+      <n-form-item label="产品到期时间" path="memberEndTime">
+        <n-date-picker
+          style="width: 520px"
+          v-model:value="form.memberEndTime"
+          type="date"
           clearable
-          filterable
-          v-model:value="form.operateCity"
-          placeholder="选择代理运营企业"
-          @update:value="handleUpdateValue"
-          :options="openCityData"
         />
       </n-form-item>
 
-      <n-form-item label="联系人性别" path="sex">
-        <n-select v-model:value="form.sex" placeholder="选择联系人性别" :options="sexOptions" />
+      <n-form-item label="产品原价" path="goodsTagPrice">
+        <n-input-number v-model:value="form.goodsTagPrice" clearable placeholder="输入产品原价" />
       </n-form-item>
-      <n-form-item label="联系人电话" path="phone">
-        <n-input
-          v-model:value="form.phone"
+
+      <n-form-item label="产品售价" path="goodsSellingPrice">
+        <n-input-number
+          v-model:value="form.goodsSellingPrice"
           clearable
-          placeholder="输入联系人电话"
-          :maxlength="11"
+          placeholder="输入产品售价"
         />
       </n-form-item>
 
-      <n-form-item label="状态" path="status">
-        <n-radio-group v-model:value="form.status">
-          <n-space>
-            <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
-              item.label
-            }}</n-radio>
-          </n-space>
-        </n-radio-group>
+      <n-form-item label="产品生效时间" path="effectBeginTime">
+        <n-date-picker
+          style="width: 520px"
+          v-model:value="form.effectBeginTime"
+          type="date"
+          clearable
+        />
+      </n-form-item>
+
+      <n-form-item label="产品失效时间" path="effectEndTime">
+        <n-date-picker
+          style="width: 520px"
+          v-model:value="form.effectEndTime"
+          type="date"
+          clearable
+        />
+      </n-form-item>
+
+      <n-form-item label="到期前开放购买天数" path="purchasableDaysBeforeMemberExpire">
+        <n-input-number
+          v-model:value="form.purchasableDaysBeforeMemberExpire"
+          clearable
+          placeholder="输入到期前开放购买天数"
+        />
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -65,16 +71,16 @@
           size="large"
           type="primary"
           @click="handleValidate"
-          >保存</n-button
-        >
+          >保存
+        </n-button>
         <n-button
           attr-type="button"
           type="warning"
           size="large"
           class="ml-10px"
           @click="handleReset"
-          >重置</n-button
-        >
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
@@ -84,7 +90,7 @@ import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { rules } from "./data";
 import { statusOptions, sexOptions } from "@/config/form";
-import { tableDataItem } from "./type";
+import { FormInter } from "./type";
 
 export default defineComponent({
   name: "DriMemDrawer",
@@ -96,21 +102,26 @@ export default defineComponent({
       disabled: false,
       openCityData: [],
     });
-    const title = ref("菜单");
+    const title = ref("司机会员产品");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      agent: null,
-      contacts: null,
-      phone: null,
-      account: null,
-      operateCity: null,
-      sex: null,
-      create_time: null,
-      status: null,
+    const form = ref<FormInter>({
+      goodsName: null,
+      companyIds: [],
+      goodsTagPrice: null,
+      goodsSellingPrice: null,
+      goodsType: null,
+      memberEndTime: null,
+      memberRenewalTimeUnit: null,
+      memberRenewalCount: null,
+      purchasableDaysBeforeMemberExpire: null,
+      effectBeginTime: null,
+      effectEndTime: null,
+      goodsRemark: null,
+      createUser: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    function openDrawer(t: string, record?: FormInter) {
       console.log(record);
       if (record) {
         form.value = { ...form.value, ...record };
@@ -151,14 +162,19 @@ export default defineComponent({
 
     function handleReset() {
       form.value = {
-        agent: null,
-        contacts: null,
-        phone: null,
-        account: null,
-        operateCity: null,
-        sex: null,
-        create_time: null,
-        status: null,
+        goodsName: null,
+        companyIds: [],
+        goodsTagPrice: null,
+        goodsSellingPrice: null,
+        goodsType: null,
+        memberEndTime: null,
+        memberRenewalTimeUnit: null,
+        memberRenewalCount: null,
+        purchasableDaysBeforeMemberExpire: null,
+        effectBeginTime: null,
+        effectEndTime: null,
+        goodsRemark: null,
+        createUser: null,
       };
       formRef.value?.restoreValidation();
     }
