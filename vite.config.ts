@@ -6,7 +6,7 @@ import { OUTPUT_DIR } from "./build/constant";
 import { loadEnv } from "vite";
 import pkg from "./package.json";
 import { format } from "date-fns";
-
+ 
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {
   pkg: { dependencies, devDependencies, name, version },
@@ -19,8 +19,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   const viteEnv = wrapperEnv(env);
   const { VITE_PUBLIC_PATH, VITE_PORT, VITE_DROP_CONSOLE } = viteEnv;
   const isBuild = command === "build";
-    console.log('vite-config', VITE_DROP_CONSOLE);
-    
+
   return {
     base: VITE_PUBLIC_PATH, //开发或生产环境服务的 公共基础路径
     plugins: createVitePlugins(viteEnv, isBuild),
@@ -78,8 +77,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         compress: {
           // 通过false以完全跳过压缩。传递一个对象以指定自定义压缩选项。
           keep_infinity: true,
-        //   drop_console: VITE_DROP_CONSOLE,
-          drop_console: false,
+          drop_console: VITE_DROP_CONSOLE,
+        //   drop_console: false,
         },
       },
       brotliSize: false, //启用/禁用 brotli 压缩大小报告

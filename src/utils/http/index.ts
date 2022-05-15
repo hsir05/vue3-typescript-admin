@@ -7,7 +7,7 @@ import { joinTimestamp, formatRequestDate } from "./helper";
 import { RequestEnum, ResultEnum, ContentTypeEnum } from "@/enums/httpEnum";
 import { PageEnum } from "@/enums/pageEnum";
 
-import { useGlobSetting } from "@/hooks/setting";
+import { useGlobSetting } from "@/hooks/setting/index";
 
 import { isString } from "@/utils/is";
 import { deepMerge, isUrl } from "@/utils";
@@ -19,6 +19,7 @@ import { useMessage, useDialog } from "naive-ui";
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix || "";
+
 import router from "@/router";
 import { locStorage } from "@/utils/storage";
 const naiMessage = useMessage();
@@ -266,7 +267,8 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 消息提示类型
           errorMessageMode: "none",
           // 接口地址
-          apiUrl: globSetting.apiUrl,
+        //   apiUrl: globSetting.apiUrl,
+          apiUrl: "",
           // 接口拼接地址
           urlPrefix: urlPrefix,
           //  是否加入时间戳
