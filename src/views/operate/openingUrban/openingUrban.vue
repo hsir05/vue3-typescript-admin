@@ -4,10 +4,12 @@
       <div class="mt-10px mb-10px text-right flex">
         <n-button attr-type="button" type="primary" @click="handleAddCity">
           <template #icon>
-            <n-icon> <AddIcon /> </n-icon>
+            <n-icon>
+              <AddIcon />
+            </n-icon>
           </template>
-          添加开通城市</n-button
-        >
+          添加开通城市
+        </n-button>
         <n-button attr-type="button" type="primary">当前选中城市：{{ label }}</n-button>
       </div>
 
@@ -15,6 +17,7 @@
         ref="table"
         :data="data"
         :loading="loading"
+        :row-class-name="rowClassName"
         :columns="columns"
         class="box-border"
         min-height="calc(100vh - 260px)"
@@ -32,10 +35,10 @@
 </template>
 <script lang="ts">
 import { defineComponent, h, ref, onMounted, toRaw } from "vue";
-import { tableItemProps, tableDataItem } from "./type";
-// import { useMessage } from "naive-ui";
+import { TableItemInter } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Map from "@/components/Map/BaiduMap.vue";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import {
   LocationOutline as LocationIcon,
   TrashOutline as TrashIcon,
@@ -44,6 +47,7 @@ import {
 import { removeOpenCity, saveCenterPoint } from "@/api/operate/operate";
 import { getAllOpenCity } from "@/api/common/common";
 import OpeningUrbanModal from "./openingUrbanModal.vue";
+import { lighten } from "@/utils/index";
 export default defineComponent({
   name: "OpeningUrban",
   components: { Map, AddIcon, OpeningUrbanModal },
@@ -54,7 +58,9 @@ export default defineComponent({
     const loading = ref(false);
     const mapLoading = ref(false);
     const data = ref([]);
-    // const message = useMessage();
+    const selectdIndex = ref(0);
+    const { appTheme } = useProjectSetting();
+    const lightenStr = lighten(appTheme.value, 16);
 
     const columns = [
       {
@@ -62,7 +68,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 50,
-        render(_: tableItemProps, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -82,7 +88,7 @@ export default defineComponent({
         key: "actions",
         align: "center",
         width: 100,
-        render(record: tableDataItem, index: number) {
+        render(record: TableItemInter, index: number) {
           return h(TableActions as any, {
             actions: [
               {
@@ -141,8 +147,9 @@ export default defineComponent({
       }
     }
 
-    async function handleEdit(record: tableDataItem, index: number) {
+    async function handleEdit(record: TableItemInter, index: number) {
       console.log(toRaw(record), index);
+      selectdIndex.value = index;
       label.value = toRaw(record).cityName as string;
       const { renderBaiduMap } = baiduMapRef.value;
       const { createMarker } = await renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
@@ -150,7 +157,7 @@ export default defineComponent({
         console.log(lng, lat);
       });
     }
-    async function handleDelete(record: tableDataItem) {
+    async function handleDelete(record: TableItemInter) {
       loading.value = true;
       try {
         let res = await removeOpenCity({ cityCode: record.cityCode as string });
@@ -162,6 +169,13 @@ export default defineComponent({
       }
     }
 
+    const rowClassName = (_: TableItemInter, index: number) => {
+      if (index === selectdIndex.value) {
+        return "selected";
+      }
+      return "";
+    };
+
     function handleAddCity() {
       const { handleModal } = ModalRef.value;
       handleModal();
@@ -172,10 +186,12 @@ export default defineComponent({
       ModalRef,
       loading,
       mapLoading,
+      lightenStr,
       data,
       columns,
       label,
-      getRowKeyId: (row: tableItemProps) => row.id,
+      rowClassName,
+      getRowKeyId: (row: TableItemInter) => row.id,
       handleAddCity,
     };
   },
@@ -192,6 +208,7 @@ export default defineComponent({
     height: auto;
     background-color: $white;
   }
+
   .map {
     width: calc(100% - 400px - 10px);
     height: auto;
@@ -201,5 +218,10 @@ export default defineComponent({
     padding-top: 5px;
     padding-left: 5px;
   }
+}
+
+:deep(.selected td) {
+  background-color: v-bind(lightenStr) !important;
+  color: white !important;
 }
 </style>

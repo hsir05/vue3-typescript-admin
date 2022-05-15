@@ -1,12 +1,8 @@
 
-export interface tableItemProps {
-    id: string | number
-}
-
-export interface tableDataItem {
-  id?: string | null;
-  cityName: string | null;
-  cityCode: string | null;
-  lng: number | null;
-  lat: number | null;
+export interface TableItemInter {
+    id: string
+    cityName: string;
+    cityCode: string;
+    lng: number;
+    lat: number;
 }
