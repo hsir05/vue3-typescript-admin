@@ -19,7 +19,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   const viteEnv = wrapperEnv(env);
   const { VITE_PUBLIC_PATH, VITE_PORT, VITE_DROP_CONSOLE } = viteEnv;
   const isBuild = command === "build";
-
+    console.log('vite-config', VITE_DROP_CONSOLE);
+    
   return {
     base: VITE_PUBLIC_PATH, //开发或生产环境服务的 公共基础路径
     plugins: createVitePlugins(viteEnv, isBuild),
@@ -52,21 +53,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       host: true,
       port: VITE_PORT,
       proxy: {
-        //   "*": "http://localhost:8888",
-        // "/api": {
-        //   target: "http://192.168.1.50:8080",
-        //   changeOrigin: true,
-        //   rewrite: (path) => {
-        //       return path.replace("/api", "") 
-        //   },
-        // },
-        // "/api": {
-        //   target: "http://192.168.1.38:8080",
-        //   changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
-        //   rewrite: (path) => {
-        //       return path.replace("/api", "")
-        //   },
-        // },
         "/api": {
           target: "http://test-ngcxpm-api.yiminyueche.com",
           changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
@@ -92,7 +78,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         compress: {
           // 通过false以完全跳过压缩。传递一个对象以指定自定义压缩选项。
           keep_infinity: true,
-          drop_console: VITE_DROP_CONSOLE,
+        //   drop_console: VITE_DROP_CONSOLE,
+          drop_console: false,
         },
       },
       brotliSize: false, //启用/禁用 brotli 压缩大小报告
