@@ -15,7 +15,7 @@ const { load } = useScriptTag(BAIDU_MAP_SDK_URL);
 const domRef = ref<HTMLDivElement | null>(null);
 
 // 渲染地图
-async function renderBaiduMap(lng: number, lat: number) {
+async function renderBaiduMap(lng = 116.405725, lat = 39.935362) {
   await load(true);
   let map = null;
   let options = {
@@ -28,7 +28,8 @@ async function renderBaiduMap(lng: number, lat: number) {
   const point = new BMap.Point(lng, lat);
   // 初始化地图,设置中心点坐标和地图级别
   map.centerAndZoom(point, 15);
-  map.enableScrollWheelZoom(); //鼠标滚轮控制缩放
+  //鼠标滚轮控制缩放
+  map.enableScrollWheelZoom();
 
   //   map.setMapStyleV2({ styleJson: stylesData.data });
   // 创建标注
