@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { PaginationState } from "../type";
+import { PaginationInter } from "../type";
 
 //-----------------个人会员类型管理-------------------------
 
@@ -7,7 +7,7 @@ import { PaginationState } from "../type";
  * 个人会员类型分页
  */
 interface CustomerPageInter {
-    page: PaginationState;
+    page: PaginationInter;
     search: {
         customerMemberNameLike: string | null;
         customerMemberLockEq: string | null;
@@ -71,7 +71,7 @@ export function editCustomerMember(data: CustomerMemberInter) {
  * 个人客户分页列表
 */
 interface InCustomerPageInter{
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     customerPhoneLike: string | null;
     customerMemberNameEq: string | null;

@@ -1,5 +1,5 @@
 import { http } from '@/utils/http';
-import { PaginationState, } from "../type"
+import { PaginationInter, } from "../type"
 
 /**---------集团客户会员类型-----------*/
 /**
@@ -7,7 +7,7 @@ import { PaginationState, } from "../type"
 */
 
 interface GroupPageInter{
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     groupCustomerMemberNameLike: string | null;
     groupCustomerMemberLockEq: number | null;
@@ -94,7 +94,7 @@ export function getAllGroupMember() {
 */
 
 interface CustomerPageInter{
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     groupCustomerNameLike: string | null;
     contactNameLike: string | null;

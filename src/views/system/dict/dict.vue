@@ -95,7 +95,7 @@ import { tableDataItem } from "./type";
 // import { data } from "./data";
 import { pageSizes } from "@/config/table";
 // import { getDict } from "@/api/system/dict";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 
 export default defineComponent({
   name: "Dict",
@@ -129,7 +129,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (pagination: PaginationState) => {
+    const getData = async (pagination: PaginationInter) => {
       console.log(pagination);
 
       //   loading.value = true;

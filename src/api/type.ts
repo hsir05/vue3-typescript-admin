@@ -5,23 +5,18 @@ export interface loginInter {
     captcha: string;
 }
 
-export interface PaginationState {
+export interface PaginationInter {
     pageIndex: number,
     pageSize: number
 }
 
 // 系统管理 - 字典管理
-export interface getDictState extends PaginationState {
-    // id?: null | string | number;
-    name: null | string;
-    // code: null | string;
-    // sort: number | null;
-    // isChild: number | null;
-    // status: number | null;
+export interface DictInter extends PaginationInter {
+    name:string| null;
 }
 
 // 系统管理 - 用户管理
-export interface getUsersDataState extends PaginationState {
+export interface UsersDataInter extends PaginationInter {
     id?: null | string | number;
     account: null | string;
     name: null | string;
@@ -29,7 +24,7 @@ export interface getUsersDataState extends PaginationState {
     status: number | null;
 }
 // 系统管理 - 角色管理
-export interface getRolesState {
+export interface RolesInter {
     id?: null | string | number;
     name: null | string;
     status: null | string;

@@ -74,7 +74,7 @@ import EnteEmeContactDrawer from "./enteEmeContactDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 import { getEmeConactPage, removeEmeContact } from "@/api/capacity/capacity";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "EnteEmeContact",
@@ -197,7 +197,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = {
@@ -277,11 +277,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

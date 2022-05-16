@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { PaginationState } from "../type";
+import { PaginationInter } from "../type";
 
 //-----------------司机钱包管理-------------------------
 
@@ -7,7 +7,7 @@ import { PaginationState } from "../type";
  * 司机钱包分页
  */
 interface WalletPageInter {
-    page: PaginationState;
+    page: PaginationInter;
     search: {
         driverNoLike: string | null;
         operationCompanyIdEq: string | null;
@@ -24,7 +24,7 @@ export function getWalletPage(data: WalletPageInter) {
  * 司机钱包交易记录
  */
 interface RecordPageInter {
-    page: PaginationState;
+    page: PaginationInter;
     search: {
         driverWalletIdEq: string | null;
         dealTypeEq: string | null;
@@ -97,7 +97,7 @@ export function editRule(data: RuleIner) {
  * 司机提现分页
  */
 interface DrawalPageInter {
-    page: PaginationState;
+    page: PaginationInter;
     search: {
         operationCompanyIdEq: string | null;
         dealTimeGe: string | null;

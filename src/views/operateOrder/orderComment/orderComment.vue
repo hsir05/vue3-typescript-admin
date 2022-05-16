@@ -125,7 +125,7 @@ import { useRouter } from "vue-router";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 export default defineComponent({
   name: "OrderComment",
   components: { BasicTable },
@@ -250,7 +250,7 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     });
 
-    // const getData = async (pagination: PaginationState) => {
+    // const getData = async (pagination: PaginationInter) => {
     //   loading.value = true;
     //   try {
     //     let res = await getUsers({ ...pagination, ...queryValue.value });
@@ -312,11 +312,11 @@ export default defineComponent({
       //   getData({ page: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       //   getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       //   getData(toRaw(pagination));
     }

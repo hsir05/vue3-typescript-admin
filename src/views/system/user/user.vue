@@ -77,7 +77,7 @@ import UserDrawer from "./userDrawer.vue";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
 // import { getUsers } from "@/api/system/user";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 export default defineComponent({
   name: "User",
   components: { BasicTable, UserDrawer },
@@ -197,7 +197,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (pagination: PaginationState) => {
+    const getData = async (pagination: PaginationInter) => {
       console.log(pagination);
 
       //   loading.value = true;
@@ -259,11 +259,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

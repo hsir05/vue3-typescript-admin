@@ -71,7 +71,7 @@ import DispatcherDrawer from "./dispatcherDrawer.vue";
 import { useMessage } from "naive-ui";
 import { tableDataItem } from "./type";
 import { statusOptions } from "@/config/form";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { getAllOperateCompany } from "@/api/common/common";
 import { getExpendPage, removeExpendContact } from "@/api/capacity/capacity";
 import dayjs from "dayjs";
@@ -194,7 +194,7 @@ export default defineComponent({
       getAllCompanyData();
     });
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };
@@ -288,11 +288,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

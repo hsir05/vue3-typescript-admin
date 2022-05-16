@@ -1,13 +1,21 @@
  import { http } from '@/utils/http';
-import { getRolesState } from "../type"
-import { getUsersDataState } from "../type"
-import { loginInter } from "../type"
+import { RolesInter, UsersDataInter, loginInter, DictInter } from "../type"
+
+
+//-----------------字典管理-------------------------
+export function getDict(data: DictInter) {
+  return http.request({
+    url: '/dict',
+    method: 'post',
+    data
+  });
+}
+
+
 
 //-----------------------登录管理----------------------------
 //获取验证码
 export function getCaptcha(data: {account: string, password: string}) {
-    console.log(data);
-    
   return http.request({
     url: '/captcha',
     method: 'post',
@@ -42,7 +50,7 @@ export function getLoginerAuth() {
 /**
  * 获取角色
 */
-export function getRoles(data: getRolesState) {
+export function getRoles(data: RolesInter) {
   return http.request({
     url: '/roles',
     method: 'post',
@@ -61,7 +69,7 @@ export function getMenus() {
 
 //-----------------------用户管理-----------------------------
 //获取路由菜单
-export function getUsers(data: getUsersDataState) {
+export function getUsers(data: UsersDataInter) {
     console.log(data);
     
   return http.request({

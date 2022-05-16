@@ -66,7 +66,7 @@ import WalletDetail from "./walletDetail.vue";
 import { FormInst } from "naive-ui";
 import { dealWay } from "@/config/table";
 import { getRecordPage, getWalletDetail } from "@/api/driverFinance/driverFinance";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "TransactionRecord",
@@ -182,7 +182,7 @@ export default defineComponent({
       state.isDrawer = true;
     }
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };

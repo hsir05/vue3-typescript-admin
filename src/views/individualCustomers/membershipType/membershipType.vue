@@ -63,7 +63,7 @@ import MemberDrawer from "./memberDrawer.vue";
 import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
 import { getCustomerMemberPage } from "@/api/individualCustomers/individualCustomers";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { memberType } from "@/config/table";
 export default defineComponent({
   name: "MembershipType",
@@ -161,7 +161,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };
@@ -216,11 +216,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

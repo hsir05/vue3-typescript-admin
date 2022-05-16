@@ -1,17 +1,17 @@
 <template>
   <div class="login-container">
     <div class="login-mobile-logo">
-      <img src="../../assets/image/logo.png" alt="" />
+      <img src="../../../assets/image/logo.png" alt="" />
     </div>
     <div class="login">
       <div class="login-left">
         <div class="login-title">
           <div class="login-title-img">
-            <img src="../../assets/image/logo.png" alt="logo" style="width: 100%" />
+            <img src="../../../assets/image/logo.png" alt="logo" style="width: 100%" />
           </div>
         </div>
         <div class="login-left-img">
-          <img src="../../assets/image/login-middle.png" style="width: 100%" alt="" />
+          <img src="../../../assets/image/login-middle.png" style="width: 100%" alt="" />
         </div>
         <div class="login-info">
           <p>兰州益民出行汽车服务有限公司</p>
@@ -221,7 +221,7 @@ export default defineComponent({
 
   .login-left {
     width: 45%;
-    background: url("../../assets/image/login-bg2.png") center no-repeat;
+    background: url("../../../assets/image/login-bg2.png") center no-repeat;
     background-size: cover;
     padding: 64px 70px;
     border-top-left-radius: 8px;
@@ -290,7 +290,7 @@ export default defineComponent({
 @media screen and (max-width: 768px) {
   .login-container {
     background-color: #fff;
-    background: url("../../assets/image/login-bg2-m.png") top no-repeat;
+    background: url("../../../assets/image/login-bg2-m.png") top no-repeat;
     background-size: contain;
 
     .login-mobile-logo {

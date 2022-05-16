@@ -1,19 +1,19 @@
 import { http } from "@/utils/http";
-import { PaginationState } from "../type";
+import { PaginationInter } from "../type";
 
 //-----------------运营企业管理-------------------------
 
 /**
  * 运营企业分页
  */
-interface pageSate {
-  page: PaginationState;
+interface CompanyPageInter {
+  page: PaginationInter;
   search: {
     nameLike: string | null;
     operationCompanyCodeLike: string | null;
   };
 }
-export function getCompanyPage(data: pageSate) {
+export function getCompanyPage(data: CompanyPageInter) {
   return http.request({
     url: "/operationCompany/page",
     method: "post",
@@ -23,7 +23,7 @@ export function getCompanyPage(data: pageSate) {
 /**
  * 新增运营企业及管理员
  */
-interface companyState {
+interface addCompanyInter {
   operationCompanyId?: string | null;
   operationCompanyCode: string | null;
   operationCompanyName: string | null;
@@ -37,7 +37,7 @@ interface companyState {
   lat: number | null;
   operationCompanyManagerPhone: string | null;
 }
-export function addCompany(data: companyState) {
+export function addCompany(data: addCompanyInter) {
   return http.request({
     url: "/operationCompany/add",
     method: "post",
@@ -47,7 +47,7 @@ export function addCompany(data: companyState) {
 /**
  * 编辑运营企业及管理员
  */
-export function editCompany(data: companyState) {
+export function editCompany(data: addCompanyInter) {
   return http.request({
     url: "/operationCompany/edit",
     method: "post",
@@ -89,13 +89,13 @@ export function updateAgentStatus(data: { operationCompanyId: string }) {
 /**
  * 代理商分页
  */
-interface agencyPageSate {
-  page: PaginationState;
+interface AgencyPageInter {
+  page: PaginationInter;
   search: {
     operationCompanyAgencyNameLike: string | null;
   };
 }
-export function getAgencyPage(data: agencyPageSate) {
+export function getAgencyPage(data: AgencyPageInter) {
   return http.request({
     url: "/operationCompanyAgency/page",
     method: "post",
@@ -105,12 +105,8 @@ export function getAgencyPage(data: agencyPageSate) {
 /**
  * 新增代理商
  */
-export interface loginCredentialProps {
-  loginCredentialState: number;
-  loginAccount: string | null;
-}
 
-interface agencyState {
+interface AgencyFormInter {
   operationCompanyAgencyId?: string | null;
   operationCompanyAgencyName: string | null;
   loginCredential: string | null;
@@ -119,7 +115,7 @@ interface agencyState {
   operationCompanyAgencyContactPhone: string | null;
   operationCompanyIds: null | string[];
 }
-export function addAgency(data: agencyState) {
+export function addAgency(data: AgencyFormInter) {
   return http.request({
     url: "/operationCompanyAgency/add",
     method: "post",
@@ -129,7 +125,7 @@ export function addAgency(data: agencyState) {
 /**
  * 编辑代理商
  */
-export function editAgency(data: agencyState) {
+export function editAgency(data: AgencyFormInter) {
   return http.request({
     url: "/operationCompanyAgency/edit",
     method: "post",
@@ -180,11 +176,11 @@ export function getAllowAgencyCompany() {
 /**
  * 校验代理商登录账号是否重复
  */
-interface ratioSate {
+interface RatioInter {
   operationCompanyAgencyId: string;
   operationCompanyId: string;
 }
-export function getRatio(data: ratioSate) {
+export function getRatio(data: RatioInter) {
   return http.request({
     url: "/operationCompanyAgency/getNumberByOperationCompanyId",
     method: "post",
@@ -220,14 +216,14 @@ export function getAreaUndertakeBus(data: { areaCode: string; operationCompanyId
 /**
  * 保存企业承接业务
  */
-interface companyUndertakeBusinessState {
+interface CompanyUndertakeBusinessInter {
   orderType: string;
   orderBusinessType: string;
 }
 interface undertakeState {
   areaCode: string | null;
   operationCompanyId: string | null;
-  companyUndertakeBusinessList: companyUndertakeBusinessState[];
+  companyUndertakeBusinessList: CompanyUndertakeBusinessInter[];
 }
 export function saveUndertakeBus(data: undertakeState) {
   return http.request({
@@ -282,8 +278,8 @@ export function updateRate(data: UpdateRate) {
 /**
  * 车辆分页
  */
-interface vehiclePage {
-  page: PaginationState;
+interface VehiclePageInter {
+  page: PaginationInter;
   search: {
     operationCompanyIdEq: string | null;
     plateNumberLike: string | null;
@@ -291,7 +287,7 @@ interface vehiclePage {
     vehicleStateEq: string | null;
   };
 }
-export function getVehiclePage(data: vehiclePage) {
+export function getVehiclePage(data: VehiclePageInter) {
   return http.request({
     url: "/vehicle/page",
     method: "post",
@@ -371,7 +367,7 @@ export function transfer(data: TransferInter) {
  * 司机分页
  */
 interface DriverPageInter {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     driverNoLike: string | null;
     operationCompanyIdEq: string | null;
@@ -542,7 +538,7 @@ export function updateCertificate(data: CertificateInter) {
  * 车辆分配分页
  */
 interface VehicleBindingInter {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     plateNumberLike: string | null;
     operationCompanyIdEq: string | null;
@@ -621,7 +617,7 @@ export function unbindDriver(data: {
  * 班级管理分页
  */
 interface DriverClazzPageInter {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     operationCompanyDriverClazzEntryLike: string | null;
     operationCompanyIdEq: string | null;
@@ -660,7 +656,7 @@ export function getMemberList(data: { operationCompanyDriverClazzId: string }) {
  * 企业紧急联系人分页
  */
 interface emeContactSate {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     operationCompanyIdEq: string | null;
     operationCompanyEmergencyContactNameLike: string | null;
@@ -764,7 +760,7 @@ export function getTimeRange(data: {
  * 企业值班调度人分页
  */
 interface expendPageState {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     operationCompanyIdEq: string | null;
     operationCompanyExpendContactNameLike: string | null;
@@ -840,7 +836,7 @@ export function removeExpendContact(data: { operationCompanyExpendContactId: str
  * DRS0006 = 平台审核通过
  */
 interface DriverRegisterInter {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     registerStateEq: string | null;
     driverFullNameLike: string | null;
@@ -867,7 +863,7 @@ export function getDriverRegisterPage(data: DriverRegisterInter) {
  *有司机会员产品的企业分页
  */
 interface DriverMemberPageInter {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     operationCompanyIdEq: string | null;
   };
@@ -883,7 +879,7 @@ export function getDriverMemberPage(data: DriverMemberPageInter) {
  *企业下会员产品列表
  */
 interface DriverMemberGoodsPageInter {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     operationCompanyIdEq: string | null;
     goodsNameLike: string | null;

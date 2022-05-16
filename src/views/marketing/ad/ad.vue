@@ -64,7 +64,7 @@ import { itemState, CityItemInter } from "@/interface/common/common";
 import { statusOptions } from "@/config/form";
 import { getAdPage, removeAd, upAdvertisement, downAdvertisement } from "@/api/marketing/marketing";
 import { getAllOpenCity } from "@/api/common/common";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 
 export default defineComponent({
@@ -244,7 +244,7 @@ export default defineComponent({
       }
     }
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { cityCodeEq: cityCodeEq.value };
@@ -309,11 +309,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

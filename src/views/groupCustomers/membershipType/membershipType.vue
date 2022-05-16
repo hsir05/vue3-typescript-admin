@@ -63,7 +63,7 @@ import MemberDrawer from "./memberDrawer.vue";
 import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
 import { getGroupMemberPage } from "@/api/groupCustomers/groupCustomers";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 // import { memberType } from "@/config/table"
 export default defineComponent({
   name: "MembershipType",
@@ -161,7 +161,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };
@@ -213,10 +213,10 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理

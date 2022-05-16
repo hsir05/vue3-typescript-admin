@@ -73,7 +73,7 @@ import DetailDrawer from "./detailDrawer.vue";
 import VouchersDrawer from "./vouchersDrawer.vue";
 import { TableDataItemInter } from "./type";
 import { getCouponConsumeRulePage, removeCoupon } from "@/api/marketing/marketing";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { FormInst, useMessage } from "naive-ui";
 import { CityItemInter } from "@/interface/common/common";
 export default defineComponent({
@@ -188,7 +188,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     };
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };
@@ -232,11 +232,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

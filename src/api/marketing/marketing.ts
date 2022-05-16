@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { PaginationState } from "../type";
+import { PaginationInter } from "../type";
 
 //-----------------广告管理-------------------------
 
@@ -7,7 +7,7 @@ import { PaginationState } from "../type";
  * 广告分页
  */
 interface AdPageInter {
-    page: PaginationState;
+    page: PaginationInter;
     search: {
         cityCodeEq: string | null;
     };
@@ -98,7 +98,7 @@ export function downAdvertisement(data: { openCityAdvertisementId: string }) {
  * 代金券分页
  */
 interface CouponPageInter {
-    page: PaginationState;
+    page: PaginationInter;
     search: {
         customerCouponConsumeRuleNameLike: string | null;
         couponUsedCityCodesLike: string | null;

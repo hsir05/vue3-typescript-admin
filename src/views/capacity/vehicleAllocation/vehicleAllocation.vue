@@ -78,7 +78,7 @@ import { NTag } from "naive-ui";
 import { getAllOperateCompany } from "@/api/common/common";
 import { tableDataItem } from "./type";
 import { getVehicleBindingPage } from "@/api/capacity/capacity";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 export default defineComponent({
   name: "VehicleAllocation",
   components: { BasicTable, AgentDrawer },
@@ -210,7 +210,7 @@ export default defineComponent({
       }
     };
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };
@@ -257,11 +257,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

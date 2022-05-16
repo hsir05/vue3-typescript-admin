@@ -99,7 +99,7 @@ import ChargeRuleDrawer from "./chargeRuleDrawer.vue";
 import Distribution from "./distribution.vue";
 // import { useMessage } from "naive-ui";
 import { getRuleData } from "@/api/operate/chargeRule";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { tableDataItem } from "./type";
 export default defineComponent({
   name: "ChargeRule",
@@ -180,12 +180,12 @@ export default defineComponent({
       isDis.value = true;
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       //   getData(toRaw(pagination));
     }
 
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       //   getData(toRaw(pagination));
     }

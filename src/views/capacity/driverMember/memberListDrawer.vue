@@ -46,7 +46,7 @@
 import { defineComponent, reactive, h, toRefs, toRaw, ref } from "vue";
 import BasicTable from "@/components/Table/Table.vue";
 import { getDriverMemberGoodsPage } from "@/api/capacity/capacity";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { TableMemberItemInter, MemberFormInter } from "./type";
 import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import DriverMemDrawer from "./driverMemberDrawer.vue";
@@ -188,7 +188,7 @@ export default defineComponent({
       state.isDrawer = true;
     }
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       state.loading = true;
       try {
         let search = { ...queryValue.value };
@@ -225,11 +225,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

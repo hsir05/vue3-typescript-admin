@@ -65,7 +65,7 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import { FormInst } from "naive-ui";
 import { tableDataItem } from "./type";
 import BasicTable from "@/components/Table/Table.vue";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { getMeiTuanPage } from "@/api/workOrder/workOrder";
 import { processStateData, refundTypeData } from "@/config/form";
 export default defineComponent({
@@ -143,7 +143,7 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryForm.value };
@@ -174,11 +174,11 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationState) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationState) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }

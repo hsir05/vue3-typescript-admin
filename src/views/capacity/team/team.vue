@@ -83,7 +83,7 @@ import TeamDrawer from "./teamDrawer.vue";
 import { pageSizes } from "@/config/table";
 import { getDriverClazzPage } from "@/api/capacity/capacity";
 import { getAllOperateCompany } from "@/api/common/common";
-import { PaginationState } from "@/api/type";
+import { PaginationInter } from "@/api/type";
 import { ItemInter } from "./type";
 export default defineComponent({
   name: "Team",
@@ -130,7 +130,7 @@ export default defineComponent({
       }
     };
 
-    const getData = async (page: PaginationState) => {
+    const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
         let search = { ...queryValue.value };

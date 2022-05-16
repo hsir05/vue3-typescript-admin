@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { PaginationState } from "../type";
+import { PaginationInter } from "../type";
 
 
 //-----------------美团工单管理-------------------------
@@ -8,7 +8,7 @@ import { PaginationState } from "../type";
  * 工单分页
  */
 interface pageSate {
-  page: PaginationState;
+  page: PaginationInter;
   search: {
     mtOrderIdEq: string | null;
     processStateEq: string | null;
