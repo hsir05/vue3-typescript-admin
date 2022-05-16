@@ -191,7 +191,7 @@ export default defineComponent({
       columns,
       label,
       rowClassName,
-      getRowKeyId: (row: TableItemInter) => row.id,
+      getRowKeyId: (row: TableItemInter) => row.cityCode,
       handleAddCity,
     };
   },

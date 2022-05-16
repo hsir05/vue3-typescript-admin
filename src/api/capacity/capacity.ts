@@ -884,11 +884,25 @@ export function getDriverMemberPage(data: DriverMemberPageInter) {
 }
 
 /**
- *删除开通司机会员的企业
+ *关闭开通司机会员的企业
  */
-export function removeMember(data: { operationCompanyOpenedDriverMemberId: string }) {
+export function closeMember(data: { operationCompanyOpenedDriverMemberId: string }) {
   return http.request({
     url: "/driverMemberGoods/deleteOpenedCompany",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ *更新派单限制开始时间
+ */
+interface OrderLimitTimeInter{
+    operationCompanyOpenedDriverMemberId: string
+    dispatchOrderLimitBeginTime: string
+}
+export function updateOrderLimitTime(data: OrderLimitTimeInter) {
+  return http.request({
+    url: "/driverMemberGoods/updateDispatchOrderLimitBeginTime",
     method: "post",
     data: data,
   });

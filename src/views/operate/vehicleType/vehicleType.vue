@@ -5,6 +5,7 @@
         ref="table"
         striped
         :loading="loading"
+        :row-class-name="rowClassName"
         :data="data"
         :columns="columns"
         class="box-border"
@@ -106,12 +107,14 @@
 import { defineComponent, ref, h, reactive, unref, toRefs, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { InfoCircleFilled as infoIcon } from "@vicons/antd";
 import { NTag, FormInst, useMessage } from "naive-ui";
 import BasicUpload from "@/components/Upload/Upload.vue";
 import { UploadTypeEnum } from "@/enums/httpEnum";
-import { tableDataItem, tableItemProps } from "./type";
+import { TableItemInter } from "./type";
 import { getVehicleType, vehicleTypeSave } from "@/api/operate/operate";
+import { lighten } from "@/utils/index";
 import { rules } from "./data";
 export default defineComponent({
   name: "VehicleType",
@@ -125,10 +128,11 @@ export default defineComponent({
     const ldleImgList = ref<string[]>([]);
     const vehichleTypeList = ref<string[]>([]);
     const busyImgList = ref<string[]>([]);
+    const selectdIndex = ref(0);
 
     const formRef = ref<FormInst | null>(null);
     const message = useMessage();
-    const form = ref<tableDataItem>({
+    const form = ref<TableItemInter>({
       vehicleTypeId: "",
       vehicleTypeDesc: "",
       vehicleTypeImageId: "",
@@ -137,7 +141,9 @@ export default defineComponent({
       vehicleTypeLock: 1,
     });
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<TableItemInter[]>([]);
+    const { appTheme } = useProjectSetting();
+    const lightenStr = lighten(appTheme.value, 16);
 
     const columns = [
       {
@@ -145,7 +151,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 60,
-        render(_: tableItemProps, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -166,14 +172,14 @@ export default defineComponent({
         key: "vehicleTypeLock",
         width: 65,
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: row.vehicleTypeLock === 1 ? "success" : "error",
+              type: row.vehicleTypeLock === 1 ? "error" : "success",
             },
             {
-              default: () => (row.vehicleTypeLock === 1 ? "是" : "否"),
+              default: () => (row.vehicleTypeLock === 1 ? "锁定" : "正常"),
             }
           );
         },
@@ -183,7 +189,7 @@ export default defineComponent({
         key: "actions",
         align: "center",
         width: 110,
-        render(record: tableItemProps) {
+        render(record: TableItemInter, index: number) {
           return h(TableActions as any, {
             actions: [
               {
@@ -191,7 +197,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handle.bind(null, record, true),
+                onClick: handle.bind(null, record, true, index),
                 auth: ["dict001"],
               },
               {
@@ -199,7 +205,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handle.bind(null, record, false),
+                onClick: handle.bind(null, record, false, index),
                 auth: ["dict001"],
               },
             ],
@@ -227,9 +233,9 @@ export default defineComponent({
     const vehicleTypeSaveSub = async () => {
       state.loading = true;
       try {
-        await vehicleTypeSave(form.value);
+        let res = await vehicleTypeSave(form.value);
         getData();
-        message.success("保存成功");
+        message.success(window.$tips[res.code]);
         state.loading = false;
       } catch (err) {
         console.log(err);
@@ -237,7 +243,8 @@ export default defineComponent({
       }
     };
 
-    function handle(record: Recordable, bool: boolean) {
+    function handle(record: Recordable, bool: boolean, index: number) {
+      selectdIndex.value = index;
       state.disabled = bool;
       state.isShow = true;
       const {
@@ -307,6 +314,13 @@ export default defineComponent({
       state.isShow = false;
     }
 
+    const rowClassName = (_: TableItemInter, index: number) => {
+      if (index === selectdIndex.value) {
+        return "selected";
+      }
+      return "";
+    };
+
     return {
       ...toRefs(state),
       data,
@@ -318,9 +332,11 @@ export default defineComponent({
       form,
       columns,
       rules,
+      lightenStr,
 
-      getRowKeyId: (row: tableItemProps) => row.id,
+      getRowKeyId: (row: TableItemInter) => row.vehicleTypeId,
       handleVisble,
+      rowClassName,
       imageRemove,
       busyRemove,
       freeRemove,
@@ -356,5 +372,10 @@ export default defineComponent({
     display: inline-flex;
     margin-left: 145px;
   }
+}
+
+:deep(.selected td) {
+  background-color: v-bind(lightenStr) !important;
+  color: white !important;
 }
 </style>

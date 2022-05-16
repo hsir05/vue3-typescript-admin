@@ -1,13 +1,7 @@
 export interface TableItemInter {
-  operationCompanyOpenedDriverMemberId: string | null;
-  account: null | string;
-  contacts: null | string;
-  agent: null | string;
-  status: null | number;
-  create_time: null | string;
-  phone?: null | string;
-  sex?: null | number;
-  operateCity: null | string
+  operationCompanyOpenedDriverMemberId: string;
+  dispatchOrderLimitBeginTime: number
+  openTime: number
 }
 
 export interface FormInter {
@@ -24,4 +18,9 @@ export interface FormInter {
     effectEndTime: number | null
     goodsRemark: string | null
     createUser: string | null
+}
+
+export interface OrderLimitTime {
+    operationCompanyOpenedDriverMemberId: string | null
+    dispatchOrderLimitBeginTime: string | null
 }

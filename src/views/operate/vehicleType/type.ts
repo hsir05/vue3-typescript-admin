@@ -1,13 +1,9 @@
 
-export interface tableDataItem {
+export interface TableItemInter {
   vehicleTypeId: string
   vehicleTypeDesc: string
   vehicleTypeImageId: string
   vehicleTypeBusyIconId: string
   vehicleTypeFreeIconId: string
   vehicleTypeLock: number;
-}
-
-export interface tableItemProps {
-  id: string;
 }

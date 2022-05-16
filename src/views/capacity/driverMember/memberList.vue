@@ -1,8 +1,8 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter" />
+  <BasicDrawer v-model:show="isDrawer" title="会员列表" @on-close-after="onCloseAfter" />
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
+import { defineComponent, reactive, toRefs } from "vue";
 export default defineComponent({
   name: "MemberListDrawer",
   setup() {
@@ -11,10 +11,8 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
-    const title = ref("会员列表");
 
-    function openDrawer(t: string) {
-      title.value = t;
+    function openDrawer() {
       state.isDrawer = true;
     }
 
@@ -28,9 +26,7 @@ export default defineComponent({
     function handleReset() {}
 
     return {
-      title,
       ...toRefs(state),
-
       openDrawer,
       onCloseAfter,
     };

@@ -32,6 +32,7 @@
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
+      :isAddBtn="true"
       :row-key="getRowKeyId"
       :itemCount="itemCount"
       @reload-page="reloadPage"
@@ -45,29 +46,38 @@
     <DriMemDrawer ref="driMemDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
 
     <MemberList ref="memberListRef" :width="700" @on-save-after="handleSaveMemberAfter" />
+
+    <OrderLimitTimeModal ref="orderLimitTimeModalRef" @on-save-after="handleSaveMemberAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import {
+  CloseCircleOutline as CloseIcon,
+  TimeOutline as TimeIcon,
+  CubeSharp as CubeSharpIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DriMemDrawer from "./driMemDrawer.vue";
+import OrderLimitTimeModal from "./orderLimitTimeModal.vue";
 import MemberList from "./memberList.vue";
 import { useMessage } from "naive-ui";
 import { TableItemInter } from "./type";
-import { getDriverMemberPage, removeMember } from "@/api/capacity/capacity";
+import { getDriverMemberPage, closeMember } from "@/api/capacity/capacity";
 import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationState } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "DriverMember",
-  components: { BasicTable, DriMemDrawer, MemberList },
+  components: { BasicTable, DriMemDrawer, MemberList, OrderLimitTimeModal },
 
   setup() {
     const loading = ref(false);
     const message = useMessage();
     const companyData = ref([]);
     const driMemDrawerRef = ref();
+    const orderLimitTimeModalRef = ref();
     const memberListRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
@@ -78,10 +88,6 @@ export default defineComponent({
     const data = ref<TableItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
@@ -95,7 +101,7 @@ export default defineComponent({
         title: "运营企业",
         key: "operationCompanyName",
         align: "center",
-        width: 250,
+        width: 320,
         ellipsis: {
           tooltip: true,
         },
@@ -107,6 +113,9 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.openTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "派单限制开始时间",
@@ -114,6 +123,9 @@ export default defineComponent({
         align: "center",
         ellipsis: {
           tooltip: true,
+        },
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.dispatchOrderLimitBeginTime).format("YYYY-MM-DD HH:mm"));
         },
       },
       {
@@ -158,23 +170,32 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
-                label: "会员编辑列表",
+                label: "会员产品列表",
                 type: "primary",
-                icon: CreateIcon,
+                icon: CubeSharpIcon,
                 isIconBtn: true,
-                onClick: handlememberList.bind(null, record),
+                onClick: handleMemberList.bind(null, record),
                 auth: ["dict001"],
               },
               {
-                label: "删除",
+                label: "调整派单限制开始时间",
+                type: "primary",
+                icon: TimeIcon,
+                isIconBtn: true,
+                isShow: record.dispatchOrderLimitBeginTime > new Date().getTime() ? false : true,
+                onClick: handleOrderTime.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "关闭",
                 type: "error",
-                icon: RemoveIcon,
+                icon: CloseIcon,
                 isIconBtn: true,
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
+                  onPositiveClick: handleClose.bind(null, record),
+                  title: "您确定关闭?",
                 },
               },
             ],
@@ -211,6 +232,8 @@ export default defineComponent({
         let search = { ...queryValue.value };
         let res = await getDriverMemberPage({ page, search: search });
         data.value = res.data.content;
+        console.log(res.data);
+
         itemCount.value = res.data.totalElements;
         loading.value = false;
       } catch (err) {
@@ -223,11 +246,18 @@ export default defineComponent({
       console.log("选择了", rowKeys);
     }
 
-    function handlememberList(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleMemberList(record: Recordable) {
       const { openDrawer } = memberListRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer(record);
     }
+    function handleOrderTime(record: Recordable) {
+      const { handleModal } = orderLimitTimeModalRef.value;
+      handleModal({
+        operationCompanyOpenedDriverMemberId: record.operationCompanyOpenedDriverMemberId,
+        dispatchOrderLimitBeginTime: record.dispatchOrderLimitBeginTime,
+      });
+    }
+
     function handleBatch() {
       console.log("点击了批量删除");
     }
@@ -236,13 +266,14 @@ export default defineComponent({
       const { openDrawer } = driMemDrawerRef.value;
       openDrawer("新增用户");
     }
-    async function handleRemove(record: Recordable) {
+    async function handleClose(record: Recordable) {
       loading.value = true;
       try {
-        let res = await removeMember({
+        let res = await closeMember({
           operationCompanyOpenedDriverMemberId: record.operationCompanyOpenedDriverMemberId,
         });
         console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
         message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {
@@ -285,13 +316,18 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handleSaveMemberAfter() {}
+    function handleSaveMemberAfter() {
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
 
     return {
       queryValue,
       data,
       loading,
       driMemDrawerRef,
+      orderLimitTimeModalRef,
       memberListRef,
       basicTableRef,
       columns,
