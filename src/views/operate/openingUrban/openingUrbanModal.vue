@@ -44,7 +44,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import BasicModal from "@/components/Modal/Modal.vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableItemInter } from "./type";
 import { getAllOpenCity } from "@/api/common/common";
 import { itemState } from "@/interface/common/common";
 import { openCitySave, uniqueCityName } from "@/api/operate/operate";
@@ -55,9 +55,9 @@ export default defineComponent({
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
-    const cityData = ref<tableDataItem[]>([]);
+    const cityData = ref<TableItemInter[]>([]);
 
-    const form = ref<tableDataItem>({
+    const form = ref<TableItemInter>({
       cityName: null,
       cityCode: null,
       lng: null,

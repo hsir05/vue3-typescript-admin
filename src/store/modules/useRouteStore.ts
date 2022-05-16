@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { RouteRecordRaw } from 'vue-router';
 import { constantRouter } from '@/router/index';
-import { getMenus } from "@/api/system/menus"
+import { getMenus } from "@/api/system/system"
 
 export interface RouteState {
   menus: RouteRecordRaw[];

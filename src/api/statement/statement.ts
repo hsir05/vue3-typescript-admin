@@ -1,15 +1,15 @@
 import { http } from "@/utils/http";
-import { getUsersDataState } from "../type";
+import { UsersDataInter } from "../type";
 
 //对帐单
-export function getInflux(data: getUsersDataState) {
+export function getInflux(data: UsersDataInter) {
   return http.request({
     url: "/orderStatementOfInflux/getOverview",
     method: "post",
     data,
   });
 }
-
+ 
 //对帐单详情
 export function getInfluxDetail(data: {
   influxCode: string;
