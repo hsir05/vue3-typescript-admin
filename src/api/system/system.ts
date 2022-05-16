@@ -30,7 +30,13 @@ export function login(data: loginInter) {
     data
   });   
 }
-
+// 刷新token
+export function refreshToken() {
+  return http.request({
+    url: '/refreshToken',
+    method: 'post'
+  });   
+}
 // 当前登录管理员详情查询
 export function getDetailViaLoginer() {
   return http.request({

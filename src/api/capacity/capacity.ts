@@ -963,3 +963,23 @@ export function editDriverMemberGoods(data: DriverMemberGoodsInter) {
     data: data,
   });
 }
+export function getUnOpenCompany() {
+  return http.request({
+    url: "/operationCompany/findCompaniesHaveNotOperationCompanyOpenedDriverMember",
+    method: "post",
+  });
+}
+/**
+ * 编辑司机会员产品
+ */
+interface AddOpenCompanyInter{
+    companyIds: string[]
+    dispatchOrderLimitBeginTime: string
+}
+export function addOpenedCompany(data: AddOpenCompanyInter) {
+  return http.request({
+    url: "/driverMemberGoods/addOpenedCompany",
+    method: "post",
+    data: data,
+  });
+}

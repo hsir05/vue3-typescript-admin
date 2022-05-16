@@ -68,6 +68,7 @@ declare module 'vue' {
     NTag: typeof import('naive-ui')['NTag']
     NTimePicker: typeof import('naive-ui')['NTimePicker']
     NTooltip: typeof import('naive-ui')['NTooltip']
+    NTransfer: typeof import('naive-ui')['NTransfer']
     NUpload: typeof import('naive-ui')['NUpload']
     Reload: typeof import('./src/components/Reload/Reload.vue')['default']
     SimpleTable: typeof import('./src/components/Table/SimpleTable.vue')['default']

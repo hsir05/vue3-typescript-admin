@@ -47,7 +47,7 @@
       :width="1000"
       @on-save-after="handleSaveMemberAfter"
     />
-
+    <OpenCompanyDrawer ref="openCompanyDrawerRef" :width="600" />
     <OrderLimitTimeModal ref="orderLimitTimeModalRef" @on-save-after="handleSaveMemberAfter" />
   </div>
 </template>
@@ -60,7 +60,7 @@ import {
   CubeSharp as CubeSharpIcon,
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-
+import OpenCompanyDrawer from "./openCompanyDrawer.vue";
 import OrderLimitTimeModal from "./orderLimitTimeModal.vue";
 import MemberListDrawer from "./memberListDrawer.vue";
 import { useMessage } from "naive-ui";
@@ -71,13 +71,13 @@ import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "DriverMember",
-  components: { BasicTable, MemberListDrawer, OrderLimitTimeModal },
+  components: { BasicTable, MemberListDrawer, OpenCompanyDrawer, OrderLimitTimeModal },
 
   setup() {
     const loading = ref(false);
     const message = useMessage();
     const companyData = ref([]);
-    const driMemDrawerRef = ref();
+    const openCompanyDrawerRef = ref();
     const orderLimitTimeModalRef = ref();
     const memberListDrawerRef = ref();
     const basicTableRef = ref();
@@ -260,7 +260,7 @@ export default defineComponent({
     }
     function handleAdd() {
       console.log("点击了新增");
-      const { openDrawer } = driMemDrawerRef.value;
+      const { openDrawer } = openCompanyDrawerRef.value;
       openDrawer("新增用户");
     }
     async function handleClose(record: Recordable) {
@@ -322,7 +322,7 @@ export default defineComponent({
       queryValue,
       data,
       loading,
-      driMemDrawerRef,
+      openCompanyDrawerRef,
       orderLimitTimeModalRef,
       memberListDrawerRef,
       basicTableRef,
