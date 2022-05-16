@@ -2,24 +2,33 @@
   <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
     <n-form
       ref="formRef"
-      :rules="rules"
-      size="large"
+      :rules="driverMemberRules"
       :disabled="disabled"
       label-placement="left"
-      :style="{ maxWidth: '440px' }"
       require-mark-placement="right-hanging"
-      label-width="140"
+      label-width="150"
       :model="form"
     >
       <n-form-item label="产品名称" path="goodsName">
-        <n-input v-model:value="form.goodsName" clearable placeholder="输入产品名称" />
+        <n-input
+          v-model:value="form.goodsName"
+          clearable
+          placeholder="输入产品名称"
+          style="width: 280px"
+        />
       </n-form-item>
       <n-form-item label="产品类型" path="goodsType">
-        <n-input v-model:value="form.goodsType" clearable placeholder="输入产品类型" />
+        <n-select
+          clearable
+          style="width: 280px"
+          v-model:value="form.goodsType"
+          placeholder="选择产品类型"
+          :options="goodsTypeOptions"
+        />
       </n-form-item>
       <n-form-item label="产品到期时间" path="memberEndTime">
         <n-date-picker
-          style="width: 520px"
+          style="width: 280px"
           v-model:value="form.memberEndTime"
           type="date"
           clearable
@@ -40,7 +49,7 @@
 
       <n-form-item label="产品生效时间" path="effectBeginTime">
         <n-date-picker
-          style="width: 520px"
+          style="width: 280px"
           v-model:value="form.effectBeginTime"
           type="date"
           clearable
@@ -49,7 +58,7 @@
 
       <n-form-item label="产品失效时间" path="effectEndTime">
         <n-date-picker
-          style="width: 520px"
+          style="width: 280px"
           v-model:value="form.effectEndTime"
           type="date"
           clearable
@@ -64,21 +73,22 @@
         />
       </n-form-item>
 
+      <n-form-item label="产品名称" path="goodsRemark">
+        <n-input
+          v-model:value="form.goodsRemark"
+          style="width: 280px"
+          type="textarea"
+          placeholder="输入产品备注"
+          round
+          clearable
+        />
+      </n-form-item>
+
       <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
           >保存
         </n-button>
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
           >重置
         </n-button>
       </div>
@@ -86,14 +96,20 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
-import { rules } from "./data";
-import { statusOptions, sexOptions } from "@/config/form";
+import { defineComponent, reactive, toRefs, ref } from "vue";
+import { FormInst, useMessage } from "naive-ui";
+import { driverMemberRules } from "./data";
+import { goodsTypeOptions } from "@/config/form";
+import { useAppUserStore } from "@/store/modules/useUserStore";
 import { FormInter } from "./type";
-
+import dayjs from "dayjs";
+import {
+  getDriverMemberDetail,
+  addDriverMemberGoods,
+  editDriverMemberGoods,
+} from "@/api/capacity/capacity";
 export default defineComponent({
-  name: "DriMemDrawer",
+  name: "DriverMemberDrawer",
   emits: ["on-save-after"],
   setup(_, { emit }) {
     const state = reactive({
@@ -103,6 +119,7 @@ export default defineComponent({
       openCityData: [],
     });
     const title = ref("司机会员产品");
+    const userStore = useAppUserStore();
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const form = ref<FormInter>({
@@ -121,39 +138,81 @@ export default defineComponent({
       createUser: null,
     });
 
-    function openDrawer(t: string, record?: FormInter) {
-      console.log(record);
-      if (record) {
-        form.value = { ...form.value, ...record };
+    function openDrawer(t: string, operationCompanyId: string, driverMemberGoodsId: string) {
+      form.value.companyIds = [operationCompanyId];
+      if (driverMemberGoodsId) {
+        getDetail(driverMemberGoodsId);
       }
       title.value = t;
       state.isDrawer = true;
     }
+    const getDetail = async (driverMemberGoodsId: string) => {
+      try {
+        state.loading = true;
+        let res = await getDriverMemberDetail({ driverMemberGoodsId });
+        console.log(res);
+        form.value = res.data;
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
-
-          handleSaveAfter();
-
-          message.success("验证成功");
+          try {
+            let res;
+            const {
+              driverMemberGoodsId,
+              goodsName,
+              companyIds,
+              goodsTagPrice,
+              goodsSellingPrice,
+              goodsType,
+              memberEndTime,
+              memberRenewalTimeUnit,
+              memberRenewalCount,
+              purchasableDaysBeforeMemberExpire,
+              effectBeginTime,
+              effectEndTime,
+              goodsRemark,
+            } = form.value;
+            let option = {
+              driverMemberGoodsId,
+              goodsName,
+              companyIds,
+              goodsTagPrice,
+              goodsSellingPrice,
+              goodsType,
+              memberEndTime: dayjs(memberEndTime).format("YYYY-MM-DD HH:mm:ss"),
+              memberRenewalTimeUnit,
+              memberRenewalCount,
+              purchasableDaysBeforeMemberExpire,
+              effectBeginTime: dayjs(effectBeginTime).format("YYYY-MM-DD HH:mm:ss"),
+              effectEndTime: dayjs(effectEndTime).format("YYYY-MM-DD HH:mm:ss"),
+              goodsRemark,
+              createUser: userStore.getAdminId,
+            };
+            if (form.value.driverMemberGoodsId) {
+              res = await editDriverMemberGoods(option);
+            } else {
+              res = await addDriverMemberGoods(option);
+            }
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+            state.loading = false;
+          } catch (err) {
+            console.log(err);
+            state.loading = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
-    }
-
-    function handleUpdateValue(_: string, option: SelectOption) {
-      console.log(option);
-      // console.log(toRaw(form.value));
-
-      //    form.value.city = unref(option).label
-      //    form.value.code = option.value
     }
 
     function handleSaveAfter() {
@@ -163,7 +222,7 @@ export default defineComponent({
     function handleReset() {
       form.value = {
         goodsName: null,
-        companyIds: [],
+        companyIds: null,
         goodsTagPrice: null,
         goodsSellingPrice: null,
         goodsType: null,
@@ -189,12 +248,10 @@ export default defineComponent({
       ...toRefs(state),
       formRef,
       title,
-      rules,
-      statusOptions,
-      sexOptions,
+      driverMemberRules,
+      goodsTypeOptions,
       form,
       openDrawer,
-      handleUpdateValue,
       handleReset,
       handleValidate,
       onCloseAfter,

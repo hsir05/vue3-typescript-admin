@@ -14,7 +14,7 @@ export const RootRoute: RouteRecordRaw = {
 export const LoginRoute: RouteRecordRaw = {
   path: '/login',
   name: 'Login',
-  component: () => import('@/views/login/login.vue'),
+  component: () => import('@/views/system/login/login.vue'),
   meta: {
     title: 'Login', 
   },

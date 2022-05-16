@@ -1,10 +1,27 @@
 export interface TableItemInter {
   operationCompanyOpenedDriverMemberId: string;
+  operationCompanyId: string
   dispatchOrderLimitBeginTime: number
+  operationCompanyName:string
   openTime: number
 }
 
+export interface TableMemberItemInter {
+    driverMemberGoodsId:string
+    operationCompanyId: string
+    operationCompanyName:string
+    createTime: number
+    effectBeginTime:number
+    effectEndTime:number
+}
+
+export interface MemberFormInter{
+    operationCompanyIdEq: string | null;
+    goodsNameLike: string | null;
+}
+
 export interface FormInter {
+    driverMemberGoodsId?:string;
     goodsName: string | null
     companyIds: string[] | null
     goodsTagPrice: number | null

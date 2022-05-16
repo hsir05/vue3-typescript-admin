@@ -862,12 +862,9 @@ export function getDriverRegisterPage(data: DriverRegisterInter) {
     data: data,
   });
 }
-//----------------------司机注册审核管理-----------------------
+//----------------------司机会员产品管理-----------------------
 /**
- * 司机注册分页
- * 申请状态 DRS0004 = 平台未审核
- * DRS0005 = 平台审核未通过
- * DRS0006 = 平台审核通过
+ *有司机会员产品的企业分页
  */
 interface DriverMemberPageInter {
   page: PaginationState;
@@ -882,13 +879,39 @@ export function getDriverMemberPage(data: DriverMemberPageInter) {
     data: data,
   });
 }
-
+/**
+ *企业下会员产品列表
+ */
+interface DriverMemberGoodsPageInter {
+  page: PaginationState;
+  search: {
+    operationCompanyIdEq: string | null;
+    goodsNameLike: string | null;
+  };
+}
+export function getDriverMemberGoodsPage(data: DriverMemberGoodsPageInter) {
+  return http.request({
+    url: "/driverMemberGoods/driverMemberGoodsPage",
+    method: "post",
+    data: data,
+  });
+}
 /**
  *关闭开通司机会员的企业
  */
 export function closeMember(data: { operationCompanyOpenedDriverMemberId: string }) {
   return http.request({
     url: "/driverMemberGoods/deleteOpenedCompany",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ *获取司机会员产品详情
+ */
+export function getDriverMemberDetail(data: { driverMemberGoodsId: string }) {
+  return http.request({
+    url: "/driverMemberGoods/detail",
     method: "post",
     data: data,
   });
@@ -903,6 +926,43 @@ interface OrderLimitTimeInter{
 export function updateOrderLimitTime(data: OrderLimitTimeInter) {
   return http.request({
     url: "/driverMemberGoods/updateDispatchOrderLimitBeginTime",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ * 新增司机会员产品
+ */
+interface DriverMemberGoodsInter {
+  driverMemberGoodsId?: string | null;
+  goodsName: string | null;
+  companyIds: string[] | null;
+  goodsTagPrice: number | null;
+  goodsSellingPrice: number | null;
+  goodsType: string | null;
+  memberEndTime: string | null;
+  memberRenewalTimeUnit: number | null;
+  memberRenewalCount: number | null;
+  purchasableDaysBeforeMemberExpire: number | null;
+  effectBeginTime: string | null;
+  effectEndTime: string | null;
+  goodsRemark: string | null;
+  createUser: string | null;
+}
+export function addDriverMemberGoods(data: DriverMemberGoodsInter) {
+  return http.request({
+    url: "/driverMemberGoods/add",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 编辑司机会员产品
+ */
+export function editDriverMemberGoods(data: DriverMemberGoodsInter) {
+  return http.request({
+    url: "/driverMemberGoods/edit",
     method: "post",
     data: data,
   });

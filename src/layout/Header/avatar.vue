@@ -2,9 +2,9 @@
   <n-dropdown :options="userOptions" :on-select="closeHandleSelect">
     <div class="header-user">
       <n-avatar round style="cursor: pointer" size="medium" src="">{{
-        userStore.getUsername
+        userStore.getAccount
       }}</n-avatar>
-      <span class="header-username">{{ userStore.getUsername }}</span>
+      <span class="header-username">{{ userStore.getAccount }}</span>
     </div>
   </n-dropdown>
 </template>

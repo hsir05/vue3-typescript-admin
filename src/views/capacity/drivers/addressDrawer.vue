@@ -119,12 +119,6 @@ export default defineComponent({
           driverHomeAddressLongitude,
           driverHomeAddressLatitude,
         } = res.data.driver;
-        console.log(
-          driverHomeAddress,
-          driverHomeAddressDetail,
-          driverHomeAddressLongitude,
-          driverHomeAddressLatitude
-        );
         form.value = {
           driverId,
           driverHomeAddress,

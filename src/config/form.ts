@@ -8,7 +8,7 @@ export const statusOptions = [
     value: 0,
   },
 ];
-
+//锁定状况
 export const lockOptions = [
   {
     label: "锁定",
@@ -19,6 +19,18 @@ export const lockOptions = [
     value: 0,
   },
 ];
+// 产品类型 
+export const goodsTypeOptions = [
+    {
+        label: "固定到期时间",
+        value: "DMG0001"
+    },
+     {
+        label: "固定单位数",
+        value: "DMG0002"
+    },
+]
+//婚姻状况
 export const maritalStatusOptions = [
   {
     label: "未婚",
@@ -61,6 +73,7 @@ export const stateOptions = [
     value: 1,
   },
 ];
+// 司机驾照类型
 export const drivingLicense = [
   {
     label: "A1",
@@ -99,6 +112,7 @@ export const drivingLicense = [
     value: "C4",
   },
 ];
+// 民族
 export const nationData = [
   { value: "汉族", label: "汉族" },
   { value: "蒙古族", label: "蒙古族" },

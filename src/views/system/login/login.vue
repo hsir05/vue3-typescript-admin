@@ -77,7 +77,7 @@ import { defineComponent, ref, reactive, unref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
-import { getCaptcha } from "@/api/login/login";
+import { getCaptcha } from "@/api/system/system";
 import { useAppUserStore } from "@/store/modules/useUserStore";
 import md5 from "blueimp-md5";
 import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";

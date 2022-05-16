@@ -1,5 +1,5 @@
 
-export interface loginState {
+export interface loginInter {
     account: string;
     password: string;
     captcha: string;

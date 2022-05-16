@@ -38,14 +38,15 @@
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
 
-    <DriMemDrawer ref="driMemDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
-
-    <MemberList ref="memberListRef" :width="700" @on-save-after="handleSaveMemberAfter" />
+    <MemberListDrawer
+      ref="memberListDrawerRef"
+      :width="1000"
+      @on-save-after="handleSaveMemberAfter"
+    />
 
     <OrderLimitTimeModal ref="orderLimitTimeModalRef" @on-save-after="handleSaveMemberAfter" />
   </div>
@@ -59,9 +60,9 @@ import {
   CubeSharp as CubeSharpIcon,
 } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import DriMemDrawer from "./driMemDrawer.vue";
+
 import OrderLimitTimeModal from "./orderLimitTimeModal.vue";
-import MemberList from "./memberList.vue";
+import MemberListDrawer from "./memberListDrawer.vue";
 import { useMessage } from "naive-ui";
 import { TableItemInter } from "./type";
 import { getDriverMemberPage, closeMember } from "@/api/capacity/capacity";
@@ -70,7 +71,7 @@ import { PaginationState } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "DriverMember",
-  components: { BasicTable, DriMemDrawer, MemberList, OrderLimitTimeModal },
+  components: { BasicTable, MemberListDrawer, OrderLimitTimeModal },
 
   setup() {
     const loading = ref(false);
@@ -78,7 +79,7 @@ export default defineComponent({
     const companyData = ref([]);
     const driMemDrawerRef = ref();
     const orderLimitTimeModalRef = ref();
-    const memberListRef = ref();
+    const memberListDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
@@ -165,7 +166,7 @@ export default defineComponent({
         title: "操作",
         key: "action",
         align: "center",
-        width: "130px",
+        width: "150px",
         render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
@@ -242,13 +243,9 @@ export default defineComponent({
       }
     };
 
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
-    function handleMemberList(record: Recordable) {
-      const { openDrawer } = memberListRef.value;
-      openDrawer(record);
+    function handleMemberList(record: TableItemInter) {
+      const { openDrawer } = memberListDrawerRef.value;
+      openDrawer(record.operationCompanyId, record.operationCompanyName);
     }
     function handleOrderTime(record: Recordable) {
       const { handleModal } = orderLimitTimeModalRef.value;
@@ -284,7 +281,6 @@ export default defineComponent({
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       getData({ pageIndex: 1, pageSize: 10 });
@@ -328,7 +324,7 @@ export default defineComponent({
       loading,
       driMemDrawerRef,
       orderLimitTimeModalRef,
-      memberListRef,
+      memberListDrawerRef,
       basicTableRef,
       columns,
       itemCount,
@@ -340,7 +336,6 @@ export default defineComponent({
       handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,
