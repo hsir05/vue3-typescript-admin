@@ -1,9 +1,18 @@
 
-export interface tableDataItem {
-  id?: string | null;
-  name: string | null;
-  parentId: string | null;
-  descript: string | null;
-  create_time?: string | null;
-  status: number | null;
+export interface TableItemInter {
+  roleId: string;
+  name: string;
+  parentRoleId: string | null;
+  description: string | null;
+  createTime: number;
+  state: number;
+}
+
+export interface RoleFormInter {
+    roleId?: string | null;
+    name: string | null;
+    parentRoleId: string | null;
+    description: string | null;
+    createTime?: number | null;
+    state: number | null;
 }

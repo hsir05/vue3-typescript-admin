@@ -191,35 +191,23 @@ export default defineComponent({
               advertisementEffectiveTimeBegin,
               advertisementEffectiveTimeEnd,
             } = form.value;
-
+            let option = {
+              cityCode,
+              advertisementTitle,
+              advertisementImageUrl,
+              advertisementH5Url,
+              advertisementEffectiveTimeBegin: dayjs(advertisementEffectiveTimeBegin).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ),
+              advertisementEffectiveTimeEnd: dayjs(advertisementEffectiveTimeEnd).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ),
+            };
             if (!form.value.openCityAdvertisementId) {
-              res = await addAdvertisement({
-                cityCode,
-                advertisementTitle,
-                advertisementImageUrl,
-                advertisementH5Url,
-                advertisementEffectiveTimeBegin: dayjs(advertisementEffectiveTimeBegin).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                ),
-                advertisementEffectiveTimeEnd: dayjs(advertisementEffectiveTimeEnd).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                ),
-              });
+              res = await addAdvertisement(option);
               console.log(res);
             } else {
-              res = await editAdvertisement({
-                openCityAdvertisementId,
-                cityCode,
-                advertisementTitle,
-                advertisementImageUrl,
-                advertisementH5Url,
-                advertisementEffectiveTimeBegin: dayjs(advertisementEffectiveTimeBegin).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                ),
-                advertisementEffectiveTimeEnd: dayjs(advertisementEffectiveTimeEnd).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                ),
-              });
+              res = await editAdvertisement({ openCityAdvertisementId, ...option });
             }
             state.loading = false;
             message.success(window.$tips[res.code]);

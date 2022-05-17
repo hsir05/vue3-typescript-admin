@@ -1,38 +1,31 @@
 import { FormItemRule } from "naive-ui";
-
-export const data = [
-  {
-    id: 131123,
-    account: "zhangsan",
-    name: "张三",
-    sex: 1,
-    phone: "18098765678",
-    create_time: "2022-03-13",
-    status: 0,
-  },
-];
+import { verifyEN, verifyPhone, verifyEmail } from "@/utils/verify";
 
 export const rules = {
-  account: { required: true, trigger: ["blur", "input"], message: "请输入帐号" },
+  account: {
+    required: true,
+    validator: (rule: FormItemRule, value: string) => {
+      return verifyEN(rule, value);
+    },
+    trigger: ["blur", "input"],
+    message: "请输入帐号",
+  },
   name: { required: true, trigger: ["blur", "input"], message: "请输入用户名称" },
+  roleIds: { type: "array", required: true, trigger: ["blur", "input"], message: "请选择角色" },
   sex: { required: true, type: "number", trigger: ["blur", "change"], message: "请选择性别" },
   phone: {
     required: true,
     trigger: ["input"],
     validator: (rule: FormItemRule, value: string) => {
-      console.log(rule);
-      return /^1\d{10}$/.test(value);
+      return verifyPhone(rule, value);
     },
     message: "请输入电话号码",
-  }, 
+  },
   email: {
     required: true,
     trigger: ["input"],
     validator: (rule: FormItemRule, value: string) => {
-      console.log(rule);
-      return /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/.test(
-        value
-      );
+      return verifyEmail(rule, value);
     },
     message: "请输入正确的邮箱地址",
   },

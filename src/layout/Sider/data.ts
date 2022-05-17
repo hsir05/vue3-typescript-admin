@@ -30,11 +30,11 @@ export const menuOptions: MenuOption[] = [
         path: "/system/dict",
         key: "protect-wild-animals-dict",
       },
-      {
-        label: "菜单管理",
-        path: "/system/menus",
-        key: "protect-wild-animals",
-      },
+    //   {
+    //     label: "菜单管理",
+    //     path: "/system/menus",
+    //     key: "protect-wild-animals",
+    //   },
       {
         label: "用户管理",
         path: "/system/user",

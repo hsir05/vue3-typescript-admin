@@ -3,7 +3,6 @@
     <n-form
       ref="formRef"
       :rules="rules"
-      size="large"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '400px' }"
@@ -26,46 +25,46 @@
       <n-form-item label="邮箱" path="email">
         <n-input v-model:value="form.email" clearable placeholder="输入邮箱" />
       </n-form-item>
-      <n-form-item label="状态" path="status">
-        <n-radio-group v-model:value="form.status">
+      <n-form-item label="角色" path="roleIds">
+        <n-select
+          v-model:value="form.roleIds"
+          placeholder="选择角色"
+          :multiple="true"
+          :options="rolesData"
+        />
+      </n-form-item>
+      <n-form-item label="状态" path="state">
+        <n-radio-group v-model:value="form.state">
           <n-space>
-            <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">
+            <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">
               {{ item.label }}
             </n-radio>
           </n-space>
         </n-radio-group>
       </n-form-item>
       <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
-          >保存</n-button
-        >
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
-          >重置</n-button
-        >
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >保存
+        </n-button>
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, reactive, toRefs, onMounted, ref } from "vue";
+import { FormInst, SelectOption, useMessage } from "naive-ui";
 import { rules } from "./data";
-import { statusOptions, sexOptions } from "@/config/form";
-import { tableDataItem } from "./type";
+import { lockOptions, sexOptions } from "@/config/form";
+import { addUser, editUser, getUserDetail, getAllRoles } from "@/api/system/system";
+// import md5 from "blueimp-md5";
+import { UserFormInter } from "./type";
 export default defineComponent({
   name: "UserDrawer",
   setup(_, { emit }) {
-    const state = reactive({
+    const data = reactive({
       isDrawer: false,
       loading: false,
       disabled: false,
@@ -73,39 +72,81 @@ export default defineComponent({
     const title = ref("");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
+    const rolesData = ref<SelectOption[]>([]);
+    const form = ref<UserFormInter>({
       name: null,
-      account: null,
-      email: null,
       sex: null,
       phone: null,
-      id: null,
-      status: 1,
+      account: null,
+      email: null,
+      roleIds: null,
+      state: 0,
+    });
+    onMounted(() => {
+      getRolesData();
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
-      console.log(record);
-      if (record) {
-        form.value = { ...form.value, ...record };
+    function openDrawer(t: string, adminId: string) {
+      if (adminId) {
+        getDetail(adminId);
       }
       title.value = t;
-      state.isDrawer = true;
+      data.isDrawer = true;
     }
+
+    const getRolesData = async () => {
+      try {
+        let res = await getAllRoles();
+        console.log(res);
+        rolesData.value = res.data.map((item: { name: string; roleId: string }) => {
+          return {
+            label: item.name,
+            value: item.roleId,
+          };
+        });
+      } catch (err) {
+        console.log(err);
+        data.loading = false;
+      }
+    };
+
+    const getDetail = async (adminId: string) => {
+      try {
+        let res = await getUserDetail({ adminId });
+        console.log(res);
+        form.value = res.data;
+        form.value.roleIds = res.data.roles.map((item: { roleId: string }) => item.roleId);
+        console.log(form.value.roleIds);
+      } catch (err) {
+        console.log(err);
+        data.loading = false;
+      }
+    };
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
-          state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
-
-          handleSaveAfter();
-
-          message.success("验证成功");
+          data.loading = true;
+          try {
+            let res;
+            const { adminId, name, sex, phone, account, email, state, roleIds } = form.value;
+            let option = { name, sex, phone, account, email, state, roleIds };
+            if (!form.value.adminId) {
+              res = await addUser(option);
+              console.log(res);
+            } else {
+              res = await editUser({ adminId, ...option });
+            }
+            data.loading = false;
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+          } catch (err) {
+            console.log(err);
+            data.loading = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -115,22 +156,31 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { name: null, account: null, email: null, sex: null, phone: null, status: 1 };
+      form.value = {
+        name: null,
+        sex: null,
+        phone: null,
+        account: null,
+        email: null,
+        roleIds: null,
+        state: 0,
+      };
       formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
-      state.isDrawer = false;
-      state.loading = false;
-      state.disabled = false;
+      data.isDrawer = false;
+      data.loading = false;
+      data.disabled = false;
       handleReset();
     }
 
     return {
-      ...toRefs(state),
+      ...toRefs(data),
       formRef,
       title,
       rules,
-      statusOptions,
+      lockOptions,
+      rolesData,
       sexOptions,
       form,
       openDrawer,

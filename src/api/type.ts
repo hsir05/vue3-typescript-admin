@@ -23,12 +23,7 @@ export interface UsersDataInter extends PaginationInter {
     phone: null | string;
     status: number | null;
 }
-// 系统管理 - 角色管理
-export interface RolesInter {
-    id?: null | string | number;
-    name: null | string;
-    status: null | string;
-}
+
 
 export interface getCityOderState {
     cityCode: string

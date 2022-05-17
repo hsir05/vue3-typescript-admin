@@ -24,7 +24,9 @@
         <n-button-group>
           <n-button type="primary" @click="handleAdd">
             <template #icon>
-              <n-icon><AddIcon /></n-icon> </template
+              <n-icon>
+                <AddIcon />
+              </n-icon> </template
             >添加
           </n-button>
           <n-button
@@ -34,7 +36,9 @@
             type="error"
           >
             <template #icon>
-              <n-icon><RemoveIcon /></n-icon>
+              <n-icon>
+                <RemoveIcon />
+              </n-icon>
             </template>
             批量删除
           </n-button>
@@ -84,7 +88,6 @@ import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Reload from "@/components/Reload/Reload.vue";
 import DictModal from "./dictModal.vue";
-// import Explain from "@/components/Explain/Explain.vue";
 import {
   Add as AddIcon,
   TrashOutline as RemoveIcon,
@@ -92,9 +95,8 @@ import {
   AddOutline as Add,
 } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
-// import { data } from "./data";
 import { pageSizes } from "@/config/table";
-// import { getDict } from "@/api/system/dict";
+// import { getDict } from "@/api/system/system";
 import { PaginationInter } from "@/api/type";
 
 export default defineComponent({

@@ -21,3 +21,17 @@ export const verifyCNName = (_: FormItemRule, value: string) => {
     }
   return /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(value);
 };
+// 中文姓名验证
+export const verifyCN = (_: FormItemRule, value: string) => {
+    if (!value) {
+        return false
+    }
+  return /[\u4E00-\u9FA5\uF900-\uFA2D]/.test(value);
+};
+// 英文帐号
+export const verifyEN = (_: FormItemRule, value: string) => {
+    if (!value) {
+        return false
+    }
+  return /^[0-9a-zA-Z_]{1,}$/.test(value);
+};

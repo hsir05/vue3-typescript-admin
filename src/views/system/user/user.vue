@@ -10,35 +10,27 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="帐号" path="account">
+      <n-form-item label="帐号" path="accountLike">
         <n-input
-          v-model:value="queryValue.account"
+          v-model:value="queryValue.accountLike"
           clearable
           placeholder="输入帐号"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="用户名称" path="name">
+      <n-form-item label="用户名称" path="nameLike">
         <n-input
-          v-model:value="queryValue.name"
+          v-model:value="queryValue.nameLike"
           clearable
           placeholder="输入用户名称"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="电话号码" path="phone">
-        <n-input
-          v-model:value="queryValue.phone"
-          clearable
-          placeholder="输入电话号码"
-          style="width: 150px"
-        />
-      </n-form-item>
 
-      <n-form-item label="状态" path="radioGroupValue">
-        <n-radio-group v-model:value="queryValue.status">
+      <n-form-item label="状态" path="stateEq">
+        <n-radio-group v-model:value="queryValue.stateEq">
           <n-radio :value="null">全部</n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+          <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">{{
             item.label
           }}</n-radio>
         </n-radio-group>
@@ -55,12 +47,12 @@
       :data="data"
       ref="basicTableRef"
       :columns="columns"
+      :row-key="getRowKeyId"
       :loading="loading"
+      :isAddBtn="true"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -72,12 +64,13 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import { NTag } from "naive-ui";
+import { NTag, useMessage } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
-import { tableDataItem } from "./type";
-import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { TableItemInter } from "./type";
+import { lockOptions } from "@/config/form";
+import { getUsersPage, removeUser } from "@/api/system/system";
 import { PaginationInter } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "User",
   components: { BasicTable, UserDrawer },
@@ -85,15 +78,17 @@ export default defineComponent({
     const loading = ref(true);
     const userDrawerRef = ref();
     const basicTableRef = ref();
+    const message = useMessage();
     const itemCount = ref(null);
     const queryValue = ref({
-      name: "",
-      account: "",
-      phone: "",
-      status: null,
+      nameLike: null,
+      stateEq: null,
+      accountLike: null,
+      createTimeGe: null,
+      createTimeLe: null,
     });
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<TableItemInter[]>([]);
 
     const columns = [
       {
@@ -105,7 +100,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -123,11 +118,11 @@ export default defineComponent({
         title: "性别",
         key: "sex",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: "info",
+              type: "success",
             },
             {
               default: () => (row.sex === 1 ? "男" : "女"),
@@ -141,49 +136,70 @@ export default defineComponent({
         align: "center",
       },
       {
-        title: "状态",
-        key: "status",
+        title: "邮箱",
+        key: "email",
         align: "center",
-        render(row: tableDataItem) {
+      },
+      {
+        title: "角色",
+        key: "roles",
+        align: "center",
+        render(row: TableItemInter) {
+          return h(
+            "span",
+            row.roles.reduce((pre, next) => (pre += next.roleName), "")
+          );
+        },
+      },
+      {
+        title: "状态",
+        key: "state",
+        align: "center",
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: row.status === 1 ? "success" : "error",
+              type: row.state === 1 ? "error" : "success",
             },
             {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
+              default: () => (row.state === 1 ? "锁定" : "正常"),
             }
           );
         },
       },
       {
         title: "创建时间",
-        key: "create_time",
+        key: "createTime",
         align: "center",
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                isIconBtn: true,
+                onClick: handleEdit.bind(null, record.adminId),
                 auth: ["dict001"],
               },
               {
                 label: "删除",
                 type: "error",
+                isIconBtn: true,
                 icon: RemoveIcon,
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
+                  onPositiveClick: handleRemove.bind(null, record.adminId),
                   title: "您确定删除?",
                 },
               },
@@ -197,48 +213,46 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async (pagination: PaginationInter) => {
-      console.log(pagination);
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-      //   loading.value = true;
-      //   try {
-      //     let res = await getUsers({ ...pagination, ...queryValue.value });
-      //     data.value = res.data;
-      //     itemCount.value = res.itemCount;
-      //     loading.value = false;
-      //   } catch (err) {
-      //     console.log(err);
-      //     loading.value = false;
-      //   }
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getUsersPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     };
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
-
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleEdit(adminId: string) {
       const { openDrawer } = userDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer("编辑用户", adminId);
     }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
+
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = userDrawerRef.value;
       openDrawer("新增用户");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    async function handleRemove(adminId: string) {
+      try {
+        loading.value = true;
+        let res = await removeUser({ adminId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
-
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       console.log(queryValue.value);
@@ -247,7 +261,13 @@ export default defineComponent({
       getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", account: "", phone: "", status: null };
+      queryValue.value = {
+        nameLike: null,
+        stateEq: null,
+        accountLike: null,
+        createTimeGe: null,
+        createTimeLe: null,
+      };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
       getData({ pageIndex: 1, pageSize: 10 });
@@ -279,16 +299,15 @@ export default defineComponent({
       loading,
       userDrawerRef,
       basicTableRef,
-      statusOptions,
+      lockOptions,
       columns,
+      getRowKeyId: (row: TableItemInter) => row.adminId,
       itemCount,
 
       reloadPage,
       handleAdd,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

@@ -6,18 +6,18 @@
       inline
       label-placement="left"
       label-width="90"
-      class="pt-15px pb-15px bg-white"
+      class="pt-15px pb-15px mb-10px bg-white"
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="角色名称" path="name">
-        <n-input v-model:value="queryValue.name" clearable placeholder="输入角色名称" />
+      <n-form-item label="角色名称" path="nameLike">
+        <n-input v-model:value="queryValue.nameLike" clearable placeholder="输入角色名称" />
       </n-form-item>
 
-      <n-form-item label="状态" path="radioGroupValue">
-        <n-radio-group v-model:value="queryValue.status" style="width: 200px">
-          <n-radio value>全部</n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+      <n-form-item label="状态" path="stateEq">
+        <n-radio-group v-model:value="queryValue.stateEq" style="width: 200px">
+          <n-radio :value="null">全部</n-radio>
+          <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">{{
             item.label
           }}</n-radio>
         </n-radio-group>
@@ -34,12 +34,12 @@
       :data="data"
       ref="basicTableRef"
       :columns="columns"
+      :row-key="getRowKeyId"
+      :isAddBtn="true"
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -51,37 +51,38 @@
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { PaginationProps } from "@/interface/table/table";
 import BasicTable from "@/components/Table/Table.vue";
 import RoleDrawer from "./roleDrawer.vue";
-import { NTag } from "naive-ui";
-import { statusOptions } from "@/config/form";
-import { tableDataItem } from "./type";
-// import { getRoles } from "@/api/system/roles";
+import { NTag, useMessage } from "naive-ui";
+import { lockOptions } from "@/config/form";
+import { TableItemInter } from "./type";
+import { PaginationInter } from "@/api/type";
+import { getRolesPage, removeRole } from "@/api/system/system";
+import dayjs from "dayjs";
 export default defineComponent({
-  name: "Role",
+  name: "Roles",
   components: { BasicTable, RoleDrawer },
   setup() {
     const loading = ref(false);
     const roleDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
+    const message = useMessage();
     const queryValue = ref({
-      name: "",
-      status: "",
+      nameLike: null,
+      stateEq: null,
+      createTimeGe: null,
+      createTimeLe: null,
     });
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<TableItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-      },
       {
         title: "序号",
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -91,59 +92,59 @@ export default defineComponent({
         align: "center",
       },
       {
-        title: "父级",
-        key: "parentId",
-        align: "center",
-      },
-      {
         title: "状态",
-        key: "status",
+        key: "state",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: row.status === 1 ? "success" : "error",
+              type: row.state === 1 ? "error" : "success",
             },
             {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
+              default: () => (row.state === 1 ? "锁定" : "正常"),
             }
           );
         },
       },
       {
         title: "描述",
-        key: "descript",
+        key: "description",
         align: "center",
       },
       {
-        title: "角色添加时间",
-        key: "create_time",
+        title: "角色创建时间",
+        key: "createTime",
         align: "center",
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableItemInter) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "编辑",
                 type: "primary",
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                isIconBtn: true,
+                onClick: handleEdit.bind(null, record.roleId),
                 auth: ["dict001"],
               },
               {
                 label: "删除",
                 type: "error",
                 icon: RemoveIcon,
+                isIconBtn: true,
                 secondary: true,
                 auth: ["dict002"],
                 popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
+                  onPositiveClick: handleRemove.bind(null, record.roleId),
                   title: "您确定删除?",
                 },
               },
@@ -154,68 +155,76 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData();
+      getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    const getData = async () => {
-      //   loading.value = true;
-      //   try {
-      //     let res = await getRoles({ ...queryValue.value });
-      //     data.value = res.data;
-      //     itemCount.value = res.itemCount;
-      //     loading.value = false;
-      //   } catch (err) {
-      //     console.log(err);
-      //   }
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getRolesPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     };
 
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleEdit(roleId: string) {
       const { openDrawer } = roleDrawerRef.value;
-      openDrawer("编辑用户", record);
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
+      openDrawer("编辑角色", roleId);
     }
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = roleDrawerRef.value;
-      openDrawer("新增用户");
+      openDrawer("新增角色");
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    async function handleRemove(roleId: string) {
+      try {
+        loading.value = true;
+        let res = await removeRole({ roleId });
+        console.log(res);
+        getData({ pageIndex: 1, pageSize: 10 });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
-      queryValue.value = { name: "", status: "" };
+      queryValue.value = {
+        nameLike: null,
+        stateEq: null,
+        createTimeGe: null,
+        createTimeLe: null,
+      };
     };
 
     function reloadPage() {
-      loading.value = true;
-      setTimeout(() => {
-        loading.value = false;
-      }, 1000);
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
-    function handlePage(pagination: PaginationProps) {
+    function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
+      getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationProps) {
+    function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData();
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -224,19 +233,18 @@ export default defineComponent({
       data,
       roleDrawerRef,
       basicTableRef,
-      statusOptions,
+      getRowKeyId: (row: TableItemInter) => row.roleId,
+      lockOptions,
       itemCount,
       columns,
 
       reloadPage,
       handleAdd,
-      handleBatch,
       searchHandle,
       handlePage,
       handlepagSize,
       handleSaveAfter,
       reset,
-      handleCheckRow,
     };
   },
 });
