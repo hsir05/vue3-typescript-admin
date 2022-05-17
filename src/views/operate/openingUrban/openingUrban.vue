@@ -10,7 +10,7 @@
           </template>
           添加开通城市
         </n-button>
-        <n-button attr-type="button" type="primary">当前选中城市：{{ label }}</n-button>
+        <n-button attr-type="button" type="primary">当前选中城市：{{ openCity.cityName }}</n-button>
       </div>
 
       <n-data-table
@@ -27,7 +27,7 @@
       />
     </div>
     <div class="map">
-      <Map ref="baiduMapRef" />
+      <Map ref="baiduMapRef" @on-dragend="updateMapPoint" />
     </div>
 
     <OpeningUrbanModal ref="ModalRef" />
@@ -36,6 +36,7 @@
 <script lang="ts">
 import { defineComponent, h, ref, onMounted, toRaw } from "vue";
 import { TableItemInter } from "./type";
+import { useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import Map from "@/components/Map/BaiduMap.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
@@ -54,13 +55,20 @@ export default defineComponent({
   setup() {
     const baiduMapRef = ref();
     const ModalRef = ref();
-    const label = ref();
     const loading = ref(false);
     const mapLoading = ref(false);
     const data = ref([]);
     const selectdIndex = ref(0);
     const { appTheme } = useProjectSetting();
     const lightenStr = lighten(appTheme.value, 16);
+    const message = useMessage();
+
+    const openCity = ref<TableItemInter>({
+      cityName: null,
+      cityCode: null,
+      lng: null,
+      lat: null,
+    });
 
     const columns = [
       {
@@ -104,7 +112,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: TrashIcon,
-                onClick: handleDelete.bind(null, record),
+                onClick: handleRemove.bind(null, record),
                 auth: ["dict001"],
               },
             ],
@@ -123,10 +131,10 @@ export default defineComponent({
         let res = await getAllOpenCity();
         data.value = res.data;
         if (res.data.length > 0) {
-          label.value = res.data[0].cityName;
+          openCity.value = res.data[0];
           const { renderBaiduMap } = baiduMapRef.value;
           const { createMarker } = await renderBaiduMap(res.data[0].lng, res.data[0].lat);
-          createMarker(updateMapPoint);
+          createMarker();
         }
         loading.value = false;
       } catch (err) {
@@ -135,11 +143,15 @@ export default defineComponent({
       }
     };
     async function updateMapPoint(lng: number, lat: number) {
-      console.log(lng, lat);
-
       try {
         mapLoading.value = true;
-        await saveCenterPoint({ lng, lat });
+        let res = await saveCenterPoint({
+          cityName: openCity.value.cityName,
+          cityCode: openCity.value.cityCode,
+          lng,
+          lat,
+        });
+        message.success(window.$tips[res.code]);
         mapLoading.value = false;
       } catch (err) {
         console.log(err);
@@ -148,23 +160,20 @@ export default defineComponent({
     }
 
     async function handleEdit(record: TableItemInter, index: number) {
-      console.log(toRaw(record), index);
       selectdIndex.value = index;
-      label.value = toRaw(record).cityName as string;
+      openCity.value = record;
       const { renderBaiduMap } = baiduMapRef.value;
       const { createMarker } = await renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
-      createMarker((lng: number, lat: number) => {
-        console.log(lng, lat);
-      });
+      createMarker();
     }
-    async function handleDelete(record: TableItemInter) {
+    async function handleRemove(record: TableItemInter) {
       loading.value = true;
       try {
         let res = await removeOpenCity({ cityCode: record.cityCode as string });
         console.log(res);
+        message.success(window.$tips[res.code]);
       } catch (err) {
         console.log(err);
-        // message.error('');
         loading.value = false;
       }
     }
@@ -189,8 +198,9 @@ export default defineComponent({
       lightenStr,
       data,
       columns,
-      label,
+      openCity,
       rowClassName,
+      updateMapPoint,
       getRowKeyId: (row: TableItemInter) => row.cityCode,
       handleAddCity,
     };

@@ -6,46 +6,40 @@
 
 <script setup lang="ts">
 //@ts-nocheck
-
 import { ref } from "vue";
 import { useScriptTag } from "@vueuse/core";
 import { BAIDU_MAP_SDK_URL } from "@/config/map";
 
 const { load } = useScriptTag(BAIDU_MAP_SDK_URL);
 const domRef = ref<HTMLDivElement | null>(null);
+const emit = defineEmits(["on-dragend"]);
 
 // 渲染地图
 async function renderBaiduMap(lng = 116.405725, lat = 39.935362) {
   await load(true);
-  let map = null;
   let options = {
     gridPrecision: 2,
   };
   let gridlines = []; // 用来存储网格线覆盖物的数组
 
   // 初始化
-  map = new BMap.Map(domRef.value!, { enableMapClick: false, minZoom: 11, maxZoom: 15 });
-  const point = new BMap.Point(lng, lat);
+  let map = new BMap.Map(domRef.value!, { enableMapClick: false, minZoom: 11, maxZoom: 15 });
+  let point = new BMap.Point(lng, lat);
   // 初始化地图,设置中心点坐标和地图级别
   map.centerAndZoom(point, 15);
   //鼠标滚轮控制缩放
   map.enableScrollWheelZoom();
-
   //   map.setMapStyleV2({ styleJson: stylesData.data });
   // 创建标注
-  function createMarker(callback: Fn) {
+  function createMarker() {
     const marker = new BMap.Marker(point); // 创建标注
     //添加覆盖物
     map.addOverlay(marker);
     //拖拽标注
     marker.enableDragging();
     marker.addEventListener("dragend", function (e) {
-      console.log(e);
-      console.log("当前位置：" + e.point.lng + ", " + e.point.lat);
-      callback(e.point.lng, e.point.lat);
+      emit("on-dragend", e.point.lng, e.point.lat);
     });
-
-    return {};
   }
 
   // 给城市添加边界线
