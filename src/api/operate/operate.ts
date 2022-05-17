@@ -127,7 +127,7 @@ export function getCompanyOpenArea(data: { companyId: string }) {
 /**
  * 保存开通区域及下属的关键点信息
  */
-interface saveAreaState {
+interface SaveAreaInter {
   areaCode: string | null;
   areaName: string | null;
   cityCode: string | null;
@@ -137,7 +137,7 @@ interface saveAreaState {
     lat: number | null;
   };
 }
-export function saveOpenArea(data: saveAreaState) {
+export function saveOpenArea(data: SaveAreaInter) {
   return http.request({
     url: "/openArea/saveOpenArea",
     method: "post",
@@ -156,16 +156,16 @@ export function getOpenAreaPointList(data: { areaCode: string }) {
 }
 
 /**
- * 获取开通区域的关键点
+ * 获取坐标范围内，区域不可选择的点
  */
-interface nonEditState {
+interface NonEditInter {
   areaCode: string;
   lngMin: number;
   lngMax: number;
   latMin: number;
   latMax: number;
 }
-export function getNonEditablePointList(data: nonEditState) {
+export function getNonEditablePointList(data: NonEditInter) {
   return http.request({
     url: "/openArea/getNonEditablePointList",
     method: "post",

@@ -43,13 +43,16 @@ async function renderBaiduMap(lng = 116.405725, lat = 39.935362) {
   }
 
   // 给城市添加边界线
-  function addBoundary() {
+  function addBoundary(boundaries) {
     let boundary = new BMap.Boundary();
-    boundary.get(function (rs: any) {
-      //获取行政区域
-      let count = rs.boundaries.length; //行政区域的点有多少个
+
+    boundary.get(function () {
+      let count = boundaries.length;
       for (let i = 0; i < count; i++) {
-        let ply = new BMap.Polygon(rs.boundaries[i], { strokeWeight: 2, strokeColor: "#ff0000" }); //建立多边形覆盖物
+        let ply = new BMap.Polygon(boundaries[i].lng, boundaries[i].lat, {
+          strokeWeight: 2,
+          strokeColor: "#ff0000",
+        }); //建立多边形覆盖物
         map.addOverlay(ply); //添加覆盖物
       }
     });

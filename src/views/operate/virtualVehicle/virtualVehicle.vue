@@ -2,14 +2,12 @@
   <div class="h-full box-border virtual-vehicle">
     <!-- 左侧 -->
     <div class="virtual-vehicle-left mr-10px">
-      <n-divider title-placement="left">
-        <n-icon class="mr-10px" size="20"> <SearchIcon /> </n-icon>检索条件
-      </n-divider>
       <!-- 检索 -->
       <n-form
         ref="queryFormRef"
         :rules="queryRules"
         label-placement="left"
+        class="mt-10px"
         :style="{ maxWidth: '360px', marginLeft: '10px' }"
         require-mark-placement="right-hanging"
         label-width="80"
@@ -202,7 +200,6 @@ import BasicUpload from "@/components/Upload/Upload.vue";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import {
   Add as AddIcon,
-  Search as SearchIcon,
   CarOutline as CarIcon,
   EyeOutline as EyeIcon,
   TrashOutline as RemoveIcon,
@@ -222,7 +219,7 @@ import {
 } from "@/api/operate/operate";
 export default defineComponent({
   name: "VirtualVehicle",
-  components: { SearchIcon, AddIcon, CarIcon, BasicUpload },
+  components: { AddIcon, CarIcon, BasicUpload },
   setup() {
     const loading = ref(false);
     const disabled = ref(false);

@@ -1,18 +1,13 @@
 
 
-export interface tableItemProps {
-    id: string | number
-}
-
-export interface tableDataItem {
-  id?: string | null;
+export interface TableItemInter {
   areaName: string | null;
   areaCode: string | null;
-  areaLock?: number | null;
+  areaLock: number | null;
+  cityCode: string | null
 }
 
-export interface formState {
-  id?: string | null;
+export interface OpenAreaFormInter {
   cityName: string | null;
   cityCode: string | null;
   lng: number | null;

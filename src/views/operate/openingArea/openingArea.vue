@@ -25,7 +25,7 @@
           :loading="loading"
           class="ml-10px"
           type="primary"
-          @click="query"
+          @click="queryValue"
         >
           查找</n-button
         >
@@ -185,7 +185,7 @@ import Map from "@/components/Map/BaiduMap.vue";
 import { FormInst, SelectOption, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import { tableItemProps, tableDataItem, formState } from "./type";
+import { TableItemInter, OpenAreaFormInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { getAllOpenCity } from "@/api/common/common";
 import {
@@ -220,11 +220,11 @@ export default defineComponent({
     SaveOutIcon,
   },
   setup() {
-    const form = ref<formState>({
-      cityCode: null,
-      cityName: null,
-      lng: null,
-      lat: null,
+    const form = ref<OpenAreaFormInter>({
+      cityCode: "110000",
+      cityName: "北京",
+      lat: 39.930936,
+      lng: 116.406299,
     });
     const loading = ref(false);
     const isShow = ref(false);
@@ -237,10 +237,11 @@ export default defineComponent({
     const openCityList = ref([]);
     const data = ref([]);
     const editFormRef = ref();
-    const editForm = ref<tableDataItem>({
+    const editForm = ref<TableItemInter>({
       areaName: null,
       areaLock: 1,
       areaCode: null,
+      cityCode: null,
     });
 
     const columns = [
@@ -258,14 +259,14 @@ export default defineComponent({
         title: "状态",
         key: "areaLock",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: row.areaLock === 1 ? "success" : "error",
+              type: row.areaLock === 1 ? "error" : "success",
             },
             {
-              default: () => (row.areaLock === 1 ? "正常" : "锁定"),
+              default: () => (row.areaLock === 1 ? "锁定" : "正常"),
             }
           );
         },
@@ -275,7 +276,7 @@ export default defineComponent({
         key: "actions",
         align: "center",
         width: 100,
-        render(record: tableDataItem, index: number) {
+        render(record: TableItemInter, index: number) {
           return h(TableActions as any, {
             actions: [
               {
@@ -317,6 +318,7 @@ export default defineComponent({
           };
           return obj;
         });
+        queryValue();
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -324,7 +326,7 @@ export default defineComponent({
       }
     };
 
-    async function query() {
+    async function queryValue() {
       try {
         isShow.value = false;
         await formRef.value?.validate();
@@ -353,7 +355,7 @@ export default defineComponent({
         loading.value = true;
         let res = await removeArea({ areaCode });
         console.log(res);
-        message.success(res.message);
+        message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -377,7 +379,7 @@ export default defineComponent({
         };
         let res = await saveOpenArea(option);
         console.log(res);
-        message.success(res.message);
+        message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -388,7 +390,7 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await getOpenAreaPointList({ areaCode });
-        console.log(res);
+        console.log(res.data);
 
         getNonPonit(
           res.data[0].lng,
@@ -396,6 +398,12 @@ export default defineComponent({
           res.data[0].lat,
           res.data[res.data.length - 1].lat
         );
+
+        const { renderBaiduMap } = baiduMapRef.value;
+        const { addBoundary } = await renderBaiduMap(form.value.lng, form.value.lat);
+
+        addBoundary(res.data);
+
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -421,18 +429,15 @@ export default defineComponent({
       }
     }
 
-    function handleEdit(record: tableDataItem) {
-      console.log(record);
+    async function handleEdit(record: TableItemInter) {
       isShow.value = true;
       area.value = record.areaName;
 
       getOpenAreaPoint(record.areaCode as string);
 
       editForm.value = record;
-      const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(form.value.lng, form.value.lat);
     }
-    function handleDelete(record: tableDataItem) {
+    function handleDelete(record: TableItemInter) {
       remove(record.areaCode as string);
     }
     function handleAddArea() {}
@@ -453,7 +458,7 @@ export default defineComponent({
       editFormRef,
       columns,
       statusOptions,
-      getRowKeyId: (row: tableItemProps) => row.id,
+      getRowKeyId: (row: TableItemInter) => row.cityCode,
       rule: {
         trigger: ["input", "blur"],
         validator() {
@@ -466,7 +471,7 @@ export default defineComponent({
         areaName: { required: true, trigger: ["blur", "change"], message: "请输入区域名称" },
       },
 
-      query,
+      queryValue,
       handleSave,
       handleAdjust,
       handleReset,
