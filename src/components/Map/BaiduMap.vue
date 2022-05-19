@@ -15,6 +15,7 @@ import stylesData from "@/assets/custom_map_config.json";
 async function renderBaiduMap(
   currentOpenAreaPointsData = [],
   remoteNonEditablePointsData = [],
+  outNonEditablePointsData = [],
   lng = 116.405725,
   lat = 39.935362
 ) {
@@ -23,6 +24,7 @@ async function renderBaiduMap(
     gridPrecision: 2,
     showGrid: true,
   };
+  let viewPions = {};
   let timer = null;
   let drawingManager = null;
 
@@ -30,6 +32,7 @@ async function renderBaiduMap(
   let nonEditablePoints = []; // 用来存储不可选择区块的数组
   let openAreaPointList = currentOpenAreaPointsData;
   let currentOpenAreaPoints = []; // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
+  let outNonEditablePoints = outNonEditablePointsData;
   let remoteNonEditablePoints = remoteNonEditablePointsData; // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
 
   let Event = {
@@ -51,6 +54,11 @@ async function renderBaiduMap(
       let bounds = map.getBounds();
       let nePoint = bounds.getNorthEast(); //可视区域右上角(东北角）
       let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
+
+      viewPions = {
+        nePoint,
+        swPoint,
+      };
       // 清除全部网格线
       if (options.showGrid) {
         clearAllGrid();
@@ -58,15 +66,14 @@ async function renderBaiduMap(
         drawGrid(nePoint, swPoint);
       }
 
-      clearOutSideNonEditablePieces(nePoint, swPoint);
-      addNonEditablePieces(remoteNonEditablePoints, nePoint, swPoint);
-      addCurrentOpenAreaPieces(openAreaPointList);
+      // clearOutSideNonEditablePieces(nePoint, swPoint);
+      // addNonEditablePieces(remoteNonEditablePoints, nePoint, swPoint);
+      // addCurrentOpenAreaPieces(openAreaPointList);
     }, 200);
   });
 
   function mapDrawingInit() {
     options.showGrid = true;
-
     drawingManager = new BMapLib.DrawingManager(map, {
       isOpen: false, //是否开启绘制模式
       enableDrawingTool: false, //是否显示工具栏
@@ -90,7 +97,6 @@ async function renderBaiduMap(
       let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
       // 添加或删除用绘制工具选择的区域（添加及删除覆盖物和openAreaMapBox.currentOpenAreaPoints中的元素）
       refershCurrentOpenAreaPieces(remoteNonEditablePoints, nePoint, swPoint);
-
       // 刪除鼠标绘制的图层
       overlay.remove();
     });
@@ -105,6 +111,10 @@ async function renderBaiduMap(
         let ply = new BMap.Polygon(rs.boundaries[i], { strokeWeight: 2, strokeColor: "#ff0000" }); //建立多边形覆盖物
         map.addOverlay(ply); //添加覆盖物
       }
+
+      clearOutSideNonEditablePieces(viewPions.nePoint, viewPions.swPoint);
+      addNonEditablePieces(outNonEditablePoints, viewPions.nePoint, viewPions.swPoint);
+      addCurrentOpenAreaPieces(openAreaPointList);
     });
   }
   // 在地图上添加区块,会返回地图上添加的区块覆盖物
@@ -311,10 +321,10 @@ async function renderBaiduMap(
     let waitSelectedPoints = [];
 
     let dValue = Number((0.1 / options.gridPrecision).toFixed(2)); // 两个相邻关键点之间经度或纬度之间的相差值
-    let latMin = calculateKey(swPoint.lat, options.gridPrecision);
-    let latMax = calculateKey(nePoint.lat, options.gridPrecision);
-    let lngMin = calculateKey(swPoint.lng, options.gridPrecision);
-    let lngMax = calculateKey(nePoint.lng, options.gridPrecision);
+    let latMin = calculateKey(swPoint.lat);
+    let latMax = calculateKey(nePoint.lat);
+    let lngMin = calculateKey(swPoint.lng);
+    let lngMax = calculateKey(nePoint.lng);
 
     if (nePoint.lng === swPoint.lng && nePoint.lat === swPoint.lat) {
       waitSelectedPoints.push({ lng: lngMax, lat: latMax });
@@ -384,6 +394,10 @@ async function renderBaiduMap(
         currentOpenAreaPoints.push(waitSelectedPoints[i]);
       }
     }
+
+    // clearOutSideNonEditablePieces(nePoint, swPoint);
+    addNonEditablePieces(outNonEditablePoints, nePoint, swPoint);
+    addCurrentOpenAreaPieces(openAreaPointList);
   }
 
   // 设置地图中心位置

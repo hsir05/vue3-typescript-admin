@@ -397,6 +397,16 @@ export default defineComponent({
         let res = await getOpenAreaPointList({ areaCode });
         currentOpenAreaPoints.value = res.data;
 
+        let params = {
+          lngMin: res.data[0].lng,
+          lngMax: res.data[res.data.length - 1].lng,
+          latMin: res.data[0].lat,
+          latMax: res.data[res.data.length - 1].lat,
+        };
+        let outResult = await getNonEditablePointList(params);
+
+        // console.log(outResult.data);
+
         let option = {
           areaCode: editForm.value.areaCode as string,
           lngMin: res.data[0].lng,
@@ -410,13 +420,13 @@ export default defineComponent({
         const { renderBaiduMap } = baiduMapRef.value;
         const { addBoundary, mapDrawingInit } = await renderBaiduMap(
           currentOpenAreaPoints.value,
-          remoteNonEditablePoints.value,
+          result.data,
+          outResult.data,
           form.value.lng,
           form.value.lat
         );
 
         addBoundary(form.value.cityName);
-
         mapDrawingInit();
 
         // addCurrentOpenAreaPieces(res.data)
