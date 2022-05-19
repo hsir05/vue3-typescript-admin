@@ -1,0 +1,19 @@
+[{
+    "featureType": "poilabel",
+    "elementType": "labels.icon",
+    "stylers": {
+        "visibility": "off"
+    }
+}, {
+    "featureType": "shoppinglabel",
+    "elementType": "labels.icon",
+    "stylers": {
+        "visibility": "off"
+    }
+}, {
+    "featureType": "shoppinglabel",
+    "elementType": "labels",
+    "stylers": {
+        "visibility": "on"
+    }
+}]

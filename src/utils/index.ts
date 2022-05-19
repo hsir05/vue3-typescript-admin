@@ -69,3 +69,11 @@ export function setObjToUrlParams(baseUrl: string, obj: object): string {
   }
   return url;
 }
+
+// 根究经纬度数值计算关键点经纬度数值
+export function calculateKey(num: number, gridPrecision: number) {
+    // 1.让目标经纬度数字乘以精度（2、5或10），2.四舍五入保留一位小数，3.除以精度
+    return Number(
+        (Math.round(num * gridPrecision * 10) / 10 / gridPrecision).toFixed(2)
+    );
+}

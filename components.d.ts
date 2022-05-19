@@ -7,6 +7,8 @@ declare module 'vue' {
     Application: typeof import('./src/components/Application/Application.vue')['default']
     BaiduMap: typeof import('./src/components/Map/BaiduMap.vue')['default']
     'BaiduMap copy': typeof import('./src/components/Map/BaiduMap copy.vue')['default']
+    'BaiduMap copy 2': typeof import('./src/components/Map/BaiduMap copy 2.vue')['default']
+    BaiduMap1: typeof import('./src/components/Map/BaiduMap1.vue')['default']
     BasicDrawer: typeof import('./src/components/BasicDrawer/BasicDrawer.vue')['default']
     Density: typeof import('./src/components/Density/Density.vue')['default']
     Explain: typeof import('./src/components/Explain/Explain.vue')['default']

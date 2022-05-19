@@ -207,6 +207,7 @@ import {
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
 import { itemState } from "@/interface/common/common";
+// import { calculateKey } from "@/utils/index"
 export default defineComponent({
   name: "OpenArea",
   components: {
@@ -235,8 +236,12 @@ export default defineComponent({
     const area = ref<string | null>();
 
     const openCityList = ref([]);
+    const currentOpenAreaPoints = ref([]);
+    const remoteNonEditablePoints = ref([]);
     const data = ref([]);
     const editFormRef = ref();
+
+    const drawingManagerRef = ref();
     const editForm = ref<TableItemInter>({
       areaName: null,
       areaLock: 1,
@@ -354,7 +359,7 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await removeArea({ areaCode });
-        console.log(res);
+        // console.log(res);
         message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {
@@ -390,38 +395,32 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await getOpenAreaPointList({ areaCode });
-        console.log(res.data);
+        currentOpenAreaPoints.value = res.data;
 
-        getNonPonit(
-          res.data[0].lng,
-          res.data[res.data.length - 1].lng,
-          res.data[0].lat,
-          res.data[res.data.length - 1].lat
-        );
-
-        const { renderBaiduMap } = baiduMapRef.value;
-        const { addBoundary } = await renderBaiduMap(form.value.lng, form.value.lat);
-
-        addBoundary(res.data);
-
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    }
-    async function getNonPonit(lngMin: number, lngMax: number, latMin: number, latMax: number) {
-      try {
-        loading.value = true;
         let option = {
           areaCode: editForm.value.areaCode as string,
-          lngMin: lngMin,
-          lngMax: lngMax,
-          latMin: latMin,
-          latMax: latMax,
+          lngMin: res.data[0].lng,
+          lngMax: res.data[res.data.length - 1].lng,
+          latMin: res.data[0].lat,
+          latMax: res.data[res.data.length - 1].lat,
         };
-        let res = await getNonEditablePointList(option);
-        console.log(res);
+        let result = await getNonEditablePointList(option);
+        remoteNonEditablePoints.value = result.data;
+
+        const { renderBaiduMap } = baiduMapRef.value;
+        const { addBoundary, mapDrawingInit } = await renderBaiduMap(
+          currentOpenAreaPoints.value,
+          remoteNonEditablePoints.value,
+          form.value.lng,
+          form.value.lat
+        );
+
+        addBoundary(form.value.cityName);
+
+        mapDrawingInit();
+
+        // addCurrentOpenAreaPieces(res.data)
+
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -442,7 +441,9 @@ export default defineComponent({
     }
     function handleAddArea() {}
 
-    function handleEditArea() {}
+    function handleEditArea() {
+      drawingManagerRef.value.openDrawingManager();
+    }
 
     return {
       loading,
