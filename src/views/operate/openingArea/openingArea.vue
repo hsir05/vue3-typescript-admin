@@ -337,7 +337,6 @@ export default defineComponent({
         await formRef.value?.validate();
         loading.value = true;
         let res = await getCityOpenArea({ cityCode: form.value.cityCode });
-        console.log(res);
         data.value = res.data;
         loading.value = false;
       } catch (err) {

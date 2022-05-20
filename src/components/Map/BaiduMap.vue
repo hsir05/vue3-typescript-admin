@@ -7,7 +7,7 @@
 <script setup lang="ts">
 //@ts-nocheck
 
-import { ref } from "vue";
+import { ref, onUnmounted } from "vue";
 const domRef = ref<HTMLDivElement | null>(null);
 import stylesData from "@/assets/custom_map_config.json";
 
@@ -38,6 +38,10 @@ async function renderBaiduMap(
   let Event = {
     tilesloaded: "tilesloaded",
   };
+
+  onUnmounted(() => {
+    console.log(444444);
+  });
   // 初始化
   let map = new BMap.Map(domRef.value!, { enableMapClick: false, minZoom: 11, maxZoom: 15 });
   let point = new BMap.Point(lng, lat);
@@ -288,7 +292,7 @@ async function renderBaiduMap(
       removeOverlay(currentOpenAreaPoints[i].piece);
     }
   }
-  // 删除地图上某范围内的可编辑区域
+  // 删除地图上某范围内的可编辑区域-------
   function clearInSideCurrentOpenAreaPieces(nePoint, swPoint) {
     let latMin = swPoint ? calculateKey(swPoint.lat) : 0;
     let latMax = nePoint ? calculateKey(nePoint.lat) : 90;
@@ -394,10 +398,6 @@ async function renderBaiduMap(
         currentOpenAreaPoints.push(waitSelectedPoints[i]);
       }
     }
-
-    // clearOutSideNonEditablePieces(nePoint, swPoint);
-    addNonEditablePieces(outNonEditablePoints, nePoint, swPoint);
-    addCurrentOpenAreaPieces(openAreaPointList);
   }
 
   // 设置地图中心位置
