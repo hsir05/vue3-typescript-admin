@@ -7,41 +7,54 @@
 <script setup lang="ts">
 //@ts-nocheck
 
-import { ref, onUnmounted } from "vue";
-const domRef = ref<HTMLDivElement | null>(null);
+import { ref, toRefs, watch } from "vue";
 import stylesData from "@/assets/custom_map_config.json";
 
+const domRef = ref<HTMLDivElement | null>(null);
+const emit = defineEmits(["update-nonEditArea"]);
+
+interface NonDataInter {
+  areaCode: string;
+  lat: number;
+  lng: number;
+}
+
+//用来存储从接口获取的不可编辑区域的数据
+const remoteNonEditablePointsData = ref<NonDataInter[]>([]);
+
+const props = defineProps({
+  nonPointsData: {
+    type: Array as PropType<NonDataInter[]>,
+    default: () => [],
+  },
+});
+const { nonPointsData } = toRefs(props);
+remoteNonEditablePointsData.value = nonPointsData;
+
+watch(nonPointsData, (newValue) => {
+  remoteNonEditablePointsData.value = newValue;
+});
+
 // 渲染地图
-async function renderBaiduMap(
-  currentOpenAreaPointsData = [],
-  remoteNonEditablePointsData = [],
-  outNonEditablePointsData = [],
-  lng = 116.405725,
-  lat = 39.935362
-) {
+async function renderBaiduMap(currentOpenAreaPointsData = [], lng = 116.405725, lat = 39.935362) {
   // await load(true);
   let options = {
     gridPrecision: 2,
     showGrid: true,
   };
-  let viewPions = {};
   let timer = null;
   let drawingManager = null;
 
   let gridlines = []; // 用来存储网格线覆盖物的数组
   let nonEditablePoints = []; // 用来存储不可选择区块的数组
-  let openAreaPointList = currentOpenAreaPointsData;
   let currentOpenAreaPoints = []; // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
-  let outNonEditablePoints = outNonEditablePointsData;
-  let remoteNonEditablePoints = remoteNonEditablePointsData; // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
+
+  let openAreaPointList = currentOpenAreaPointsData;
 
   let Event = {
     tilesloaded: "tilesloaded",
   };
 
-  onUnmounted(() => {
-    console.log(444444);
-  });
   // 初始化
   let map = new BMap.Map(domRef.value!, { enableMapClick: false, minZoom: 11, maxZoom: 15 });
   let point = new BMap.Point(lng, lat);
@@ -49,34 +62,39 @@ async function renderBaiduMap(
   map.centerAndZoom(point, 12);
   //鼠标滚轮控制缩放
   map.disableDoubleClickZoom(false);
-
   map.setMapStyleV2({ styleJson: stylesData });
 
-  map.addEventListener(Event.tilesloaded, function () {
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      let bounds = map.getBounds();
-      let nePoint = bounds.getNorthEast(); //可视区域右上角(东北角）
-      let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
+  // 添加地图监听
+  function addMapEventListener() {
+    map.addEventListener(Event.tilesloaded, function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        let bounds = map.getBounds();
+        let nePoint = bounds.getNorthEast(); //可视区域右上角(东北角）
+        let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
 
-      viewPions = {
-        nePoint,
-        swPoint,
-      };
-      // 清除全部网格线
-      if (options.showGrid) {
-        clearAllGrid();
-        // 绘制地图范围内的网格
-        drawGrid(nePoint, swPoint);
-      }
+        // 清除覆盖物
+        for (let key of currentOpenAreaPoints) {
+          removeOverlay(key.piece);
+        }
+        currentOpenAreaPoints = [];
+        // 清除全部网格线
+        if (options.showGrid) {
+          clearAllGrid();
+          // 绘制地图范围内的网格
+          drawGrid(nePoint, swPoint);
+        }
+        let paramData = {};
+        paramData.lngMin = calculateKey(swPoint.lng);
+        paramData.lngMax = calculateKey(nePoint.lng);
+        paramData.latMin = calculateKey(swPoint.lat);
+        paramData.latMax = calculateKey(nePoint.lat);
+        emit("update-nonEditArea", paramData);
+      }, 200);
+    });
+  }
 
-      // clearOutSideNonEditablePieces(nePoint, swPoint);
-      // addNonEditablePieces(remoteNonEditablePoints, nePoint, swPoint);
-      // addCurrentOpenAreaPieces(openAreaPointList);
-    }, 200);
-  });
-
-  function mapDrawingInit() {
+  function drawingManagerInit() {
     options.showGrid = true;
     drawingManager = new BMapLib.DrawingManager(map, {
       isOpen: false, //是否开启绘制模式
@@ -91,7 +109,6 @@ async function renderBaiduMap(
         strokeStyle: "solid", //边线的样式，solid或dashed。
       }, //多边形的样式
     });
-
     drawingManager.setDrawingMode(BMAP_DRAWING_RECTANGLE);
     // 添加鼠标绘制工具监听事件，用于获取绘制结果
     drawingManager.addEventListener("rectanglecomplete", function (overlay) {
@@ -100,7 +117,7 @@ async function renderBaiduMap(
       let nePoint = bounds.getNorthEast(); //可视区域右上角(东北角）
       let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
       // 添加或删除用绘制工具选择的区域（添加及删除覆盖物和openAreaMapBox.currentOpenAreaPoints中的元素）
-      refershCurrentOpenAreaPieces(remoteNonEditablePoints, nePoint, swPoint);
+      refershCurrentOpenAreaPieces(remoteNonEditablePointsData.value, nePoint, swPoint);
       // 刪除鼠标绘制的图层
       overlay.remove();
     });
@@ -115,26 +132,7 @@ async function renderBaiduMap(
         let ply = new BMap.Polygon(rs.boundaries[i], { strokeWeight: 2, strokeColor: "#ff0000" }); //建立多边形覆盖物
         map.addOverlay(ply); //添加覆盖物
       }
-
-      clearOutSideNonEditablePieces(viewPions.nePoint, viewPions.swPoint);
-      addNonEditablePieces(outNonEditablePoints, viewPions.nePoint, viewPions.swPoint);
-      addCurrentOpenAreaPieces(openAreaPointList);
     });
-  }
-  // 在地图上添加区块,会返回地图上添加的区块覆盖物
-  function addPiece(keyLng, keyLat, style) {
-    let dValue = Number((0.1 / options.gridPrecision).toFixed(2)); // 两个相邻关键点之间经度或纬度之间的相差值
-    let rectangle = new BMap.Polygon(
-      [
-        new BMap.Point((keyLng - dValue / 2).toFixed(3), (keyLat - dValue / 2).toFixed(3)),
-        new BMap.Point((keyLng - dValue / 2).toFixed(3), (keyLat + dValue / 2).toFixed(3)),
-        new BMap.Point((keyLng + dValue / 2).toFixed(3), (keyLat + dValue / 2).toFixed(3)),
-        new BMap.Point((keyLng + dValue / 2).toFixed(3), (keyLat - dValue / 2).toFixed(3)),
-      ],
-      style
-    );
-    map.addOverlay(rectangle);
-    return rectangle;
   }
   // 绘制地图上的网格线
   function drawGrid(nePoint, swPoint) {
@@ -167,12 +165,53 @@ async function renderBaiduMap(
       addOverlay(polygon);
       gridlines.push(polygon);
     }
+
+    clearOutSideNonEditablePieces(nePoint, swPoint);
+    addCurrentOpenAreaPieces(openAreaPointList);
+    addNonEditablePieces(remoteNonEditablePointsData.value, nePoint, swPoint);
   }
-  // 清除地图上的网格线
-  function clearAllGrid() {
-    for (let i = gridlines.length - 1; i >= 0; i--) {
-      removeOverlay(gridlines[i]);
-      gridlines.splice(i, 1);
+  // 在地图上添加区块,会返回地图上添加的区块覆盖物
+  function addPiece(keyLng, keyLat, style) {
+    let dValue = Number((0.1 / options.gridPrecision).toFixed(2)); // 两个相邻关键点之间经度或纬度之间的相差值
+    let rectangle = new BMap.Polygon(
+      [
+        new BMap.Point((keyLng - dValue / 2).toFixed(3), (keyLat - dValue / 2).toFixed(3)),
+        new BMap.Point((keyLng - dValue / 2).toFixed(3), (keyLat + dValue / 2).toFixed(3)),
+        new BMap.Point((keyLng + dValue / 2).toFixed(3), (keyLat + dValue / 2).toFixed(3)),
+        new BMap.Point((keyLng + dValue / 2).toFixed(3), (keyLat - dValue / 2).toFixed(3)),
+      ],
+      style
+    );
+    map.addOverlay(rectangle);
+    return rectangle;
+  }
+  // 在地图上添加某个开通区域的关键点区块(添加完之后会将地图移动到区域中间)
+  function addCurrentOpenAreaPieces(data) {
+    if (data && data.length > 0) {
+      let latMin, latMax, lngMin, lngMax;
+      for (let i = 0; i < data.length; i++) {
+        let openAreaPoint = data[i];
+        if (!latMin || latMin > openAreaPoint.lat) {
+          latMin = openAreaPoint.lat;
+        }
+        if (!latMax || latMax < openAreaPoint.lat) {
+          latMax = openAreaPoint.lat;
+        }
+        if (!lngMin || lngMin > openAreaPoint.lng) {
+          lngMin = openAreaPoint.lng;
+        }
+        if (!lngMax || lngMax < openAreaPoint.lng) {
+          lngMax = openAreaPoint.lng;
+        }
+        openAreaPoint.piece = addPiece(openAreaPoint.lng, openAreaPoint.lat, {
+          strokeColor: "#89b929",
+          fillColor: "#89b929",
+          strokeWeight: 0.1,
+          fillOpacity: 0.5,
+        });
+        currentOpenAreaPoints.push(openAreaPoint);
+      }
+      // panTo((lngMin + lngMax) / 2, (latMin + latMax) / 2)
     }
   }
   // 在地图上添加某范围内的不可编辑区块（可以传入一个区域编码，添加的不可编辑区块中将不会包含该区域编码下的区块）
@@ -258,38 +297,11 @@ async function renderBaiduMap(
       }
     }
   }
-  // 在地图上添加某个开通区域的关键点区块(添加完之后会将地图移动到区域中间)
-  function addCurrentOpenAreaPieces(data) {
-    if (data && data.length > 0) {
-      let latMin, latMax, lngMin, lngMax;
-      for (let i = 0; i < data.length; i++) {
-        let openAreaPoint = data[i];
-        if (!latMin || latMin > openAreaPoint.lat) {
-          latMin = openAreaPoint.lat;
-        }
-        if (!latMax || latMax < openAreaPoint.lat) {
-          latMax = openAreaPoint.lat;
-        }
-        if (!lngMin || lngMin > openAreaPoint.lng) {
-          lngMin = openAreaPoint.lng;
-        }
-        if (!lngMax || lngMax < openAreaPoint.lng) {
-          lngMax = openAreaPoint.lng;
-        }
-        openAreaPoint.piece = addPiece(openAreaPoint.lng, openAreaPoint.lat, {
-          strokeColor: "#89b929",
-          fillColor: "#89b929",
-          strokeWeight: 0.1,
-          fillOpacity: 0.5,
-        });
-        currentOpenAreaPoints.push(openAreaPoint);
-      }
-      // panTo((lngMin + lngMax) / 2, (latMin + latMax) / 2)
-    }
-  }
-  function removeAllOverlay() {
-    for (let i = 0; i < currentOpenAreaPoints.length; i++) {
-      removeOverlay(currentOpenAreaPoints[i].piece);
+  // 清除地图上的网格线
+  function clearAllGrid() {
+    for (let i = gridlines.length - 1; i >= 0; i--) {
+      removeOverlay(gridlines[i]);
+      gridlines.splice(i, 1);
     }
   }
   // 删除地图上某范围内的可编辑区域-------
@@ -318,9 +330,8 @@ async function renderBaiduMap(
       (Math.round(number * options.gridPrecision * 10) / 10 / options.gridPrecision).toFixed(2)
     );
   }
-
+  // 在一定范围内更新当前开通区域选中的关键点及区块
   function refershCurrentOpenAreaPieces(remoteNonEditablePoints, nePoint, swPoint) {
-    // _setMapTilesloadedListener()
     // 1.计算出选中的关键点列表（可能没有、可能是1个，可能是多个）waitSelectedPoints
     let waitSelectedPoints = [];
 
@@ -399,25 +410,6 @@ async function renderBaiduMap(
       }
     }
   }
-
-  // 设置地图中心位置
-  function reSetCenter(lng, lat, delay) {
-    setTimeout(
-      function () {
-        map.setCenter(new BMap.Point(lng, lat));
-      },
-      delay ? delay : 0
-    );
-  }
-  // 设置地图中心位置,如果新的中点在可视范围内，将会平滑移动过去
-  function panTo(lng, lat, delay) {
-    setTimeout(
-      function () {
-        map.panTo(new BMap.Point(lng, lat));
-      },
-      delay ? delay : 0
-    );
-  }
   // 添加传入的覆盖物
   function addOverlay(overlay) {
     map.addOverlay(overlay);
@@ -446,15 +438,33 @@ async function renderBaiduMap(
     map.addOverlay(marker);
     return marker;
   }
+  // 设置地图中心位置
+  function reSetCenter(lng, lat, delay) {
+    setTimeout(
+      function () {
+        map.setCenter(new BMap.Point(lng, lat));
+      },
+      delay ? delay : 0
+    );
+  }
+  // 设置地图中心位置,如果新的中点在可视范围内，将会平滑移动过去
+  function panTo(lng, lat, delay) {
+    setTimeout(
+      function () {
+        map.panTo(new BMap.Point(lng, lat));
+      },
+      delay ? delay : 0
+    );
+  }
 
   return {
     addBoundary,
-    removeAllOverlay,
-    mapDrawingInit,
+    drawingManagerInit,
     clearInSideCurrentOpenAreaPieces,
     reSetCenter,
     panTo,
     clearOverlays,
+    addMapEventListener,
 
     addMarker,
   };

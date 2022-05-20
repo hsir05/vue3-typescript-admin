@@ -57,7 +57,11 @@
     </div>
 
     <div class="map">
-      <Map ref="baiduMapRef" />
+      <Map
+        ref="baiduMapRef"
+        :nonPointsData="remoteNonEditablePoints"
+        @update-nonEditArea="getNonEditAreaPonits"
+      />
 
       <div class="map-edit-area" v-if="isShow">
         <div class="">
@@ -185,7 +189,7 @@ import Map from "@/components/Map/BaiduMap.vue";
 import { FormInst, SelectOption, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import { TableItemInter, OpenAreaFormInter } from "./type";
+import { TableItemInter, OpenAreaFormInter, NonDataInter, NonEditAreaPonitsInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { getAllOpenCity } from "@/api/common/common";
 import {
@@ -237,7 +241,7 @@ export default defineComponent({
 
     const openCityList = ref([]);
     const currentOpenAreaPoints = ref([]);
-    const remoteNonEditablePoints = ref([]);
+    const remoteNonEditablePoints = ref<NonDataInter[]>([]);
     const data = ref([]);
     const editFormRef = ref();
 
@@ -390,21 +394,24 @@ export default defineComponent({
         loading.value = false;
       }
     }
+
+    const getNonEditAreaPonits = async (paramData: NonEditAreaPonitsInter) => {
+      try {
+        let option = {
+          areaCode: editForm.value.areaCode as string,
+          ...paramData,
+        };
+        let res = await getNonEditablePointList(option);
+        remoteNonEditablePoints.value = res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    };
     async function getOpenAreaPoint(areaCode: string) {
       try {
         loading.value = true;
         let res = await getOpenAreaPointList({ areaCode });
         currentOpenAreaPoints.value = res.data;
-
-        let params = {
-          lngMin: res.data[0].lng,
-          lngMax: res.data[res.data.length - 1].lng,
-          latMin: res.data[0].lat,
-          latMax: res.data[res.data.length - 1].lat,
-        };
-        let outResult = await getNonEditablePointList(params);
-
-        // console.log(outResult.data);
 
         let option = {
           areaCode: editForm.value.areaCode as string,
@@ -417,18 +424,16 @@ export default defineComponent({
         remoteNonEditablePoints.value = result.data;
 
         const { renderBaiduMap } = baiduMapRef.value;
-        const { addBoundary, mapDrawingInit } = await renderBaiduMap(
+        const { addMapEventListener, addBoundary, drawingManagerInit } = await renderBaiduMap(
           currentOpenAreaPoints.value,
-          result.data,
-          outResult.data,
           form.value.lng,
           form.value.lat
         );
 
-        addBoundary(form.value.cityName);
-        mapDrawingInit();
+        addMapEventListener();
 
-        // addCurrentOpenAreaPieces(res.data)
+        addBoundary(form.value.cityName);
+        drawingManagerInit();
 
         loading.value = false;
       } catch (err) {
@@ -461,6 +466,7 @@ export default defineComponent({
       form,
       formRef,
       openCityList,
+      remoteNonEditablePoints,
       baiduMapRef,
       data,
       appTheme,
@@ -488,6 +494,7 @@ export default defineComponent({
       handleUpdateValue,
       handleAddArea,
       handleEditArea,
+      getNonEditAreaPonits,
     };
   },
 });
