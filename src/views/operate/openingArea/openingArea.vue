@@ -245,7 +245,6 @@ export default defineComponent({
     const data = ref([]);
     const editFormRef = ref();
 
-    const drawingManagerRef = ref();
     const editForm = ref<TableItemInter>({
       areaName: null,
       areaLock: 1,
@@ -373,7 +372,12 @@ export default defineComponent({
         loading.value = false;
       }
     }
-    function handleAdjust() {}
+    function handleAdjust() {
+      const { map, drawingManager } = baiduMapRef.value;
+      map.enableScrollWheelZoom();
+      map.enableDoubleClickZoom();
+      drawingManager.close();
+    }
     function handleReset() {}
     async function handleSave() {
       try {
@@ -426,12 +430,10 @@ export default defineComponent({
         let result = await getNonEditablePointList(option);
         remoteNonEditablePoints.value = result.data;
 
-        const { renderBaiduMap } = baiduMapRef.value;
-        const { addMapEventListener, addBoundary, drawingManagerInit } = await renderBaiduMap(
-          form.value.lng,
-          form.value.lat
-        );
+        const { renderBaiduMap, addMapEventListener, addBoundary, drawingManagerInit } =
+          baiduMapRef.value;
 
+        renderBaiduMap(form.value.lng, form.value.lat);
         addMapEventListener();
         addBoundary(form.value.cityName);
         drawingManagerInit();
@@ -446,9 +448,7 @@ export default defineComponent({
     async function handleEdit(record: TableItemInter) {
       isShow.value = true;
       area.value = record.areaName;
-
       getOpenAreaPoint(record.areaCode as string);
-
       editForm.value = record;
     }
     function handleDelete(record: TableItemInter) {
@@ -457,7 +457,10 @@ export default defineComponent({
     function handleAddArea() {}
 
     function handleEditArea() {
-      drawingManagerRef.value.openDrawingManager();
+      const { map, drawingManager } = baiduMapRef.value;
+      map.disableScrollWheelZoom();
+      map.disableDoubleClickZoom();
+      drawingManager.open();
     }
 
     return {
