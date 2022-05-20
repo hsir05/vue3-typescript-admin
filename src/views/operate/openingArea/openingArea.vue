@@ -60,6 +60,7 @@
       <Map
         ref="baiduMapRef"
         :nonPointsData="remoteNonEditablePoints"
+        :currentPointsData="currentOpenAreaPoints"
         @update-nonEditArea="getNonEditAreaPonits"
       />
 
@@ -211,7 +212,6 @@ import {
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
 import { itemState } from "@/interface/common/common";
-// import { calculateKey } from "@/utils/index"
 export default defineComponent({
   name: "OpenArea",
   components: {
@@ -240,7 +240,7 @@ export default defineComponent({
     const area = ref<string | null>();
 
     const openCityList = ref([]);
-    const currentOpenAreaPoints = ref([]);
+    const currentOpenAreaPoints = ref<NonDataInter[]>([]);
     const remoteNonEditablePoints = ref<NonDataInter[]>([]);
     const data = ref([]);
     const editFormRef = ref();
@@ -313,6 +313,9 @@ export default defineComponent({
     onMounted(() => {
       getOpenCity();
     });
+    // const { renderBaiduMap } = baiduMapRef.value
+    // // const { addMapEventListener, addBoundary, drawingManagerInit } = renderBaiduMap( form.value.lng, form.value.lat );
+    // const {resetCenter, addMapEventListener, addBoundary, drawingManagerInit } = renderBaiduMap();
 
     const getOpenCity = async () => {
       try {
@@ -425,13 +428,11 @@ export default defineComponent({
 
         const { renderBaiduMap } = baiduMapRef.value;
         const { addMapEventListener, addBoundary, drawingManagerInit } = await renderBaiduMap(
-          currentOpenAreaPoints.value,
           form.value.lng,
           form.value.lat
         );
 
         addMapEventListener();
-
         addBoundary(form.value.cityName);
         drawingManagerInit();
 
@@ -467,6 +468,7 @@ export default defineComponent({
       formRef,
       openCityList,
       remoteNonEditablePoints,
+      currentOpenAreaPoints,
       baiduMapRef,
       data,
       appTheme,

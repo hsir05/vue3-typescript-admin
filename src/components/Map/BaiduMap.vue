@@ -18,25 +18,33 @@ interface NonDataInter {
   lat: number;
   lng: number;
 }
-
-//用来存储从接口获取的不可编辑区域的数据
-const remoteNonEditablePointsData = ref<NonDataInter[]>([]);
-
 const props = defineProps({
   nonPointsData: {
     type: Array as PropType<NonDataInter[]>,
     default: () => [],
   },
+  currentPointsData: {
+    type: Array as PropType<NonDataInter[]>,
+    default: () => [],
+  },
 });
-const { nonPointsData } = toRefs(props);
+//用来存储从接口获取的不可编辑区域的数据
+const remoteNonEditablePointsData = ref<NonDataInter[]>([]);
+const openAreaPointList = ref<NonDataInter[]>([]);
+
+const { nonPointsData, currentPointsData } = toRefs(props);
 remoteNonEditablePointsData.value = nonPointsData;
+openAreaPointList.value = currentPointsData;
 
 watch(nonPointsData, (newValue) => {
   remoteNonEditablePointsData.value = newValue;
 });
+watch(currentPointsData, (newValue) => {
+  openAreaPointList.value = newValue;
+});
 
 // 渲染地图
-async function renderBaiduMap(currentOpenAreaPointsData = [], lng = 116.405725, lat = 39.935362) {
+async function renderBaiduMap(lng = 116.405725, lat = 39.935362) {
   // await load(true);
   let options = {
     gridPrecision: 2,
@@ -48,8 +56,6 @@ async function renderBaiduMap(currentOpenAreaPointsData = [], lng = 116.405725, 
   let gridlines = []; // 用来存储网格线覆盖物的数组
   let nonEditablePoints = []; // 用来存储不可选择区块的数组
   let currentOpenAreaPoints = []; // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
-
-  let openAreaPointList = currentOpenAreaPointsData;
 
   let Event = {
     tilesloaded: "tilesloaded",
@@ -167,7 +173,7 @@ async function renderBaiduMap(currentOpenAreaPointsData = [], lng = 116.405725, 
     }
 
     clearOutSideNonEditablePieces(nePoint, swPoint);
-    addCurrentOpenAreaPieces(openAreaPointList);
+    addCurrentOpenAreaPieces(openAreaPointList.value);
     addNonEditablePieces(remoteNonEditablePointsData.value, nePoint, swPoint);
   }
   // 在地图上添加区块,会返回地图上添加的区块覆盖物
@@ -439,7 +445,7 @@ async function renderBaiduMap(currentOpenAreaPointsData = [], lng = 116.405725, 
     return marker;
   }
   // 设置地图中心位置
-  function reSetCenter(lng, lat, delay) {
+  function resetCenter(lng, lat, delay) {
     setTimeout(
       function () {
         map.setCenter(new BMap.Point(lng, lat));
@@ -461,7 +467,7 @@ async function renderBaiduMap(currentOpenAreaPointsData = [], lng = 116.405725, 
     addBoundary,
     drawingManagerInit,
     clearInSideCurrentOpenAreaPieces,
-    reSetCenter,
+    resetCenter,
     panTo,
     clearOverlays,
     addMapEventListener,
