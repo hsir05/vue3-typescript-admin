@@ -1,3 +1,5 @@
+import { objIner } from "@/interface/common/common"
+
 export const statusOptions = [
   {
     label: "正常",
@@ -19,6 +21,58 @@ export const lockOptions = [
     value: 0,
   },
 ];
+
+// 代金券获得时机 
+export const couponAchieveOpportunityOptions = [
+    {
+        label: "注册赠券",
+        value: "COT0001"
+    },
+     {
+        label: "后台赠券",
+        value: "COT0002"
+    },
+      {
+        label: "兑换赠券",
+        value: "COT0003"
+    },
+]
+export const couponAchieveOpportunityObj = (() => {
+    let obj:objIner = {}
+    for(let key of couponAchieveOpportunityOptions) {
+        obj[key.value] = key.label
+    }
+    return obj
+})()
+
+
+// 代金券获得时机
+export const couponUseStateOptions = [
+    {
+        label: "未使用",
+        value: "CS00001"
+    },
+     {
+        label: "已冻结",
+        value: "CS00002"
+    },
+      {
+        label: "已使用",
+        value: "CS00003"
+    },
+    {
+        label: "已过期",
+        value: "CS00004"
+    },
+]
+
+export const couponUseStateObj = (() => {
+    let obj:objIner = {}
+    for(let key of couponUseStateOptions) {
+        obj[key.value] = key.label
+    }
+    return obj
+})()
 // 产品类型 
 export const goodsTypeOptions = [
     {

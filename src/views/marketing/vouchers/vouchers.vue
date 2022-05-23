@@ -6,38 +6,65 @@
       inline
       label-placement="left"
       :show-feedback="false"
-      label-width="80"
+      label-width="130"
       class="pt-15px bg-white pb-10px mb-5px flex-wrap"
       :model="queryValue"
     >
-      <n-form-item label="消费规则名称" path="customerCouponConsumeRuleNameLike">
+      <n-form-item label="代金券名称" path="couponNameLike">
         <n-input
-          v-model:value="queryValue.customerCouponConsumeRuleNameLike"
+          v-model:value="queryValue.couponNameLike"
           clearable
-          placeholder="输入消费规则名称"
+          placeholder="输入代金券名称"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label-width="90" label="开通城市" path="couponUsedCityCodesLike">
-        <n-select
-          v-model:value="queryValue.couponUsedCityCodesLike"
+      <n-form-item label="所属客户手机号" path="customerPhoneLike">
+        <n-input
+          v-model:value="queryValue.customerPhoneLike"
           clearable
-          filterable
-          placeholder="选择开通城市"
-          style="width: 260px"
-          :options="openCityData"
+          placeholder="输入所属客户手机号"
+          style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="可使用的订单类型" path="couponUsedOrderTypesLike">
+      <n-form-item label="获得时间(起始)" path="couponAchieveTimeGe">
+        <n-date-picker
+          v-model:value="queryValue.couponAchieveTimeGe"
+          type="datetime"
+          style="width: 180px"
+          clearable
+        />
+      </n-form-item>
+
+      <n-form-item label="获得时间(结束)" path="couponAchieveTimeLe">
+        <n-date-picker
+          v-model:value="queryValue.couponAchieveTimeLe"
+          type="datetime"
+          style="width: 180px"
+          clearable
+        />
+      </n-form-item>
+
+      <n-form-item label-width="90" label="获得时机" path="couponAchieveOpportunityEq">
+        <n-select
+          v-model:value="queryValue.couponAchieveOpportunityEq"
+          clearable
+          filterable
+          placeholder="选择获得时机"
+          style="width: 140px"
+          :options="couponAchieveOpportunityOptions"
+        />
+      </n-form-item>
+
+      <n-form-item label="使用状态" path="couponUseStateEq">
         <n-select
           clearable
           filterable
-          style="width: 150px"
-          v-model:value="queryValue.couponUsedOrderTypesLike"
-          placeholder="选择可使用的订单类型"
-          :options="[]"
+          style="width: 140px"
+          v-model:value="queryValue.couponUseStateEq"
+          placeholder="选择使用状态"
+          :options="couponUseStateOptions"
         />
       </n-form-item>
 
@@ -67,15 +94,21 @@
 <script lang="ts">
 import { defineComponent, ref, h, onMounted, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DetailDrawer from "./detailDrawer.vue";
 import VouchersDrawer from "./vouchersDrawer.vue";
 import { TableDataItemInter } from "./type";
-import { getCouponConsumeRulePage, removeCoupon } from "@/api/marketing/marketing";
+import { getCouponPage, removeCoupon } from "@/api/marketing/marketing";
 import { PaginationInter } from "@/api/type";
 import { FormInst, useMessage } from "naive-ui";
-import { CityItemInter } from "@/interface/common/common";
+import dayjs from "dayjs";
+import {
+  couponAchieveOpportunityOptions,
+  couponUseStateOptions,
+  couponUseStateObj,
+  couponAchieveOpportunityObj,
+} from "@/config/form";
 export default defineComponent({
   name: "Vouchers",
   components: { BasicTable, DetailDrawer, VouchersDrawer },
@@ -85,12 +118,14 @@ export default defineComponent({
     const vouchersDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
-    const openCityData = ref<CityItemInter[]>([]);
 
     const queryValue = ref({
-      customerCouponConsumeRuleNameLike: null,
-      couponUsedCityCodesLike: null,
-      couponUsedOrderTypesLike: null,
+      couponNameLike: null,
+      customerPhoneLike: null,
+      couponAchieveTimeGe: null,
+      couponAchieveTimeLe: null,
+      couponAchieveOpportunityEq: null,
+      couponUseStateEq: null,
     });
     const queryFormRef = ref<FormInst | null>(null);
     const message = useMessage();
@@ -104,43 +139,58 @@ export default defineComponent({
       },
       {
         title: "代金券名称",
-        key: "voucher",
+        key: "couponName",
         align: "center",
       },
       {
         title: "所属客户手机号",
-        key: "phone",
+        key: "customerPhone",
         align: "center",
       },
       {
         title: "代金券面值(元)",
-        key: "voucherFaceValue",
+        key: "couponDenomination",
         align: "center",
       },
       {
         title: "获得时间",
-        key: "createTime",
+        key: "couponAchieveTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.couponAchieveTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "获得时机",
-        key: "active",
+        key: "couponAchieveOpportunity",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", couponAchieveOpportunityObj[record.couponAchieveOpportunity]);
+        },
       },
       {
         title: "生效时间",
         key: "startTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.couponEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "失效时间",
         key: "endTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.couponEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "使用状态",
-        key: "sort",
+        key: "couponUseState",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", couponUseStateObj[record.couponUseState]);
+        },
       },
       {
         title: "操作",
@@ -151,24 +201,12 @@ export default defineComponent({
           return h(TableActions as any, {
             actions: [
               {
-                label: "编辑",
+                label: "查看",
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleSee.bind(null, record),
                 auth: ["dict001"],
-              },
-              {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                isIconBtn: true,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
               },
             ],
           });
@@ -192,7 +230,7 @@ export default defineComponent({
       loading.value = true;
       try {
         let search = { ...queryValue.value };
-        let res = await getCouponConsumeRulePage({ page, search: search });
+        let res = await getCouponPage({ page, search: search });
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -201,9 +239,9 @@ export default defineComponent({
         loading.value = false;
       }
     };
-    function handleEdit(record: Recordable) {
-      const { openDrawer } = vouchersDrawerRef.value;
-      openDrawer("编辑城市广告", record.openCityAdvertisementId);
+    function handleSee(record: Recordable) {
+      const { openDrawer } = detailDrawerRef.value;
+      openDrawer(record.customerCouponId);
     }
     function handleAdd() {
       const { openDrawer } = vouchersDrawerRef.value;
@@ -255,10 +293,11 @@ export default defineComponent({
       vouchersDrawerRef,
       basicTableRef,
       columns,
-      openCityData,
-      getRowKeyId: (row: TableDataItemInter) => row.customerCouponConsumeRuleId,
+      getRowKeyId: (row: TableDataItemInter) => row.customerCouponId,
       itemCount,
       queryValue,
+      couponAchieveOpportunityOptions,
+      couponUseStateOptions,
 
       reloadPage,
       handleAdd,

@@ -65,7 +65,6 @@ export default defineComponent({
       loading.value = true;
       try {
         let res = await getAllCustomerMember();
-        console.log(res.data);
         options.value = res.data.map(
           (item: { customerMemberName: string; customerMemberId: string }) => {
             return {

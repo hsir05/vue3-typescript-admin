@@ -133,7 +133,7 @@ export default defineComponent({
         render(record: TableDataItemInter) {
           return h(
             "span",
-            dayjs(record.advertisementEffectiveTimeBegin).format("YYYY-MM-DD HH:mm")
+            dayjs(record.advertisementEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
           );
         },
       },
@@ -145,7 +145,10 @@ export default defineComponent({
           tooltip: true,
         },
         render(record: TableDataItemInter) {
-          return h("span", dayjs(record.advertisementEffectiveTimeEnd).format("YYYY-MM-DD HH:mm"));
+          return h(
+            "span",
+            dayjs(record.advertisementEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
+          );
         },
       },
       {

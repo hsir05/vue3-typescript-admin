@@ -118,3 +118,39 @@ export function updateCustomerType(data:{customerId:string; customerMemberId: st
     data:data
   });
 }
+
+// ----------------已注销客户管理--------------------
+/**
+ * 已注销客户分页
+*/
+interface InCustomerInvalidPageInter{
+  page: PaginationInter;
+  search: {
+    customerPhoneLike: string;
+  };
+}
+export function getCustomerInvalidPage(data:InCustomerInvalidPageInter) {
+  return http.request({
+    url: "/customerInvalid/page",
+    method: "post",
+    data: data
+  });
+}
+
+// ----------------个人客户钱包管理--------------------
+/**
+ * 个人客户钱包分页
+*/
+interface InCustomerWalletPageInter{
+  page: PaginationInter;
+  search: {
+    customerPhoneLike: string | null;
+  };
+}
+export function getCustomerWalletPage(data:InCustomerWalletPageInter) {
+  return http.request({
+    url: "/customerWallet/customerWalletPage",
+    method: "post",
+    data: data
+  });
+}

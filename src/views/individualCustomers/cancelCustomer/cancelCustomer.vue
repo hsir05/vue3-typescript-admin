@@ -10,8 +10,12 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="客户手机号" path="phone">
-        <n-input v-model:value="queryValue.phone" clearable placeholder="输入客户手机号" />
+      <n-form-item label="客户手机号" path="customerPhoneLike">
+        <n-input
+          v-model:value="queryValue.customerPhoneLike"
+          clearable
+          placeholder="输入客户手机号"
+        />
       </n-form-item>
       <n-form-item>
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
@@ -34,7 +38,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -51,135 +55,153 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, reactive } from "vue";
-import { useMessage, FormInst, NTag } from "naive-ui";
-import { tableDataItem } from "./type";
+import { defineComponent, ref, h, unref, toRaw, onMounted, reactive } from "vue";
+import { FormInst, NTag } from "naive-ui";
+import { TableItemInter } from "./type";
+import { PaginationInter } from "@/api/type";
 import { pageSizes } from "@/config/table";
+import { getCustomerInvalidPage } from "@/api/individualCustomers/individualCustomers";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "CancelCustomer",
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
-      phone: "",
+      customerPhoneLike: "",
     });
     const loading = ref(false);
     const itemCount = ref(null);
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
-    const message = useMessage();
-
     const columns = [
-      {
-        type: "selection",
-      },
       {
         title: "序号",
         key: "index",
-        width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        width: 70,
+        render(_: TableItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "客户昵称",
-        key: "nickname",
+        key: "customerNickname",
         align: "center",
+        render(_: TableItemInter) {
+          return h("span", "匿名");
+        },
       },
       {
         title: "客户姓名",
-        key: "name",
+        key: "customerName",
         align: "center",
+        render(_: TableItemInter) {
+          return h("span", "匿名");
+        },
       },
       {
         title: "客户性别",
-        key: "sex",
-        width: 80,
+        key: "customerGender",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: "info",
+              type: "success",
             },
             {
-              default: () => (row.sex === 1 ? "男" : "女"),
+              default: () => (row.customerGender === 1 ? "男" : "女"),
             }
           );
         },
       },
       {
         title: "客户生日",
-        key: "birthday",
+        key: "customerBirthday",
         align: "center",
+        render(_: TableItemInter) {
+          return h("span", "暂无");
+        },
       },
       {
         title: "客户邮箱",
-        key: "email",
-        width: 110,
+        key: "customerEmail",
         align: "center",
+        render(_: TableItemInter) {
+          return h("span", "暂无");
+        },
       },
       {
         title: "客户手机号",
-        key: "phone",
-        align: "center",
-      },
-      {
-        title: "会员名称",
-        key: "memberName",
-        width: 110,
+        key: "customerPhone",
         align: "center",
       },
       {
         title: "客户注册时间",
-        key: "create_time",
+        key: "customerRegTime",
         align: "center",
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.customerRegTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
-        title: "客户注销时间",
-        key: "cancelTime",
-        width: 110,
+        title: "客户状态",
+        key: "customerLock",
         align: "center",
+        render(row: TableItemInter) {
+          return h(
+            NTag,
+            {
+              type: row.customerLock === 0 ? "success" : "error",
+            },
+            {
+              default: () => (row.customerLock === 0 ? "正常" : "锁定"),
+            }
+          );
+        },
       },
     ];
 
-    const data = ref([
-      {
-        id: "12313123",
-        nickname: "string",
-        name: "string",
-        sex: 1,
-        birthday: "string",
-        email: "string",
-        phone: "1809798797",
-        memberName: "string",
-        create_time: "string",
-        cancelTime: "string",
-      },
-    ]);
+    const data = ref([]);
+
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getCustomerInvalidPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     const reset = () => {
-      unref(queryValue).phone = "";
-      message.info("点击了删除");
-      //   getData({ page: 1, pageSize: 10 });
+      unref(queryValue).customerPhoneLike = "";
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
-    function handlePage(page: number) {
-      console.log(page);
-      pagination.page = page;
-      //   getData(toRaw(pagination));
+    function handlePage(pageIndex: number) {
+      pagination.pageIndex = pageIndex;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
       console.log(pageSize);
       pagination.pageSize = pageSize;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
 
     return {
@@ -190,7 +212,7 @@ export default defineComponent({
       loading,
       pageSizes,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableItemInter) => row.customerId,
       itemCount,
 
       searchHandle,

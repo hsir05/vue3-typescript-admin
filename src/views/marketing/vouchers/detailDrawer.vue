@@ -1,31 +1,43 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" title="代金券详情" @on-close-after="onCloseAfter">
     <n-descriptions label-placement="left" bordered :column="2">
-      <n-descriptions-item label="代金券名称">新用户快车券</n-descriptions-item>
-      <n-descriptions-item label="代金券面值(元)">未使用</n-descriptions-item>
-      <n-descriptions-item label="获得时间">未使用</n-descriptions-item>
-      <n-descriptions-item label="获得时机">未使用</n-descriptions-item>
-      <n-descriptions-item label="获得备注">未使用</n-descriptions-item>
-      <n-descriptions-item label="生效时间">2020-04-24 08:51:10</n-descriptions-item>
-      <n-descriptions-item label="失效时间">2020-04-24 08:51:10</n-descriptions-item>
+      <n-descriptions-item label="代金券名称">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="代金券面值(元)">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="获得时间">{{
+        dayjs(detail?.couponAchieveTime).format("YYYY-MM-DD HH:mm:ss")
+      }}</n-descriptions-item>
+      <n-descriptions-item label="获得时机">{{
+        couponAchieveOpportunityObj[detail?.couponAchieveOpportunity]
+      }}</n-descriptions-item>
+      <n-descriptions-item label="获得备注">{{
+        detail?.couponConsumeNote || "暂无"
+      }}</n-descriptions-item>
+      <n-descriptions-item label="生效时间">{{
+        dayjs(detail?.couponEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
+      }}</n-descriptions-item>
+      <n-descriptions-item label="失效时间">{{
+        dayjs(detail?.couponEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
+      }}</n-descriptions-item>
 
-      <n-descriptions-item label="消费时间">未使用</n-descriptions-item>
-      <n-descriptions-item label="消费备注">未使用</n-descriptions-item>
-      <n-descriptions-item label="消费规则">未使用</n-descriptions-item>
-      <n-descriptions-item label="获得备注">未使用</n-descriptions-item>
-      <n-descriptions-item label="使用限制金额(元)">未使用</n-descriptions-item>
-      <n-descriptions-item label="可使用城市">未使用</n-descriptions-item>
-      <n-descriptions-item label="可使用的订单类型">未使用</n-descriptions-item>
-      <n-descriptions-item label="可使用的车型">未使用</n-descriptions-item>
-      <n-descriptions-item label="可使用的时间">未使用</n-descriptions-item>
-      <n-descriptions-item label="可使用的星期">未使用</n-descriptions-item>
+      <n-descriptions-item label="消费时间">{{ detail?.couponConsumeTime }}</n-descriptions-item>
+      <n-descriptions-item label="消费备注">{{ detail?.couponName || "暂无" }}</n-descriptions-item>
+      <n-descriptions-item label="消费规则">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="获得备注">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="使用限制金额(元)">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="可使用城市">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="可使用的订单类型">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="可使用的车型">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="可使用的时间">{{ detail?.couponName }}</n-descriptions-item>
+      <n-descriptions-item label="可使用的星期">{{ detail?.couponName }}</n-descriptions-item>
     </n-descriptions>
   </BasicDrawer>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from "vue";
-import { useMessage } from "naive-ui";
-import { TableDataItemInter } from "./type";
+import { getCouponDetail } from "@/api/marketing/marketing";
+import { couponUseStateObj, couponAchieveOpportunityObj } from "@/config/form";
+
+import dayjs from "dayjs";
 export default defineComponent({
   name: "DetailDrawer",
   setup(_, { emit }) {
@@ -34,19 +46,28 @@ export default defineComponent({
       loading: false,
       disabled: false,
     });
+    const detail = ref();
 
-    const title = ref("");
-    const message = useMessage();
-
-    function openDrawer(t: string, record?: TableDataItemInter | string) {
-      console.log(record);
-      if (record) {
-        // form.value = { ...form.value, ...record };
+    function openDrawer(customerCouponId: string) {
+      if (customerCouponId) {
+        getDetail(customerCouponId);
       }
-      title.value = t;
       state.isDrawer = true;
-      message.error("打开");
     }
+
+    const getDetail = async (customerCouponId: string) => {
+      try {
+        state.loading = true;
+        let res = await getCouponDetail({ customerCouponId });
+        console.log(res.data);
+        detail.value = res.data;
+        detail.value = { ...detail.value, ...res.data.customerCouponConsumeRule };
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
 
     function handleSaveAfter() {
       emit("on-save-after");
@@ -67,7 +88,10 @@ export default defineComponent({
 
     return {
       ...toRefs(state),
-      title,
+      detail,
+      dayjs,
+      couponUseStateObj,
+      couponAchieveOpportunityObj,
       openDrawer,
       onCloseAfter,
       handleSaveAfter,

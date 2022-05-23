@@ -10,8 +10,19 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="客户手机号" path="phone">
-        <n-input v-model:value="queryValue.phone" clearable placeholder="输入客户手机号" />
+      <n-form-item label="集团客户名称" path="groupCustomerNameLike">
+        <n-input
+          v-model:value="queryValue.groupCustomerNameLike"
+          clearable
+          placeholder="输入集团客户名称"
+        />
+      </n-form-item>
+      <n-form-item label="登录账号" path="groupCustomerLoginAccountLike">
+        <n-input
+          v-model:value="queryValue.groupCustomerLoginAccountLike"
+          clearable
+          placeholder="输入登录账号"
+        />
       </n-form-item>
       <n-form-item>
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
@@ -34,7 +45,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -56,7 +67,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, unref, reactive } from "vue";
+import { defineComponent, ref, h, toRaw, reactive, onMounted } from "vue";
 import { useMessage, FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import TransactionRecord from "./transactionRecordDrawer.vue";
@@ -65,6 +76,8 @@ import Transfer from "./transferDrawer.vue";
 import Recharge from "./rechargeDrawer.vue";
 import { tableDataItem } from "./type";
 import { pageSizes } from "@/config/table";
+import { PaginationInter } from "@/api/type";
+import { getGroupCustomerWalletPage } from "@/api/groupCustomers/groupCustomers";
 import { ReaderOutline as ReaderIcon, WalletOutline as WalletIcon } from "@vicons/ionicons5";
 import {
   PayCircleOutlined as PayCircleIcon,
@@ -77,7 +90,8 @@ export default defineComponent({
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
-      phone: "",
+      groupCustomerNameLike: null,
+      groupCustomerLoginAccountLike: null,
     });
     const loading = ref(false);
     const itemCount = ref(null);
@@ -86,7 +100,7 @@ export default defineComponent({
     const refundRef = ref();
     const transferRef = ref();
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
     const message = useMessage();
@@ -208,31 +222,39 @@ export default defineComponent({
       },
     ];
 
-    const data = ref([
-      {
-        id: "12313123",
-        nickname: "string",
-        name: "string",
-        phone: "1809798797",
-        actualAmount: "string",
-        giveAmount: "string",
-        frozenAmount: "string",
-        availableAmount: "string",
-        totalAmount: "string",
-        amountCreatetime: "string",
-        create_time: "string",
-      },
-    ]);
+    const data = ref([]);
+
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getGroupCustomerWalletPage({ page, search: search });
+        console.log(res);
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     const reset = () => {
-      unref(queryValue).phone = "";
+      queryValue.value = {
+        groupCustomerNameLike: null,
+        groupCustomerLoginAccountLike: null,
+      };
       message.info("点击了删除");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function handleRecord(record: Recordable) {
@@ -257,20 +279,18 @@ export default defineComponent({
       openDrawer();
     }
 
-    function handlePage(page: number) {
-      console.log(page);
-      pagination.page = page;
-      //   getData(toRaw(pagination));
+    function handlePage(pageIndex: number) {
+      pagination.pageIndex = pageIndex;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
-      console.log(pageSize);
       pagination.pageSize = pageSize;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
 
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {

@@ -97,7 +97,7 @@ export function downAdvertisement(data: { openCityAdvertisementId: string }) {
 /**
  * 代金券分页
  */
-interface CouponPageInter {
+interface CouponRulePageInter {
     page: PaginationInter;
     search: {
         customerCouponConsumeRuleNameLike: string | null;
@@ -105,7 +105,7 @@ interface CouponPageInter {
         couponUsedOrderTypesLike: string | null;
     };
 }
-export function getCouponConsumeRulePage(data: CouponPageInter) {
+export function getCouponConsumeRulePage(data: CouponRulePageInter) {
     return http.request({
         url: "/customerCouponConsumeRule/page",
         method: "post",
@@ -148,6 +148,40 @@ export function editCoupon(data: CouponInter) {
 export function removeCoupon(data: { customerCouponConsumeRuleId: string }) {
     return http.request({
         url: "/customerCouponConsumeRule/delete",
+        method: "post",
+        data: data,
+    });
+}
+//-----------------代金券管理-------------------------
+
+/**
+ * 代金券分页
+ */
+interface CouponPageInter {
+    page: PaginationInter;
+    search: {
+        couponNameLike: string | null;
+        customerPhoneLike: string | null;
+        couponAchieveTimeGe: string | null;
+        couponAchieveTimeLe: string | null;
+        couponAchieveOpportunityEq: string | null;
+        couponUseStateEq: string | null;
+    };
+}
+export function getCouponPage(data: CouponPageInter) {
+    return http.request({
+        url: "/customerCoupon/page",
+        method: "post",
+        data: data,
+    });
+}
+
+/**
+ * 代金券详情
+ */
+export function getCouponDetail(data: { customerCouponId: string }) {
+    return http.request({
+        url: "/customerCoupon/detail",
         method: "post",
         data: data,
     });
