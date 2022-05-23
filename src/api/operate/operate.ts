@@ -139,7 +139,7 @@ interface SaveAreaInter {
 }
 export function saveOpenArea(data: SaveAreaInter) {
   return http.request({
-    url: "/openArea/saveOpenArea",
+    url: "/openArea/editOpenArea",
     method: "post",
     data,
   });

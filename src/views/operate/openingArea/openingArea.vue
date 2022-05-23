@@ -61,7 +61,7 @@
         ref="baiduMapRef"
         :nonPointsData="remoteNonEditablePoints"
         :currentPointsData="currentOpenAreaPoints"
-        @update-nonEditArea="getNonEditAreaPonits"
+        @update-non-editArea="getNonEditAreaPonits"
       />
 
       <div class="map-edit-area" v-if="isShow">
@@ -162,7 +162,7 @@
               保存
             </n-tooltip>
 
-            <n-tooltip trigger="hover">
+            <!-- <n-tooltip trigger="hover">
               <template #trigger>
                 <n-button
                   attr-type="button"
@@ -177,7 +177,7 @@
                 </n-button>
               </template>
               取消
-            </n-tooltip>
+            </n-tooltip> -->
           </n-form-item>
         </n-form>
       </div>
@@ -206,7 +206,6 @@ import {
   CreateOutline as CreatIcon,
   SaveOutline as SaveOutIcon,
   ArrowUndoCircleOutline as ArrowBackIcon,
-  RefreshCircleOutline as RefreshIcon,
   Add as AddIcon,
   HandRightOutline as HandIcon,
   CreateOutline as CreateIcon,
@@ -220,7 +219,6 @@ export default defineComponent({
     AlertIcon,
     HandIcon,
     CreatIcon,
-    RefreshIcon,
     ArrowBackIcon,
     SaveOutIcon,
   },
@@ -312,9 +310,6 @@ export default defineComponent({
     onMounted(() => {
       getOpenCity();
     });
-    // const { renderBaiduMap } = baiduMapRef.value
-    // // const { addMapEventListener, addBoundary, drawingManagerInit } = renderBaiduMap( form.value.lng, form.value.lat );
-    // const {resetCenter, addMapEventListener, addBoundary, drawingManagerInit } = renderBaiduMap();
 
     const getOpenCity = async () => {
       try {
@@ -372,28 +367,46 @@ export default defineComponent({
         loading.value = false;
       }
     }
+    // 调整地图
     function handleAdjust() {
       const { map, drawingManager } = baiduMapRef.value;
       map.enableScrollWheelZoom();
       map.enableDoubleClickZoom();
       drawingManager.close();
     }
-    function handleReset() {}
+
+    // 还原
+    function handleReset() {
+      const { map, drawingManager, removeAllOverlay, addCurrentOpenAreaPieces } = baiduMapRef.value;
+      map.enableScrollWheelZoom();
+      map.enableDoubleClickZoom();
+      drawingManager.close();
+      removeAllOverlay();
+      addCurrentOpenAreaPieces(currentOpenAreaPoints.value);
+    }
     async function handleSave() {
       try {
         loading.value = true;
+
+        const { currentOpenAreaPoints } = baiduMapRef.value;
+
+        let pointsData = currentOpenAreaPoints.map((item: { lng: number; lat: number }) => {
+          return { lng: item.lng, lat: item.lat };
+        });
+        console.log(pointsData);
+
         let option = {
           areaCode: editForm.value.areaCode,
           areaName: editForm.value.areaName,
           cityCode: form.value.cityCode,
           areaLock: editForm.value.areaLock,
-          openAreaPointList: {
-            lng: form.value.lng,
-            lat: form.value.lat,
-          },
+          openAreaPointList: pointsData,
         };
         let res = await saveOpenArea(option);
         console.log(res);
+
+        handleAdjust();
+
         message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {

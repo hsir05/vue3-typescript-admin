@@ -132,8 +132,8 @@ export default defineComponent({
         data.value = res.data;
         if (res.data.length > 0) {
           openCity.value = res.data[0];
-          const { renderBaiduMap } = baiduMapRef.value;
-          const { createMarker } = await renderBaiduMap(res.data[0].lng, res.data[0].lat);
+          const { renderBaiduMap, createMarker } = baiduMapRef.value;
+          renderBaiduMap(res.data[0].lng, res.data[0].lat);
           createMarker();
         }
         loading.value = false;
@@ -162,8 +162,9 @@ export default defineComponent({
     async function handleEdit(record: TableItemInter, index: number) {
       selectdIndex.value = index;
       openCity.value = record;
-      const { renderBaiduMap } = baiduMapRef.value;
-      const { createMarker } = await renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
+
+      const { renderBaiduMap, createMarker } = baiduMapRef.value;
+      renderBaiduMap(toRaw(record).lng, toRaw(record).lat);
       createMarker();
     }
     async function handleRemove(record: TableItemInter) {

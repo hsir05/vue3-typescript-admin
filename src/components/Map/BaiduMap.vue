@@ -11,7 +11,7 @@ import { ref, toRefs, watch } from "vue";
 import stylesData from "@/assets/custom_map_config.json";
 
 const domRef = ref<HTMLDivElement | null>(null);
-const emit = defineEmits(["update-nonEditArea"]);
+const emit = defineEmits(["update-nonEditArea", "on-dragend"]);
 
 interface NonDataInter {
   areaCode: string;
@@ -48,10 +48,11 @@ let timer = null;
 
 const map = ref(null);
 const drawingManager = ref(null);
+const point = ref(null);
 
 let gridlines = []; // 用来存储网格线覆盖物的数组
 let nonEditablePoints = []; // 用来存储不可选择区块的数组
-let currentOpenAreaPoints = []; // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
+const currentOpenAreaPoints = ref([]); // 用来存储当前开通区域的区块的数组（新增或编辑时即是可编辑区块）
 
 watch(nonPointsData, (newValue) => {
   remoteNonEditablePointsData.value = newValue;
@@ -64,9 +65,9 @@ watch(currentPointsData, (newValue) => {
 function renderBaiduMap(lng = 116.405725, lat = 39.935362) {
   // 初始化
   map.value = new BMap.Map(domRef.value!, { enableMapClick: false, minZoom: 11, maxZoom: 15 });
-  let point = new BMap.Point(lng, lat);
+  point.value = new BMap.Point(lng, lat);
   // 初始化地图,设置中心点坐标和地图级别
-  map.value.centerAndZoom(point, 12);
+  map.value.centerAndZoom(point.value, 12);
   //鼠标滚轮控制缩放
   map.value.disableDoubleClickZoom(false);
   map.value.setMapStyleV2({ styleJson: stylesData });
@@ -81,11 +82,12 @@ function addMapEventListener() {
       let nePoint = bounds.getNorthEast(); //可视区域右上角(东北角）
       let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
 
-      // 清除覆盖物
-      for (let key of currentOpenAreaPoints) {
-        removeOverlay(key.piece);
-      }
-      currentOpenAreaPoints = [];
+      //   // 清除覆盖物
+      //   for (let key of currentOpenAreaPoints) {
+      //     removeOverlay(key.piece);
+      //   }
+      //   currentOpenAreaPoints = [];
+
       // 清除全部网格线
       if (options.showGrid) {
         clearAllGrid();
@@ -173,7 +175,7 @@ function drawGrid(nePoint, swPoint) {
     addOverlay(polygon);
     gridlines.push(polygon);
   }
-
+  removeAllOverlay();
   clearOutSideNonEditablePieces(nePoint, swPoint);
   addCurrentOpenAreaPieces(openAreaPointList.value);
   addNonEditablePieces(remoteNonEditablePointsData.value, nePoint, swPoint);
@@ -195,6 +197,7 @@ function addPiece(keyLng, keyLat, style) {
 }
 // 在地图上添加某个开通区域的关键点区块(添加完之后会将地图移动到区域中间)
 function addCurrentOpenAreaPieces(data) {
+  currentOpenAreaPoints.value = [];
   if (data && data.length > 0) {
     let latMin, latMax, lngMin, lngMax;
     for (let i = 0; i < data.length; i++) {
@@ -217,7 +220,7 @@ function addCurrentOpenAreaPieces(data) {
         strokeWeight: 0.1,
         fillOpacity: 0.5,
       });
-      currentOpenAreaPoints.push(openAreaPoint);
+      currentOpenAreaPoints.value.push(openAreaPoint);
     }
     // panTo((lngMin + lngMax) / 2, (latMin + latMax) / 2)
   }
@@ -229,13 +232,13 @@ function addNonEditablePieces(data, nePoint, swPoint) {
       for (let i = 0; i < data.length; i++) {
         let openAreaPoint = data[i];
         // 判断返回的不可选关键点（或区块）是不是已经在可编辑区块列表中，如果在，从可编辑区块列表中删除
-        for (let i = currentOpenAreaPoints.length - 1; i >= 0; i--) {
+        for (let i = currentOpenAreaPoints.value.length - 1; i >= 0; i--) {
           if (
             currentOpenAreaPoints[i].lng === openAreaPoint.lng &&
             currentOpenAreaPoints[i].lat === openAreaPoint.lat
           ) {
-            removeOverlay(currentOpenAreaPoints[i].piece);
-            currentOpenAreaPoints.splice(i, 1);
+            removeOverlay(currentOpenAreaPoints.value[i].piece);
+            currentOpenAreaPoints.value.splice(i, 1);
             break;
           }
         }
@@ -318,16 +321,16 @@ function clearInSideCurrentOpenAreaPieces(nePoint, swPoint) {
   let latMax = nePoint ? calculateKey(nePoint.lat) : 90;
   let lngMin = swPoint ? calculateKey(swPoint.lng) : 0;
   let lngMax = nePoint ? calculateKey(nePoint.lng) : 180;
-  for (let i = currentOpenAreaPoints.length - 1; i >= 0; i--) {
+  for (let i = currentOpenAreaPoints.value.length - 1; i >= 0; i--) {
     // 如果在地图可视范围内，清除之
     if (
-      lngMin <= currentOpenAreaPoints[i].lng &&
-      currentOpenAreaPoints[i].lng <= lngMax &&
-      latMin <= currentOpenAreaPoints[i].lat &&
-      currentOpenAreaPoints[i].lat <= latMax
+      lngMin <= currentOpenAreaPoints.value[i].lng &&
+      currentOpenAreaPoints.value[i].lng <= lngMax &&
+      latMin <= currentOpenAreaPoints.value[i].lat &&
+      currentOpenAreaPoints.value[i].lat <= latMax
     ) {
-      removeOverlay(currentOpenAreaPoints[i].piece);
-      currentOpenAreaPoints.splice(i, 1);
+      removeOverlay(currentOpenAreaPoints.value[i].piece);
+      currentOpenAreaPoints.value.splice(i, 1);
     }
   }
 }
@@ -396,18 +399,18 @@ function refershCurrentOpenAreaPieces(remoteNonEditablePoints, nePoint, swPoint)
   // 4.已经选中的取消选中，没选中的添加选中
   for (let i = 0; i < waitSelectedPoints.length; i++) {
     let index = -1;
-    for (let j = 0; j < currentOpenAreaPoints.length; j++) {
+    for (let j = 0; j < currentOpenAreaPoints.value.length; j++) {
       if (
-        waitSelectedPoints[i].lng === currentOpenAreaPoints[j].lng &&
-        waitSelectedPoints[i].lat === currentOpenAreaPoints[j].lat
+        waitSelectedPoints[i].lng === currentOpenAreaPoints.value[j].lng &&
+        waitSelectedPoints[i].lat === currentOpenAreaPoints.value[j].lat
       ) {
         index = j;
         break;
       }
     }
     if (index > -1) {
-      removeOverlay(currentOpenAreaPoints[index].piece);
-      currentOpenAreaPoints.splice(index, 1);
+      removeOverlay(currentOpenAreaPoints.value[index].piece);
+      currentOpenAreaPoints.value.splice(index, 1);
     } else {
       waitSelectedPoints[i].piece = addPiece(waitSelectedPoints[i].lng, waitSelectedPoints[i].lat, {
         strokeColor: "#89b929",
@@ -415,7 +418,7 @@ function refershCurrentOpenAreaPieces(remoteNonEditablePoints, nePoint, swPoint)
         strokeWeight: 0.1,
         fillOpacity: 0.5,
       });
-      currentOpenAreaPoints.push(waitSelectedPoints[i]);
+      currentOpenAreaPoints.value.push(waitSelectedPoints[i]);
     }
   }
 }
@@ -427,6 +430,13 @@ function addOverlay(overlay) {
 function removeOverlay(overlay) {
   map.value.removeOverlay(overlay);
 }
+function removeAllOverlay() {
+  // 清除覆盖物
+  for (let key of currentOpenAreaPoints.value) {
+    removeOverlay(key.piece);
+  }
+  // currentOpenAreaPoints = [];
+}
 // 清除所有覆盖物
 function clearOverlays() {
   // 清除所有覆盖物
@@ -434,7 +444,7 @@ function clearOverlays() {
   // 清除openAreaMapBox中存储的引用
   gridlines.splice(0, gridlines.length);
   nonEditablePoints.splice(0, nonEditablePoints.length);
-  currentOpenAreaPoints.splice(0, currentOpenAreaPoints.length);
+  currentOpenAreaPoints.value.splice(0, currentOpenAreaPoints.value.length);
 }
 // 添加单个点覆盖物
 function addMarker(lng, lat, icon) {
@@ -444,9 +454,24 @@ function addMarker(lng, lat, icon) {
   } else {
     marker = new BMap.Marker(new BMap.Point(lng, lat));
   }
+
   map.value.addOverlay(marker);
   return marker;
 }
+
+function createMarker() {
+  let marker = new BMap.Marker(point.value, {
+    enableDragging: true,
+  }); // 创建标注
+  map.value.addOverlay(marker); // 将标注添加到地图中
+  // marker.disableDragging();     // 不可拖拽
+  marker.addEventListener("dragend", function () {
+    var nowPoint = marker.getPosition(); // 拖拽完成之后坐标的位置
+    console.log(nowPoint);
+    emit("on-dragend", nowPoint.lng, nowPoint.lat);
+  });
+}
+
 // 设置地图中心位置
 function resetCenter(lng, lat, delay) {
   setTimeout(
@@ -471,13 +496,17 @@ defineExpose({
   addBoundary,
   drawingManagerInit,
   clearInSideCurrentOpenAreaPieces,
+  addCurrentOpenAreaPieces,
   resetCenter,
   panTo,
   clearOverlays,
   addMapEventListener,
+  removeAllOverlay,
   addMarker,
+  createMarker,
   map,
   drawingManager,
+  currentOpenAreaPoints,
 });
 </script>
 <style scoped></style>
