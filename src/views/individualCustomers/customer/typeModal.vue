@@ -5,7 +5,6 @@
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
-    @on-ok="handleValidate"
   >
     <n-form
       ref="formRef"
@@ -25,6 +24,11 @@
           :options="options"
         />
       </n-form-item>
+
+      <div class="text-center flex-center">
+        <n-button attr-type="button" type="primary" @click="handleValidate">提交</n-button>
+        <!-- <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset">重置</n-button> -->
+      </div>
     </n-form>
   </BasicModal>
 </template>
@@ -32,12 +36,16 @@
 import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { getAllCustomerMember } from "@/api/individualCustomers/individualCustomers";
+import {
+  getAllCustomerMember,
+  updateCustomerType,
+} from "@/api/individualCustomers/individualCustomers";
 import { FormInter } from "./type";
 export default defineComponent({
   name: "TypeModal",
   components: { BasicModal },
-  setup() {
+  emits: ["on-save-after"],
+  setup(_, { emit }) {
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
@@ -59,10 +67,10 @@ export default defineComponent({
         let res = await getAllCustomerMember();
         console.log(res.data);
         options.value = res.data.map(
-          (item: { groupCustomerMemberName: string; groupCustomerMemberId: string }) => {
+          (item: { customerMemberName: string; customerMemberId: string }) => {
             return {
-              label: item.groupCustomerMemberName,
-              value: item.groupCustomerMemberId,
+              label: item.customerMemberName,
+              value: item.customerMemberId,
             };
           }
         );
@@ -81,14 +89,24 @@ export default defineComponent({
     };
 
     function handleValidate() {
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           console.log(unref(form));
-
-          message.success("验证成功");
+          try {
+            loading.value = true;
+            let option = {
+              customerId: form.value.customerId as string,
+              customerMemberId: form.value.customerMemberId as string,
+            };
+            let res = await updateCustomerType(option);
+            message.success(window.$tips[res.code]);
+            loading.value = false;
+          } catch (err) {
+            console.log(err);
+            loading.value = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -96,18 +114,14 @@ export default defineComponent({
     function handleReset() {
       form.value = { customerId: null, customerMemberId: null };
       formRef.value?.restoreValidation();
+      emit("on-save-after");
     }
 
     return {
       ModalRef,
       formRef,
       form,
-      options: [
-        {
-          label: "普通会员",
-          value: "1",
-        },
-      ],
+      options,
       loading,
       rules: {
         customerId: { required: true, trigger: ["blur", "change"], message: "请选择会员类型" },

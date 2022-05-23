@@ -43,13 +43,11 @@
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
     <DetailDrawer ref="detailDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
-    <TypeModal ref="typeModalRef" />
+    <TypeModal ref="typeModalRef" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -179,7 +177,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleSee.bind(null, record),
+                onClick: handleSee.bind(null, record.customerId),
                 auth: ["dict001"],
               },
               {
@@ -214,8 +212,6 @@ export default defineComponent({
         let search = { ...queryValue.value };
         let res = await getCustomerPage({ page, search: search });
         data.value = res.data.content;
-        console.log(res);
-
         itemCount.value = res.data.totalElements;
         loading.value = false;
       } catch (err) {
@@ -224,24 +220,18 @@ export default defineComponent({
       }
     };
 
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
     function handleEdit(customerMemberId: string, customerId: string) {
       const { handleModal } = typeModalRef.value;
       handleModal(customerMemberId, customerId);
     }
-    function handleSee(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleSee(customerId: string) {
       const { openDrawer } = detailDrawerRef.value;
-      openDrawer("编辑会员", record);
+      openDrawer(customerId);
     }
-    async function handleLock(groupCustomerId: string) {
-      console.log("点击了编辑", groupCustomerId);
+    async function handleLock(customerId: string) {
       try {
         loading.value = true;
-        let res = await lockCustomer({ groupCustomerId });
+        let res = await lockCustomer({ customerId });
         console.log(res);
         getData({ pageIndex: 1, pageSize: 10 });
         message.success(window.$tips[res.code]);
@@ -251,9 +241,7 @@ export default defineComponent({
         loading.value = false;
       }
     }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
+
     function handleAdd() {
       console.log("点击了新增");
       const { openDrawer } = detailDrawerRef.value;
@@ -265,7 +253,7 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
@@ -277,27 +265,27 @@ export default defineComponent({
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -314,10 +302,8 @@ export default defineComponent({
       handleAdd,
       typeModalRef,
       getRowKeyId: (row: TableItemInter) => row.customerMemberId,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

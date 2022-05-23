@@ -25,7 +25,7 @@ export function getCustomerMemberPage(data: CustomerPageInter) {
  */
 export function getAllCustomerMember() {
     return http.request({
-        url: "/customerMember/page",
+        url: "/customer/findOtherCustomerCouponList",
         method: "post",
     });
 }
@@ -90,9 +90,9 @@ export function getCustomerPage(data:InCustomerPageInter) {
 /**
  * 个人客户详情
 */
-export function getGroupCustomerDetail(data:{groupCustomerId: string}) {
+export function getCustomerDetail(data:{customerId: string}) {
   return http.request({
-    url: '/groupCustomer/detail',
+    url: '/customer/detail',
     method: 'post',
     data:data
   });
@@ -100,9 +100,20 @@ export function getGroupCustomerDetail(data:{groupCustomerId: string}) {
 /**
  * 个人客户锁定
 */
-export function lockCustomer(data:{groupCustomerId:string}) {
+export function lockCustomer(data:{customerId:string}) {
   return http.request({
     url: '/groupCustomer/lockGroupCustomer',
+    method: 'post',
+    data:data
+  });
+}
+
+/**
+ * 变更客户会员类型
+*/
+export function updateCustomerType(data:{customerId:string; customerMemberId: string}) {
+  return http.request({
+    url: '/customer/customerMemberSave',
     method: 'post',
     data:data
   });
