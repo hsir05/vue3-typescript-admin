@@ -47,7 +47,7 @@
       :width="1000"
       @on-save-after="handleSaveMemberAfter"
     />
-    <OpenCompanyDrawer ref="openCompanyDrawerRef" :width="600" />
+    <OpenCompanyDrawer ref="openCompanyDrawerRef" :width="860" />
     <OrderLimitTimeModal ref="orderLimitTimeModalRef" @on-save-after="handleSaveMemberAfter" />
   </div>
 </template>
@@ -115,7 +115,7 @@ export default defineComponent({
           tooltip: true,
         },
         render(record: TableItemInter) {
-          return h("span", dayjs(record.openTime).format("YYYY-MM-DD HH:mm"));
+          return h("span", dayjs(record.openTime).format("YYYY-MM-DD HH:mm:ss"));
         },
       },
       {
@@ -126,7 +126,7 @@ export default defineComponent({
           tooltip: true,
         },
         render(record: TableItemInter) {
-          return h("span", dayjs(record.dispatchOrderLimitBeginTime).format("YYYY-MM-DD HH:mm"));
+          return h("span", dayjs(record.dispatchOrderLimitBeginTime).format("YYYY-MM-DD HH:mm:ss"));
         },
       },
       {

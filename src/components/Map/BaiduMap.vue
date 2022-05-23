@@ -11,7 +11,7 @@ import { ref, toRefs, watch } from "vue";
 import stylesData from "@/assets/custom_map_config.json";
 
 const domRef = ref<HTMLDivElement | null>(null);
-const emit = defineEmits(["update-nonEditArea", "on-dragend"]);
+const emit = defineEmits(["update-non-editArea", "on-dragend"]);
 
 interface NonDataInter {
   areaCode: string;

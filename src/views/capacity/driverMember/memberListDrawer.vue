@@ -1,5 +1,9 @@
 <template>
   <BasicDrawer v-model:show="isDrawer" title="会员列表" @on-close-after="onCloseAfter">
+    <p class="pt-10px pl-12px pb-10px mb-15px" style="background-color: #fafafc">
+      {{ operationCompanyName }} 司机会员产品列表
+    </p>
+
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -23,7 +27,7 @@
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
       </n-form-item>
     </n-form>
-    <p class="">{{ operationCompanyName }} 司机会员产品列表</p>
+
     <!-- 表格 -->
     <BasicTable
       :data="data"
@@ -206,11 +210,11 @@ export default defineComponent({
 
     function handleEdit(driverMemberGoodsId: string) {
       const { openDrawer } = driverMemDrawerRef.value;
-      openDrawer("编辑会员产品", queryValue.value.operationCompanyIdEq, driverMemberGoodsId);
+      openDrawer("编辑会员产品", [queryValue.value.operationCompanyIdEq], driverMemberGoodsId);
     }
     function handleAdd() {
       const { openDrawer } = driverMemDrawerRef.value;
-      openDrawer("新增会员产品", queryValue.value.operationCompanyIdEq);
+      openDrawer("新增会员产品", [queryValue.value.operationCompanyIdEq]);
     }
 
     const searchHandle = (e: MouseEvent) => {

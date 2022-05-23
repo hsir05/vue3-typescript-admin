@@ -138,8 +138,8 @@ export default defineComponent({
       createUser: null,
     });
 
-    function openDrawer(t: string, operationCompanyId: string, driverMemberGoodsId: string) {
-      form.value.companyIds = [operationCompanyId];
+    function openDrawer(t: string, operationCompanyId: string[], driverMemberGoodsId: string) {
+      form.value.companyIds = operationCompanyId;
       if (driverMemberGoodsId) {
         getDetail(driverMemberGoodsId);
       }
@@ -182,7 +182,6 @@ export default defineComponent({
               goodsRemark,
             } = form.value;
             let option = {
-              driverMemberGoodsId,
               goodsName,
               companyIds,
               goodsTagPrice,
@@ -198,7 +197,7 @@ export default defineComponent({
               createUser: userStore.getAdminId,
             };
             if (form.value.driverMemberGoodsId) {
-              res = await editDriverMemberGoods(option);
+              res = await editDriverMemberGoods({ driverMemberGoodsId, ...option });
             } else {
               res = await addDriverMemberGoods(option);
             }
