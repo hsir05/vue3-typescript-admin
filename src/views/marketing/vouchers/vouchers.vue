@@ -10,7 +10,7 @@
       class="pt-15px bg-white pb-10px mb-5px flex-wrap"
       :model="queryValue"
     >
-      <n-form-item label="代金券名称" path="couponNameLike">
+      <!-- <n-form-item label="代金券名称" path="couponNameLike">
         <n-input
           v-model:value="queryValue.couponNameLike"
           clearable
@@ -26,7 +26,7 @@
           placeholder="输入所属客户手机号"
           style="width: 150px"
         />
-      </n-form-item>
+      </n-form-item> -->
 
       <n-form-item label="获得时间(起始)" path="couponAchieveTimeGe">
         <n-date-picker
@@ -87,14 +87,14 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <DetailDrawer ref="detailDrawerRef" :width="700" @on-save-after="handleSaveAfter" />
-    <VouchersDrawer ref="vouchersDrawerRef" :width="600" @on-save-after="handleSaveAfter" />
+    <DetailDrawer ref="detailDrawerRef" :width="800" @on-save-after="handleSaveAfter" />
+    <VouchersDrawer ref="vouchersDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, onMounted, toRaw } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import DetailDrawer from "./detailDrawer.vue";
 import VouchersDrawer from "./vouchersDrawer.vue";
@@ -204,7 +204,7 @@ export default defineComponent({
                 label: "查看",
                 type: "primary",
                 isIconBtn: true,
-                icon: CreateIcon,
+                icon: EyeIcon,
                 onClick: handleSee.bind(null, record),
                 auth: ["dict001"],
               },

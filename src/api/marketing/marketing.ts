@@ -186,3 +186,23 @@ export function getCouponDetail(data: { customerCouponId: string }) {
         data: data,
     });
 }
+
+/**
+ * 代金券详情
+ */
+interface GiftCouponInter {
+    customerId:string | null
+    couponName:string | null
+    customerCouponConsumeRuleId:string | null
+    couponDenomination:string | null
+    couponEffectiveTimeBegin:string | null
+    couponEffectiveTimeEnd:string | null
+    couponCount:string | null
+}
+export function giftCoupon(data: GiftCouponInter) {
+    return http.request({
+        url: "/customerCoupon/giftCoupon",
+        method: "post",
+        data: data,
+    });
+}

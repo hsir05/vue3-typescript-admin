@@ -44,8 +44,6 @@ export const couponAchieveOpportunityObj = (() => {
     }
     return obj
 })()
-
-
 // 代金券获得时机
 export const couponUseStateOptions = [
     {
@@ -127,6 +125,47 @@ export const stateOptions = [
     value: 1,
   },
 ];
+// 可使用的星期
+export const withdrawalWeekOptions = [
+      {
+        label: "周一",
+        value: 0,
+      },
+      {
+        label: "周二",
+        value: 1,
+      },
+      {
+        label: "周三",
+        value: 2,
+      },
+      {
+        label: "周四",
+        value: 3,
+      },
+      {
+        label: "周五",
+        value: 4,
+      },
+      {
+        label: "周六",
+        value: 5,
+      },
+      {
+        label: "周日",
+        value: 6,
+      },
+];  
+// 可使用的时间
+export const withdrawalHourOptions = (()=>{
+    let hourArr = []
+    for(let i = 1;  i <= 24; i++) {
+        hourArr.push({label: `${i}时`, value: 1} )
+    }
+    // hourArr.push({ label: `${0}时`, value: 1, })
+
+    return hourArr
+})()
 // 司机驾照类型
 export const drivingLicense = [
   {

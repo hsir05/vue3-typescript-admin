@@ -18,7 +18,7 @@
           :multiple="true"
           v-model:value="form.withdrawalWeek"
           placeholder="选择可提现的星期"
-          :options="withdrawalWeekData"
+          :options="withdrawalWeekOptions"
         />
       </n-form-item>
 
@@ -75,6 +75,7 @@
 import { defineComponent, ref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { getWithdrawalRule } from "@/api/driverFinance/driverFinance";
+import { withdrawalWeekOptions } from "@/config/form";
 import { FormInter } from "./type";
 import { editRule } from "@/api/driverFinance/driverFinance";
 export default defineComponent({
@@ -83,36 +84,6 @@ export default defineComponent({
     const formRef = ref<FormInst | null>(null);
     const loading = ref(false);
     const message = useMessage();
-    const withdrawalWeekData = ref([
-      {
-        label: "周一",
-        value: 0,
-      },
-      {
-        label: "周二",
-        value: 1,
-      },
-      {
-        label: "周三",
-        value: 2,
-      },
-      {
-        label: "周四",
-        value: 3,
-      },
-      {
-        label: "周五",
-        value: 4,
-      },
-      {
-        label: "周六",
-        value: 5,
-      },
-      {
-        label: "周日",
-        value: 6,
-      },
-    ]);
 
     const form = ref<FormInter>({
       driverWalletWithdrawalRuleId: null,
@@ -208,7 +179,7 @@ export default defineComponent({
       form,
       loading,
       formRef,
-      withdrawalWeekData,
+      withdrawalWeekOptions,
       rules: {
         withdrawalWeek: {
           type: "array",
