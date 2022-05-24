@@ -11,16 +11,20 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="客户手机号" path="phone">
-        <n-input v-model:value="queryValue.phone" clearable placeholder="输入客户手机号" />
+      <n-form-item label="客户手机号" path="contactPhoneLike">
+        <n-input
+          v-model:value="queryValue.contactPhoneLike"
+          clearable
+          placeholder="输入客户手机号"
+        />
       </n-form-item>
 
-      <n-form-item label="联系电话" path="phone">
-        <n-input v-model:value="queryValue.phone" clearable placeholder="输入联系电话" />
+      <n-form-item label="联系电话" path="contactPhoneLike">
+        <n-input v-model:value="queryValue.contactPhoneLike" clearable placeholder="输入联系电话" />
       </n-form-item>
 
-      <n-form-item label="状态" path="status">
-        <n-radio-group v-model:value="queryValue.type">
+      <n-form-item label="状态" path="dealStateEq">
+        <n-radio-group v-model:value="queryValue.dealStateEq">
           <n-space>
             <n-radio :value="null">全部</n-radio>
             <n-radio :value="0">待处理</n-radio>
@@ -69,12 +73,14 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive } from "vue";
+import { defineComponent, ref, h, reactive, onMounted } from "vue";
 import { useMessage, FormInst, NTag } from "naive-ui";
 import { tableDataItem } from "./type";
+import { PaginationInter } from "@/api/type";
 import { pageSizes } from "@/config/table";
 import { CheckboxOutline as CheckboxIcon } from "@vicons/ionicons5";
 import TableActions from "@/components/TableActions/TableActions.vue";
+import { getRefundApplicationPage } from "@/api/individualCustomers/individualCustomers";
 import RefundModal from "./refundModal.vue";
 export default defineComponent({
   name: "WalletRefundApplication",
@@ -82,8 +88,9 @@ export default defineComponent({
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
-      type: 1,
-      phone: null,
+      invoiceApplicationTimeLE: null,
+      contactPhoneLike: null,
+      dealStateEq: null,
     });
     const loading = ref(false);
     const itemCount = ref(null);
@@ -175,6 +182,7 @@ export default defineComponent({
                 label: "处理申请",
                 type: "primary",
                 icon: CheckboxIcon,
+                isIconBtn: true,
                 onClick: handleAppliction.bind(null, record),
                 auth: ["dict001"],
               },
@@ -184,19 +192,26 @@ export default defineComponent({
       },
     ];
 
-    const data = ref([
-      {
-        id: "12313123",
-        status: "number",
-        name: "number",
-        phone: "number",
-        relation: "number",
-        create_time: "number",
-        result: "number",
-        resultPerson: "number",
-        result_time: "number",
-      },
-    ]);
+    const data = ref([]);
+
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
+    });
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getRefundApplicationPage({ page, search: search });
+        console.log(res.data);
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
@@ -205,11 +220,12 @@ export default defineComponent({
 
     const reset = () => {
       queryValue.value = {
-        type: 1,
-        phone: null,
+        invoiceApplicationTimeLE: null,
+        contactPhoneLike: null,
+        dealStateEq: null,
       };
       message.info("点击了删除");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function handleAppliction(record: Recordable) {

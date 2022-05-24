@@ -1,5 +1,5 @@
 import { http } from '@/utils/http';
-import { PaginationInter, UsersDataInter, loginInter, DictInter } from "../type"
+import { PaginationInter, loginInter, DictInter } from "../type"
 
 //-----------------字典管理-------------------------
 export function getDict(data: DictInter) {

@@ -10,39 +10,41 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="客户手机号" path="phone">
+      <n-form-item label="客户手机号" path="customerPhoneLike">
         <n-input
-          v-model:value="queryValue.phone"
+          v-model:value="queryValue.customerPhoneLike"
           clearable
           placeholder="输入客户手机号"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="申请时间(起始)" path="applictionTimeStart">
+      <n-form-item label="申请时间(起始)" path="invoiceApplicationTimeLE">
         <n-date-picker
-          v-model:value="queryValue.applictionTimeStart"
+          v-model:value="queryValue.invoiceApplicationTimeLE"
           style="width: 120px"
           type="date"
           clearable
         />
       </n-form-item>
-      <n-form-item label="申请时间(结束)" path="applictionTimeEnd">
+      <n-form-item label="申请时间(结束)" path="invoiceApplicationTimeGE">
         <n-date-picker
-          v-model:value="queryValue.applictionTimeEnd"
+          v-model:value="queryValue.invoiceApplicationTimeGE"
           style="width: 120px"
           type="date"
           clearable
         />
       </n-form-item>
 
-      <n-form-item label="发票申请状态" path="status">
-        <n-radio-group v-model:value="queryValue.status">
-          <n-radio :value="null">全部</n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
-            item.label
-          }}</n-radio>
-        </n-radio-group>
+      <n-form-item label="发票申请状态" path="invoiceApplicationStateEQ">
+        <n-select
+          clearable
+          filterable
+          v-model:value="queryValue.invoiceApplicationStateEQ"
+          style="width: 150px"
+          placeholder="发票申请状态"
+          :options="invoiceAppOptions"
+        />
       </n-form-item>
 
       <n-form-item>
@@ -59,9 +61,6 @@
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -69,15 +68,16 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import InvoiceDrawer from "./invoiceDrawer.vue";
-import { tableDataItem } from "./type";
-import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { TableDataItemInter } from "./type";
+import { invoiceAppOptions, invoiceAppObj } from "@/config/form";
+import { getInvoiceAppPage } from "@/api/individualCustomers/individualCustomers";
 import { PaginationInter } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "InvoiceApplicationList",
   components: { BasicTable, InvoiceDrawer },
@@ -87,54 +87,37 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
-      applictionTimeStart: null,
-      applictionTimeEnd: null,
-      phone: null,
-      status: null,
+      invoiceApplicationTimeLE: null,
+      invoiceApplicationTimeGE: null,
+      invoiceApplicationStateEQ: null,
+      customerPhoneLike: null,
     });
 
-    const data = ref<tableDataItem[]>([
-      {
-        id: "12312123",
-        phone: "string",
-        invoiceApplicationType: "string",
-        amount: "string",
-        invoiceType: "string",
-        invoiceTitle: "string",
-        taxpayerIdeNumber: "string",
-        invoiceContent: "string",
-        invoiceStatus: "string",
-        create_time: "string",
-      },
-    ]);
+    const data = ref<TableDataItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "客户手机号",
-        key: "phone",
+        key: "customerPhone",
         align: "center",
       },
       {
         title: "发票申请类型",
-        key: "invoiceApplicationType",
+        key: "invoiceApplicationTypeName",
         align: "center",
       },
       {
         title: "发票金额(元)",
-        key: "amount",
+        key: "invoiceAmount",
         align: "center",
       },
 
@@ -151,7 +134,7 @@ export default defineComponent({
       },
       {
         title: "纳税人识别号",
-        key: "taxpayerIdeNumber",
+        key: "taxpayerIdentificationNumber",
         align: "center",
       },
 
@@ -162,32 +145,39 @@ export default defineComponent({
       },
       {
         title: "申请时间",
-        key: "create_time",
+        key: "invoiceApplicationTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.invoiceApplicationTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "发票申请状态",
-        key: "invoiceStatus",
+        key: "invoiceApplicationState",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", invoiceAppObj[record.invoiceApplicationState]);
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
-        width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "查看",
                 type: "primary",
                 icon: EyeIcon,
+                isIconBtn: true,
                 onClick: handleSee.bind(null, record),
                 auth: ["dict001"],
               },
               {
                 label: "删除",
                 type: "error",
+                isIconBtn: true,
                 icon: RemoveIcon,
                 secondary: true,
                 auth: ["dict002"],
@@ -202,45 +192,31 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
+    });
 
-    // const getData = async (pagination: PaginationInter) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
-
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
-
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getInvoiceAppPage({ page, search: search });
+        console.log(res.data);
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function handleSee(record: Recordable) {
       console.log("点击了编辑", record.id);
       const { openDrawer } = invoiceDrawerRef.value;
       openDrawer(record);
     }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
-    function handleAdd() {
-      console.log("点击了新增");
-      const { openDrawer } = invoiceDrawerRef.value;
-      openDrawer();
-    }
+
     function handleRemove(record: Recordable) {
       //   message.info("点击了删除", record);
       console.log("点击了删除", record);
@@ -248,41 +224,38 @@ export default defineComponent({
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
-        applictionTimeStart: null,
-        applictionTimeEnd: null,
-        phone: null,
-        status: null,
+        invoiceApplicationTimeLE: null,
+        invoiceApplicationTimeGE: null,
+        invoiceApplicationStateEQ: null,
+        customerPhoneLike: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationInter) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationInter) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -291,16 +264,14 @@ export default defineComponent({
       loading,
       invoiceDrawerRef,
       basicTableRef,
-      statusOptions,
+      invoiceAppOptions,
+      getRowKeyId: (row: TableDataItemInter) => row.customerInvoiceApplicationId,
       columns,
       itemCount,
 
       reloadPage,
-      handleAdd,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

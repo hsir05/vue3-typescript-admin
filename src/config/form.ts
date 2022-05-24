@@ -71,6 +71,33 @@ export const couponUseStateObj = (() => {
     }
     return obj
 })()
+
+// 发票申请状态 
+export const invoiceAppOptions = [
+    {
+        label: "提交申请",
+        value: 0
+    },
+     {
+        label: "申请成功",
+        value: 1
+    },
+      {
+        label: "取消申请",
+        value: 2
+    },
+    {
+        label: "退回申请",
+        value: 3
+    },
+]
+export const invoiceAppObj = (() => {
+    let obj:objIner = {}
+    for(let key of invoiceAppOptions) {
+        obj[key.value] = key.label
+    }
+    return obj
+})()
 // 产品类型 
 export const goodsTypeOptions = [
     {

@@ -46,9 +46,6 @@
           @search="handleSearch"
           :options="options"
         />
-        <!-- 
-                <n-input v-model:value="form.targetCustomerId" :maxlength="11" clearable placeholder="输入对方客户手机号"
-                    style="width: 180px" /> -->
       </n-form-item>
 
       <n-form-item label="实充转账金额" path="rechargeAmount">

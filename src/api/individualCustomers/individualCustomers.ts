@@ -250,3 +250,63 @@ export function customerWalletTransfer(data:TransferInter) {
     data:data
   });
 }
+
+// ----------------所有个人钱包交易总览管理--------------------
+/**
+ * 所有个人钱包交易总览分页
+*/
+interface OverviewPageInter{
+  page: PaginationInter;
+  search: {
+    dealTypeEQ: string | null;
+    dealTimeGE: string | null;
+    dealTimeLE: string | null;
+    dealSerialNumberEQ: string | null;
+  };
+}
+export function getOverviewPage(data:OverviewPageInter) {
+  return http.request({
+    url: "/customerWallet/aggregatedCustomerWalletDealRecordPage",
+    method: "post",
+    data: data
+  });
+}
+// ----------------个人客户发票申请分页--------------------
+/**
+ * 所有个人钱包交易总览分页
+*/
+interface InvoiceAppPageInter{
+  page: PaginationInter;
+  search: {
+    invoiceApplicationTimeLE: string | null;
+    invoiceApplicationTimeGE: string | null;
+    invoiceApplicationStateEQ: string | null;
+    customerPhoneLike: string | null;
+  };
+}
+export function getInvoiceAppPage(data:InvoiceAppPageInter) {
+  return http.request({
+    url: "/customerInvoiceApplication/page",
+    method: "post",
+    data: data
+  });
+}
+// ----------------钱包退款申请管理--------------------
+/**
+ * 所有个人钱包交易总览分页
+*/
+interface RefundApplicationPageInter{
+  page: PaginationInter;
+  search: {
+    invoiceApplicationTimeLE: string | null;
+    contactPhoneLike: string | null;
+    dealStateEq: string | null;
+  };
+}
+export function getRefundApplicationPage(data:RefundApplicationPageInter) {
+  return http.request({
+    url: "/customerWalletRefundApplication/page",
+    method: "post",
+    data: data
+  });
+}

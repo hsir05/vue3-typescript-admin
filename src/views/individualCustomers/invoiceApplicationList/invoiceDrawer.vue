@@ -40,7 +40,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from "vue";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 export default defineComponent({
   name: "InvoiceDrawer",
   setup() {
@@ -49,7 +49,7 @@ export default defineComponent({
       loading: false,
     });
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record?: TableDataItemInter) {
       console.log(record);
       if (record) {
         console.log(record);
