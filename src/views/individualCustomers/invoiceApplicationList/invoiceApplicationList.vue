@@ -171,7 +171,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleSee.bind(null, record),
+                onClick: handleSee.bind(null, record.customerInvoiceApplicationId),
                 auth: ["dict001"],
               },
               {
@@ -211,10 +211,9 @@ export default defineComponent({
       }
     };
 
-    function handleSee(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleSee(customerInvoiceApplicationId: string) {
       const { openDrawer } = invoiceDrawerRef.value;
-      openDrawer(record);
+      openDrawer(customerInvoiceApplicationId);
     }
 
     function handleRemove(record: Recordable) {

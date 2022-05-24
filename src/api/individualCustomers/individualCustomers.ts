@@ -291,6 +291,17 @@ export function getInvoiceAppPage(data:InvoiceAppPageInter) {
     data: data
   });
 }
+/**
+ * 发票详情
+*/
+export function getIndInvoiceDetail(data:{customerInvoiceApplicationId: string}) {
+  return http.request({
+    url: '/customerInvoiceApplication/detail',
+    method: 'post',
+    data:data
+  });
+}
+
 // ----------------钱包退款申请管理--------------------
 /**
  * 所有个人钱包交易总览分页

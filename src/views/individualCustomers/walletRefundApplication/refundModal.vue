@@ -25,6 +25,10 @@
           clearable
         />
       </n-form-item>
+
+      <div class="text-center flex-center">
+        <n-button attr-type="button" type="primary" @click="handleValidate">提交</n-button>
+      </div>
     </n-form>
   </BasicModal>
 </template>
@@ -37,7 +41,8 @@ import { FormInter } from "./type";
 export default defineComponent({
   name: "RefundModal",
   components: { BasicModal },
-  setup() {
+  emits: ["on-save-after"],
+  setup(_, { emit }) {
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
@@ -48,25 +53,27 @@ export default defineComponent({
     });
     const formRef = ref<FormInst | null>(null);
 
-    const handleModal = () => {
+    const handleModal = (customerWalletRefundApplicationId: string) => {
       const { showModal } = ModalRef.value;
+      form.value.customerWalletRefundApplicationId = customerWalletRefundApplicationId;
       showModal();
     };
-
     function handleValidate() {
       formRef.value?.validate(async (errors) => {
         if (!errors) {
           console.log(unref(form));
-
           try {
+            loading.value = true;
             let res = await changeDealState(form.value);
-            console.log(res);
+            emit("on-save-after");
+            message.success(window.$tips[res.code]);
+            loading.value = false;
           } catch (err) {
+            console.log(err);
             loading.value = false;
           }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -82,7 +89,7 @@ export default defineComponent({
       form,
       loading,
       rules: {
-        result: { required: true, trigger: ["blur", "change"], message: "请输入处理结果" },
+        dealResult: { required: true, trigger: ["blur", "input"], message: "请输入处理结果" },
       },
 
       handleModal,

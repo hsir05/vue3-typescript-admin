@@ -1,23 +1,33 @@
 <template>
   <BasicDrawer v-model:show="isDrawer" title="开票申请信息" @on-close-after="onCloseAfter">
     <n-descriptions label-placement="left" bordered :column="2">
-      <n-descriptions-item label="客户手机号"> 177****9673 </n-descriptions-item>
-      <n-descriptions-item label="发票申请类型"> 按支付订单 </n-descriptions-item>
-      <n-descriptions-item label="发票金额(元)"> 43.55 </n-descriptions-item>
-      <n-descriptions-item label="发票类型"> 公司发票 </n-descriptions-item>
-      <n-descriptions-item label="发票抬头"> 123 </n-descriptions-item>
-      <n-descriptions-item label="纳税人识别号"> 123 </n-descriptions-item>
-      <n-descriptions-item label="发票内容"> 客运服务费 </n-descriptions-item>
+      <n-descriptions-item label="客户手机号"> {{ detail?.customerPhone }} </n-descriptions-item>
+      <n-descriptions-item label="发票申请类型">
+        {{ detail?.invoiceApplicationTypeName }}
+      </n-descriptions-item>
+      <n-descriptions-item label="发票金额(元)"> {{ detail?.invoiceAmount }} </n-descriptions-item>
+      <n-descriptions-item label="发票类型"> {{ detail?.invoiceType }} </n-descriptions-item>
+      <n-descriptions-item label="发票抬头"> {{ detail?.invoiceTitle }} </n-descriptions-item>
+      <n-descriptions-item label="纳税人识别号">
+        {{ detail?.taxpayerIdentificationNumber }}
+      </n-descriptions-item>
+      <n-descriptions-item label="发票内容"> {{ detail?.invoiceContent }} </n-descriptions-item>
       <n-descriptions-item label="开户行名称"> 暂无 </n-descriptions-item>
       <n-descriptions-item label="开户行账号"> 暂无 </n-descriptions-item>
       <n-descriptions-item label="公司注册地址"> 暂无 </n-descriptions-item>
       <n-descriptions-item label="公司注册电话"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="联系人姓名"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="联系人电话"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="联系人地址"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="联系人邮箱"> 暂无 </n-descriptions-item>
+      <n-descriptions-item label="联系人姓名"> {{ detail?.contactName }} </n-descriptions-item>
+      <n-descriptions-item label="联系人电话">
+        {{ detail?.contactPhone || "暂无" }}
+      </n-descriptions-item>
+      <n-descriptions-item label="联系人地址">
+        {{ detail?.contactAddress || "暂无" }}
+      </n-descriptions-item>
+      <n-descriptions-item label="联系人邮箱">
+        {{ detail?.contactMail || "暂无" }}
+      </n-descriptions-item>
       <n-descriptions-item label="提交时间"> 2022-04-04 17:40:17 </n-descriptions-item>
-      <n-descriptions-item label="提交备注"> 暂无 </n-descriptions-item>
+      <n-descriptions-item label="提交备注"> {{ detail?.asdf }} </n-descriptions-item>
       <n-descriptions-item label="取消时间"> 2022-04-04 17:49:17 </n-descriptions-item>
       <n-descriptions-item label="取消原因"> 暂无 </n-descriptions-item>
       <n-descriptions-item label="发票申请状态"> 取消申请 </n-descriptions-item>
@@ -39,8 +49,8 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from "vue";
-import { TableDataItemInter } from "./type";
+import { defineComponent, reactive, ref, toRefs } from "vue";
+import { getIndInvoiceDetail } from "@/api/individualCustomers/individualCustomers";
 export default defineComponent({
   name: "InvoiceDrawer",
   setup() {
@@ -49,21 +59,37 @@ export default defineComponent({
       loading: false,
     });
 
-    function openDrawer(record?: TableDataItemInter) {
-      console.log(record);
-      if (record) {
-        console.log(record);
+    const detail = ref();
+
+    function openDrawer(customerCouponId: string) {
+      if (customerCouponId) {
+        getDetail(customerCouponId);
       }
       state.isDrawer = true;
     }
 
+    const getDetail = async (customerInvoiceApplicationId: string) => {
+      try {
+        state.loading = true;
+        let res = await getIndInvoiceDetail({ customerInvoiceApplicationId });
+        console.log(res.data);
+        detail.value = { ...res.data };
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+
     function onCloseAfter() {
       state.isDrawer = false;
       state.loading = false;
+      detail.value = null;
     }
 
     return {
       ...toRefs(state),
+      detail,
       openDrawer,
       onCloseAfter,
     };

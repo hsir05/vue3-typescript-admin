@@ -74,7 +74,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, reactive, onMounted } from "vue";
-import { useMessage, FormInst, NTag } from "naive-ui";
+import { FormInst, NTag } from "naive-ui";
 import { TableDataItemInter, QueryFormInter } from "./type";
 import { PaginationInter } from "@/api/type";
 import { pageSizes } from "@/config/table";
@@ -100,12 +100,8 @@ export default defineComponent({
       page: 1,
       pageSize: 10,
     });
-    const message = useMessage();
 
     const columns = [
-      {
-        type: "selection",
-      },
       {
         title: "序号",
         key: "index",
@@ -173,7 +169,10 @@ export default defineComponent({
         key: "dealTime",
         align: "center",
         render(record: TableDataItemInter) {
-          return h("span", dayjs(record.dealTime).format("YYYY-MM-DD HH:mm:ss"));
+          return h(
+            "span",
+            record.dealState === 0 ? "-" : dayjs(record.dealTime).format("YYYY-MM-DD HH:mm:ss")
+          );
         },
       },
       {
@@ -190,7 +189,7 @@ export default defineComponent({
                 icon: CheckboxIcon,
                 isIconBtn: true,
                 isShow: record.dealState === 0 ? false : true,
-                onClick: handleAppliction.bind(null, record),
+                onClick: handleAppliction.bind(null, record.customerWalletRefundApplicationId),
                 auth: ["dict001"],
               },
             ],
@@ -222,7 +221,7 @@ export default defineComponent({
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     const reset = () => {
@@ -231,26 +230,21 @@ export default defineComponent({
         contactPhoneLike: null,
         dealStateEq: null,
       };
-      message.info("点击了删除");
       getData({ pageIndex: 1, pageSize: 10 });
     };
 
-    function handleAppliction(record: Recordable) {
-      console.log(record);
-
+    function handleAppliction(customerWalletRefundApplicationId: string) {
       const { handleModal } = refundModalRef.value;
-      handleModal();
+      handleModal(customerWalletRefundApplicationId);
     }
 
-    function handlePage(page: number) {
-      console.log(page);
-      pagination.page = page;
-      //   getData(toRaw(pagination));
+    function handlePage(pageIndex: number) {
+      pagination.pageIndex = pageIndex;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
-      console.log(pageSize);
       pagination.pageSize = pageSize;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
 
     return {
