@@ -1,16 +1,18 @@
 
-export interface tableDataItem{
-    id?: string
-    status: number | null
-    name: string | null
-    phone: string | null
-    relation: string | null
-    create_time: string | null
-    result: string | null
-    resultPerson: string | null
-    result_time: string | null
+export interface TableDataItemInter{
+    customerWalletRefundApplicationId: string
+    dealState: number
+    dealTime: number
+    createTime: number
 }
 
-export interface formState{
-    result: null | string
+export interface FormInter{
+    dealResult: string | null
+    customerWalletRefundApplicationId: string | null
+}
+
+export interface QueryFormInter{
+    invoiceApplicationTimeLE: string | null;
+    contactPhoneLike: string | null;
+    dealStateEq: number | null;
 }

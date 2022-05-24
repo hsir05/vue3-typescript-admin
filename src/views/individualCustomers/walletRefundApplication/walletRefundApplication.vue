@@ -75,19 +75,20 @@
 <script lang="ts">
 import { defineComponent, ref, h, reactive, onMounted } from "vue";
 import { useMessage, FormInst, NTag } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableDataItemInter, QueryFormInter } from "./type";
 import { PaginationInter } from "@/api/type";
 import { pageSizes } from "@/config/table";
 import { CheckboxOutline as CheckboxIcon } from "@vicons/ionicons5";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { getRefundApplicationPage } from "@/api/individualCustomers/individualCustomers";
 import RefundModal from "./refundModal.vue";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "WalletRefundApplication",
   components: { RefundModal },
   setup() {
     const formRef = ref<FormInst | null>(null);
-    const queryValue = ref({
+    const queryValue = ref<QueryFormInter>({
       invoiceApplicationTimeLE: null,
       contactPhoneLike: null,
       dealStateEq: null,
@@ -110,72 +111,77 @@ export default defineComponent({
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "客户姓名",
-        key: "name",
+        key: "customerName",
         align: "center",
+        render() {
+          return h("span", "匿名");
+        },
       },
       {
         title: "客户手机号",
-        key: "phone",
+        key: "customerPhone",
         align: "center",
       },
       {
         title: "联系电话",
-        key: "relation",
+        key: "contactPhone",
         align: "center",
       },
 
       {
         title: "状态",
-        key: "status",
+        key: "dealState",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableDataItemInter) {
           return h(
             NTag,
             {
-              type: row.status === 1 ? "success" : "error",
+              type: row.dealState === 1 ? "success" : "error",
             },
             {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
+              default: () => (row.dealState === 1 ? "正常" : "锁定"),
             }
           );
         },
       },
       {
         title: "申请时间",
-        key: "create_time",
-        width: 110,
+        key: "createTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "处理结果",
-        key: "result",
-        width: 110,
+        key: "dealResult",
         align: "center",
       },
       {
         title: "处理人",
-        key: "resultPerson",
-        width: 110,
+        key: "dealName",
         align: "center",
       },
       {
         title: "处理时间",
-        key: "result_time",
-        width: 110,
+        key: "dealTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.dealTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -183,6 +189,7 @@ export default defineComponent({
                 type: "primary",
                 icon: CheckboxIcon,
                 isIconBtn: true,
+                isShow: record.dealState === 0 ? false : true,
                 onClick: handleAppliction.bind(null, record),
                 auth: ["dict001"],
               },
@@ -255,7 +262,7 @@ export default defineComponent({
       refundModalRef,
       pageSizes,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.customerWalletRefundApplicationId,
       itemCount,
 
       searchHandle,

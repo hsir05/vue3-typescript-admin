@@ -16,9 +16,9 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="处理结果" path="result">
+      <n-form-item label="处理结果" path="dealResult">
         <n-input
-          v-model:value="form.result"
+          v-model:value="form.dealResult"
           type="textarea"
           placeholder="输入处理结果"
           round
@@ -32,7 +32,8 @@
 import { defineComponent, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { formState } from "./type";
+import { changeDealState } from "@/api/individualCustomers/individualCustomers";
+import { FormInter } from "./type";
 export default defineComponent({
   name: "RefundModal",
   components: { BasicModal },
@@ -41,8 +42,9 @@ export default defineComponent({
     const message = useMessage();
     const loading = ref(false);
 
-    const form = ref<formState>({
-      result: null,
+    const form = ref<FormInter>({
+      dealResult: null,
+      customerWalletRefundApplicationId: null,
     });
     const formRef = ref<FormInst | null>(null);
 
@@ -52,11 +54,16 @@ export default defineComponent({
     };
 
     function handleValidate() {
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           console.log(unref(form));
 
-          message.success("验证成功");
+          try {
+            let res = await changeDealState(form.value);
+            console.log(res);
+          } catch (err) {
+            loading.value = false;
+          }
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -65,7 +72,7 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { result: null };
+      form.value = { dealResult: null, customerWalletRefundApplicationId: null };
       formRef.value?.restoreValidation();
     }
 

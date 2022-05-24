@@ -300,12 +300,26 @@ interface RefundApplicationPageInter{
   search: {
     invoiceApplicationTimeLE: string | null;
     contactPhoneLike: string | null;
-    dealStateEq: string | null;
+    dealStateEq: number | null;
   };
 }
 export function getRefundApplicationPage(data:RefundApplicationPageInter) {
   return http.request({
     url: "/customerWalletRefundApplication/page",
+    method: "post",
+    data: data
+  });
+}
+/**
+ * 钱包退款申请状态修改
+*/
+interface ChangeDealInter{
+  dealResult: string | null
+  customerWalletRefundApplicationId: string | null
+}
+export function changeDealState(data:ChangeDealInter) {
+  return http.request({
+    url: "/customerWalletRefundApplication/changeDealState",
     method: "post",
     data: data
   });
