@@ -65,6 +65,16 @@ export function editCustomerMember(data: CustomerMemberInter) {
         method: "post",
         data: data,
     });
+} 
+/**
+ * 个人会员详情
+*/
+export function getIndMemberDetail(data:{customerMemberId: string}) {
+  return http.request({
+    url: '/customerMember/detail',
+    method: 'post',
+    data:data
+  });
 }
 // ----------------个人客户管理--------------------
 /**
@@ -152,5 +162,91 @@ export function getCustomerWalletPage(data:InCustomerWalletPageInter) {
     url: "/customerWallet/customerWalletPage",
     method: "post",
     data: data
+  });
+}
+
+/**
+ * 当前个人钱包交易明细分页
+*/
+interface WalletRecordtPageInter{
+  page: PaginationInter;
+  search: {
+    customerWalletIdEQ: string | null;
+    dealTypeEQ: string | null;
+    dealTimeGE: string | null;
+    dealTimeLE: string | null;
+  };
+}
+export function getWalletDealRecordPage(data:WalletRecordtPageInter) {
+  return http.request({
+    url: "/customerWallet/customerWalletDealRecordPage",
+    method: "post",
+    data: data
+  });
+}
+/**
+ * 当前个人钱包交易明细分页
+*/
+interface WalletRechargeInter{
+    customerWalletId: string | null
+    rechargeAmount: number | null
+    giftAmount: number | null
+    rechargeNote: string | null
+    password: string | null
+}
+export function customerWalletRecharge(data:WalletRechargeInter) {
+  return http.request({
+    url: "/customerWallet/customerWalletRecharge",
+    method: "post",
+    data: data
+  });
+}
+/**
+ * 退款操作
+*/
+export function getPhoneCusotmer(data:{customerPhoneHeader: string;}) {
+  return http.request({
+    url: '/customer/findByCustomerPhoneHeader',
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 钱包详情
+*/
+export function getWalletDetail(data:{customerWalletId: string}) {
+  return http.request({
+    url: '/customerWallet/customerWalletDetail',
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 退款操作
+*/
+export function customerWalletRefund(data:{customerWalletId: string; password: string}) {
+  return http.request({
+    url: '/customerWallet/customerWalletRefund',
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 转账操作
+*/
+interface TransferInter {
+    customerWalletId:string | null
+    targetCustomerId:string | null
+    rechargeAmount:number | null
+    giftAmount:number | null
+    transferNote:string | null
+    password: string | null
+
+}
+export function customerWalletTransfer(data:TransferInter) {
+  return http.request({
+    url: '/customerWallet/customerWalletTransfer',
+    method: 'post',
+    data:data
   });
 }

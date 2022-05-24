@@ -102,7 +102,7 @@ export default defineComponent({
         title: "客户昵称",
         key: "customerNickname",
         align: "center",
-        render(_: TableItemInter) {
+        render() {
           return h("span", "匿名");
         },
       },
@@ -110,7 +110,7 @@ export default defineComponent({
         title: "客户姓名",
         key: "customerName",
         align: "center",
-        render(_: TableItemInter) {
+        render() {
           return h("span", "匿名");
         },
       },
@@ -123,7 +123,7 @@ export default defineComponent({
         title: "客户生日",
         key: "customerBirthday",
         align: "center",
-        render(_: TableItemInter) {
+        render() {
           return h("span", "暂无");
         },
       },
@@ -131,7 +131,7 @@ export default defineComponent({
         title: "客户邮箱",
         key: "customerEmail",
         align: "center",
-        render(_: TableItemInter) {
+        render() {
           return h("span", "暂无");
         },
       },

@@ -54,7 +54,7 @@
       </n-pagination>
     </div>
 
-    <TransactionRecord ref="transactionRecordRef" :width="800" @on-save-after="handleSaveAfter" />
+    <TransactionRecord ref="transactionRecordRef" :width="1000" @on-save-after="handleSaveAfter" />
     <Recharge ref="rechargeRef" :width="700" @on-save-after="handleSaveAfter" />
     <Refund ref="refundRef" :width="700" @on-save-after="handleSaveAfter" />
     <Transfer ref="transferRef" :width="700" @on-save-after="handleSaveAfter" />
@@ -62,13 +62,13 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, unref, onMounted, reactive, toRaw } from "vue";
-import { useMessage, FormInst } from "naive-ui";
+import { FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import TransactionRecord from "./transactionRecordDrawer.vue";
 import Refund from "./refundDrawer.vue";
 import Transfer from "./transferDrawer.vue";
 import Recharge from "./rechargeDrawer.vue";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 import { PaginationInter } from "@/api/type";
 import { pageSizes } from "@/config/table";
 import { ReaderOutline as ReaderIcon } from "@vicons/ionicons5";
@@ -78,6 +78,7 @@ import {
   TransactionOutlined as TransactionIcon,
   RedEnvelopeOutlined as RedEnvelopeIcon,
 } from "@vicons/antd";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "Wallet",
   components: { TransactionRecord, Recharge, Refund, Transfer },
@@ -95,78 +96,84 @@ export default defineComponent({
     const pagination = reactive({
       pageIndex: 1,
       pageSize: 10,
+      sort: [],
     });
-    const message = useMessage();
 
     const columns = [
-      {
-        type: "selection",
-      },
       {
         title: "序号",
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "客户昵称",
-        key: "nickname",
+        key: "customerNickname",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+        render() {
+          return h("span", "匿名");
+        },
       },
       {
         title: "客户姓名",
         key: "name",
         align: "center",
+        render() {
+          return h("span", "匿名");
+        },
       },
       {
         title: "客户手机号",
-        key: "phone",
+        key: "customer.customerPhone",
+        align: "center",
+        width: 130,
+      },
+      {
+        title: "实充余额(元)",
+        key: "rechargeAmountBalance",
         align: "center",
       },
       {
-        title: "实充余额",
-        key: "actualAmount",
-        align: "center",
-      },
-      {
-        title: "赠送余额",
-        key: "giveAmount",
-        width: 90,
+        title: "赠送余额(元)",
+        key: "giftAmountBalance",
         align: "center",
       },
 
       {
-        title: "冻结金额",
+        title: "冻结金额(元)",
         key: "frozenAmount",
-        width: 90,
         align: "center",
       },
       {
-        title: "可用余额",
-        key: "availableAmount",
+        title: "可用余额(元)",
+        key: "availableBalance",
         align: "center",
       },
       {
-        title: "总余额",
-        key: "totalAmount",
-        width: 90,
+        title: "总余额(元)",
+        key: "totalBalance",
         align: "center",
       },
       {
         title: "钱包创建时间",
-        key: "amountCreatetime",
-        width: 90,
+        key: "customerWalletCreateTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.customerWalletCreateTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -174,7 +181,7 @@ export default defineComponent({
                 type: "primary",
                 icon: ReaderIcon,
                 isIconBtn: true,
-                onClick: handleRecord.bind(null, record),
+                onClick: handleRecord.bind(null, record.customerWalletId),
                 auth: ["dict001"],
               },
               {
@@ -182,7 +189,7 @@ export default defineComponent({
                 type: "primary",
                 icon: PayCircleIcon,
                 isIconBtn: true,
-                onClick: handleRecharge.bind(null, record),
+                onClick: handleRecharge.bind(null, record.customerWalletId),
                 auth: ["dict001"],
               },
               {
@@ -190,7 +197,7 @@ export default defineComponent({
                 type: "primary",
                 icon: RedEnvelopeIcon,
                 isIconBtn: true,
-                onClick: handleRefund.bind(null, record),
+                onClick: handleRefund.bind(null, record.customerWalletId),
                 auth: ["dict001"],
               },
               {
@@ -198,7 +205,7 @@ export default defineComponent({
                 type: "primary",
                 icon: TransactionIcon,
                 isIconBtn: true,
-                onClick: handleTransfer.bind(null, record),
+                onClick: handleTransfer.bind(null, record.customerWalletId),
                 auth: ["dict001"],
               },
             ],
@@ -210,7 +217,7 @@ export default defineComponent({
     const data = ref([]);
 
     onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData(pagination);
     });
 
     const getData = async (page: PaginationInter) => {
@@ -218,7 +225,7 @@ export default defineComponent({
       try {
         let search = { ...queryValue.value };
         let res = await getCustomerWalletPage({ page, search: search });
-        console.log(res);
+        console.log(res.data);
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -230,50 +237,44 @@ export default defineComponent({
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData(pagination);
     };
 
     const reset = () => {
       unref(queryValue).customerPhoneLike = null;
-      message.info("点击了删除");
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData(pagination);
     };
 
-    function handleRecord(record: Recordable) {
-      console.log(record);
+    function handleRecord(customerWalletId: string) {
       const { openDrawer } = transactionRecordRef.value;
-      openDrawer();
+      openDrawer(customerWalletId);
     }
-    function handleRecharge(record: Recordable) {
-      console.log(record);
+    function handleRecharge(customerWalletId: string) {
       const { openDrawer } = rechargeRef.value;
-      openDrawer();
+      openDrawer(customerWalletId);
     }
 
-    function handleRefund(record: Recordable) {
-      console.log(record);
+    function handleRefund(customerWalletId: string) {
       const { openDrawer } = refundRef.value;
-      openDrawer();
+      openDrawer(customerWalletId);
     }
-    function handleTransfer(record: Recordable) {
-      console.log(record);
+    function handleTransfer(customerWalletId: string) {
       const { openDrawer } = transferRef.value;
-      openDrawer();
+      openDrawer(customerWalletId);
     }
 
     function handlePage(pageIndex: number) {
       pagination.pageIndex = pageIndex;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
-      console.log(pageSize);
       pagination.pageSize = pageSize;
       getData(toRaw(pagination));
     }
 
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData(pagination);
     }
 
     return {
@@ -288,7 +289,7 @@ export default defineComponent({
       loading,
       pageSizes,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.customerWalletId,
       itemCount,
 
       searchHandle,

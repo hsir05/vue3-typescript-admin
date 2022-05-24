@@ -10,7 +10,7 @@
       class="pt-15px bg-white pb-10px mb-5px flex-wrap"
       :model="queryValue"
     >
-      <!-- <n-form-item label="代金券名称" path="couponNameLike">
+      <n-form-item label="代金券名称" path="couponNameLike">
         <n-input
           v-model:value="queryValue.couponNameLike"
           clearable
@@ -26,7 +26,7 @@
           placeholder="输入所属客户手机号"
           style="width: 150px"
         />
-      </n-form-item> -->
+      </n-form-item>
 
       <n-form-item label="获得时间(起始)" path="couponAchieveTimeGe">
         <n-date-picker

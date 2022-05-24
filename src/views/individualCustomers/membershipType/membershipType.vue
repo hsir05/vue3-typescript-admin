@@ -48,8 +48,9 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
+
     <MemberDrawer ref="memberDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
-    <!-- <DetailDrawer ref="detailDrawerRef" :width="650" @on-save-after="handleSaveAfter" /> -->
+    <DetailDrawer ref="detailDrawerRef" :width="650" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
@@ -57,7 +58,7 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-// import DetailDrawer from "@/components/memberDetail/memberDetailDrawer.vue";
+import DetailDrawer from "./detailDrawer.vue";
 import { NTag } from "naive-ui";
 import MemberDrawer from "./memberDrawer.vue";
 import { TableItemInter } from "./type";
@@ -67,7 +68,7 @@ import { PaginationInter } from "@/api/type";
 import { memberType } from "@/config/table";
 export default defineComponent({
   name: "MembershipType",
-  components: { MemberDrawer, BasicTable },
+  components: { MemberDrawer, BasicTable, DetailDrawer },
   setup() {
     const loading = ref(false);
     const memberDrawerRef = ref();
@@ -140,7 +141,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleSee.bind(null, record),
+                onClick: handleSee.bind(null, record.customerMemberId),
                 auth: ["dict001"],
               },
               {
@@ -148,7 +149,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record.customerMemberId),
                 auth: ["dict001"],
               },
             ],
@@ -177,15 +178,13 @@ export default defineComponent({
       }
     };
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleEdit(customerMemberId: string) {
       const { openDrawer } = memberDrawerRef.value;
-      openDrawer("编辑用户", record);
+      openDrawer("编辑用户", customerMemberId);
     }
-    function handleSee(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleSee(customerMemberId: string) {
       const { openDrawer } = detailDrawerRef.value;
-      openDrawer("编辑会员", record);
+      openDrawer(customerMemberId);
     }
 
     function handleAdd() {

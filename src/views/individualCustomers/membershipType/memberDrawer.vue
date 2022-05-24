@@ -35,8 +35,8 @@
           :ref="setItemRef"
           :orderBusinessType="item.orderBusinessType"
           :orderBusinessTypeName="item.orderBusinessTypeName"
-          :rate="item.rate"
-          :limit="item.limit"
+          :rate="item.customerMemberDiscountRate"
+          :limit="item.customerMemberCreateOrderLimit"
           v-for="(item, index) in form.rateLimitData"
           :loading="loading"
           :key="index"
@@ -89,13 +89,20 @@
 import { defineComponent, reactive, toRefs, ref, onBeforeUpdate } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import { lockOptions } from "@/config/form";
-import { getGroupMemberDetail } from "@/api/groupCustomers/groupCustomers";
 import {
   addCustomerMember,
+  getIndMemberDetail,
   editCustomerMember,
 } from "@/api/individualCustomers/individualCustomers";
 import BusTypeItem from "./busTypeItem.vue";
-import { FormInter, busTypeInter, BusLimitInter, BusRateInter } from "./type";
+import {
+  FormInter,
+  busTypeInter,
+  BusLimitInter,
+  BusRateInter,
+  ItemLimitInter,
+  ItemRateInter,
+} from "./type";
 export default defineComponent({
   name: "MemberDrawer",
   components: { BusTypeItem },
@@ -119,22 +126,22 @@ export default defineComponent({
       customerMemberLock: null,
       rateLimitData: [
         {
-          limit: null,
+          customerMemberCreateOrderLimit: null,
+          customerMemberDiscountRate: null,
           orderBusinessType: "OBT0001",
-          orderBusinessTypeName: "专车业务",
-          rate: null,
+          orderBusinessTypeName: "业务类型-专车业务",
         },
         {
-          limit: null,
+          customerMemberCreateOrderLimit: null,
+          customerMemberDiscountRate: null,
           orderBusinessType: "OBT0002",
-          orderBusinessTypeName: "快车业务",
-          rate: null,
+          orderBusinessTypeName: "业务类型-快车业务",
         },
         {
-          limit: null,
+          customerMemberCreateOrderLimit: null,
+          customerMemberDiscountRate: null,
           orderBusinessType: "OBT0003",
-          orderBusinessTypeName: "出租车业务",
-          rate: null,
+          orderBusinessTypeName: "业务类型-出租车业务",
         },
       ],
     });
@@ -150,48 +157,64 @@ export default defineComponent({
       formItemRef.value = [];
     });
 
-    function openDrawer(t: string, groupCustomerMemberId: string, bool: boolean) {
-      console.log(bool);
-
-      if (groupCustomerMemberId) {
-        getDetail(groupCustomerMemberId);
+    function openDrawer(t: string, customerMemberId: string) {
+      if (customerMemberId) {
+        getDetail(customerMemberId);
       } else {
         state.isDrawer = true;
       }
-      if (bool) {
-        state.disabled = bool;
-      }
+
       title.value = t;
     }
 
-    const getDetail = async (groupCustomerMemberId: string) => {
+    const getDetail = async (customerMemberId: string) => {
       try {
         state.loading = true;
-        let res = await getGroupMemberDetail({ groupCustomerMemberId });
+        let res = await getIndMemberDetail({ customerMemberId });
+        console.log(res.data);
+
         const {
-          customerMemberType,
-          customerMemberName,
-          customerMemberDesc,
-          customerMemberLock,
-          customerMemberCreateOrderLimitMap,
-          customerMemberDiscountRateMap,
+          customerMemberType: { entryId },
+          customerMember: { customerMemberName, customerMemberDesc, customerMemberLock },
         } = res.data;
 
-        let dataArr: busTypeInter[] = [];
-        for (let key = 0; key < customerMemberDiscountRateMap.length; key++) {
-          let item = {
-            rate: customerMemberDiscountRateMap[key].groupCustomerMemberDiscountRate,
-            limit: customerMemberCreateOrderLimitMap[key].groupCustomerMemberCreateOrderLimit,
-            // orderBusinessType: customerMemberDiscountRateMap[key].groupCustomerMemberDiscountRate,
+        let dataArr = [
+          {
+            customerMemberCreateOrderLimit: null,
+            customerMemberDiscountRate: null,
             orderBusinessType: "OBT0001",
-            orderBusinessTypeName: customerMemberDiscountRateMap[key].orderBusinessType,
-          };
-          dataArr.push(item);
-        }
-        console.log(dataArr);
+            orderBusinessTypeName: "业务类型-专车业务",
+          },
+          {
+            customerMemberCreateOrderLimit: null,
+            customerMemberDiscountRate: null,
+            orderBusinessType: "OBT0002",
+            orderBusinessTypeName: "业务类型-快车业务",
+          },
+          {
+            customerMemberCreateOrderLimit: null,
+            customerMemberDiscountRate: null,
+            orderBusinessType: "OBT0003",
+            orderBusinessTypeName: "业务类型-出租车业务",
+          },
+        ];
 
+        for (let key of dataArr) {
+          let limit = res.data.customerMemberCreateOrderLimitList.find(
+            (item: ItemLimitInter) => item.orderBusinessType === key.orderBusinessType
+          );
+          if (limit) {
+            key.customerMemberCreateOrderLimit = limit.customerMemberCreateOrderLimit;
+          }
+          let rate = res.data.customerMemberDiscountRateList.find(
+            (item: ItemRateInter) => item.orderBusinessType === key.orderBusinessType
+          );
+          if (rate) {
+            key.customerMemberDiscountRate = rate.customerMemberDiscountRate;
+          }
+        }
         form.value = {
-          customerMemberType,
+          customerMemberType: entryId,
           customerMemberName,
           customerMemberDesc,
           customerMemberLock,
@@ -235,11 +258,11 @@ export default defineComponent({
           for (let key of resultArr.value) {
             customerMemberDiscountRateMap.push({
               orderBusinessType: key.orderBusinessType as string,
-              customerMemberDiscountRate: key.rate as number,
+              customerMemberDiscountRate: key.customerMemberDiscountRate as number,
             });
             customerMemberCreateOrderLimitMap.push({
               orderBusinessType: key.orderBusinessType as string,
-              customerMemberCreateOrderLimit: key.limit as number,
+              customerMemberCreateOrderLimit: key.customerMemberCreateOrderLimit as number,
             });
           }
           state.loading = true;
@@ -294,22 +317,22 @@ export default defineComponent({
         customerMemberLock: null,
         rateLimitData: [
           {
-            limit: null,
+            customerMemberCreateOrderLimit: null,
+            customerMemberDiscountRate: null,
             orderBusinessType: "OBT0001",
-            orderBusinessTypeName: "专车业务",
-            rate: null,
+            orderBusinessTypeName: "业务类型-专车业务",
           },
           {
-            limit: null,
+            customerMemberCreateOrderLimit: null,
+            customerMemberDiscountRate: null,
             orderBusinessType: "OBT0002",
-            orderBusinessTypeName: "快车业务",
-            rate: null,
+            orderBusinessTypeName: "业务类型-快车业务",
           },
           {
-            limit: null,
+            customerMemberCreateOrderLimit: null,
+            customerMemberDiscountRate: null,
             orderBusinessType: "OBT0003",
-            orderBusinessTypeName: "出租车业务",
-            rate: null,
+            orderBusinessTypeName: "业务类型-出租车业务",
           },
         ],
       };

@@ -7,7 +7,8 @@ export interface loginInter {
 
 export interface PaginationInter {
     pageIndex: number,
-    pageSize: number
+    pageSize: number,
+    sort?: any[]
 }
 
 // 系统管理 - 字典管理
