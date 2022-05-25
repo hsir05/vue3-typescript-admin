@@ -227,3 +227,21 @@ export function getExchangeCodePage(data: ExchangeCodePageInter) {
         data: data,
     });
 }
+//-----------------钱包充值活动管理-------------------------
+
+/**
+ * 钱包充值活动分页
+ */
+interface WalletRechargeActivityPageInter {
+    page: PaginationInter;
+    search: {
+        paymentChannelTypeEq: string | null;
+    };
+}
+export function getWalletRechargeActivityPage(data: WalletRechargeActivityPageInter) {
+    return http.request({
+        url: "/customerWalletRechargeActivity/page",
+        method: "post",
+        data: data,
+    });
+}

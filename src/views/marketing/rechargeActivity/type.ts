@@ -1,10 +1,16 @@
-export interface tableDataItem {
-    id?: string
-    channel: null | string
-    ratio: null | number
-    minAmount: null | number
-    cumulativeQuota: null | number
-    startTime: null | string
-    endTime: null | string
-    remark: null | string
+export interface TableDataItemInter {
+    customerWalletRechargeActivityId: string
+    activityEndTime: number
+    activityBeginTime: number
+}
+
+export interface FormInter {
+    paymentChannelType: string | null;
+      rechargeRate: string | null;
+      minimumRechargeAmount: string | null;
+      cumulativeRechargeAmount: string | null;
+      activityBeginTime: number | null;
+      activityEndTime: number | null;
+      activityDesc: string | null;
+
 }

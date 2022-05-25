@@ -17,7 +17,8 @@
           v-model:value="form.operationCompanyId"
           placeholder="选择运营企业"
           @update:value="handleUpdateValue"
-          :options="options"
+          :options="companyData"
+          style="width: 300px"
         />
       </n-form-item>
 
@@ -28,7 +29,7 @@
           v-model:value="form.orderBusinessType"
           placeholder="选择订单类型"
           style="width: 170px"
-          :options="options"
+          :options="orderBustypeData"
         />
       </n-form-item>
 
@@ -86,10 +87,10 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import { FormInst } from "naive-ui";
+import { FormInst, SelectOption } from "naive-ui";
 import Line from "./line.vue";
 import Gauge from "./gauge.vue";
-import { getAllOperateCompany } from "@/api/common/common";
+import { getAllOperateCompany, getDict } from "@/api/common/common";
 import { getChartsData, getOrderBusinessType } from "@/api/realtimeDynamic/realtimeDynamic";
 import {
   BarcodeOutline as BarcodeIcon,
@@ -110,7 +111,11 @@ export default defineComponent({
     const loading = ref(false);
     const options = [{ label: "asdf", value: "sd" }];
     const formRef = ref<FormInst | null>(null);
-    const form = ref({
+    interface FormInter {
+      operationCompanyId: string | null;
+      orderBusinessType: string | null;
+    }
+    const form = ref<FormInter>({
       operationCompanyId: null,
       orderBusinessType: null,
     });
@@ -118,6 +123,9 @@ export default defineComponent({
     const subtext = ref("司机总数： 人");
     const workRatio = ref<number>(0);
     const busyRatio = ref<number>(0);
+
+    const orderBustypeData = ref<SelectOption[]>([]);
+    const companyData = ref<SelectOption[]>([]);
 
     const orderData = ref([
       {
@@ -165,22 +173,32 @@ export default defineComponent({
     ]);
 
     onMounted(() => {
+      getOrderBusType();
       getOperateCompanyData();
       getData();
     });
 
-    const getOperateCompanyData = async () => {
+    const getOrderBusType = async () => {
       try {
-        let res = await getAllOperateCompany();
-        console.log(res);
+        let res = await getDict({ parentEntryCode: "OBT0000" });
+        form.value.orderBusinessType = res.data[0].entryCode;
+        orderBustypeData.value = res.data.map((item: { entryName: string; entryCode: string }) => {
+          return { label: item.entryName, value: item.entryCode };
+        });
       } catch (err) {
         console.log(err);
       }
     };
-    const getComOrderType = async () => {
+
+    const getOperateCompanyData = async () => {
       try {
-        let res = await getOrderBusinessType({ operationCompanyId: form.value.operationCompanyId });
-        console.log(res);
+        let res = await getAllOperateCompany();
+        form.value.operationCompanyId = res.data[0].operationCompanyId;
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            return { label: item.operationCompanyName, value: item.operationCompanyId };
+          }
+        );
       } catch (err) {
         console.log(err);
       }
@@ -189,7 +207,11 @@ export default defineComponent({
     const getData = async () => {
       loading.value = true;
       try {
-        let res = await getChartsData({ operationCompanyId: null, orderBusinessType: "OBT0000" });
+        let option = {
+          operationCompanyId: form.value.operationCompanyId as string,
+          orderBusinessType: form.value.orderBusinessType as string,
+        };
+        let res = await getChartsData(option);
         orderData.value = orderData.value.map((item) => {
           item.value = res[item.key];
           return item;
@@ -203,12 +225,25 @@ export default defineComponent({
         loading.value = false;
       } catch (err) {
         console.log(err);
+        loading.value = false;
+      }
+    };
+
+    const getIdData = async (operationCompanyId: string) => {
+      try {
+        loading.value = true;
+
+        let res = await getOrderBusinessType({ operationCompanyId });
+        console.log(res);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
       }
     };
     function handleUpdateValue(value: string) {
       console.log(value);
-
-      getComOrderType();
+      getIdData(value);
     }
     function query() {}
 
@@ -222,6 +257,8 @@ export default defineComponent({
       loading,
       form,
       orderData,
+      orderBustypeData,
+      companyData,
 
       query,
       handleUpdateValue,
@@ -248,6 +285,7 @@ export default defineComponent({
   margin-right: 10px;
   background-color: $white;
 }
+
 .today {
   font-size: 14px;
 }

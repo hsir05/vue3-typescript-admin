@@ -10,38 +10,43 @@
       label-width="120"
       :model="form"
     >
-      <n-form-item label="支付渠道" path="channel">
+      <n-form-item label="支付渠道" path="paymentChannelType">
         <n-select
           clearable
           filterable
-          v-model:value="form.channel"
+          v-model:value="form.paymentChannelType"
           placeholder="选择支付渠道"
           :options="options"
         />
       </n-form-item>
 
-      <n-form-item label="充值比率" path="ratio">
-        <n-input-number v-model:value="form.ratio" :min="0" clearable />
+      <n-form-item label="充值比率" path="rechargeRate">
+        <n-input-number v-model:value="form.rechargeRate" :min="0" clearable />
       </n-form-item>
 
-      <n-form-item label="最低起充金额" path="minAmount">
-        <n-input-number v-model:value="form.minAmount" clearable />
+      <n-form-item label="最低起充金额" path="minimumRechargeAmount">
+        <n-input-number v-model:value="form.minimumRechargeAmount" clearable />
       </n-form-item>
 
-      <n-form-item label="累计实充额度" path="cumulativeQuota">
-        <n-input-number v-model:value="form.cumulativeQuota" clearable />
+      <n-form-item label="累计实充额度" path="cumulativeRechargeAmount">
+        <n-input-number v-model:value="form.cumulativeRechargeAmount" clearable />
       </n-form-item>
 
-      <n-form-item label="开始时间" path="startTime">
-        <n-date-picker v-model:value="form.startTime" type="datetime" clearable />
+      <n-form-item label="开始时间" path="activityBeginTime">
+        <n-date-picker v-model:value="form.activityBeginTime" type="datetime" clearable />
       </n-form-item>
 
-      <n-form-item label="结束时间" path="endTime">
-        <n-date-picker v-model:value="form.endTime" type="datetime" clearable />
+      <n-form-item label="结束时间" path="activityEndTime">
+        <n-date-picker v-model:value="form.activityEndTime" type="datetime" clearable />
       </n-form-item>
 
-      <n-form-item label="活动描述" path="remark">
-        <n-input v-model:value="form.remark" type="textarea" clearable placeholder="输入活动描述" />
+      <n-form-item label="活动描述" path="activityDesc">
+        <n-input
+          v-model:value="form.activityDesc"
+          type="textarea"
+          clearable
+          placeholder="输入活动描述"
+        />
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -58,7 +63,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { FormInter } from "./type";
 export default defineComponent({
   name: "RechargeActivity",
   setup(_, { emit }) {
@@ -71,20 +76,18 @@ export default defineComponent({
     const title = ref("");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      channel: null,
-      ratio: null,
-      minAmount: null,
-      cumulativeQuota: null,
-      startTime: null,
-      endTime: null,
-      remark: null,
+    const form = ref<FormInter>({
+      paymentChannelType: null,
+      rechargeRate: null,
+      minimumRechargeAmount: null,
+      cumulativeRechargeAmount: null,
+      activityBeginTime: null,
+      activityEndTime: null,
+      activityDesc: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
-      console.log(record);
-      if (record) {
-        form.value = { ...form.value, ...record };
+    function openDrawer(t: string, customerWalletRechargeActivityId: string) {
+      if (customerWalletRechargeActivityId) {
       }
       title.value = t;
       state.isDrawer = true;
@@ -114,13 +117,13 @@ export default defineComponent({
 
     function handleReset() {
       form.value = {
-        channel: null,
-        ratio: null,
-        minAmount: null,
-        cumulativeQuota: null,
-        startTime: null,
-        endTime: null,
-        remark: null,
+        paymentChannelType: null,
+        rechargeRate: null,
+        minimumRechargeAmount: null,
+        cumulativeRechargeAmount: null,
+        activityBeginTime: null,
+        activityEndTime: null,
+        activityDesc: null,
       };
       formRef.value?.restoreValidation();
     }

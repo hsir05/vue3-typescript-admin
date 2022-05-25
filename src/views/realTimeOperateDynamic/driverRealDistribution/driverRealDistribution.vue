@@ -20,7 +20,7 @@
           @update:value="handleCompany"
           v-model:value="companyId"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -69,7 +69,7 @@ const companyId = ref();
 const dirverNum = ref();
 const vehicleType = ref();
 const baiduMapRef = ref();
-const compOpton = ref([]);
+const companyData = ref([]);
 
 onMounted(async () => {
   const { renderBaiduMap } = baiduMapRef.value;
@@ -106,8 +106,11 @@ const options = [
 const getOperateCompanyData = async () => {
   try {
     let res = await getAllOperateCompany();
-    console.log(res);
-    compOpton.value = res;
+    companyData.value = res.data.map(
+      (item: { operationCompanyName: string; operationCompanyId: string }) => {
+        return { label: item.operationCompanyName, value: item.operationCompanyId };
+      }
+    );
     if (res.length > 0) {
       let id = res[0].operationCompanyId;
       getWorkingDriver(id);
@@ -164,6 +167,7 @@ function handleCompany(value: string) {
   padding-top: 5px;
   padding-left: 5px;
   position: relative;
+
   .examples {
     position: absolute;
     right: 30px;
@@ -175,6 +179,7 @@ function handleCompany(value: string) {
     background-color: #ffffff;
     border-radius: 12px;
   }
+
   .icon-status {
     cursor: pointer;
     display: inline-block;
