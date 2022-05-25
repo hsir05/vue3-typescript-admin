@@ -73,9 +73,14 @@ export function getCompanyOder(data: getCompanyOderState) {
 }
 
 //获取司机满意度
-export function getSatisfaction(data: getCompanyOderState) {    
+interface SatisfactionInter {
+    operationCompanyId: string
+    beginDate: string
+    endDate: string
+}
+export function getSatisfaction(data: SatisfactionInter) {    
   return http.request({
-    url: '/driverServiceSatisfiedStatistics/getDriverServiceSatisfiedStatistics',
+    url: '/operationAnalysis/getDriverServiceSatisfiedStatistics',
     method: 'post',
     data
   });

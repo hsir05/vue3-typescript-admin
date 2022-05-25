@@ -13,12 +13,12 @@
     >
       <n-form-item label="运营企业" label-placement="left">
         <n-select
-          v-model:value="queryForm.companyId"
+          v-model:value="queryForm.operationCompanyId"
           clearable
           filterable
           placeholder="选择运营企业"
           style="width: 260px"
-          :options="operateCompanyOptions"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -39,8 +39,8 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
@@ -59,21 +59,23 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, ref, onMounted } from "vue";
+import { FormInst } from "naive-ui";
 import { getSatisfaction } from "@/api/operationStatistics/operationStatistics";
-import { tableDataItem } from "./type";
+import { tableDataItem, QueryFormInter } from "./type";
+import { getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "SatisfactionStatistics",
   setup() {
     const loading = ref(false);
     const queryFormRef = ref<FormInst | null>(null);
-    const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
-      companyId: "companyId",
+    const companyData = ref([]);
+    const queryForm = ref<QueryFormInter>({
+      section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
+      operationCompanyId: null,
     });
-    const message = useMessage();
     const data = ref([]);
     const openCityData = ref([]);
 
@@ -125,32 +127,41 @@ export default defineComponent({
       },
     ];
 
-    function query(e: MouseEvent) {
-      e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
-    }
-
     onMounted(() => {
-      getData();
+      getAllCompanyData();
     });
+
+    const getAllCompanyData = async () => {
+      try {
+        loading.value = true;
+        let res = await getAllOperateCompany();
+        queryForm.value.operationCompanyId = res.data[0].operationCompanyId;
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+        getData();
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const getData = async () => {
       loading.value = true;
       try {
-        let res = await getSatisfaction({
-          companyId: "allCompany",
-          beginDate: "2022-03-16",
-          endDate: "2022-03-18",
-        });
-        console.log(res);
+        let option = {
+          operationCompanyId: queryForm.value.operationCompanyId as string,
+          beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
+          endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
+        };
+        let res = await getSatisfaction(option);
+        data.value = res.data;
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -158,15 +169,26 @@ export default defineComponent({
       }
     };
 
+    function query(e: MouseEvent) {
+      e.preventDefault();
+      queryFormRef.value?.validate((errors) => {
+        if (!errors) {
+          getData();
+        } else {
+          console.log(errors);
+        }
+      });
+    }
+
     return {
       loading,
       openCityData,
       queryForm,
       queryFormRef,
+      companyData,
 
       columns,
       data,
-      operateCompanyOptions: [],
       pagination: {
         pageSize: 10,
       },

@@ -154,11 +154,6 @@ export default defineComponent({
         },
       },
       {
-        title: "序列",
-        key: "sort",
-        align: "center",
-      },
-      {
         title: "兑换码",
         key: "exchangeCode",
         align: "center",

@@ -10,87 +10,92 @@
       class="pt-15px pb-15px bg-white mb-5px"
       :model="queryValue"
     >
-      <n-form-item label="流量方订单号" path="influxCode">
+      <n-form-item label="流量方订单号" path="influxOrderNoEq">
         <n-input
-          v-model:value="queryValue.influxCode"
+          v-model:value="queryValue.influxOrderNoEq"
           clearable
           placeholder="输入流量方订单号"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="流量方" path="influx">
+      <n-form-item label="流量方" path="influxCodeEq">
         <n-select
-          v-model:value="queryValue.influx"
+          v-model:value="queryValue.influxCodeEq"
           placeholder="选择流量方"
           :options="options"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="订单类型" path="orderType">
+      <n-form-item label="订单类型" path="orderTypeEq">
         <n-select
-          v-model:value="queryValue.orderType"
+          v-model:value="queryValue.orderTypeEq"
           placeholder="选择订单类型"
           :options="options"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="下单客户电话" path="phone">
+      <n-form-item label="下单客户电话" path="customerPhoneEq">
         <n-input
-          v-model:value="queryValue.phone"
+          v-model:value="queryValue.customerPhoneEq"
           clearable
           placeholder="输入下单客户电话"
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="运营企业" path="companyId">
+      <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
-          v-model:value="queryValue.companyId"
+          v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
           :options="options"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="司机工号" path="driverNum">
+      <n-form-item label="司机工号" path="driverNoEq">
         <n-input
-          v-model:value="queryValue.driverNum"
+          v-model:value="queryValue.driverNoEq"
           clearable
           placeholder="输入司机工号"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="车牌号" path="plate">
+      <n-form-item label="车牌号" path="plateNumberEq">
         <n-input
-          v-model:value="queryValue.plate"
+          v-model:value="queryValue.plateNumberEq"
           clearable
           placeholder="输入车牌号"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="订单状态" path="orderStatus">
+      <n-form-item label="订单状态" path="orderStateEq">
         <n-select
-          v-model:value="queryValue.orderStatus"
+          v-model:value="queryValue.orderStateEq"
           placeholder="选择订单状态"
           :options="options"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(起始)" path="start">
+      <n-form-item label="交易时间(起始)" path="timeGe">
         <n-date-picker
-          v-model:value="queryValue.start"
+          v-model:value="queryValue.timeGe"
           type="date"
           style="width: 150px"
           clearable
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(结束)" path="end">
-        <n-date-picker v-model:value="queryValue.end" type="date" style="width: 150px" clearable />
+      <n-form-item label="交易时间(结束)" path="timeLe">
+        <n-date-picker
+          v-model:value="queryValue.timeLe"
+          type="date"
+          style="width: 150px"
+          clearable
+        />
       </n-form-item>
 
       <n-form-item>
@@ -104,6 +109,7 @@
       :data="data"
       ref="basicTableRef"
       :columns="columns"
+      :row-key="getRowKeyId"
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
@@ -123,9 +129,9 @@ import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ioni
 import BasicTable from "@/components/Table/Table.vue";
 // import { NTag } from "naive-ui";
 // import UserDrawer from "./userDrawer.vue";
-import { tableDataItem } from "./type";
+import { TableDataItemInter, QueryForm } from "./type";
 import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { getOrderPage } from "@/api/operateOrder/operateOrder";
 import { PaginationInter } from "@/api/type";
 export default defineComponent({
   name: "ServingOrder",
@@ -135,39 +141,34 @@ export default defineComponent({
     const userDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
-    const queryValue = ref({
-      influxCode: null,
-      influx: null,
-      phone: null,
-      status: null,
-      companyId: null,
-      driverNum: null,
-      plate: null,
-      orderStatus: null,
-      start: null,
-      end: null,
-      orderType: null,
+    const queryValue = ref<QueryForm>({
+      timeGe: null,
+      timeLe: null,
+      influxOrderNoEq: null,
+      influxCodeEq: null,
+      operationCompanyIdEq: null,
+      orderStateEq: null,
+      plateNumberEq: null,
+      orderTypeEq: null,
+      driverNoEq: null,
+      customerPhoneEq: null,
     });
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<TableDataItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "流量方订单号",
-        key: "account",
+        key: "influxOrderNo",
         align: "center",
       },
       {
@@ -177,77 +178,62 @@ export default defineComponent({
       },
       {
         title: "订单类型",
-        key: "phone",
+        key: "orderType",
         align: "center",
       },
       {
         title: "下单客户电话",
-        key: "account",
+        key: "customerPhone",
         align: "center",
       },
       {
         title: "出发地",
-        key: "name",
+        key: "orderBeginAddress",
         align: "center",
       },
       {
         title: "目的地",
-        key: "phone",
+        key: "orderEndAddress",
         align: "center",
       },
 
       {
         title: "运营企业",
-        key: "account",
+        key: "operationCompanyName",
         align: "center",
       },
       {
         title: "司机工号",
-        key: "name",
+        key: "driverNo",
         align: "center",
       },
       {
         title: "车牌号",
-        key: "phone",
+        key: "plateNumber",
         align: "center",
       },
       {
         title: "订单状态",
-        key: "account",
+        key: "orderState",
         align: "center",
       },
       {
         title: "用车时间",
-        key: "name",
+        key: "orderServiceDuration",
         align: "center",
       },
-      //   {
-      //     title: "状态",
-      //     key: "status",
-      //     align: "center",
-      //     render(row: tableDataItem) {
-      //       return h(
-      //         NTag,
-      //         {
-      //           type: row.status === 1 ? "success" : "error",
-      //         },
-      //         {
-      //           default: () => (row.status === 1 ? "正常" : "锁定"),
-      //         }
-      //       );
-      //     },
-      //   },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "130px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "详情",
                 type: "primary",
+                isIconBtn: true,
                 icon: EyeIcon,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
@@ -255,6 +241,7 @@ export default defineComponent({
               {
                 label: "删除",
                 type: "error",
+                isIconBtn: true,
                 icon: CreateIcon,
                 secondary: true,
                 auth: ["dict002"],
@@ -270,27 +257,22 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     });
 
-    // const getData = async (pagination: PaginationInter) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
-
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
-
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getOrderPage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
     function handleCheckRow(rowKeys: string[]) {
       console.log("选择了", rowKeys);
     }
@@ -322,41 +304,40 @@ export default defineComponent({
     };
     const reset = () => {
       queryValue.value = {
-        influxCode: null,
-        influx: null,
-        phone: null,
-        status: null,
-        companyId: null,
-        driverNum: null,
-        plate: null,
-        orderStatus: null,
-        start: null,
-        orderType: null,
-        end: null,
+        timeGe: null,
+        timeLe: null,
+        influxOrderNoEq: null,
+        influxCodeEq: null,
+        operationCompanyIdEq: null,
+        orderStateEq: null,
+        plateNumberEq: null,
+        orderTypeEq: null,
+        driverNoEq: null,
+        customerPhoneEq: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -369,6 +350,7 @@ export default defineComponent({
       options: [],
       columns,
       itemCount,
+      getRowKeyId: (row: TableDataItemInter) => row.orderId,
 
       reloadPage,
       handleAdd,
