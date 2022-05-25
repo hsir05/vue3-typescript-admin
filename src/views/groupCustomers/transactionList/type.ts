@@ -1,14 +1,12 @@
-export interface tableDataItem{
-    id?: string
-    phone: null | string
-    transactionCode: null | string
-    transactionType: null | string
-    rechargeAmount: null | string 
-    giveAmount: null | string
-    transactionBlance: null | string
-    transactionTotalAmount: null | string
-    currentAmount: null | string
-    walletType: null | string
-    remark: null | string
-    create_time: null | string
+export interface TableDataItemInrter{
+    groupCustomerWalletDealRecordId: string
+    dealType: number
+    dealTime:number
+}
+
+export interface QueryFormInter{
+    dealSerialNumberEq: string | null;
+    dealTypeEq: string | null;
+    dealTimeGe: string | null;
+    dealTimeLe: string | null;
 }

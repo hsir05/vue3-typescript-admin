@@ -215,3 +215,78 @@ export function getCustomerWalletPage(data: CustomerWalletPageInter) {
     data: data,
   });
 }
+/**-------------集团客户钱包交易总览管理--------------------*/
+/**
+ * 集团客户钱包交易总览列表
+ */
+
+interface GroupCustomerRecordPageInter {
+  page: PaginationInter;
+  search: {
+    dealSerialNumberEq: string | null;
+    dealTypeEq: string | null;
+    dealTimeGe: string | null;
+    dealTimeLe: string | null;
+  };
+}
+export function getGroupCustomeRecordPage(data: GroupCustomerRecordPageInter) {
+  return http.request({
+    url: "/groupCustomerWallet/aggregatedGroupCustomerWalletDealRecordPage",
+    method: "post",
+    data: data,
+  });
+}
+
+
+/**-------------集团客户发票申请管理--------------------*/
+/**
+ * 集团客户发票申请管理列表
+ */
+
+interface InvoiceAppPageInter {
+  page: PaginationInter;
+  search: {
+    groupCustomerNameLike: string | null;
+    invoiceApplicationTimeGe: string | null;
+    invoiceApplicationTimeLe: string | null;
+    invoiceApplicationStateEq: string | null;
+  };
+}
+export function getGroupInvoiceAppPage(data: InvoiceAppPageInter) {
+  return http.request({
+    url: "/groupCustomerInvoiceApplication/page",
+    method: "post",
+    data: data,
+  });
+}
+
+/**
+ * 发票详情
+*/
+export function getGrdInvoiceDetail(data:{groupCustomerInvoiceApplicationId: string}) {
+  return http.request({
+    url: '/groupCustomerInvoiceApplication/detail',
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 集团客户申请开票
+*/
+export function confirmInvoice(data:{groupCustomerInvoiceApplicationId: string | null; note: string | null}) {
+  return http.request({
+    url: '/groupCustomerInvoiceApplication/confirmInvoice',
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 集团客户发票申请退回
+*/
+export function returnInvoice(data:{groupCustomerInvoiceApplicationId: string | null; note: string | null}) {
+  return http.request({
+    url: '/groupCustomerInvoiceApplication/returnInvoice',
+    method: 'post',
+    data:data
+  });
+}

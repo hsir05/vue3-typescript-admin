@@ -46,7 +46,7 @@
         striped
         :columns="columns"
         class="box-border"
-        min-height="calc(100vh - 95px - 280px)"
+        min-height="calc(100vh - 90px - 250px)"
         flex-height
         :row-key="getRowKeyId"
         :data="data"
@@ -54,7 +54,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -73,7 +73,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive, onMounted } from "vue";
+import { defineComponent, ref, h, reactive, onMounted, toRaw } from "vue";
 import { FormInst, NTag } from "naive-ui";
 import { TableDataItemInter, QueryFormInter } from "./type";
 import { PaginationInter } from "@/api/type";
@@ -97,7 +97,7 @@ export default defineComponent({
     const itemCount = ref(null);
     const refundModalRef = ref();
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
 

@@ -64,27 +64,44 @@
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
-    <InvoiceDrawer ref="invoiceDrawerRef" :width="700" @on-save-after="handleSaveAfter" />
+
+    <InvoiceDrawer ref="invoiceDrawerRef" :width="770" @on-save-after="handleSaveAfter" />
+
+    <SendMail ref="sendMailRef" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
+import {
+  DownloadOutline as GitIcon,
+  ArrowBackCircleOutline as ArrowBackIcon,
+  EyeOutline as EyeIcon,
+  MailOutline as MailIcon,
+  PrintOutline as PrintIcon,
+  TicketOutline as TicketIcon,
+  MailOpenOutline as MailOpenIcon,
+  CopyOutline as CopyIcon,
+} from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import InvoiceDrawer from "./invoiceDrawer.vue";
+import SendMail from "./sendModal.vue";
 import { TableDataItemInter } from "./type";
 import { invoiceAppOptions, invoiceAppObj } from "@/config/form";
-import { getInvoiceAppPage } from "@/api/individualCustomers/individualCustomers";
+import {
+  getInvoiceAppPage,
+  downloadRelativeItinerary,
+} from "@/api/individualCustomers/individualCustomers";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "InvoiceApplicationList",
-  components: { BasicTable, InvoiceDrawer },
+  components: { BasicTable, InvoiceDrawer, SendMail },
   setup() {
     const loading = ref(false);
     const invoiceDrawerRef = ref();
     const basicTableRef = ref();
+    const sendMailRef = ref();
     const itemCount = ref(null);
     const queryValue = ref({
       invoiceApplicationTimeLE: null,
@@ -175,16 +192,85 @@ export default defineComponent({
                 auth: ["dict001"],
               },
               {
-                label: "删除",
-                type: "error",
+                label: "开票",
+                type: "primary",
+                icon: TicketIcon,
                 isIconBtn: true,
-                icon: RemoveIcon,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
+                isShow: record.invoiceApplicationState === 0 ? false : true,
+                onClick: handleConfirmInvoice.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "重新开票",
+                type: "primary",
+                icon: CopyIcon,
+                isIconBtn: true,
+                isShow:
+                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
+                onClick: handleReInvoice.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "打印",
+                type: "primary",
+                icon: PrintIcon,
+                isIconBtn: true,
+                isShow:
+                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
+                onClick: handlePrint.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "寄出",
+                type: "primary",
+                icon: MailOpenIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 6 ? false : true,
+                onClick: handleMail.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "重寄",
+                type: "primary",
+                icon: MailIcon,
+                isIconBtn: true,
+                isShow:
+                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
+                onClick: handleMail.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "退回",
+                type: "primary",
+                icon: ArrowBackIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 0 ? false : true,
+                onClick: handleBack.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "作废",
+                type: "primary",
+                icon: ArrowBackIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 4 ? false : true,
+                onClick: handleBack.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "导出相关行程单",
+                type: "primary",
+                icon: GitIcon,
+                isIconBtn: true,
+                isShow:
+                  (record.invoiceApplicationState === 1 ||
+                    record.invoiceApplicationState === 6 ||
+                    record.invoiceApplicationState === 7) &&
+                  record.invoiceApplicationTypeCode === "IAT0002"
+                    ? false
+                    : true,
+                onClick: handleDownload.bind(null, record.customerInvoiceApplicationId),
+                auth: ["dict001"],
               },
             ],
           });
@@ -215,17 +301,53 @@ export default defineComponent({
       const { openDrawer } = invoiceDrawerRef.value;
       openDrawer(customerInvoiceApplicationId);
     }
-
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    // 邮寄
+    function handleMail(customerInvoiceApplicationId: string) {
+      const { handleModal } = sendMailRef.value;
+      handleModal(customerInvoiceApplicationId);
+    }
+    // 打印
+    function handlePrint(customerInvoiceApplicationId: string) {
+      console.log(customerInvoiceApplicationId);
+    }
+    // 确认开票
+    function handleConfirmInvoice(customerInvoiceApplicationId: string) {
+      console.log(customerInvoiceApplicationId);
+    }
+    // 重新邮寄
+    function handleReInvoice(customerInvoiceApplicationId: string) {
+      console.log(customerInvoiceApplicationId);
+    }
+    // 退回
+    function handleBack(customerInvoiceApplicationId: string) {
+      console.log(customerInvoiceApplicationId);
+    }
+    async function handleDownload(customerInvoiceApplicationId: string) {
+      try {
+        let res = await downloadRelativeItinerary({ customerInvoiceApplicationId });
+        console.log(res);
+        // 创建一个新的url，此url指向新建的Blob对象
+        // let url = window.URL.createObjectURL(new Blob([data]))
+        let url = "data:text/csv;charset=utf-8,\ufeff" + encodeURIComponent(res);
+        // 创建a标签，并隐藏改a标签
+        let link = document.createElement("a");
+        link.style.display = "none";
+        // a标签的href属性指定下载链接
+        link.href = url;
+        //setAttribute() 方法添加指定的属性，并为其赋指定的值。
+        link.setAttribute("download", "发票关联行程单" + ".xlsx");
+        document.body.appendChild(link);
+        link.click();
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
     };
     const reset = () => {
       queryValue.value = {
@@ -236,13 +358,13 @@ export default defineComponent({
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
     }
 
     function handlePage(pagination: PaginationInter) {
@@ -254,7 +376,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
     }
 
     return {
@@ -262,6 +384,7 @@ export default defineComponent({
       data,
       loading,
       invoiceDrawerRef,
+      sendMailRef,
       basicTableRef,
       invoiceAppOptions,
       getRowKeyId: (row: TableDataItemInter) => row.customerInvoiceApplicationId,

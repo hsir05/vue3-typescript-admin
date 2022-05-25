@@ -11,8 +11,8 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="交易类型" path="status">
-        <n-radio-group v-model:value="queryValue.type">
+      <n-form-item label="交易类型" path="dealTypeEq">
+        <n-radio-group v-model:value="queryValue.dealTypeEq">
           <n-space>
             <n-radio :value="null">全部</n-radio>
             <n-radio :value="0">入账</n-radio>
@@ -20,26 +20,26 @@
           </n-space>
         </n-radio-group>
       </n-form-item>
-      <n-form-item label="交易流水号" path="transactionCode">
+      <n-form-item label="交易流水号" path="dealSerialNumberEq">
         <n-input
-          v-model:value="queryValue.transactionCode"
+          v-model:value="queryValue.dealSerialNumberEq"
           clearable
           placeholder="输入交易流水号"
         />
       </n-form-item>
-      <n-form-item label="交易时间(起始)" path="transaction_start">
+      <n-form-item label="交易时间(起始)" path="dealTimeGe">
         <n-date-picker
-          v-model:value="queryValue.transaction_start"
+          v-model:value="queryValue.dealTimeGe"
           style="width: 120px"
-          type="date"
+          type="datetime"
           clearable
         />
       </n-form-item>
-      <n-form-item label="交易时间(结束)" path="transaction_end">
+      <n-form-item label="交易时间(结束)" path="dealTimeLe">
         <n-date-picker
-          v-model:value="queryValue.transaction_end"
+          v-model:value="queryValue.dealTimeLe"
           style="width: 120px"
-          type="date"
+          type="datetime"
           clearable
         />
       </n-form-item>
@@ -49,14 +49,14 @@
       </n-form-item>
     </n-form>
 
-    <div class="bg-white p-10px" style="height: calc(100% - 95px)">
+    <div class="bg-white p-10px">
       <n-data-table
         :loading="loading"
         ref="table"
         striped
         :columns="columns"
         class="box-border"
-        min-height="calc(100vh - 95px - 280px)"
+        min-height="calc(100vh - 95px - 240px)"
         flex-height
         :row-key="getRowKeyId"
         :data="data"
@@ -64,7 +64,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -81,148 +81,147 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive } from "vue";
-import { useMessage, FormInst } from "naive-ui";
-import { tableDataItem } from "./type";
+import { defineComponent, ref, h, reactive, onMounted, toRaw } from "vue";
+import { FormInst } from "naive-ui";
+import { PaginationInter } from "@/api/type";
+import { getGroupCustomeRecordPage } from "@/api/groupCustomers/groupCustomers";
+import { TableDataItemInrter, QueryFormInter } from "./type";
 import { pageSizes } from "@/config/table";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "TransactionList",
   setup() {
     const formRef = ref<FormInst | null>(null);
-    const queryValue = ref({
-      type: 1,
-      transactionCode: null,
-      transaction_start: null,
-      transaction_end: null,
+    const queryValue = ref<QueryFormInter>({
+      dealSerialNumberEq: null,
+      dealTypeEq: null,
+      dealTimeGe: null,
+      dealTimeLe: null,
     });
     const loading = ref(false);
     const itemCount = ref(null);
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
-    const message = useMessage();
-
     const columns = [
-      {
-        type: "selection",
-      },
       {
         title: "序号",
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInrter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
-        title: "客户手机号",
-        key: "phone",
+        title: "集团客户名称",
+        key: "groupCustomerName",
         align: "center",
       },
       {
         title: "交易流水号",
-        key: "transactionCode",
+        key: "groupCustomerWalletDealRecordId",
         align: "center",
       },
       {
         title: "交易类型",
-        key: "transactionType",
+        key: "dealType",
         align: "center",
+        render(row: TableDataItemInrter) {
+          return h("span", `${row.dealType === 1 ? "出账" : "入帐"}`);
+        },
       },
 
       {
         title: "实充交易金额",
-        key: "rechargeAmount",
+        key: "rechargeDealAmount",
         align: "center",
       },
       {
         title: "赠送交易金额",
-        key: "giveAmount",
+        key: "giftDealAmount",
         width: 110,
         align: "center",
       },
 
       {
         title: "交易总金额",
-        key: "transactionTotalAmount",
+        key: "totalDealAmount",
         width: 110,
         align: "center",
       },
       {
         title: "交易后钱包余额",
-        key: "transactionBlance",
+        key: "groupCustomerWalletBalance",
         align: "center",
       },
       {
         title: "当前钱包余额",
-        key: "currentAmount",
+        key: "totalBalance",
         width: 110,
         align: "center",
       },
 
       {
-        title: "钱包类型",
-        key: "walletType",
-        align: "center",
-      },
-      {
         title: "交易时间",
-        key: "create_time",
+        key: "dealTime",
         width: 110,
         align: "center",
+        render(record: TableDataItemInrter) {
+          return h("span", dayjs(record.dealTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "备注",
-        key: "remark",
+        key: "dealNote",
         width: 110,
         align: "center",
       },
     ];
 
-    const data = ref([
-      {
-        id: "12313123",
-        phone: "string",
-        transactionCode: "string",
-        transactionType: "string",
-        rechargeAmount: "string",
-        giveAmount: "string",
-        transactionBlance: "string",
-        transactionTotalAmount: "string",
-        currentAmount: "string",
-        walletType: "string",
-        remark: "string",
-        create_time: "string",
-      },
-    ]);
+    const data = ref([]);
+
+    onMounted(() => {
+      getData(pagination);
+    });
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getGroupCustomeRecordPage({ page, search: search });
+        console.log(res.data);
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      //   getData({ page: 1, pageSize: 10 });
+      getData(pagination);
     };
-
     const reset = () => {
       queryValue.value = {
-        type: 1,
-        transactionCode: null,
-        transaction_start: null,
-        transaction_end: null,
+        dealSerialNumberEq: null,
+        dealTypeEq: null,
+        dealTimeGe: null,
+        dealTimeLe: null,
       };
-      message.info("点击了删除");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
-    function handlePage(page: number) {
-      console.log(page);
-      pagination.page = page;
-      //   getData(toRaw(pagination));
+    function handlePage(pageIndex: number) {
+      pagination.pageIndex = pageIndex;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
-      console.log(pageSize);
       pagination.pageSize = pageSize;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
 
     return {
@@ -233,7 +232,7 @@ export default defineComponent({
       loading,
       pageSizes,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInrter) => row.groupCustomerWalletDealRecordId,
       itemCount,
 
       searchHandle,

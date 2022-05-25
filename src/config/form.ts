@@ -72,14 +72,14 @@ export const couponUseStateObj = (() => {
     return obj
 })()
 
-// 发票申请状态 
+// 发票申请状态  0:提交申请1:开票成功2:取消申请3:退回申请4.作废申请5.作废成功6.已打印7.已寄出
 export const invoiceAppOptions = [
     {
         label: "提交申请",
         value: 0
     },
      {
-        label: "申请成功",
+        label: "开票成功",
         value: 1
     },
       {
@@ -89,6 +89,22 @@ export const invoiceAppOptions = [
     {
         label: "退回申请",
         value: 3
+    },
+     {
+        label: "作废申请",
+        value: 4
+    },
+      {
+        label: "作废成功",
+        value: 5
+    },
+    {
+        label: "已打印",
+        value: 6
+    },
+    {
+        label: "已寄出",
+        value: 6
     },
 ]
 export const invoiceAppObj = (() => {

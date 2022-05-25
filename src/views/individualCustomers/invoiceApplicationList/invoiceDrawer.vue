@@ -3,34 +3,39 @@
     <n-descriptions label-placement="left" bordered :column="2">
       <n-descriptions-item label="客户手机号"> {{ detail?.customerPhone }} </n-descriptions-item>
       <n-descriptions-item label="发票申请类型">
-        {{ detail?.invoiceApplicationTypeName }}
+        {{ detail?.invoiceApplicationType }}
       </n-descriptions-item>
       <n-descriptions-item label="发票金额(元)"> {{ detail?.invoiceAmount }} </n-descriptions-item>
-      <n-descriptions-item label="发票类型"> {{ detail?.invoiceType }} </n-descriptions-item>
+      <n-descriptions-item label="发票类型">
+        {{ detail?.invoiceType === 1 ? "公司类型" : "个人类型" }}
+      </n-descriptions-item>
       <n-descriptions-item label="发票抬头"> {{ detail?.invoiceTitle }} </n-descriptions-item>
       <n-descriptions-item label="纳税人识别号">
         {{ detail?.taxpayerIdentificationNumber }}
       </n-descriptions-item>
       <n-descriptions-item label="发票内容"> {{ detail?.invoiceContent }} </n-descriptions-item>
-      <n-descriptions-item label="开户行名称"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="开户行账号"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="公司注册地址"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="公司注册电话"> 暂无 </n-descriptions-item>
+      <n-descriptions-item label="开户行名称">
+        {{ detail?.companyAccountBankName }}
+      </n-descriptions-item>
+      <n-descriptions-item label="开户行账号">
+        {{ detail?.companyAccountBankNumber }}
+      </n-descriptions-item>
+      <n-descriptions-item label="公司注册地址">
+        {{ detail?.companyRegistrationAddress }}
+      </n-descriptions-item>
+      <n-descriptions-item label="公司注册电话">
+        {{ detail?.companyRegistrationPhone }}
+      </n-descriptions-item>
       <n-descriptions-item label="联系人姓名"> {{ detail?.contactName }} </n-descriptions-item>
-      <n-descriptions-item label="联系人电话">
-        {{ detail?.contactPhone || "暂无" }}
+      <n-descriptions-item label="联系人电话"> {{ detail?.contactPhone }} </n-descriptions-item>
+      <n-descriptions-item label="联系人地址"> {{ detail?.contactAddress }} </n-descriptions-item>
+      <n-descriptions-item label="联系人邮箱"> {{ detail?.contactMail }} </n-descriptions-item>
+      <n-descriptions-item label="提交时间">
+        {{ dayjs(detail?.invoiceApplicationTime).format("YYYY-MM-DD HH:mm:ss") }}
       </n-descriptions-item>
-      <n-descriptions-item label="联系人地址">
-        {{ detail?.contactAddress || "暂无" }}
+      <n-descriptions-item label="提交备注">
+        {{ detail?.invoiceApplicationSuccessNote }}
       </n-descriptions-item>
-      <n-descriptions-item label="联系人邮箱">
-        {{ detail?.contactMail || "暂无" }}
-      </n-descriptions-item>
-      <n-descriptions-item label="提交时间"> 2022-04-04 17:40:17 </n-descriptions-item>
-      <n-descriptions-item label="提交备注"> {{ detail?.asdf }} </n-descriptions-item>
-      <n-descriptions-item label="取消时间"> 2022-04-04 17:49:17 </n-descriptions-item>
-      <n-descriptions-item label="取消原因"> 暂无 </n-descriptions-item>
-      <n-descriptions-item label="发票申请状态"> 取消申请 </n-descriptions-item>
     </n-descriptions>
 
     <n-divider title-placement="left"> 开票信息</n-divider>
@@ -50,6 +55,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs } from "vue";
+import dayjs from "dayjs";
 import { getIndInvoiceDetail } from "@/api/individualCustomers/individualCustomers";
 export default defineComponent({
   name: "InvoiceDrawer",
@@ -90,6 +96,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       detail,
+      dayjs,
       openDrawer,
       onCloseAfter,
     };

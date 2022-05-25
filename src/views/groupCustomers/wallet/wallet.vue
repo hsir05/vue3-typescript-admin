@@ -30,35 +30,16 @@
       </n-form-item>
     </n-form>
 
-    <div class="bg-white p-10px" style="height: calc(100% - 95px)">
-      <n-data-table
-        :loading="loading"
-        ref="table"
-        striped
-        :columns="columns"
-        class="box-border"
-        min-height="calc(100vh - 95px - 280px)"
-        flex-height
-        :row-key="getRowKeyId"
-        :data="data"
-        :pagination="false"
-      />
-
-      <n-pagination
-        v-model:page="pagination.pageIndex"
-        v-model:page-size="pagination.pageSize"
-        v-model:item-count="itemCount"
-        :page-slot="5"
-        show-size-picker
-        show-quick-jumper
-        class="mt-10px justify-end"
-        :on-update:page="handlePage"
-        :on-update:page-size="handlePageSize"
-        :page-sizes="pageSizes"
-      >
-        <template #prefix> 共 {{ itemCount }} 项 </template>
-      </n-pagination>
-    </div>
+    <BasicTable
+      :data="data"
+      ref="basicTableRef"
+      :columns="columns"
+      :loading="loading"
+      :itemCount="itemCount"
+      @reload-page="reloadPage"
+      @on-page="handlePage"
+      @on-pagination="handlepagSize"
+    />
 
     <TransactionRecord ref="transactionRecordRef" :width="800" @on-save-after="handleSaveAfter" />
     <Recharge ref="rechargeRef" :width="700" @on-save-after="handleSaveAfter" />
@@ -67,16 +48,18 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw, reactive, onMounted } from "vue";
-import { useMessage, FormInst } from "naive-ui";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
+import { FormInst } from "naive-ui";
+import BasicTable from "@/components/Table/Table.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import TransactionRecord from "./transactionRecordDrawer.vue";
 import Refund from "./refundDrawer.vue";
 import Transfer from "./transferDrawer.vue";
 import Recharge from "./rechargeDrawer.vue";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 import { pageSizes } from "@/config/table";
 import { PaginationInter } from "@/api/type";
+import dayjs from "dayjs";
 import { getGroupCustomerWalletPage } from "@/api/groupCustomers/groupCustomers";
 import { ReaderOutline as ReaderIcon, WalletOutline as WalletIcon } from "@vicons/ionicons5";
 import {
@@ -85,8 +68,8 @@ import {
   RedEnvelopeOutlined as RedEnvelopeIcon,
 } from "@vicons/antd";
 export default defineComponent({
-  name: "Wallet",
-  components: { TransactionRecord, Recharge, Refund, Transfer },
+  name: "GroupWallet",
+  components: { TransactionRecord, BasicTable, Recharge, Refund, Transfer },
   setup() {
     const formRef = ref<FormInst | null>(null);
     const queryValue = ref({
@@ -97,83 +80,70 @@ export default defineComponent({
     const itemCount = ref(null);
     const transactionRecordRef = ref();
     const rechargeRef = ref();
+    const basicTableRef = ref();
     const refundRef = ref();
     const transferRef = ref();
-    const pagination = reactive({
-      pageIndex: 1,
-      pageSize: 10,
-    });
-    const message = useMessage();
 
     const columns = [
-      {
-        type: "selection",
-      },
       {
         title: "序号",
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
-        title: "客户昵称",
-        key: "nickname",
+        title: "集团客户名称",
+        key: "groupCustomerName",
         align: "center",
       },
       {
-        title: "客户姓名",
-        key: "name",
-        align: "center",
-      },
-      {
-        title: "客户手机号",
-        key: "phone",
+        title: "登录账号",
+        key: "groupCustomerLoginAccount",
         align: "center",
       },
       {
         title: "实充余额",
-        key: "actualAmount",
+        key: "rechargeAmountBalance",
         align: "center",
       },
       {
         title: "赠送余额",
-        key: "giveAmount",
-        width: 90,
+        key: "giftAmountBalance",
+        align: "center",
+      },
+      {
+        title: "冻结金额",
+        key: "frozenAmount",
         align: "center",
       },
 
       {
-        title: "冻结金额",
-        key: "frozenAmount",
-        width: 90,
-        align: "center",
-      },
-      {
         title: "可用余额",
-        key: "availableAmount",
+        key: "availableBalance",
         align: "center",
       },
       {
         title: "总余额",
-        key: "totalAmount",
-        width: 90,
+        key: "totalBalance",
         align: "center",
       },
       {
         title: "钱包创建时间",
-        key: "amountCreatetime",
-        width: 90,
+        key: "groupCustomerWalletCreateTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.groupCustomerWalletCreateTime).format("YYYY-MM-DD HH:mm"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -253,7 +223,6 @@ export default defineComponent({
         groupCustomerNameLike: null,
         groupCustomerLoginAccountLike: null,
       };
-      message.info("点击了删除");
       getData({ pageIndex: 1, pageSize: 10 });
     };
 
@@ -279,12 +248,16 @@ export default defineComponent({
       openDrawer();
     }
 
-    function handlePage(pageIndex: number) {
-      pagination.pageIndex = pageIndex;
+    function reloadPage() {
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10, sort: [] });
+    }
+
+    function handlePage(pagination: PaginationInter) {
       getData(toRaw(pagination));
     }
-    function handlePageSize(pageSize: number) {
-      pagination.pageSize = pageSize;
+    function handlepagSize(pagination: PaginationInter) {
       getData(toRaw(pagination));
     }
 
@@ -295,7 +268,6 @@ export default defineComponent({
 
     return {
       queryValue,
-      pagination,
       transactionRecordRef,
       refundRef,
       rechargeRef,
@@ -305,11 +277,14 @@ export default defineComponent({
       loading,
       pageSizes,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      basicTableRef,
+      getRowKeyId: (row: TableDataItemInter) => row.groupCustomerWalletId,
       itemCount,
 
       searchHandle,
-      handlePageSize,
+      reloadPage,
+      handlepagSize,
+      //   handlePageSize,
       handlePage,
       reset,
       handleSaveAfter,

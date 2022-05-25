@@ -74,7 +74,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, reactive, unref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
 import { getCaptcha } from "@/api/system/system";
@@ -91,6 +91,7 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
+    const route = useRoute();
     const formRef = ref<FormInst | null>(null);
     const message = useMessage();
     const loading = ref(false);
@@ -158,7 +159,13 @@ export default defineComponent({
         message.success("登录成功，即将进入系统");
         setTimeout(() => {
           loading.value = false;
-          router.push({ path: "/dashboard" });
+          const { query } = route;
+
+          if (query.redirect) {
+            router.replace({ path: query.redirect as string });
+          } else {
+            router.replace({ path: "/dashboard" });
+          }
         }, 1000);
       } catch (err) {
         console.log(err);

@@ -10,39 +10,41 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="客户手机号" path="phone">
+      <n-form-item label="集团客户名称" path="groupCustomerNameLike">
         <n-input
-          v-model:value="queryValue.phone"
+          v-model:value="queryValue.groupCustomerNameLike"
           clearable
-          placeholder="输入客户手机号"
+          placeholder="输入集团客户名称"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="申请时间(起始)" path="applictionTimeStart">
+      <n-form-item label="申请时间(起始)" path="invoiceApplicationTimeGe">
         <n-date-picker
-          v-model:value="queryValue.applictionTimeStart"
+          v-model:value="queryValue.invoiceApplicationTimeGe"
           style="width: 120px"
           type="date"
           clearable
         />
       </n-form-item>
-      <n-form-item label="申请时间(结束)" path="applictionTimeEnd">
+      <n-form-item label="申请时间(结束)" path="invoiceApplicationTimeLe">
         <n-date-picker
-          v-model:value="queryValue.applictionTimeEnd"
+          v-model:value="queryValue.invoiceApplicationTimeLe"
           style="width: 120px"
           type="date"
           clearable
         />
       </n-form-item>
 
-      <n-form-item label="发票申请状态" path="status">
-        <n-radio-group v-model:value="queryValue.status">
-          <n-radio :value="null">全部</n-radio>
-          <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
-            item.label
-          }}</n-radio>
-        </n-radio-group>
+      <n-form-item label="发票申请状态" path="invoiceApplicationStateEq">
+        <n-select
+          clearable
+          filterable
+          v-model:value="queryValue.invoiceApplicationStateEq"
+          style="width: 150px"
+          placeholder="发票申请状态"
+          :options="invoiceAppOptions"
+        />
       </n-form-item>
 
       <n-form-item>
@@ -59,72 +61,68 @@
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
     <InvoiceDrawer ref="invoiceDrawerRef" :width="700" @on-save-after="handleSaveAfter" />
+
+    <BackModal ref="backModalRef" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw } from "vue";
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { TrashOutline as RemoveIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
+import {
+  DownloadOutline as GitIcon,
+  ArrowBackCircleOutline as ArrowBackIcon,
+  EyeOutline as EyeIcon,
+  MailOutline as MailIcon,
+  PrintOutline as PrintIcon,
+  TicketOutline as TicketIcon,
+  MailOpenOutline as MailOpenIcon,
+  CopyOutline as CopyIcon,
+} from "@vicons/ionicons5";
+
 import BasicTable from "@/components/Table/Table.vue";
 import InvoiceDrawer from "./invoiceDrawer.vue";
-import { tableDataItem } from "./type";
-import { statusOptions } from "@/config/form";
-// import { getUsers } from "@/api/system/user";
+import { invoiceAppOptions, invoiceAppObj } from "@/config/form";
+import { TableDataItemInter, QueryFormInter } from "./type";
+import BackModal from "./backModal.vue";
+import { getGroupInvoiceAppPage } from "@/api/groupCustomers/groupCustomers";
 import { PaginationInter } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "InvoiceApplicationList",
-  components: { BasicTable, InvoiceDrawer },
+  components: { BasicTable, InvoiceDrawer, BackModal },
   setup() {
     const loading = ref(false);
     const invoiceDrawerRef = ref();
     const basicTableRef = ref();
+    const sendMailRef = ref();
+    const backModalRef = ref();
     const itemCount = ref(null);
-    const queryValue = ref({
-      applictionTimeStart: null,
-      applictionTimeEnd: null,
-      phone: null,
-      status: null,
+    const queryValue = ref<QueryFormInter>({
+      groupCustomerNameLike: null,
+      invoiceApplicationTimeGe: null,
+      invoiceApplicationTimeLe: null,
+      invoiceApplicationStateEq: null,
     });
 
-    const data = ref<tableDataItem[]>([
-      {
-        id: "12312123",
-        phone: "string",
-        invoiceApplicationType: "string",
-        amount: "string",
-        invoiceType: "string",
-        invoiceTitle: "string",
-        taxpayerIdeNumber: "string",
-        invoiceContent: "string",
-        invoiceStatus: "string",
-        create_time: "string",
-      },
-    ]);
+    const data = ref<TableDataItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
-        title: "客户手机号",
-        key: "phone",
+        title: "集团客户名称",
+        key: "groupCustomerName",
         align: "center",
       },
       {
@@ -134,7 +132,7 @@ export default defineComponent({
       },
       {
         title: "发票金额(元)",
-        key: "amount",
+        key: "invoiceAmount",
         align: "center",
       },
 
@@ -151,7 +149,7 @@ export default defineComponent({
       },
       {
         title: "纳税人识别号",
-        key: "taxpayerIdeNumber",
+        key: "taxpayerIdentificationNumber",
         align: "center",
       },
 
@@ -162,39 +160,115 @@ export default defineComponent({
       },
       {
         title: "申请时间",
-        key: "create_time",
+        key: "invoiceApplicationTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.invoiceApplicationTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "发票申请状态",
-        key: "invoiceStatus",
+        key: "invoiceApplicationState",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", invoiceAppObj[record.invoiceApplicationState]);
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
-        width: "200px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "查看",
                 type: "primary",
                 icon: EyeIcon,
-                onClick: handleSee.bind(null, record),
+                isIconBtn: true,
+                onClick: handleSee.bind(null, record.groupCustomerInvoiceApplicationId),
                 auth: ["dict001"],
               },
               {
-                label: "删除",
-                type: "error",
-                icon: RemoveIcon,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
+                label: "开票",
+                type: "primary",
+                icon: TicketIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 0 ? false : true,
+                onClick: handleConfirmInvoice.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "重新开票",
+                type: "primary",
+                icon: CopyIcon,
+                isIconBtn: true,
+                isShow:
+                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
+                onClick: handleReInvoice.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "打印",
+                type: "primary",
+                icon: PrintIcon,
+                isIconBtn: true,
+                isShow:
+                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
+                onClick: handlePrint.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "寄出",
+                type: "primary",
+                icon: MailOpenIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 6 ? false : true,
+                onClick: handleMail.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "重寄",
+                type: "primary",
+                icon: MailIcon,
+                isIconBtn: true,
+                isShow:
+                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
+                onClick: handleMail.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "退回",
+                type: "primary",
+                icon: ArrowBackIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 0 ? false : true,
+                onClick: handleBack.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "作废",
+                type: "primary",
+                icon: ArrowBackIcon,
+                isIconBtn: true,
+                isShow: record.invoiceApplicationState === 4 ? false : true,
+                onClick: handleBack.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
+              },
+              {
+                label: "导出相关行程单",
+                type: "primary",
+                icon: GitIcon,
+                isIconBtn: true,
+                isShow:
+                  (record.invoiceApplicationState === 1 ||
+                    record.invoiceApplicationState === 6 ||
+                    record.invoiceApplicationState === 7) &&
+                  record.invoiceApplicationTypeCode === "IAT0002"
+                    ? false
+                    : true,
+                onClick: handleDownload.bind(null, record.groupCustomerInvoiceApplicationId),
+                auth: ["dict001"],
               },
             ],
           });
@@ -202,48 +276,72 @@ export default defineComponent({
       },
     ];
 
-    // onMounted(() => {
-    //   getData({ page: 1, pageSize: 10 });
-    // });
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
 
-    // const getData = async (pagination: PaginationInter) => {
-    //   loading.value = true;
-    //   try {
-    //     let res = await getUsers({ ...pagination, ...queryValue.value });
-    //     data.value = res.data;
-    //     itemCount.value = res.itemCount;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getGroupInvoiceAppPage({ page, search: search });
+        console.log(res.data);
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
-    // nextTick(() => {
-    //   const { page } = basicTableRef.value;
-    //   console.log(page);
-    // });
-
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
-    function handleSee(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleSee(groupCustomerInvoiceApplicationId: string) {
       const { openDrawer } = invoiceDrawerRef.value;
-      openDrawer(record);
+      openDrawer(groupCustomerInvoiceApplicationId);
     }
-    function handleBatch() {
-      console.log("点击了批量删除");
+
+    // 邮寄
+    function handleMail(groupCustomerInvoiceApplicationId: string) {
+      const { handleModal } = sendMailRef.value;
+      handleModal(groupCustomerInvoiceApplicationId);
     }
-    function handleAdd() {
-      console.log("点击了新增");
-      const { openDrawer } = invoiceDrawerRef.value;
-      openDrawer();
+    // 打印
+    function handlePrint(groupCustomerInvoiceApplicationId: string) {
+      console.log(groupCustomerInvoiceApplicationId);
     }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    // 确认开票
+    function handleConfirmInvoice(groupCustomerInvoiceApplicationId: string) {
+      console.log(groupCustomerInvoiceApplicationId);
+    }
+    // 重新邮寄
+    function handleReInvoice(groupCustomerInvoiceApplicationId: string) {
+      console.log(groupCustomerInvoiceApplicationId);
+    }
+    // 退回
+    function handleBack(groupCustomerInvoiceApplicationId: string) {
+      console.log(groupCustomerInvoiceApplicationId);
+      const { handleModal } = backModalRef.value;
+      handleModal(groupCustomerInvoiceApplicationId);
+    }
+    async function handleDownload(groupCustomerInvoiceApplicationId: string) {
+      // try {
+      //     let res = await downloadRelativeItinerary({groupCustomerInvoiceApplicationId})
+      console.log(groupCustomerInvoiceApplicationId);
+      //      // 创建一个新的url，此url指向新建的Blob对象
+      //     // let url = window.URL.createObjectURL(new Blob([data]))
+      //     let url = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(res);
+      //     // 创建a标签，并隐藏改a标签
+      //     let link = document.createElement('a')
+      //     link.style.display = 'none'
+      //     // a标签的href属性指定下载链接
+      //     link.href = url
+      //     //setAttribute() 方法添加指定的属性，并为其赋指定的值。
+      //     link.setAttribute('download', '发票关联行程单' + '.xlsx')
+      //     document.body.appendChild(link)
+      //     link.click()
+      // } catch (err) {
+      //     console.log(err);
+      // }
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -251,24 +349,24 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
-        applictionTimeStart: null,
-        applictionTimeEnd: null,
-        phone: null,
-        status: null,
+        groupCustomerNameLike: null,
+        invoiceApplicationTimeGe: null,
+        invoiceApplicationTimeLe: null,
+        invoiceApplicationStateEq: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationInter) {
@@ -277,12 +375,12 @@ export default defineComponent({
     }
     function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -291,16 +389,15 @@ export default defineComponent({
       loading,
       invoiceDrawerRef,
       basicTableRef,
-      statusOptions,
+      invoiceAppOptions,
+      backModalRef,
       columns,
       itemCount,
 
       reloadPage,
-      handleAdd,
-      handleBatch,
+      sendMailRef,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

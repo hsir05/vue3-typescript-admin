@@ -1,6 +1,5 @@
 import { http } from "@/utils/http";
 import { PaginationInter } from "../type";
-
 //-----------------个人会员类型管理-------------------------
 
 /**
@@ -301,7 +300,43 @@ export function getIndInvoiceDetail(data:{customerInvoiceApplicationId: string})
     data:data
   });
 }
-
+/**
+ * 确认个人客户开票
+*/
+export function confirmInvoice(data:{customerInvoiceApplicationId: string; invoiceApplicationSuccessNote: string}) {
+  return http.request({
+    url: '/customerInvoiceApplication/confirmInvoice',
+    method: 'post',
+    headers: {
+        responseType: 'blob'
+    },
+    data:data
+  });
+}
+/**
+ * 按条件导出发票关联的行程单
+*/
+export function downloadRelativeItinerary(data:{customerInvoiceApplicationId: string}) {
+  return http.request({
+    url: '/customerInvoiceApplication/exportRelativeItineraryData',
+    method: 'post',
+    headers: {
+        responseType: 'blob'
+    },
+    data:data
+  });
+}
+/**
+ * 发送邮件
+ * 调用第三方地址
+*/
+export function sendMail(data:{customerInvoiceApplicationId: string | null; contactMail: string | null}) {
+  return http.request({
+    url: `/customerInvoiceApplication/platform/invoiceMail`,
+    method: 'post',
+    data:data
+  });
+}
 // ----------------钱包退款申请管理--------------------
 /**
  * 所有个人钱包交易总览分页

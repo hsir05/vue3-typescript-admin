@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { locStorage } from "@/utils/storage";
+import router from "@/router/index"
 // import { ACCESS_TOKEN_KEY, USER_INFO_KEY, PERMISSIONS_KEY } from "@/config/constant";
 import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
 import { login, getDetailViaLoginer, getLoginerAuth } from "@/api/system/system";
@@ -115,6 +116,9 @@ export const useAppUserStore = defineStore({
       });
       locStorage.remove(ACCESS_TOKEN_KEY);
       locStorage.remove(USER_INFO_KEY);
+
+           router.push({ path: "/login" });
+            // router.push({ path: "/login" ,params:{path: route} });
       return Promise.resolve();
     },
   },

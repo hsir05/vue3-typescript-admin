@@ -6,6 +6,7 @@ import { OUTPUT_DIR } from "./build/constant";
 import { loadEnv } from "vite";
 import pkg from "./package.json";
 import { format } from "date-fns";
+import { otherUrl } from "./src/config/config"
  
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {
@@ -58,6 +59,13 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           rewrite: (path) => {
               return path.replace("/api", "")
           },
+        },
+        "/customerInvoiceApplication/platform": {
+          target: "http://testcxcustomer.yiminyueche.com",
+          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
+        //   rewrite: (path) => {
+        //       return path.replace("/api/customerInvoiceApplication/platform", "/customerInvoiceApplication/platform")
+        //   },
         },
         "/attachFile/upload": {
           target: "http://test-ngcxpm-api.yiminyueche.com",

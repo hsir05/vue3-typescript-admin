@@ -62,6 +62,8 @@ const transform: AxiosTransform = {
       // return '[HTTP] Request has no return value';
       throw new Error("请求出错，请稍候重试");
     }
+  
+    
     //  这里 code，result，message为 后台统一的字段，需要修改为项目自己的接口返回格式
     const { success, code, message } = data;
     // 请求成功
