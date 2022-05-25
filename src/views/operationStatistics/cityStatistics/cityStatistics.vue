@@ -39,8 +39,8 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
@@ -72,12 +72,13 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
 import { getCityOrder } from "@/api/operationStatistics/operationStatistics";
 import { getInfluxList, getAllOpenCity } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "CityStatistics",
   components: {
@@ -86,12 +87,13 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const status = ref("finished");
-    const openCityData = ref([]);
+    const openCityData = ref<SelectOption[]>([]);
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
+      section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
       cityCode: "allCity",
     });
+    const influxData = ref([]);
     const message = useMessage();
 
     function query(e: MouseEvent) {
@@ -139,24 +141,20 @@ export default defineComponent({
 
     onMounted(() => {
       getData();
-      getCityOrderData();
     });
 
     const getData = async () => {
       loading.value = true;
       try {
         let result = await getAllOpenCity();
-        console.log(result);
-
-        let influx = await getInfluxList();
-        console.log(influx);
-
-        let res = await getCityOrder({
-          cityCode: "allCity",
-          beginDate: "2022-03-16",
-          endDate: "2022-03-18",
+        openCityData.value = result.data.map((item: { cityCode: string; cityName: string }) => {
+          return { label: item.cityName, value: item.cityCode };
         });
-        console.log(res);
+        openCityData.value.unshift({ label: "全部", value: "allCity" });
+        influxData.value = await getInfluxList();
+        // console.log(influxData);
+
+        getCityOrderData();
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -166,7 +164,11 @@ export default defineComponent({
 
     const getCityOrderData = async () => {
       try {
-        let res = await getCityOrder({ cityCode: "", beginDate: "", endDate: "" });
+        let res = await getCityOrder({
+          cityCode: queryForm.value.cityCode,
+          beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
+          endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
+        });
         console.log(res);
       } catch (err) {
         console.log(err);

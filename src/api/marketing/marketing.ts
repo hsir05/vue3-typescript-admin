@@ -206,3 +206,24 @@ export function giftCoupon(data: GiftCouponInter) {
         data: data,
     });
 }
+//-----------------代金券管理-------------------------
+
+/**
+ * 代金券分页
+ */
+interface ExchangeCodePageInter {
+    page: PaginationInter;
+    search: {
+        exchangeCodeLike: string | null;
+        exchangeCodeExchangeTypeEq: string | null;
+        exchangeCodeCreateTimeGe: string | null;
+        exchangeCodeCreateTimeLe: string | null;
+    };
+}
+export function getExchangeCodePage(data: ExchangeCodePageInter) {
+    return http.request({
+        url: "/exchangeCode/page",
+        method: "post",
+        data: data,
+    });
+}

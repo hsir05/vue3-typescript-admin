@@ -26,11 +26,7 @@ export interface UsersDataInter extends PaginationInter {
 }
 
 
-export interface getCityOderState {
-    cityCode: string
-    beginDate: string
-    endDate: string
-}
+
 
 export interface getCompanyOderState {
     companyId: string

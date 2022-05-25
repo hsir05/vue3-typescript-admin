@@ -11,14 +11,14 @@
       label-width="100"
       :model="queryForm"
     >
-      <n-form-item label="运营企业" path="companyId">
+      <n-form-item label="运营企业" path="operationCompanyId">
         <n-select
-          v-model:value="queryForm.companyId"
+          v-model:value="queryForm.operationCompanyId"
           clearable
           filterable
           placeholder="选择运营企业"
           style="width: 260px"
-          :options="operateCompanyOptions"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -51,21 +51,24 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { defineComponent, ref, onMounted } from "vue";
+import { FormInst } from "naive-ui";
+import { tableDataItem, QueryFormInter } from "./type";
+import { getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
+import dayjs from "dayjs";
+import { getDriverOrder } from "@/api/operationStatistics/operationStatistics";
 export default defineComponent({
   name: "DriverStatistics",
   setup() {
     const loading = ref(false);
+    const companyData = ref([]);
 
     const queryFormRef = ref<FormInst | null>(null);
-    const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
-      companyId: "75e642e0096b4a41a2b2ecf933c92247",
+    const queryForm = ref<QueryFormInter>({
+      section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
+      operationCompanyId: null,
     });
-    const message = useMessage();
 
     const data = ref([]);
 
@@ -155,22 +158,55 @@ export default defineComponent({
       },
     ];
 
+    onMounted(() => {
+      getAllCompanyData();
+    });
+
+    const getAllCompanyData = async () => {
+      try {
+        loading.value = true;
+        let res = await getAllOperateCompany();
+        queryForm.value.operationCompanyId = res.data[0].operationCompanyId;
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+        getData();
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    const getData = async () => {
+      try {
+        let option = {
+          operationCompanyId: queryForm.value.operationCompanyId as string,
+          beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
+          endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
+        };
+        let res = await getDriverOrder(option);
+        data.value = res.data;
+
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
     function query(e: MouseEvent) {
       e.preventDefault();
       queryFormRef.value?.validate((errors) => {
         if (!errors) {
-          console.log(unref(queryForm));
-          //   let { companyId, beginDate: section[0], endDate: section[1] } = unref(queryForm)
-          console.log({
-            companyId: unref(queryForm).companyId,
-            beginDate: unref(queryForm).section[0],
-            endDate: unref(queryForm).section[0],
-          });
-
-          message.success("验证成功");
+          getData();
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -183,8 +219,8 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
+      companyData,
       getRowKeyId: (row: tableDataItem) => row.id,
-      operateCompanyOptions: [],
       rangeShortcuts,
 
       query,

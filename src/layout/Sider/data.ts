@@ -264,6 +264,39 @@ export const menuOptions: MenuOption[] = [
       },
     ],
   },
+    {
+    label: "运营订单管理",
+    key: "operate-order",
+    icon: renderIcon(FileTrayFullOutline),
+    children: [
+      {
+        label: "服务中订单",
+        path: "/operate-order/serving",
+        key: "operate-order-serving",
+      },
+      {
+        label: "已完成订单",
+        path: "/operate-order/finished",
+        key: "operate-order_finished",
+       
+      },
+       {
+        label: "已取消订单",
+        path: "/operate-order/channel",
+        key: "operate-order_channel",
+      },
+      {
+        label: "无效订单",
+        path: "/operate-order/invalid",
+        key: "operate-order_invalid",
+      },
+      {
+        label: "订单评论",
+        path: "/operate-order/order-comment",
+        key: "operate-order_order-comment",
+      },
+    ],
+  },
   {
     label: "运营分析统计",
     key: "operation-statistics",
@@ -405,39 +438,7 @@ export const menuOptions: MenuOption[] = [
       },
     ],
   },
-    {
-    label: "运营订单管理",
-    key: "operate-order",
-    icon: renderIcon(FileTrayFullOutline),
-    children: [
-      {
-        label: "服务中订单",
-        path: "/operate-order/serving",
-        key: "operate-order-serving",
-      },
-      {
-        label: "已完成订单",
-        path: "/operate-order/finished",
-        key: "operate-order_finished",
-       
-      },
-       {
-        label: "已取消订单",
-        path: "/operate-order/channel",
-        key: "operate-order_channel",
-      },
-      {
-        label: "无效订单",
-        path: "/operate-order/invalid",
-        key: "operate-order_invalid",
-      },
-      {
-        label: "订单评论",
-        path: "/operate-order/order-comment",
-        key: "operate-order_order-comment",
-      },
-    ],
-  },
+  
 //   {
 //     label: "设置管理",
 //     key: "bear-setting",

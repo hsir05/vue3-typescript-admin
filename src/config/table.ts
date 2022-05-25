@@ -20,26 +20,26 @@ export const uploadConfig = {
 };
 
 export const rangeShortcuts = {
-  今天: [1629216000000, 1631203200000],
+  今天: [new Date().getTime(), new Date().getTime()],
   过去3天: () => {
     const cur = new Date().getTime();
-    return [cur - 2 * 60 * 60 * 1000, cur];
+    return [cur - 2 * 60 * 60 * 1000 * 24, cur];
   },
   过去7天: () => {
     const cur = new Date().getTime();
-    return [cur - 2 * 60 * 60 * 1000, cur];
+    return [cur - 7 * 60 * 60 * 1000 * 24, cur];
   },
   过去15天: () => {
     const cur = new Date().getTime();
-    return [cur - 2 * 60 * 60 * 1000, cur];
+    return [cur - 15 * 60 * 60 * 1000 * 24, cur];
   },
   本月: () => {
     const cur = new Date().getTime();
-    return [cur - 2 * 60 * 60 * 1000, cur];
+    return [cur - 2 * 60 * 60 * 1000 * 24, cur];
   },
   上月: () => {
     const cur = new Date().getTime();
-    return [cur - 2 * 60 * 60 * 1000, cur];
+    return [cur - 2 * 60 * 60 * 1000 * 24, cur];
   },
 };
 

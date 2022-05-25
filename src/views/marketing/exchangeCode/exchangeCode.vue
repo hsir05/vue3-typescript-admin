@@ -10,13 +10,13 @@
       :show-feedback="false"
       :model="form"
     >
-      <n-form-item label="兑换码" path="code">
-        <n-input v-model:value="form.code" clearable placeholder="输入兑换码" />
+      <n-form-item label="兑换码" path="exchangeCodeLike">
+        <n-input v-model:value="form.exchangeCodeLike" clearable placeholder="输入兑换码" />
       </n-form-item>
 
-      <n-form-item label="兑换类型" path="type">
+      <n-form-item label="兑换类型" path="exchangeCodeExchangeTypeEq">
         <n-select
-          v-model:value="form.type"
+          v-model:value="form.exchangeCodeExchangeTypeEq"
           clearable
           filterable
           placeholder="选择兑换类型"
@@ -25,15 +25,15 @@
         />
       </n-form-item>
 
-      <n-form-item label="生成时间(起始)" path="startTime">
-        <n-date-picker v-model:value="form.startTime" type="datetime" clearable />
+      <n-form-item label="生成时间(起始)" path="exchangeCodeCreateTimeGe">
+        <n-date-picker v-model:value="form.exchangeCodeCreateTimeGe" type="datetime" clearable />
       </n-form-item>
 
-      <n-form-item label="生成时间(结束)" path="endTime">
-        <n-date-picker v-model:value="form.endTime" type="datetime" clearable />
+      <n-form-item label="生成时间(结束)" path="exchangeCodeCreateTimeLe">
+        <n-date-picker v-model:value="form.exchangeCodeCreateTimeLe" type="datetime" clearable />
       </n-form-item>
 
-      <n-button attr-type="button" type="primary" @click="query">查询</n-button>
+      <n-button attr-type="button" type="primary" @click="handleValidate">查询</n-button>
     </n-form>
 
     <!-- 表格 -->
@@ -50,7 +50,7 @@
 
           <n-dropdown trigger="hover" :options="amoutOptions" @select="handleAmout">
             <n-button type="primary"
-              ><template #icon><n-icon :component="AccountBookIcon" /> </template
+              ><template #icon> <n-icon :component="AccountBookIcon" /> </template
               >金额兑换码</n-button
             >
           </n-dropdown>
@@ -68,7 +68,7 @@
       />
 
       <n-pagination
-        v-model:page="pagination.page"
+        v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
@@ -94,7 +94,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive } from "vue";
+import { defineComponent, ref, h, reactive, toRaw, onMounted } from "vue";
 import { FormInst } from "naive-ui";
 import { tableDataItem } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
@@ -110,7 +110,8 @@ import {
   AccountBookOutlined as AccountBookIcon,
 } from "@vicons/antd";
 import { pageSizes } from "@/config/table";
-
+import { PaginationInter } from "@/api/type";
+import { getExchangeCodePage } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "ExchangeCode",
   components: {
@@ -123,14 +124,14 @@ export default defineComponent({
   },
   setup() {
     const form = ref({
-      code: null,
-      type: null,
-      startTime: null,
-      endTime: null,
+      exchangeCodeLike: null,
+      exchangeCodeExchangeTypeEq: null,
+      exchangeCodeCreateTimeGe: null,
+      exchangeCodeCreateTimeLe: null,
     });
     const itemCount = ref(null);
     const pagination = reactive({
-      page: 1,
+      pageIndex: 1,
       pageSize: 10,
     });
     const formRef = ref<FormInst | null>(null);
@@ -141,11 +142,7 @@ export default defineComponent({
     const amountDrawerRef = ref();
     const batchCodeDrawerRef = ref();
     const loading = ref(false);
-    const data = ref([
-      {
-        id: "212312",
-      },
-    ]);
+    const data = ref([]);
     const columns = [
       {
         title: "序号",
@@ -163,37 +160,37 @@ export default defineComponent({
       },
       {
         title: "兑换码",
-        key: "sort",
+        key: "exchangeCode",
         align: "center",
       },
       {
         title: "兑换类型",
-        key: "sort",
+        key: "exchangeCodeExchangeType",
         align: "center",
       },
       {
         title: "生效时间",
-        key: "sort",
+        key: "exchangeCodeEffectiveTimeBegin",
         align: "center",
       },
       {
         title: "失效时间",
-        key: "sort",
+        key: "exchangeCodeEffectiveTimeEnd",
         align: "center",
       },
       {
         title: "生成时间",
-        key: "sort",
+        key: "exchangeCodeCreateTime",
         align: "center",
       },
       {
         title: "可兑换次数",
-        key: "sort",
+        key: "exchangeCodeUsedCount",
         align: "center",
       },
       {
         title: "已兑换次数",
-        key: "sort",
+        key: "exchangeCodeUsableCount",
         align: "center",
       },
       {
@@ -226,7 +223,27 @@ export default defineComponent({
       },
     ];
 
-    function query() {}
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...form.value };
+        let res = await getExchangeCodePage({ page, search: search });
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    async function handleValidate() {
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
 
     function handleCode(key: string | number) {
       if (key === "codeSingle") {
@@ -260,15 +277,13 @@ export default defineComponent({
       openDrawer("兑换码记录", record);
     }
 
-    function handlePage(page: number) {
-      console.log(page);
-      pagination.page = page;
-      //   getData(toRaw(pagination));
+    function handlePage(pageIndex: number) {
+      pagination.pageIndex = pageIndex;
+      getData(toRaw(pagination));
     }
     function handlePageSize(pageSize: number) {
-      console.log(pageSize);
       pagination.pageSize = pageSize;
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
 
     return {
@@ -311,7 +326,7 @@ export default defineComponent({
         },
       ],
 
-      query,
+      handleValidate,
       handlePage,
       handleCode,
       handleAmout,

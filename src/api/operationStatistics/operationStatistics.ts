@@ -1,16 +1,33 @@
 import { http } from '@/utils/http';
-import { getCityOderState, getCompanyOderState } from "../type"
+import { getCompanyOderState } from "../type"
 
 
 //获取城市单量
-export function getCityOrder(data: getCityOderState) {    
+interface CityOderInter {
+    cityCode: string
+    beginDate: string
+    endDate: string
+}
+export function getCityOrder(data: CityOderInter) {    
   return http.request({
-    url: '/order/getCityOrderStatistics',
+    url: '/operationAnalysis/getCityOrderStatistics',
     method: 'post',
     data
   });
 }
-
+//获取司机单量
+interface DriverOderInter {
+    operationCompanyId: string
+    beginDate: string
+    endDate: string
+}
+export function getDriverOrder(data: DriverOderInter) {    
+  return http.request({
+    url: '/operationAnalysis/getDriverOrderStatistics',
+    method: 'post',
+    data
+  });
+}
 //获取司机在线时长
 //获取添加班组列表
 export function getClass(data: getCompanyOderState) {    
