@@ -56,3 +56,83 @@ export function getOrderFinishedPage(data: OrderFinishedInter) {
         data: data,
     });
 }
+//-----------------已完成订单-------------------------
+
+/**
+ * 已完成订单
+ */
+interface OrderChannelInter {
+    page: PaginationInter;
+    search: {
+        timeGe: string | null;
+        timeLe: string | null;
+        influxOrderNoEq: string | null;
+        influxCodeEq: string | null;
+        operationCompanyIdEq: string | null;
+        orderStateEq: string | null;
+        plateNumberEq: string | null;
+        orderTypeEq: string | null;
+        driverNoEq: string | null;
+        customerPhoneEq: string | null;
+        orderBusinessType: string | null;
+    };
+}
+export function getOrderChannelPage(data: OrderChannelInter) {
+    return http.request({
+        url: "/orderCancelled/page",
+        method: "post",
+        data: data,
+    });
+}
+//-----------------无效订单-------------------------
+
+/**
+ * 无效订单
+ */
+interface OrderInvalidInter {
+    page: PaginationInter;
+    search: {
+        timeGe: string | null;
+        timeLe: string | null;
+        influxOrderNoEq: string | null;
+        influxCodeEq: string | null;
+        operationCompanyIdEq: string | null;
+        orderStateEq: string | null;
+        plateNumberEq: string | null;
+        orderTypeEq: string | null;
+        driverNoEq: string | null;
+        customerPhoneEq: string | null;
+        orderBusinessType: string | null;
+    };
+}
+export function getOrderInvalidPage(data: OrderInvalidInter) {
+    return http.request({
+        url: "/orderInvalid/page",
+        method: "post",
+        data: data,
+    });
+}
+
+//-----------------评论订单-------------------------
+
+/**
+ * 评论订单
+ */
+interface OrderEvaluationInter {
+    page: PaginationInter;
+    search: {
+        timeGe: null,
+            timeLe: null,
+            plateNumberEq: null,
+            orderTypeEq: null,
+            driverNoEq: null,
+            customerPhoneEq: null,
+    };
+}
+export function getOrderEvaluationPage(data: {}) {
+    return http.request({
+        url: "/orderEvaluation/page",
+        method: "post",
+        data: data,
+    });
+}

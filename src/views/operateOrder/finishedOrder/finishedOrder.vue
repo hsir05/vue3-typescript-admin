@@ -5,6 +5,7 @@
       ref="formRef"
       inline
       label-placement="left"
+      :show-feedback="false"
       label-width="120"
       style="flex-wrap: wrap"
       class="pt-15px pb-15px bg-white mb-5px"
@@ -99,6 +100,9 @@
       </n-form-item>
 
       <n-form-item>
+        <n-button attr-type="button" type="primary" class="mr-10px" @click="searchHandle"
+          >展开</n-button
+        >
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
       </n-form-item>
@@ -107,13 +111,12 @@
     <!-- 表格 -->
     <BasicTable
       :data="data"
+      :row-key="getRowKeyId"
       ref="basicTableRef"
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -125,9 +128,8 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { useRouter } from "vue-router";
-// import { NTag } from "naive-ui";
-// import UserDrawer from "./userDrawer.vue";
-import { tableDataItem } from "./type";
+import dayjs from "dayjs";
+import { TableDataItemInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { getOrderFinishedPage } from "@/api/operateOrder/operateOrder";
 import { PaginationInter } from "@/api/type";
@@ -152,84 +154,95 @@ export default defineComponent({
       useVehicleTimeLe: null,
     });
 
-    const data = ref<tableDataItem[]>([]);
+    const data = ref<TableDataItemInter[]>([]);
 
     const columns = [
-      {
-        type: "selection",
-        align: "center",
-      },
       {
         title: "序号",
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "流量方订单号",
-        key: "account",
+        key: "influxOrderNo",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
-        title: "下单车型",
-        key: "name",
+        title: "业务类型",
+        key: "orderBusinessType",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "订单类型",
-        key: "phone",
+        key: "orderType",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "下单客户电话",
-        key: "account",
+        key: "orderType",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "出发地",
-        key: "name",
+        key: "orderBeginAddress",
         align: "center",
       },
       {
         title: "目的地",
-        key: "phone",
+        key: "orderEndAddress",
         align: "center",
       },
 
       {
         title: "运营企业",
-        key: "account",
+        key: "operationCompanyName",
         align: "center",
       },
       {
         title: "司机工号",
-        key: "name",
+        key: "driverNo",
         align: "center",
       },
       {
         title: "车牌号",
-        key: "phone",
+        key: "plateNumber",
         align: "center",
       },
       {
-        title: "订单状态",
-        key: "account",
+        title: "支付金额",
+        key: "orderPayAmount",
         align: "center",
       },
       {
-        title: "用车时间",
-        key: "name",
+        title: "支付时间",
+        key: "orderPayTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.orderPayTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
         width: "130px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -263,24 +276,16 @@ export default defineComponent({
         loading.value = false;
       }
     };
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
     function handleDetail(record: Recordable) {
       console.log("点击了编辑", record.id);
       router.push({ path: "/operate-order/finished-detail", query: { id: record.id } });
     }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
@@ -297,13 +302,13 @@ export default defineComponent({
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     function handlePage(pagination: PaginationInter) {
@@ -312,12 +317,12 @@ export default defineComponent({
     }
     function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -329,12 +334,10 @@ export default defineComponent({
       options: [],
       columns,
       itemCount,
-
+      getRowKeyId: (row: TableDataItemInter) => row.orderId,
       reloadPage,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

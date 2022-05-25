@@ -1,3 +1,4 @@
-export interface tableDataItem{
-    id?: string
+export interface TableDataItemInter{
+    orderId: string
+    orderPayTime: number
 }

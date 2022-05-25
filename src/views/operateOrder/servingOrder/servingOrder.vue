@@ -127,8 +127,6 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-// import { NTag } from "naive-ui";
-// import UserDrawer from "./userDrawer.vue";
 import { TableDataItemInter, QueryForm } from "./type";
 import { statusOptions } from "@/config/form";
 import { getOrderPage } from "@/api/operateOrder/operateOrder";
@@ -169,11 +167,6 @@ export default defineComponent({
       {
         title: "流量方订单号",
         key: "influxOrderNo",
-        align: "center",
-      },
-      {
-        title: "下单车型",
-        key: "name",
         align: "center",
       },
       {
