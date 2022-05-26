@@ -177,6 +177,9 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
+        render() {
+          return h("span", "暂无");
+        },
       },
       {
         title: "订单类型",
@@ -184,6 +187,9 @@ export default defineComponent({
         align: "center",
         ellipsis: {
           tooltip: true,
+        },
+        render() {
+          return h("span", "暂无");
         },
       },
       {
@@ -218,16 +224,25 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
+        render() {
+          return h("span", "暂无");
+        },
       },
       {
         title: "司机工号",
         key: "driverNo",
         align: "center",
+        render() {
+          return h("span", "暂无");
+        },
       },
       {
         title: "车牌号",
         key: "plateNumber",
         align: "center",
+        render() {
+          return h("span", "暂无");
+        },
       },
       {
         title: "取消时间",

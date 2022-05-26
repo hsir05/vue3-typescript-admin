@@ -5,7 +5,6 @@
       ref="formRef"
       inline
       label-placement="left"
-      :show-feedback="false"
       label-width="120"
       style="flex-wrap: wrap"
       class="pt-15px pb-15px bg-white mb-5px"

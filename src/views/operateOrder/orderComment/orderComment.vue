@@ -1,56 +1,74 @@
 <template>
   <div class="h-full overflow-hidden box-border">
     <!-- 搜索 -->
-    <!-- <n-form ref="formRef" inline label-placement="left" label-width="120" style="flex-wrap: wrap"
-            class="pt-15px pb-15px bg-white mb-5px" :model="queryValue">
-            <n-form-item label="订单号" path="orderNo">
-                <n-input v-model:value="queryValue.orderNo" clearable placeholder="输入流量方订单号" style="width: 150px" />
-            </n-form-item>
-            <n-form-item label="流量方" path="influx">
-                <n-select v-model:value="queryValue.influx" placeholder="选择流量方" :options="options"
-                    style="width: 150px" />
-            </n-form-item>
+    <n-form
+      ref="formRef"
+      inline
+      label-placement="left"
+      label-width="120"
+      style="flex-wrap: wrap"
+      class="pt-15px pb-15px bg-white mb-5px"
+      :model="queryValue"
+    >
+      <n-form-item label="订单号" path="orderNo">
+        <n-input
+          v-model:value="queryValue.orderNo"
+          clearable
+          placeholder="输入流量方订单号"
+          style="width: 150px"
+        />
+      </n-form-item>
+      <n-form-item label="下单客户电话" path="customerPhoneEq">
+        <n-input
+          v-model:value="queryValue.orderNo"
+          clearable
+          placeholder="输入下单客户电话"
+          :maxlength="11"
+          style="width: 150px"
+        />
+      </n-form-item>
 
-            <n-form-item label="订单类型" path="orderType">
-                <n-select v-model:value="queryValue.orderType" placeholder="选择订单类型" :options="options"
-                    style="width: 150px" />
-            </n-form-item>
+      <n-form-item label="司机工号" path="driverNoEq">
+        <n-input
+          v-model:value="queryValue.driverNoEq"
+          clearable
+          placeholder="输入司机工号"
+          style="width: 150px"
+        />
+      </n-form-item>
 
-            <n-form-item label="下单客户电话" path="phone">
-                <n-input v-model:value="queryValue.phone" clearable placeholder="输入下单客户电话" style="width: 150px" />
-            </n-form-item>
-            <n-form-item label="运营企业" path="companyId">
-                <n-select v-model:value="queryValue.companyId" placeholder="选择运营企业" :options="options"
-                    style="width: 150px" />
-            </n-form-item>
+      <n-form-item label="评论星级" path="serviceStar">
+        <n-select
+          v-model:value="queryValue.serviceStar"
+          placeholder="选择评论星级"
+          :options="options"
+          style="width: 150px"
+        />
+      </n-form-item>
 
-            <n-form-item label="司机工号" path="driverNum">
-                <n-input v-model:value="queryValue.driverNum" clearable placeholder="输入司机工号" style="width: 150px" />
-            </n-form-item>
+      <n-form-item label="交易时间(起始)" path="timeGe">
+        <n-date-picker
+          v-model:value="queryValue.timeGe"
+          type="date"
+          style="width: 150px"
+          clearable
+        />
+      </n-form-item>
 
-            <n-form-item label="车牌号" path="plate">
-                <n-input v-model:value="queryValue.plate" clearable placeholder="输入车牌号" style="width: 150px" />
-            </n-form-item>
+      <n-form-item label="交易时间(结束)" path="timeLe">
+        <n-date-picker
+          v-model:value="queryValue.timeLe"
+          type="date"
+          style="width: 150px"
+          clearable
+        />
+      </n-form-item>
 
-            <n-form-item label="订单状态" path="orderStatus">
-                <n-select v-model:value="queryValue.orderStatus" placeholder="选择订单状态" :options="options"
-                    style="width: 150px" />
-            </n-form-item>
-
-            <n-form-item label="交易时间(起始)" path="start">
-                <n-date-picker v-model:value="queryValue.start" type="date" style="width: 150px" clearable />
-            </n-form-item>
-
-            <n-form-item label="交易时间(结束)" path="end">
-                <n-date-picker v-model:value="queryValue.end" type="date" style="width: 150px" clearable />
-            </n-form-item>
-
-            <n-form-item>
-                <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
-                <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
-            </n-form-item>
-        </n-form> -->
-
+      <n-form-item>
+        <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
+      </n-form-item>
+    </n-form>
     <!-- 表格 -->
     <BasicTable
       :data="data"
@@ -91,6 +109,7 @@ export default defineComponent({
       orderTypeEq: null,
       driverNoEq: null,
       customerPhoneEq: null,
+      serviceStar: null,
     });
 
     const data = ref<TableDataItemInter[]>([]);
@@ -202,6 +221,7 @@ export default defineComponent({
         orderTypeEq: null,
         driverNoEq: null,
         customerPhoneEq: null,
+        serviceStar: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();

@@ -15,9 +15,10 @@
         <n-select
           clearable
           style="width: 200px"
+          filterable
           v-model:value="queryForm.companyId"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -38,8 +39,8 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
@@ -77,101 +78,123 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, reactive, onMounted, toRefs } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, ref, reactive, toRaw, onMounted, toRefs } from "vue";
+import { FormInst } from "naive-ui";
 import { pageSizes, rangeShortcuts } from "@/config/table";
+import { getAllOperateCompany } from "@/api/common/common";
+import { getStatementOfCompanyPage } from "@/api/statement/statement";
 import { tableDataItem } from "../type";
+import dayjs from "dayjs";
+// import { PaginationInter } from "@/api/type";
 export default defineComponent({
   name: "OperateCompanyStatement",
   setup() {
     const loading = ref(false);
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
-      cityCode: "allCity",
-      companyId: null,
+      section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
+      companyId: "75e642e0096b4a41a2b2ecf933c92247",
     });
-    const itemCount = ref(10);
+    const itemCount = ref(null);
     const pagination = reactive({
-      page: 1,
+      page: 0,
       pageSize: 10,
     });
-    const message = useMessage();
+    const companyData = ref();
 
-    const data = ref([
-      {
-        success: true,
-        code: "200",
-        message: null,
-        result: {
-          recordsFiltered: 3,
-          list: [
-            [
-              "兰州益民约车汽车服务有限公司",
-              1884.41,
-              1884.41,
-              197.42,
-              "75e642e0096b4a41a2b2ecf933c92247",
-            ],
-            ["兰州顺风汽车出租有限公司", 78.9, 78.9, 3.94, "75e642e0096b4a41a2b2ecf933c92255"],
-            ["兰州大桥出租汽车有限公司", 10, 10, 0.5, "75e642e0096b4a41a2b2ecf933c92279"],
-          ],
-          recordsTotal: 3,
-        },
-      },
-    ]);
+    const data = ref([]);
     const columns = [
       {
         title: "运营企业",
-        key: "flowSquare",
+        key: "operationCompanyName",
         align: "center",
       },
       {
         title: "总报价",
-        key: "flowSquare",
+        key: "totalDivideAmount",
         align: "center",
       },
       {
         title: "总抽成金额",
-        key: "flowSquare",
+        key: "orderTotalCost",
         align: "center",
       },
       {
         title: "企业抽成金额",
-        key: "flowSquare",
+        key: "companyDivideAmount",
         align: "center",
       },
     ];
 
-    onMounted(() => {});
+    onMounted(() => {
+      getAllCompanyData();
+      getData({ page: 0, pageSize: 10 });
+    });
+
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const getData = async (page: { page: number; pageSize: number }) => {
+      try {
+        loading.value = true;
+        let search = {
+          companyId: queryForm.value.companyId as string,
+          beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
+          endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
+          ...page,
+        };
+        let res = await getStatementOfCompanyPage(search);
+        data.value = res.data.list;
+        itemCount.value = res.data.count;
+        loading.value = false;
+        console.log(res.data.list);
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function query(e: MouseEvent) {
       e.preventDefault();
       queryFormRef.value?.validate((errors) => {
         if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
+          getData({ page: 0, pageSize: 10 });
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
 
     function handlePage(page: number) {
       pagination.page = page;
+      getData(toRaw(pagination));
     }
     // 每页显示
     function handlePageSize(pageSize: number) {
       pagination.pageSize = pageSize;
+      getData(toRaw(pagination));
     }
     return {
       loading,
       queryForm,
       columns,
       data,
-      options: [],
+      queryFormRef,
       itemCount,
+      companyData,
       getRowKeyId: (row: tableDataItem) => row.id,
       pageSizes,
       ...toRefs(pagination),

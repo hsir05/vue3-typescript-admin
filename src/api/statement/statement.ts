@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import { PaginationInter } from "../type";
 import { UsersDataInter } from "../type";
 
 //对帐单
@@ -49,4 +50,50 @@ export function downloadInflux(data: {
     method: "post",
     data,
   });
+}
+
+//-----------------企业对帐单----------------------
+
+/**
+ * 企业对帐单
+ */
+interface StatementOfCompanyPageInter {
+    // page: PaginationInter;
+    // search: {
+        companyId: string | null;
+        beginDate: string | null;
+        endDate: string | null;
+        page:number
+        pageSize:number
+    // }
+}
+export function getStatementOfCompanyPage(data: StatementOfCompanyPageInter) {
+    return http.request({
+        url: "/orderStatementOfCompany/getOverview",
+        method: "post",
+        data: data,
+    });
+}
+//-----------------司机对帐单----------------------
+
+/**
+ * 司机对帐单
+ */
+interface StatementOfDriverPageInter {
+    // page: PaginationInter;
+    // search: {
+        companyId: string | null;
+        beginDate: string | null;
+        endDate: string | null;
+        page:number | null
+        pageSize:number | null
+        influxCode: string | number
+    // }
+}
+export function getStatementDriverPage(data: StatementOfDriverPageInter) {
+    return http.request({
+        url: "/orderStatementOfDriver/getOverview",
+        method: "post",
+        data: data,
+    });
 }
