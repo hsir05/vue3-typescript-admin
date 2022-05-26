@@ -1,9 +1,15 @@
 import { http } from "@/utils/http";
-import { PaginationInter } from "../type";
-import { UsersDataInter } from "../type";
 
-//对帐单
-export function getInflux(data: UsersDataInter) {
+//--------------------流量方对帐单------------------------
+//对帐单总计
+interface StatementOfInfluxPageInter {
+        cityCode: string | null;
+        beginDate: string | null;
+        endDate: string | null;
+        influxCode: string | number
+    // }
+}
+export function getInflux(data: StatementOfInfluxPageInter) {
   return http.request({
     url: "/orderStatementOfInflux/getOverview",
     method: "post",
@@ -11,12 +17,12 @@ export function getInflux(data: UsersDataInter) {
   });
 }
  
-//对帐单详情
+//流量方对帐单详情
 export function getInfluxDetail(data: {
-  influxCode: string;
-  cityCode: string;
-  beginDate: string;
-  endDate: string;
+  influxCode: string | null;
+  cityCode: string | null;
+  beginDate: string | null;
+  endDate: string | null;
   page: number;
   pageSize: number;
 }) {
