@@ -1,6 +1,47 @@
 import { http } from "@/utils/http";
 import { PaginationInter } from "../type";
 
+
+/**
+ * 查询预付款信息
+ */
+export function getOrderAdvance(data: {orderId: string}) {
+    return http.request({
+        url: "/orderAdvance/listByOrderId",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 根据订单流水号查询行程录音文件
+ */
+export function getOrderSoundRecordingAttachfile(data: {orderId: string}) {
+    return http.request({
+        url: "/orderSoundRecordingAttachfile/listByOrderNo",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 查询订单异常支付记录
+ */
+export function getNetworkPaymentOrderData(data: {orderId: string}) {
+    return http.request({
+        url: "/networkPaymentOrderData/listByOrderId",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 查询订单支付记录
+ */
+export function getOrderPayInfo(data: {orderId: string}) {
+    return http.request({
+        url: "/orderPayInfo/listByOrderIdd",
+        method: "post",
+        data: data,
+    });
+}
 // 运营订单管理
 //-----------------服务中订单-------------------------
 
@@ -29,6 +70,18 @@ export function getOrderPage(data: OrderPageInter) {
         data: data,
     });
 }
+/**
+ * 服务中订单详情
+ */
+export function getOrderDetail(data: {orderId: string}) {
+    return http.request({
+        url: "/order/detail",
+        method: "post",
+        data: data,
+    });
+}
+
+
 //-----------------已完成订单-------------------------
 
 /**
@@ -56,6 +109,17 @@ export function getOrderFinishedPage(data: OrderFinishedInter) {
         data: data,
     });
 }
+/**
+ * 服务中订单详情
+ */
+export function getOrderFinishedDetail(data: {orderId: string}) {
+    return http.request({
+        url: "/orderFinished/detail",
+        method: "post",
+        data: data,
+    });
+}
+
 //-----------------已完成订单-------------------------
 
 /**

@@ -114,8 +114,6 @@
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-add="handleAdd"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -131,6 +129,7 @@ import { TableDataItemInter, QueryForm } from "./type";
 import { statusOptions } from "@/config/form";
 import { getOrderPage } from "@/api/operateOrder/operateOrder";
 import { PaginationInter } from "@/api/type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "ServingOrder",
   components: { BasicTable },
@@ -168,6 +167,17 @@ export default defineComponent({
         title: "流量方订单号",
         key: "influxOrderNo",
         align: "center",
+      },
+      {
+        title: "下单车型",
+        key: "orderPlaceVehicleList.vehicleTypeName",
+        align: "center",
+        render(row: TableDataItemInter) {
+          return h(
+            "span",
+            row.orderPlaceVehicleList.reduce((pre, next) => (pre += next.vehicleTypeName), "")
+          );
+        },
       },
       {
         title: "订单类型",
@@ -212,8 +222,11 @@ export default defineComponent({
       },
       {
         title: "用车时间",
-        key: "orderServiceDuration",
+        key: "useVehicleTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.useVehicleTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "操作",
@@ -228,7 +241,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: EyeIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record.orderId),
                 auth: ["dict001"],
               },
               {
@@ -266,18 +279,12 @@ export default defineComponent({
         loading.value = false;
       }
     };
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
+
+    function handleEdit(orderId: string) {
+      const { openDrawer } = userDrawerRef.value;
+      openDrawer(orderId);
     }
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      const { openDrawer } = userDrawerRef.value;
-      openDrawer("编辑用户", record);
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
-    }
     function handleAdd() {
       console.log("点击了新增");
       const { openDrawer } = userDrawerRef.value;
@@ -347,10 +354,8 @@ export default defineComponent({
 
       reloadPage,
       handleAdd,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

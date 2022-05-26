@@ -1,7 +1,13 @@
 export interface TableDataItemInter {
   orderId: string;
+  useVehicleTime: number,
+  orderPlaceVehicleList: OrderTypeInter[]
 }
 
+interface OrderTypeInter{
+    vehicleTypeName: string
+    totalCost: string
+}
 export interface QueryForm {
   timeGe: string | null;
   timeLe: string | null;

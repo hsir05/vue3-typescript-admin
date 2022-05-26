@@ -249,7 +249,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleDetail.bind(null, record),
+                onClick: handleDetail.bind(null, record.orderId),
                 auth: ["dict001"],
               },
             ],
@@ -275,9 +275,8 @@ export default defineComponent({
         loading.value = false;
       }
     };
-    function handleDetail(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      router.push({ path: "/operate-order/finished-detail", query: { id: record.id } });
+    function handleDetail(orderId: string) {
+      router.push({ path: "/operate-order/finished-detail", query: { id: orderId } });
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -311,8 +310,7 @@ export default defineComponent({
     }
 
     function handlePage(pagination: PaginationInter) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
