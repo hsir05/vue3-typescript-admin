@@ -206,10 +206,10 @@ export function giftCoupon(data: GiftCouponInter) {
         data: data,
     });
 }
-//-----------------代金券管理-------------------------
+//-----------------兑换码管理-------------------------
 
 /**
- * 代金券分页
+ * 兑换码分页
  */
 interface ExchangeCodePageInter {
     page: PaginationInter;
@@ -223,6 +223,14 @@ interface ExchangeCodePageInter {
 export function getExchangeCodePage(data: ExchangeCodePageInter) {
     return http.request({
         url: "/exchangeCode/page",
+        method: "post",
+        data: data,
+    });
+}
+// 兑换码详情
+export function getExchangeCodeDetail(data: {exchangeCodeId: string}) {
+    return http.request({
+        url: "/exchangeCode/detail",
         method: "post",
         data: data,
     });

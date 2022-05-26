@@ -96,7 +96,7 @@
 <script lang="ts">
 import { defineComponent, ref, h, reactive, toRaw, onMounted } from "vue";
 import { FormInst } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import CodeDetailDrawer from "./codeDetailDrawer.vue";
 import ExchangeRecordCodeDrawer from "./exchangeRecordDrawer.vue";
@@ -149,7 +149,7 @@ export default defineComponent({
         key: "index",
         width: 70,
         align: "center",
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -193,7 +193,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "90px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -201,7 +201,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: EyeIcon,
-                onClick: handleDetail.bind(null, record),
+                onClick: handleDetail.bind(null, record.exchangeCodeId),
                 auth: ["dict001"],
               },
               {
@@ -209,7 +209,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: FileExceIcon,
-                onClick: handleRecord.bind(null, record),
+                onClick: handleRecord.bind(null, record.exchangeCodeId),
                 auth: ["dict001"],
               },
             ],
@@ -260,16 +260,14 @@ export default defineComponent({
       }
     }
 
-    function handleDetail(record: Recordable) {
-      console.log(record);
+    function handleDetail(exchangeCodeId: string) {
       const { openDrawer } = codeDetailDrawerRef.value;
-      openDrawer("兑换码详情", record);
+      openDrawer(exchangeCodeId);
     }
 
-    function handleRecord(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleRecord(exchangeCodeId: string) {
       const { openDrawer } = recordDrawerRef.value;
-      openDrawer("兑换码记录", record);
+      openDrawer("兑换码记录", exchangeCodeId);
     }
 
     function handlePage(pageIndex: number) {
@@ -295,7 +293,7 @@ export default defineComponent({
       itemCount,
       columns,
       data,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
       pagination,
       pageSizes,
       DocumentIcon,

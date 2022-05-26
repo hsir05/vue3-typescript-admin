@@ -1,4 +1,4 @@
-export interface tableDataItem {
-    id?: string
+export interface TableDataItemInter {
+    exchangeCodeId: string
     status: null | number
 }
