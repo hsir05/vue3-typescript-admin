@@ -1,4 +1,6 @@
 export interface TableDataItemInter {
     exchangeCodeId: string
-    status: null | number
+    exchangeCodeUseTime: number
+    exchangeCodeEffectiveTimeEnd: number
+    exchangeCodeCreateTime: number
 }

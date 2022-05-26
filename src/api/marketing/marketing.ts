@@ -235,6 +235,23 @@ export function getExchangeCodeDetail(data: {exchangeCodeId: string}) {
         data: data,
     });
 }
+/**
+ * 兑换码兑换分页
+ */
+interface RecordPageInter {
+    page: PaginationInter;
+    search: {
+        exchangeCodeIdEq: string | null;
+        customerPhoneLike: string | null;
+    };
+}
+export function getRecordPagePage(data: RecordPageInter) {
+    return http.request({
+        url: "/exchangeCode/recordPage",
+        method: "post",
+        data: data,
+    });
+}
 //-----------------钱包充值活动管理-------------------------
 
 /**

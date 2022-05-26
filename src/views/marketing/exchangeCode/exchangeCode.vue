@@ -61,6 +61,8 @@
         ref="table"
         striped
         :columns="columns"
+        min-height="400px"
+        flex-height
         class="box-border"
         :row-key="getRowKeyId"
         :data="data"
@@ -109,6 +111,7 @@ import {
   FileExcelOutlined as FileExceIcon,
   AccountBookOutlined as AccountBookIcon,
 } from "@vicons/antd";
+import dayjs from "dayjs";
 import { pageSizes } from "@/config/table";
 import { PaginationInter } from "@/api/type";
 import { getExchangeCodePage } from "@/api/marketing/marketing";
@@ -172,11 +175,20 @@ export default defineComponent({
         title: "失效时间",
         key: "exchangeCodeEffectiveTimeEnd",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h(
+            "span",
+            dayjs(record.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
+          );
+        },
       },
       {
         title: "生成时间",
         key: "exchangeCodeCreateTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.exchangeCodeCreateTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "可兑换次数",
@@ -267,7 +279,7 @@ export default defineComponent({
 
     function handleRecord(exchangeCodeId: string) {
       const { openDrawer } = recordDrawerRef.value;
-      openDrawer("兑换码记录", exchangeCodeId);
+      openDrawer(exchangeCodeId);
     }
 
     function handlePage(pageIndex: number) {

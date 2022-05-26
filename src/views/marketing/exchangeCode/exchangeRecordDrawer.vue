@@ -1,14 +1,28 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" title="兑换码记录" @on-close-after="onCloseAfter">
     <n-descriptions label-placement="left" bordered :column="2">
-      <n-descriptions-item label="兑换码">0001</n-descriptions-item>
-      <n-descriptions-item label="兑换类型">22</n-descriptions-item>
-      <n-descriptions-item label="生效时间" :span="2">2022-04-06 11:55:00</n-descriptions-item>
-      <n-descriptions-item label="生成时间" :span="2">2020-04-24 08:51:10</n-descriptions-item>
-      <n-descriptions-item label="可兑换次数">22</n-descriptions-item>
-      <n-descriptions-item label="已兑换次数">22</n-descriptions-item>
-      <n-descriptions-item label="兑换实充金额">22</n-descriptions-item>
-      <n-descriptions-item label="兑换赠送金额">22</n-descriptions-item>
+      <n-descriptions-item label="兑换码">{{ detail?.exchangeCode }}</n-descriptions-item>
+      <n-descriptions-item label="兑换类型">{{
+        detail?.exchangeCodeExchangeType
+      }}</n-descriptions-item>
+      <n-descriptions-item label="生效时间" :span="2">{{
+        dayjs(detail?.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
+      }}</n-descriptions-item>
+      <n-descriptions-item label="生成时间" :span="2">{{
+        dayjs(detail?.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
+      }}</n-descriptions-item>
+      <n-descriptions-item label="可兑换次数">{{
+        detail?.exchangeCodeUsedCount
+      }}</n-descriptions-item>
+      <n-descriptions-item label="已兑换次数">{{
+        detail?.exchangeCodeUsableCount
+      }}</n-descriptions-item>
+      <n-descriptions-item label="兑换实充金额">{{
+        detail?.exchangeRechargeAmount
+      }}</n-descriptions-item>
+      <n-descriptions-item label="兑换赠送金额">{{
+        detail?.exchangeGiftAmount
+      }}</n-descriptions-item>
     </n-descriptions>
 
     <!-- 搜索 -->
@@ -21,9 +35,9 @@
       :show-feedback="false"
       :model="queryForm"
     >
-      <n-form-item label="客户手机号" path="agent">
+      <n-form-item label="客户手机号" path="customerPhoneLike">
         <n-input
-          v-model:value="queryForm.phone"
+          v-model:value="queryForm.customerPhoneLike"
           clearable
           placeholder="输入客户手机号"
           style="width: 200px"
@@ -49,8 +63,11 @@
 </template>
 <script lang="ts">
 import { defineComponent, h, reactive, ref, toRefs } from "vue";
-import { FormInst, useMessage, NTag } from "naive-ui";
-import { tableDataItem } from "./type";
+import { FormInst } from "naive-ui";
+import dayjs from "dayjs";
+import { TableDataItemInter } from "./type";
+import { PaginationInter } from "@/api/type";
+import { getRecordPagePage, getExchangeCodeDetail } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "ExchangeRecordCodeDrawer",
   setup() {
@@ -60,22 +77,18 @@ export default defineComponent({
     });
 
     const title = ref("");
-    const message = useMessage();
+    const detail = ref();
     const formRef = ref<FormInst | null>(null);
-    const queryForm = ref({
-      phone: null,
+    interface QueryFormInter {
+      customerPhoneLike: string | null;
+      exchangeCodeIdEq: string | null;
+    }
+    const queryForm = ref<QueryFormInter>({
+      customerPhoneLike: null,
+      exchangeCodeIdEq: null,
     });
 
-    const data = ref([
-      {
-        id: "23123",
-        phone: "213123",
-        channel: "sadfa",
-        status: 1,
-        createTime: "2022-09-09",
-        remark: "备注",
-      },
-    ]);
+    const data = ref([]);
 
     const columns = [
       {
@@ -83,58 +96,92 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "客户手机号",
-        key: "phone",
+        key: "customerPhone",
         align: "center",
       },
       {
         title: "获取途径",
-        key: "channel",
+        key: "exchangeCodeAchieveOpportunity",
         align: "center",
       },
       {
         title: "状态",
-        key: "status",
+        key: "exchangeCodeState",
         align: "center",
-        render(row: tableDataItem) {
-          return h(
-            NTag,
-            {
-              type: row.status === 1 ? "success" : "error",
-            },
-            {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
-            }
-          );
-        },
+        // render(row: TableDataItemInter) {
+        //   return h(
+        //     NTag,
+        //     {
+        //       type: row.status === 1 ? "success" : "error",
+        //     },
+        //     {
+        //       default: () => (row.status === 1 ? "正常" : "锁定"),
+        //     }
+        //   );
+        // },
       },
       {
         title: "获取时间",
-        key: "createTime",
+        key: "exchangeCodeUseTime",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", dayjs(record.exchangeCodeUseTime).format("YYYY-MM-DD HH:mm:ss"));
+        },
       },
       {
         title: "兑换备注",
-        key: "remark",
+        key: "exchangeCodeUseNote",
         align: "center",
       },
     ];
 
-    function openDrawer(t: string, record?: tableDataItem) {
-      if (record) {
-        console.log(record);
-        message.success("验证成功");
+    function openDrawer(exchangeCodeId: string) {
+      if (exchangeCodeId) {
+        queryForm.value.exchangeCodeIdEq = exchangeCodeId;
+        getDetail(exchangeCodeId);
+        getData({ pageIndex: 1, pageSize: 10 });
       }
-      title.value = t;
       state.isDrawer = true;
     }
 
-    function query() {}
+    const getDetail = async (exchangeCodeId: string) => {
+      try {
+        state.loading = true;
+        let res = await getExchangeCodeDetail({ exchangeCodeId });
+        detail.value = res.data;
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+
+    const getData = async (page: PaginationInter) => {
+      try {
+        state.loading = true;
+        let search = {
+          exchangeCodeIdEq: queryForm.value.exchangeCodeIdEq,
+          customerPhoneLike: queryForm.value.customerPhoneLike,
+        };
+        let res = await getRecordPagePage({ page: page, search: search });
+        console.log(res.data.content);
+        data.value = res.data.content;
+        state.loading = false;
+      } catch (err) {
+        console.log(err);
+        state.loading = false;
+      }
+    };
+
+    function query() {
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
 
     function onCloseAfter() {
       state.isDrawer = false;
@@ -145,13 +192,15 @@ export default defineComponent({
       queryForm,
       formRef,
       columns,
+      detail,
       title,
       data,
       pagination: {
         pageSize: 10,
       },
+      dayjs,
       ...toRefs(state),
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
 
       query,
       openDrawer,
