@@ -1,0 +1,101 @@
+<template>
+  <div class="step pb-10px">
+    <div class="date mb-10px">{{ dayjs(date).format("YYYY-MM-DD") }}</div>
+    <div class="step-content" @click="handle">
+      <div class="step-icon-box">
+        <n-icon size="20" class="icon-item">
+          <DocumentIcon />
+        </n-icon>
+      </div>
+      <div class="step-item-text pl-15px">
+        <p class="step-text mt-5px">{{ orderStateText }}</p>
+        <span class="time">
+          <n-icon size="14" class="icon-item mr-5px"> <TimeIcon /> </n-icon
+          >{{ dayjs(date).format("HH:mm:ss") }}
+        </span>
+      </div>
+    </div>
+  </div>
+</template>
+<script lang="ts" setup>
+import { DocumentTextOutline as DocumentIcon, TimeOutline as TimeIcon } from "@vicons/ionicons5";
+import { toRefs } from "vue";
+import dayjs from "dayjs";
+const props = defineProps({
+  orderStateText: {
+    type: String,
+    default: " ",
+  },
+  date: {
+    type: Number,
+    default: null,
+  },
+});
+const { orderStateText, date } = toRefs(props);
+
+const emit = defineEmits(["handleEvent"]);
+
+const handle = () => {
+  emit("handleEvent");
+};
+</script>
+<style lang="scss">
+.step {
+  .date {
+    font-size: 14px;
+  }
+
+  .step-content {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+
+    @mixin line {
+      content: " ";
+      width: 4px;
+      height: 16px;
+      background-color: #e5e5e5;
+      position: absolute;
+      left: 22px;
+    }
+
+    &::before {
+      @include line;
+      top: -14px;
+    }
+
+    &::after {
+      @include line;
+      bottom: -14px;
+    }
+  }
+
+  .step-icon-box {
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    border: 1px solid #b4b2b2;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step-item-text {
+    width: 70%;
+  }
+
+  .step-text {
+    font-weight: 600;
+  }
+
+  .time {
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+</style>

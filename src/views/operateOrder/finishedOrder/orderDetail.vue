@@ -15,29 +15,19 @@
           <n-descriptions-item label="乘车人手机号"
             >{{ detail?.passengerPhone }}
           </n-descriptions-item>
-          <n-descriptions-item label="司机姓名[工号]">{{ detail?.driverNo }} </n-descriptions-item>
+          <n-descriptions-item label="司机姓名[工号]" :span="2">
+            {{ detail?.driverFullName }} [{{ detail?.driverNo }}]
+          </n-descriptions-item>
           <n-descriptions-item label="司机手机号">{{ detail?.driverPhone }} </n-descriptions-item>
           <n-descriptions-item label="车牌号">{{ detail?.plateNumber }} </n-descriptions-item>
-          <n-descriptions-item label="车辆类型">{{ detail?.vehicleTypeName }} </n-descriptions-item>
+          <n-descriptions-item label="车辆类型" :span="2"
+            >{{ detail?.vehicleTypeName }}
+          </n-descriptions-item>
         </n-descriptions>
       </n-spin>
 
       <div class="p-30px mt-10px bg-white step">
-        <n-steps vertical :current="(current as number)" :status="currentStatus">
-          <n-step
-            :title="item.title"
-            v-for="(item, index) in step"
-            :key="index"
-            :description="item.time"
-          >
-            <template #finish-icon>
-              <n-icon :component="item.icon" />
-              <n-icon>
-                <DocumentIcon />
-              </n-icon>
-            </template>
-          </n-step>
-        </n-steps>
+        <StepItem :date="1647511783468" orderStateText="下单" />
       </div>
     </div>
     <div class="right">
@@ -65,22 +55,26 @@
         <n-descriptions-item label="用车时间">{{
           detail?.orderServiceDuration
         }}</n-descriptions-item>
-        <n-descriptions-item label="下单地点">{{
+        <n-descriptions-item label="下单地点" :span="2">{{
           detail?.customerCreateOrderAddress
         }}</n-descriptions-item>
         <n-descriptions-item label="订单留言">{{ detail?.orderMessage }}</n-descriptions-item>
-        <n-descriptions-item label="上车地点">{{ detail?.orderBeginAddress }}</n-descriptions-item>
-        <n-descriptions-item label="下车地点">{{ detail?.orderEndAddress }}</n-descriptions-item>
+        <n-descriptions-item label="上车地点" :span="2">{{
+          detail?.orderBeginAddress
+        }}</n-descriptions-item>
+        <n-descriptions-item label="下车地点" :span="2">{{
+          detail?.orderEndAddress
+        }}</n-descriptions-item>
         <n-descriptions-item label="订单预计时长">{{
           detail?.orderEstimateDuration
         }}</n-descriptions-item>
         <n-descriptions-item label="订单预计里程">{{
           detail?.orderEstimateMileage
         }}</n-descriptions-item>
-        <n-descriptions-item label="需付预付款金额">{{
+        <n-descriptions-item label="需付预付款金额(元)">{{
           detail?.needAdvanceAmount
         }}</n-descriptions-item>
-        <n-descriptions-item label="已付预付款金额">{{
+        <n-descriptions-item label="已付预付款金额(元)">{{
           detail?.paidAdvanceAmount
         }}</n-descriptions-item>
         <n-descriptions-item label="下单车型信息">{{
@@ -108,35 +102,23 @@
 <script lang="ts">
 import { defineComponent, ref, h, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { StepsProps } from "naive-ui";
 import { TableDataItemInter } from "./type";
 import OrderAdvanceModal from "./orderAdvanceModal.vue";
-import { DocumentTextOutline as DocumentIcon, TimeOutline as TimeIcon } from "@vicons/ionicons5";
+
 import Map from "@/components/Map/BaiduMap.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
-
+import StepItem from "./stepItem.vue";
 import { getOrderFinishedDetail, getOrderAdvance } from "@/api/operateOrder/operateOrder";
 export default defineComponent({
   name: "FinisherOrderDetail",
-  components: { Map, DocumentIcon, OrderAdvanceModal },
+  components: { Map, OrderAdvanceModal, StepItem },
   setup() {
     const route = useRoute();
     const loading = ref(false);
     const baiduMapRef = ref();
     const currentRef = ref<number | null>(2);
-    const step = ref([
-      {
-        title: "下单",
-        icon: DocumentIcon,
-        time: "10:56:16",
-      },
-      {
-        title: "接单",
-        icon: DocumentIcon,
-        time: "10:56:16",
-      },
-    ]);
+    const step = ref([]);
     const detail = ref();
     const orderAdvance = ref();
     const orderAdvanceModalRef = ref();
@@ -211,7 +193,7 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await getOrderFinishedDetail({ orderId });
-        // console.log(res.data);
+        console.log(res.data);
         detail.value = res.data;
 
         let str = "";
@@ -237,7 +219,7 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await getOrderAdvance({ orderId });
-        console.log(res.data);
+        // console.log(res.data);
         orderAdvanceRDTOList.value = res.data.orderAdvanceRDTOList;
         loading.value = false;
       } catch (err) {
@@ -251,18 +233,15 @@ export default defineComponent({
     }
 
     return {
-      currentStatus: ref<StepsProps["status"]>("finish"),
       getRowKeyId: (row: TableDataItemInter) => row.dealSerialNumber,
       current: currentRef,
       orderAdvanceModalRef,
       baiduMapRef,
-      TimeIcon,
       loading,
       detail,
       orderAdvance,
       orderAdvanceRDTOList,
       columns,
-      DocumentIcon,
       step,
     };
   },
