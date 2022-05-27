@@ -1,4 +1,6 @@
-import { objIner } from "@/interface/common/common"
+import { objIner, OrderDataIner } from "@/interface/common/common"
+import { DocumentTextOutline as DocumentIcon, TimeOutline as TimeIcon } from "@vicons/ionicons5";
+import { OrderDataEnum } from "@/enums/dict"
 
 export const pageSizes = [
   { label: "每页10条", value: 10 },
@@ -54,4 +56,36 @@ export const memberType: objIner = {
     CMT0001: "注册会员",
     CMT0002: "升级会员",
     CMT0003: "其他会员"
+}
+
+// 订单状态
+export const orderData: OrderDataIner = {
+    [OrderDataEnum.CREATEORDER]: {
+        text: '下单',
+        icon: DocumentIcon
+    },
+    [OrderDataEnum.ACCEPTORDER]: {
+        text: '接单',
+        icon: TimeIcon
+    },
+    [OrderDataEnum.RECEPTIONPASSENGER]: {
+        text: '去接乘客',
+        icon: DocumentIcon
+    },
+    [OrderDataEnum.DRIVERARRIVERPICKUPADDRESS]: {
+        text: '到达上车地点',
+        icon: DocumentIcon
+    },
+    [OrderDataEnum.DRIVERBEGINSERVICES]: {
+        text: '开始服务',
+        icon: DocumentIcon
+    },
+    [OrderDataEnum.DRIVERENDSERVICES]: {
+        text: '结束服务',
+        icon: DocumentIcon
+    },
+    [OrderDataEnum.ORDERCOSTCREATE]: {
+        text: '支付',
+        icon: DocumentIcon
+    }
 }

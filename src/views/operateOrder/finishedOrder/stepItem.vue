@@ -1,14 +1,12 @@
 <template>
   <div class="step pb-10px">
-    <div class="date mb-10px">{{ dayjs(date).format("YYYY-MM-DD") }}</div>
+    <div class="date mb-10px" v-if="isDate">{{ dayjs(date).format("YYYY-MM-DD") }}</div>
     <div class="step-content" @click="handle">
       <div class="step-icon-box">
-        <n-icon size="20" class="icon-item">
-          <DocumentIcon />
-        </n-icon>
+        <n-icon :component="orderData[orderState].icon" size="20" />
       </div>
       <div class="step-item-text pl-15px">
-        <p class="step-text mt-5px">{{ orderStateText }}</p>
+        <p class="step-text mt-5px">{{ orderData[orderState].text }}</p>
         <span class="time">
           <n-icon size="14" class="icon-item mr-5px"> <TimeIcon /> </n-icon
           >{{ dayjs(date).format("HH:mm:ss") }}
@@ -18,20 +16,25 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { DocumentTextOutline as DocumentIcon, TimeOutline as TimeIcon } from "@vicons/ionicons5";
+import { orderData } from "@/config/table";
 import { toRefs } from "vue";
+import { TimeOutline as TimeIcon } from "@vicons/ionicons5";
 import dayjs from "dayjs";
 const props = defineProps({
-  orderStateText: {
+  orderState: {
     type: String,
     default: " ",
   },
   date: {
-    type: Number,
+    type: Number as PropType<number | null>,
     default: null,
   },
+  isDate: {
+    type: Boolean,
+    default: true,
+  },
 });
-const { orderStateText, date } = toRefs(props);
+const { orderState, date, isDate } = toRefs(props);
 
 const emit = defineEmits(["handleEvent"]);
 
@@ -62,7 +65,7 @@ const handle = () => {
 
     &::before {
       @include line;
-      top: -14px;
+      top: -13px;
     }
 
     &::after {

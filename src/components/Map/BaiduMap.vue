@@ -11,7 +11,7 @@ import { ref, toRefs, watch } from "vue";
 import stylesData from "@/assets/custom_map_config.json";
 
 const domRef = ref<HTMLDivElement | null>(null);
-const emit = defineEmits(["update-non-editArea", "on-dragend"]);
+const emit = defineEmits(["update-nonEditArea", "on-dragend"]);
 
 interface NonDataInter {
   areaCode: string;
@@ -49,6 +49,7 @@ let timer = null;
 const map = ref(null);
 const drawingManager = ref(null);
 const point = ref(null);
+const drivingRoute = ref(null);
 
 let gridlines = []; // 用来存储网格线覆盖物的数组
 let nonEditablePoints = []; // 用来存储不可选择区块的数组
@@ -132,6 +133,50 @@ function drawingManagerInit() {
     overlay.remove();
   });
 }
+// 下单标志
+// function createOrderPoint(createOrderLng: number, createOrderLat: number) {
+//     // 下单地点标志
+//     let createOrderAddressPoint = new BMap.Point(createOrderLng, createOrderLat)
+//     orderMapBox.addOverlay(orderMapBox.getMarker(createOrderAddressPoint, orderTimelineListBox.options.icon.iconOrderCreate))
+// }
+// 车辆轨迹
+function trackIng(
+  beginLng: number,
+  beginLat: number,
+  endLng: number,
+  endLat: number,
+  startIcon,
+  endIcon
+) {
+  let myP1 = new BMap.Point(beginLng, beginLat); //起点
+  let myP2 = new BMap.Point(endLng, endLat); //终点
+
+  drivingRoute.value = new BMap.DrivingRoute(map.value, {
+    renderOptions: { map: map.value, autoViewport: true },
+  });
+  drivingRoute.value.clearResults();
+  // 为百度地图路径显示添加个性化图片
+  drivingRoute.value.setMarkersSetCallback(function (result) {
+    result[0].marker.setIcon(
+      new BMap.Icon(startIcon, new BMap.Size(81, 33), { anchor: new BMap.Size(40, 33) })
+    );
+    result[1].marker.setIcon(
+      new BMap.Icon(endIcon, new BMap.Size(81, 33), { anchor: new BMap.Size(40, 33) })
+    );
+  });
+  drivingRoute.value.search(myP1, myP2);
+}
+
+// function addDrivingRoute(beginPoint, endPoint, startIcon, endIcon) {
+//     drivingRoute.value.clearResults()
+//     //为百度地图路径显示添加个性化图片
+//     drivingRoute.value.setMarkersSetCallback(function (result) {
+//         result[0].marker.setIcon(new BMap.Icon(startIcon, new BMap.Size(81, 33), {anchor: new BMap.Size(40, 33)}));
+//         result[1].marker.setIcon(new BMap.Icon(endIcon, new BMap.Size(81, 33), {anchor: new BMap.Size(40, 33)}));
+//     })
+//     drivingRoute.value.search(beginPoint, endPoint)
+// }
+
 // 给城市添加边界线
 function addBoundary(name) {
   let boundary = new BMap.Boundary();
@@ -504,6 +549,7 @@ defineExpose({
   removeAllOverlay,
   addMarker,
   createMarker,
+  trackIng,
   map,
   drawingManager,
   currentOpenAreaPoints,

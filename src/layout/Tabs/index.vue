@@ -142,6 +142,7 @@ export default defineComponent({
     // 获取简易的路由对象
     const getSimpleRoute = (route: any): RouteItem => {
       const { fullPath, hash, meta, params, path, query } = route;
+
       return { fullPath, hash, meta, name: meta.title, params, path, query };
     };
 
@@ -220,6 +221,7 @@ export default defineComponent({
 
     function goPage(e: RouteItem) {
       const { fullPath } = e;
+
       if (fullPath === route.fullPath) return;
       state.activeKey = fullPath;
       router.push({ path: fullPath });

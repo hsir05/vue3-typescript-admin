@@ -27,7 +27,13 @@
       </n-spin>
 
       <div class="p-30px mt-10px bg-white step">
-        <StepItem :date="1647511783468" orderStateText="下单" />
+        <StepItem
+          :date="item.date || null"
+          :orderState="item.orderState"
+          :isDate="item.isDate"
+          v-for="(item, index) in step"
+          :key="index"
+        />
       </div>
     </div>
     <div class="right">
@@ -50,7 +56,7 @@
         }}</n-descriptions-item>
         <n-descriptions-item label="乘车人手机号">{{ detail?.passengerPhone }}</n-descriptions-item>
         <n-descriptions-item label="乘车人称呼"
-          >{{ detail?.passengerGender === 0 ? "女士" : "先生" }}
+          >{{ detail?.passengerGender ? "暂无" : detail?.passengerGender === 0 ? "女士" : "先生" }}
         </n-descriptions-item>
         <n-descriptions-item label="用车时间">{{
           detail?.orderServiceDuration
@@ -110,6 +116,9 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import StepItem from "./stepItem.vue";
 import { getOrderFinishedDetail, getOrderAdvance } from "@/api/operateOrder/operateOrder";
+import startIcon from "@/assets/image/icon_begin_address.png";
+import endIcon from "@/assets/image/icon_end_address.png";
+import { OrderDataEnum } from "@/enums/dict";
 export default defineComponent({
   name: "FinisherOrderDetail",
   components: { Map, OrderAdvanceModal, StepItem },
@@ -118,7 +127,13 @@ export default defineComponent({
     const loading = ref(false);
     const baiduMapRef = ref();
     const currentRef = ref<number | null>(2);
-    const step = ref([]);
+    interface StepInter {
+      orderState: string;
+      date: number | null;
+      isDate: boolean;
+    }
+
+    const step = ref<StepInter[]>([]);
     const detail = ref();
     const orderAdvance = ref();
     const orderAdvanceModalRef = ref();
@@ -181,9 +196,6 @@ export default defineComponent({
     onMounted(async () => {
       getDetail(route.query.id as string);
       getOrderAdvanceData(route.query.id as string);
-      const { renderBaiduMap } = baiduMapRef.value;
-      await renderBaiduMap(103.841521, 36.067212);
-      //   addBoundary()
     });
 
     const getDetail = async (orderId: string) => {
@@ -195,6 +207,60 @@ export default defineComponent({
         let res = await getOrderFinishedDetail({ orderId });
         console.log(res.data);
         detail.value = res.data;
+
+        const {
+          orderCreateTime,
+          driverAcceptOrderTime,
+          driverReceptionPassengerTime,
+          driverArrivePickupAddressTime,
+          driverBeginServiceTime,
+          driverEndServiceTime,
+          orderCostCreateTime,
+        } = res.data;
+
+        step.value.push({
+          orderState: OrderDataEnum.CREATEORDER,
+          date: orderCreateTime,
+          isDate: true,
+        });
+        step.value.push({
+          orderState: OrderDataEnum.ACCEPTORDER,
+          date: driverAcceptOrderTime,
+          isDate: false,
+        });
+        step.value.push({
+          orderState: OrderDataEnum.RECEPTIONPASSENGER,
+          date: driverReceptionPassengerTime,
+          isDate: false,
+        });
+        step.value.push({
+          orderState: OrderDataEnum.DRIVERARRIVERPICKUPADDRESS,
+          date: driverArrivePickupAddressTime,
+          isDate: false,
+        });
+        step.value.push({
+          orderState: OrderDataEnum.DRIVERBEGINSERVICES,
+          date: driverBeginServiceTime,
+          isDate: false,
+        });
+        step.value.push({
+          orderState: OrderDataEnum.DRIVERENDSERVICES,
+          date: driverEndServiceTime,
+          isDate: false,
+        });
+        step.value.push({
+          orderState: OrderDataEnum.ORDERCOSTCREATE,
+          date: orderCostCreateTime,
+          isDate: false,
+        });
+
+        const beginLng = detail.value.orderBeginAddressLongitude * 1e-6;
+        const beginEnd = detail.value.orderBeginAddressLatitude * 1e-6;
+        const endLng = detail.value.orderEndAddressLongitude * 1e-6;
+        const EndLat = detail.value.orderEndAddressLatitude * 1e-6;
+        const { renderBaiduMap, trackIng } = baiduMapRef.value;
+        renderBaiduMap(beginLng, beginEnd);
+        trackIng(beginLng, beginEnd, endLng, EndLat, startIcon, endIcon);
 
         let str = "";
         for (let i = 0; i < detail.value.orderPlaceVehicleList.length; i++) {

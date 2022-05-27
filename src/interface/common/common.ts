@@ -13,3 +13,12 @@ export interface CityItemInter {
 export interface objIner { 
   [symbol: string]: string;
 }
+
+// 订单
+interface ItemInter {
+    text: string
+    icon: Object
+}
+export interface OrderDataIner {
+    [symbol: string]: ItemInter;
+}

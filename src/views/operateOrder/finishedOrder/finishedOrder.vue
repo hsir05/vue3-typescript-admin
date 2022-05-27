@@ -191,7 +191,7 @@ export default defineComponent({
       },
       {
         title: "下单客户电话",
-        key: "orderType",
+        key: "customerPhone",
         align: "center",
         ellipsis: {
           tooltip: true,
