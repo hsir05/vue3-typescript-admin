@@ -85,3 +85,15 @@ export function getSatisfaction(data: SatisfactionInter) {
     data
   });
 }
+// ---------------个人用户统计---------------------
+//个人用户统计
+interface MonthInter {
+    month: string | null
+}
+export function getCustomer(data: MonthInter) {    
+  return http.request({
+    url: '/operationAnalysis/customerStatisticsMonth',
+    method: 'post',
+    data
+  });
+}

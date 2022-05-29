@@ -1,33 +1,45 @@
 <template>
-  <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
-    <n-data-table
-      :loading="loading"
-      ref="table"
-      striped
-      :columns="columns"
-      class="box-border mb-15px"
-      :row-key="getRowKeyId"
-      :data="data"
-      :pagination="false"
-    />
-    <div class="flex mb-20px">
+  <div>
+    <div class="bg-white p-10px">
+      <n-spin :show="loading">
+        <n-row>
+          <n-col :span="10" v-for="(item, index) in usersData" :key="index">
+            <n-statistic :label="item.label" class="text-center p-10px">
+              <template #suffix>
+                <span>{{ item.value }}</span>
+              </template>
+            </n-statistic>
+          </n-col>
+        </n-row>
+      </n-spin>
+    </div>
+
+    <div class="flex mt-10px p-10px bg-white">
       <span>用户增长曲线</span>
       <n-date-picker
         v-model:value="month"
-        style="width: 250px"
+        style="width: 200px"
+        :is-date-disabled="disablePreviousDate"
         @update:value="handleDate"
         type="month"
       />
     </div>
-    <Order />
+    <n-spin :show="loading" class="bg-white">
+      <Order :data="lineData" :xAxisData="dateData" />
+    </n-spin>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import { useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import {
+  BarcodeOutline as BarcodeIcon,
+  AlarmOutline as AlarmIcon,
+  CodeWorking as CodeIcon,
+  IdCardOutline as IdCardIcon,
+} from "@vicons/ionicons5";
 import Order from "./order.vue";
-// import { getInfluxList } from "@/api/common/common";
+import dayjs from "dayjs";
+import { getCustomer } from "@/api/operationStatistics/operationStatistics";
 export default defineComponent({
   name: "UsersStatistics",
   components: {
@@ -35,79 +47,73 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false);
-    const month = ref(null);
-    const message = useMessage();
-
-    const data = ref([]);
-
-    const columns = [
+    const month = ref(new Date().getTime());
+    const lineData = ref([]);
+    const dateData = ref([]);
+    const usersData = ref([
       {
-        title: "流量方",
-        key: "flowSquare",
-        align: "center",
+        label: "当前用户总数",
+        value: "",
+        icon: AlarmIcon,
+        key: "pendingOrders",
       },
       {
-        title: "完成单量",
-        key: "finishOrder",
-        align: "center",
+        label: "今日新增用户",
+        value: "",
+        key: "pendingServiceOrders",
+        icon: BarcodeIcon,
       },
       {
-        title: "取消单量",
-        key: "cancelOrder",
-        align: "center",
+        label: "今日活跃用户",
+        value: "",
+        key: "inServiceOrders",
+        icon: CodeIcon,
       },
       {
-        title: "无效单量",
-        key: "invalidOrder",
-        align: "center",
+        label: "今日用车用户",
+        value: "",
+        key: "toBePaidOrders",
+        icon: IdCardIcon,
       },
-      {
-        title: "总计",
-        key: "total",
-        align: "center",
-      },
-    ];
+    ]);
 
     onMounted(() => {
-      getData();
+      getData(dayjs(new Date()).format("YYYY-MM"));
     });
 
-    const getData = async () => {
+    const getData = async (month: string) => {
       loading.value = true;
-      //   try {
-      //     let openCity = await getOpenCity();
-      //     console.log(openCity);
+      try {
+        let res = await getCustomer({ month });
+        usersData.value[0].value = res.data.customerCount;
+        usersData.value[1].value = res.data.newCustomerCount;
+        usersData.value[2].value = res.data.activeCustomerCount;
+        usersData.value[3].value = res.data.orderCustomerCount;
 
-      //     let influx = await getInfluxList();
-      //     console.log(influx);
+        dateData.value = res.data.dayList;
+        lineData.value = res.data.countList;
 
-      //     let res = await getCityOder({
-      //       cityCode: "allCity",
-      //       beginDate: "2022-03-16",
-      //       endDate: "2022-03-18",
-      //     });
-      //     console.log(res);
-      //     loading.value = false;
-      //   } catch (err) {
-      //     console.log(err);
-      //     loading.value = false;
-      //   }
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
     };
 
     function handleDate(value: string) {
-      console.log(value);
-      message.success("验证成功");
+      getData(dayjs(new Date(value)).format("YYYY-MM"));
     }
 
     return {
       loading,
       month,
-      columns,
-      data,
-      pagination: {
-        pageSize: 10,
+      dateData,
+      lineData,
+      usersData,
+      disablePreviousDate(ts: number) {
+        return ts > Date.now();
       },
-      getRowKeyId: (row: tableDataItem) => row.id,
+      legenData: ["用户总数"],
       handleDate,
     };
   },
