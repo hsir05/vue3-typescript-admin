@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-hidden box-border">
+  <div class="overflow-hidden box-border">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -113,8 +113,6 @@
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-batch="handleBatch"
-      @on-checked-row="handleCheckRow"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -248,7 +246,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleDetail.bind(null, record),
+                onClick: handleDetail.bind(null, record.orderId),
                 auth: ["dict001"],
               },
             ],
@@ -275,16 +273,11 @@ export default defineComponent({
       }
     };
 
-    function handleCheckRow(rowKeys: string[]) {
-      console.log("选择了", rowKeys);
-    }
-
-    function handleDetail(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      router.push({ path: "/operate-order/finished-detail", query: { id: record.id } });
-    }
-    function handleBatch() {
-      console.log("点击了批量删除");
+    function handleDetail(orderId: string) {
+      router.push({
+        path: "/operate-order/finished-detail",
+        query: { id: orderId, orderState: "invalid" },
+      });
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -292,7 +285,7 @@ export default defineComponent({
       console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
@@ -345,10 +338,8 @@ export default defineComponent({
       itemCount,
 
       reloadPage,
-      handleBatch,
       searchHandle,
       reset,
-      handleCheckRow,
       handlePage,
       handlepagSize,
       handleSaveAfter,

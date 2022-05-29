@@ -16,7 +16,7 @@ export interface objIner {
 
 // 订单
 interface ItemInter {
-    text: string
+    text: string | null
     icon: Object
 }
 export interface OrderDataIner {

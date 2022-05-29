@@ -1,10 +1,11 @@
 <template>
-  <div class="h-full overflow-hidden box-border">
+  <div class="overflow-hidden box-border">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
       inline
       label-placement="left"
+      :show-feedback="false"
       label-width="120"
       style="flex-wrap: wrap"
       class="pt-15px pb-15px bg-white mb-5px"
@@ -36,7 +37,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="下单客户电话" path="customerPhoneEq">
+      <n-form-item label="下单客户电话" path="customerPhoneEq" v-if="isActive">
         <n-input
           v-model:value="queryValue.customerPhoneEq"
           clearable
@@ -44,7 +45,7 @@
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="运营企业" path="operationCompanyIdEq">
+      <n-form-item label="运营企业" path="operationCompanyIdEq" v-if="isActive">
         <n-select
           v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
@@ -53,7 +54,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="司机工号" path="driverNoEq">
+      <n-form-item label="司机工号" path="driverNoEq" v-if="isActive">
         <n-input
           v-model:value="queryValue.driverNoEq"
           clearable
@@ -62,7 +63,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="车牌号" path="plateNumberEq">
+      <n-form-item label="车牌号" path="plateNumberEq" v-if="isActive">
         <n-input
           v-model:value="queryValue.plateNumberEq"
           clearable
@@ -71,7 +72,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="订单状态" path="orderBusinessTypeEq">
+      <n-form-item label="订单状态" path="orderBusinessTypeEq" v-if="isActive">
         <n-select
           v-model:value="queryValue.orderBusinessTypeEq"
           placeholder="选择订单状态"
@@ -80,7 +81,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(起始)" path="useVehicleTimeGe">
+      <n-form-item label="交易时间(起始)" path="useVehicleTimeGe" v-if="isActive">
         <n-date-picker
           v-model:value="queryValue.useVehicleTimeGe"
           type="date"
@@ -89,7 +90,7 @@
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(结束)" path="useVehicleTimeLe">
+      <n-form-item label="交易时间(结束)" path="useVehicleTimeLe" v-if="isActive">
         <n-date-picker
           v-model:value="queryValue.useVehicleTimeLe"
           type="date"
@@ -99,9 +100,9 @@
       </n-form-item>
 
       <n-form-item>
-        <n-button attr-type="button" type="primary" class="mr-10px" @click="searchHandle"
-          >展开</n-button
-        >
+        <n-button attr-type="button" type="primary" class="mr-10px" @click="toggleActive">{{
+          isActive ? "收起" : " 展开"
+        }}</n-button>
         <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
         <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
       </n-form-item>
@@ -140,6 +141,7 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const router = useRouter();
+    const isActive = ref(false);
     const queryValue = ref({
       influxOrderNoEq: null,
       influxCodeEq: null,
@@ -276,7 +278,10 @@ export default defineComponent({
       }
     };
     function handleDetail(orderId: string) {
-      router.push({ path: "/operate-order/finished-detail", query: { id: orderId } });
+      router.push({
+        path: "/operate-order/finished-detail",
+        query: { id: orderId, orderState: "finished" },
+      });
     }
 
     const searchHandle = (e: MouseEvent) => {
@@ -302,7 +307,9 @@ export default defineComponent({
       resetPagination();
       getData({ pageIndex: 1, pageSize: 10 });
     };
-
+    const toggleActive = () => {
+      isActive.value = !isActive.value;
+    };
     function reloadPage() {
       const { resetPagination } = basicTableRef.value;
       resetPagination();
@@ -326,6 +333,7 @@ export default defineComponent({
       queryValue,
       data,
       loading,
+      isActive,
       basicTableRef,
       statusOptions,
       options: [],
@@ -333,6 +341,7 @@ export default defineComponent({
       itemCount,
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
       reloadPage,
+      toggleActive,
       searchHandle,
       reset,
       handlePage,

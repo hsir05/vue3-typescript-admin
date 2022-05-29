@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-hidden box-border">
+  <div class="overflow-hidden box-border">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -108,12 +108,12 @@
     <BasicTable
       :data="data"
       ref="basicTableRef"
+      :scroll-x="1400"
       :columns="columns"
       :row-key="getRowKeyId"
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-add="handleAdd"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
     />
@@ -123,7 +123,8 @@
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import { useRouter } from "vue-router";
+import { EyeOutline as EyeIcon, GitBranchOutline as GitBranchIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { TableDataItemInter, QueryForm } from "./type";
 import { statusOptions } from "@/config/form";
@@ -138,6 +139,7 @@ export default defineComponent({
     const userDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
+    const router = useRouter();
     const queryValue = ref<QueryForm>({
       timeGe: null,
       timeLe: null,
@@ -167,11 +169,17 @@ export default defineComponent({
         title: "流量方订单号",
         key: "influxOrderNo",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "下单车型",
         key: "orderPlaceVehicleList.vehicleTypeName",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
         render(row: TableDataItemInter) {
           return h(
             "span",
@@ -182,6 +190,9 @@ export default defineComponent({
       {
         title: "订单类型",
         key: "orderType",
+        ellipsis: {
+          tooltip: true,
+        },
         align: "center",
       },
       {
@@ -192,17 +203,26 @@ export default defineComponent({
       {
         title: "出发地",
         key: "orderBeginAddress",
+        ellipsis: {
+          tooltip: true,
+        },
         align: "center",
       },
       {
         title: "目的地",
         key: "orderEndAddress",
+        ellipsis: {
+          tooltip: true,
+        },
         align: "center",
       },
 
       {
         title: "运营企业",
         key: "operationCompanyName",
+        ellipsis: {
+          tooltip: true,
+        },
         align: "center",
       },
       {
@@ -224,6 +244,9 @@ export default defineComponent({
         title: "用车时间",
         key: "useVehicleTime",
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
         render(record: TableDataItemInter) {
           return h("span", dayjs(record.useVehicleTime).format("YYYY-MM-DD HH:mm:ss"));
         },
@@ -241,20 +264,16 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: EyeIcon,
-                onClick: handleEdit.bind(null, record.orderId),
+                onClick: handleDetail.bind(null, record.orderId),
                 auth: ["dict001"],
               },
               {
-                label: "删除",
-                type: "error",
+                label: "订单改派",
+                type: "primary",
                 isIconBtn: true,
-                icon: CreateIcon,
-                secondary: true,
-                auth: ["dict002"],
-                popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
-                  title: "您确定删除?",
-                },
+                icon: GitBranchIcon,
+                onClick: handleReassignment.bind(null, record.orderId),
+                auth: ["dict001"],
               },
             ],
           });
@@ -280,27 +299,22 @@ export default defineComponent({
       }
     };
 
-    function handleEdit(orderId: string) {
-      const { openDrawer } = userDrawerRef.value;
-      openDrawer(orderId);
+    function handleDetail(orderId: string) {
+      router.push({
+        path: "/operate-order/finished-detail",
+        query: { id: orderId, orderState: "serving" },
+      });
     }
 
-    function handleAdd() {
-      console.log("点击了新增");
-      const { openDrawer } = userDrawerRef.value;
-      openDrawer("新增用户");
-    }
-    function handleRemove(record: Recordable) {
-      //   message.info("点击了删除", record);
-      console.log("点击了删除", record);
+    function handleReassignment(orderId: string) {
+      console.log(orderId);
     }
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      console.log(queryValue.value);
       const { resetPagination } = basicTableRef.value;
       resetPagination();
-      //   getData({ page: 1, pageSize: 10 });
+      getData({ pageIndex: 1, pageSize: 10 });
     };
     const reset = () => {
       queryValue.value = {
@@ -353,7 +367,6 @@ export default defineComponent({
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
 
       reloadPage,
-      handleAdd,
       searchHandle,
       reset,
       handlePage,

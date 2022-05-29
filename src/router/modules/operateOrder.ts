@@ -31,14 +31,7 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operateOrder/finishedOrder/finishedOrder.vue"),
       },
-       {
-        path: "/operate-order/finished-detail",
-        name: `operate-order_finished-detail`,
-        meta: {
-          title: "已完成订单详情",
-        },
-        component: () => import("@/views/operateOrder/finishedOrder/orderDetail.vue"),
-      },
+       
        {
         path: "/operate-order/channel",
         name: `operate-order_channel`,
@@ -54,6 +47,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "无效订单",
         },
         component: () => import("@/views/operateOrder/invalidOrder/invalidOrder.vue"),
+      },
+      {
+        path: "/operate-order/finished-detail",
+        name: `operate-order_finished-detail`,
+        meta: {
+          title: "已完成订单详情",
+        },
+        component: () => import("@/views/operateOrder/orderDetail/orderDetail.vue"),
       },
        {
         path: "/operate-order/order-comment",

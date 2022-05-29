@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-hidden box-border">
+  <div class="overflow-hidden box-border">
     <!-- 搜索 -->
     <n-form
       ref="formRef"
@@ -265,7 +265,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleDetail.bind(null, record),
+                onClick: handleDetail.bind(null, record.orderId),
                 auth: ["dict001"],
               },
             ],
@@ -292,9 +292,11 @@ export default defineComponent({
       }
     };
 
-    function handleDetail(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      router.push({ path: "/operate-order/finished-detail", query: { id: record.id } });
+    function handleDetail(orderId: string) {
+      router.push({
+        path: "/operate-order/finished-detail",
+        query: { id: orderId, orderState: "channel" },
+      });
     }
 
     const searchHandle = (e: MouseEvent) => {

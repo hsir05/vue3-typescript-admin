@@ -110,7 +110,7 @@ export function getOrderFinishedPage(data: OrderFinishedInter) {
     });
 }
 /**
- * 服务中订单详情
+ * 已完成订单详情
  */
 export function getOrderFinishedDetail(data: {orderId: string}) {
     return http.request({
@@ -120,10 +120,10 @@ export function getOrderFinishedDetail(data: {orderId: string}) {
     });
 }
 
-//-----------------已完成订单-------------------------
+//-----------------已取消订单-------------------------
 
 /**
- * 已完成订单
+ * 已取消订单
  */
 interface OrderChannelInter {
     page: PaginationInter;
@@ -141,9 +141,20 @@ interface OrderChannelInter {
         orderBusinessType: string | null;
     };
 }
+
 export function getOrderChannelPage(data: OrderChannelInter) {
     return http.request({
         url: "/orderCancelled/page",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 已取消订单详情
+ */
+export function getOrderCannelDetail(data: {orderId: string}) {
+    return http.request({
+        url: "/orderCancelled/detail",
         method: "post",
         data: data,
     });
@@ -176,7 +187,16 @@ export function getOrderInvalidPage(data: OrderInvalidInter) {
         data: data,
     });
 }
-
+/**
+ * 无效订单详情
+ */
+export function getOrderInvalidDetail(data: {orderId: string}) {
+    return http.request({
+        url: "/orderInvalid/detail",
+        method: "post",
+        data: data,
+    });
+}
 //-----------------评论订单-------------------------
 
 /**

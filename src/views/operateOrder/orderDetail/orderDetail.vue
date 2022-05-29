@@ -16,7 +16,8 @@
             >{{ detail?.passengerPhone }}
           </n-descriptions-item>
           <n-descriptions-item label="司机姓名[工号]" :span="2">
-            {{ detail?.driverFullName }} [{{ detail?.driverNo }}]
+            {{ detail?.driverFullName }}
+            <span v-if="detail?.driverNo">[{{ detail?.driverNo }}]</span>
           </n-descriptions-item>
           <n-descriptions-item label="司机手机号">{{ detail?.driverPhone }} </n-descriptions-item>
           <n-descriptions-item label="车牌号">{{ detail?.plateNumber }} </n-descriptions-item>
@@ -33,11 +34,13 @@
           :isDate="item.isDate"
           v-for="(item, index) in step"
           :key="index"
+          @update-event="handleEvent"
         />
       </div>
     </div>
     <div class="right">
       <Map ref="baiduMapRef" class="map" />
+
       <n-descriptions label-placement="left" bordered :column="3" class="mt-10px">
         <n-descriptions-item label="客户手机号">{{ detail?.customerPhone }}</n-descriptions-item>
         <n-descriptions-item label="客户称呼">{{ detail?.customerNickname }}</n-descriptions-item>
@@ -64,22 +67,25 @@
         <n-descriptions-item label="下单地点" :span="2">{{
           detail?.customerCreateOrderAddress
         }}</n-descriptions-item>
-        <n-descriptions-item label="订单留言">{{ detail?.orderMessage }}</n-descriptions-item>
-        <n-descriptions-item label="上车地点" :span="2">{{
-          detail?.orderBeginAddress
-        }}</n-descriptions-item>
-        <n-descriptions-item label="下车地点" :span="2">{{
-          detail?.orderEndAddress
-        }}</n-descriptions-item>
         <n-descriptions-item label="订单预计时长">{{
           detail?.orderEstimateDuration
+        }}</n-descriptions-item>
+        <n-descriptions-item label="订单留言" :span="2">{{
+          detail?.orderMessage
         }}</n-descriptions-item>
         <n-descriptions-item label="订单预计里程">{{
           detail?.orderEstimateMileage
         }}</n-descriptions-item>
+        <n-descriptions-item label="上车地点" :span="2">{{
+          detail?.orderBeginAddress
+        }}</n-descriptions-item>
         <n-descriptions-item label="需付预付款金额(元)">{{
           detail?.needAdvanceAmount
         }}</n-descriptions-item>
+        <n-descriptions-item label="下车地点" :span="2">{{
+          detail?.orderEndAddress
+        }}</n-descriptions-item>
+
         <n-descriptions-item label="已付预付款金额(元)">{{
           detail?.paidAdvanceAmount
         }}</n-descriptions-item>
@@ -89,39 +95,30 @@
       </n-descriptions>
 
       <!-- 表格 -->
-      <p class="mt-10px ml-10px">订单预付款信息</p>
-      <n-data-table
-        ref="table"
-        :data="orderAdvanceRDTOList"
-        :columns="columns"
-        class="box-border mt-10px"
-        min-height="100px"
-        flex-height
-        :row-key="getRowKeyId"
-        :pagination="false"
-      />
+      <OrderAdvance />
     </div>
-
-    <OrderAdvanceModal ref="orderAdvanceModalRef" width="930px" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, onMounted } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { TableDataItemInter } from "./type";
-import OrderAdvanceModal from "./orderAdvanceModal.vue";
-
 import Map from "@/components/Map/BaiduMap.vue";
-import TableActions from "@/components/TableActions/TableActions.vue";
-import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
+import OrderAdvance from "./orderAdvance.vue";
 import StepItem from "./stepItem.vue";
-import { getOrderFinishedDetail, getOrderAdvance } from "@/api/operateOrder/operateOrder";
+import {
+  getOrderDetail,
+  getOrderFinishedDetail,
+  getOrderInvalidDetail,
+  getOrderCannelDetail,
+} from "@/api/operateOrder/operateOrder";
+import { isSameDay } from "@/utils/index";
 import startIcon from "@/assets/image/icon_begin_address.png";
 import endIcon from "@/assets/image/icon_end_address.png";
 import { OrderDataEnum } from "@/enums/dict";
 export default defineComponent({
   name: "FinisherOrderDetail",
-  components: { Map, OrderAdvanceModal, StepItem },
+  components: { Map, OrderAdvance, StepItem },
   setup() {
     const route = useRoute();
     const loading = ref(false);
@@ -129,73 +126,16 @@ export default defineComponent({
     const currentRef = ref<number | null>(2);
     interface StepInter {
       orderState: string;
-      date: number | null;
-      isDate: boolean;
+      date?: number | null;
+      isDate?: boolean;
     }
 
     const step = ref<StepInter[]>([]);
     const detail = ref();
     const orderAdvance = ref();
-    const orderAdvanceModalRef = ref();
-
-    const orderAdvanceRDTOList = ref([]);
-
-    const columns = [
-      {
-        title: "交易流水号",
-        key: "dealSerialNumber",
-        align: "center",
-      },
-      {
-        title: "支付渠道类型",
-        key: "paymentChannelType",
-        align: "center",
-      },
-      {
-        title: "预付款金额",
-        key: "advanceAmount",
-        align: "center",
-      },
-      {
-        title: "已支付订单金额",
-        key: "paidOrderAmount",
-        align: "center",
-      },
-      {
-        title: "已退款金额",
-        key: "refundedAmount",
-        align: "center",
-      },
-      {
-        title: "记录时间",
-        key: "createTime",
-        align: "center",
-      },
-      {
-        title: "操作",
-        key: "actions",
-        align: "center",
-        width: 100,
-        render(record: TableDataItemInter) {
-          return h(TableActions as any, {
-            actions: [
-              {
-                label: "x详情",
-                type: "primary",
-                isIconBtn: true,
-                icon: EyeIcon,
-                onClick: hanldleSee.bind(null, record),
-                auth: ["dict001"],
-              },
-            ],
-          });
-        },
-      },
-    ];
 
     onMounted(async () => {
       getDetail(route.query.id as string);
-      getOrderAdvanceData(route.query.id as string);
     });
 
     const getDetail = async (orderId: string) => {
@@ -204,63 +144,25 @@ export default defineComponent({
       }
       try {
         loading.value = true;
-        let res = await getOrderFinishedDetail({ orderId });
+        let res = null;
+        console.log(route.query.orderState);
+        let orderState = route.query.orderState;
+        switch (orderState) {
+          case "serving":
+            res = await getOrderDetail({ orderId });
+            break;
+          case "finished":
+            res = await getOrderFinishedDetail({ orderId });
+            break;
+          case "channel":
+            res = await getOrderCannelDetail({ orderId });
+            break;
+          case "invalid":
+            res = await getOrderInvalidDetail({ orderId });
+            break;
+        }
         console.log(res.data);
         detail.value = res.data;
-
-        const {
-          orderCreateTime,
-          driverAcceptOrderTime,
-          driverReceptionPassengerTime,
-          driverArrivePickupAddressTime,
-          driverBeginServiceTime,
-          driverEndServiceTime,
-          orderCostCreateTime,
-        } = res.data;
-
-        step.value.push({
-          orderState: OrderDataEnum.CREATEORDER,
-          date: orderCreateTime,
-          isDate: true,
-        });
-        step.value.push({
-          orderState: OrderDataEnum.ACCEPTORDER,
-          date: driverAcceptOrderTime,
-          isDate: false,
-        });
-        step.value.push({
-          orderState: OrderDataEnum.RECEPTIONPASSENGER,
-          date: driverReceptionPassengerTime,
-          isDate: false,
-        });
-        step.value.push({
-          orderState: OrderDataEnum.DRIVERARRIVERPICKUPADDRESS,
-          date: driverArrivePickupAddressTime,
-          isDate: false,
-        });
-        step.value.push({
-          orderState: OrderDataEnum.DRIVERBEGINSERVICES,
-          date: driverBeginServiceTime,
-          isDate: false,
-        });
-        step.value.push({
-          orderState: OrderDataEnum.DRIVERENDSERVICES,
-          date: driverEndServiceTime,
-          isDate: false,
-        });
-        step.value.push({
-          orderState: OrderDataEnum.ORDERCOSTCREATE,
-          date: orderCostCreateTime,
-          isDate: false,
-        });
-
-        const beginLng = detail.value.orderBeginAddressLongitude * 1e-6;
-        const beginEnd = detail.value.orderBeginAddressLatitude * 1e-6;
-        const endLng = detail.value.orderEndAddressLongitude * 1e-6;
-        const EndLat = detail.value.orderEndAddressLatitude * 1e-6;
-        const { renderBaiduMap, trackIng } = baiduMapRef.value;
-        renderBaiduMap(beginLng, beginEnd);
-        trackIng(beginLng, beginEnd, endLng, EndLat, startIcon, endIcon);
 
         let str = "";
         for (let i = 0; i < detail.value.orderPlaceVehicleList.length; i++) {
@@ -271,6 +173,10 @@ export default defineComponent({
           }
         }
         detail.value.vehicleTypeName = str;
+
+        await getOrderStep();
+        await handleMap();
+
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -278,37 +184,158 @@ export default defineComponent({
       }
     };
 
-    const getOrderAdvanceData = async (orderId: string) => {
-      if (!orderId) {
-        return false;
-      }
-      try {
-        loading.value = true;
-        let res = await getOrderAdvance({ orderId });
-        // console.log(res.data);
-        orderAdvanceRDTOList.value = res.data.orderAdvanceRDTOList;
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
+    const getOrderStep = (): Promise<boolean> => {
+      return new Promise((resolve) => {
+        const {
+          orderCreateTime,
+          driverAcceptOrderTime,
+          driverReceptionPassengerTime,
+          driverArrivePickupAddressTime,
+          driverBeginServiceTime,
+          driverEndServiceTime,
+          orderCostCreateTime,
+        } = detail.value;
+        if (!orderCreateTime) {
+          resolve(true);
+          return;
+        }
+        step.value.push({
+          orderState: OrderDataEnum.CREATEORDER,
+          date: orderCreateTime,
+          isDate: true,
+        });
+        if (!driverAcceptOrderTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+
+        if (
+          detail.value.orderDispatchRecordList &&
+          detail.value.orderDispatchRecordList.length > 0
+        ) {
+          for (let i = 0; i < detail.value.orderDispatchRecordList.length; i++) {
+            let item = detail.value.orderDispatchRecordList[i];
+            if (i === 0) {
+              step.value.push({
+                orderState: OrderDataEnum.ACCEPTORDER,
+                date: item.dispatchOrderTime,
+                isDate: !isSameDay(new Date(orderCreateTime), new Date(item.dispatchOrderTime)),
+              });
+            } else {
+              step.value.push({
+                orderState: OrderDataEnum.ACCEPTORDER,
+                date: item.dispatchOrderTime,
+                isDate: !isSameDay(
+                  new Date(detail.value.orderDispatchRecordList[i - 1]),
+                  new Date(item.dispatchOrderTime)
+                ),
+              });
+            }
+          }
+        } else {
+          step.value.push({
+            orderState: OrderDataEnum.ACCEPTORDER,
+            date: driverAcceptOrderTime,
+            isDate: !isSameDay(new Date(orderCreateTime), new Date(driverAcceptOrderTime)),
+          });
+        }
+        if (!driverReceptionPassengerTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+        step.value.push({
+          orderState: OrderDataEnum.RECEPTIONPASSENGER,
+          date: driverReceptionPassengerTime,
+          isDate: !isSameDay(
+            new Date(driverAcceptOrderTime),
+            new Date(driverReceptionPassengerTime)
+          ),
+        });
+        if (!driverArrivePickupAddressTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+        step.value.push({
+          orderState: OrderDataEnum.DRIVERARRIVERPICKUPADDRESS,
+          date: driverArrivePickupAddressTime,
+          isDate: !isSameDay(
+            new Date(driverReceptionPassengerTime),
+            new Date(driverArrivePickupAddressTime)
+          ),
+        });
+        if (!driverBeginServiceTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+        step.value.push({
+          orderState: OrderDataEnum.DRIVERBEGINSERVICES,
+          date: driverBeginServiceTime,
+          isDate: !isSameDay(
+            new Date(driverArrivePickupAddressTime),
+            new Date(driverBeginServiceTime)
+          ),
+        });
+        if (!driverEndServiceTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+        step.value.push({
+          orderState: OrderDataEnum.DRIVERENDSERVICES,
+          date: driverEndServiceTime,
+          isDate: !isSameDay(new Date(driverBeginServiceTime), new Date(driverEndServiceTime)),
+        });
+        if (!orderCostCreateTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+        step.value.push({
+          orderState: OrderDataEnum.ORDERCOSTCREATE,
+          date: orderCostCreateTime,
+          isDate: !isSameDay(new Date(driverEndServiceTime), new Date(orderCostCreateTime)),
+        });
+        if (!driverAcceptOrderTime) {
+          step.value.push({ orderState: OrderDataEnum.ORDEREND });
+          resolve(true);
+          return;
+        }
+        step.value.push({ orderState: OrderDataEnum.ORDEREND });
+        resolve(true);
+      });
     };
-    function hanldleSee(record: Recordable) {
-      const { handleModal } = orderAdvanceModalRef.value;
-      handleModal(record.orderAdvanceFlowOutRDTOList);
-    }
+
+    const handleMap = (): Promise<boolean> => {
+      return new Promise((resolve) => {
+        const beginLng = detail.value.orderBeginAddressLongitude * 1e-6;
+        const beginEnd = detail.value.orderBeginAddressLatitude * 1e-6;
+        const endLng = detail.value.orderEndAddressLongitude * 1e-6;
+        const EndLat = detail.value.orderEndAddressLatitude * 1e-6;
+        const { renderBaiduMap, trackIng } = baiduMapRef.value;
+        renderBaiduMap(beginLng, beginEnd);
+        trackIng(beginLng, beginEnd, endLng, EndLat, startIcon, endIcon);
+
+        resolve(true);
+      });
+    };
+
+    const handleEvent = (orderState: string) => {
+      console.log(orderState);
+    };
 
     return {
       getRowKeyId: (row: TableDataItemInter) => row.dealSerialNumber,
       current: currentRef,
-      orderAdvanceModalRef,
       baiduMapRef,
       loading,
       detail,
       orderAdvance,
-      orderAdvanceRDTOList,
-      columns,
       step,
+      handleEvent,
     };
   },
 });
@@ -322,13 +349,13 @@ export default defineComponent({
 }
 
 .left {
-  width: 570px;
+  width: 500px;
   height: 100%;
   overflow-y: scroll;
 }
 
 .right {
-  width: calc(100% - 570px - 15px);
+  width: calc(100% - 500px - 15px);
   height: 100%;
   padding: 5px;
   background-color: $white;
@@ -337,7 +364,7 @@ export default defineComponent({
   overflow-y: scroll;
 
   .map {
-    height: 400px;
+    height: 320px;
   }
 }
 </style>

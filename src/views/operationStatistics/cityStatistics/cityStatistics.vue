@@ -5,7 +5,7 @@
       ref="queryFormRef"
       inline
       label-placement="left"
-      class="pt-15px pb-15px bg-white mb-5px"
+      class="pt-15px pb-10px mb-5px bg-white"
       require-mark-placement="right-hanging"
       :show-feedback="false"
       label-width="100"
@@ -44,36 +44,36 @@
       </div>
     </n-form>
 
-    <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
-      <n-data-table
-        :loading="loading"
-        ref="table"
-        striped
-        :columns="columns"
-        class="box-border mb-15px"
-        :row-key="getRowKeyId"
-        :data="data"
-        :pagination="false"
+    <n-data-table
+      :loading="loading"
+      ref="table"
+      striped
+      :columns="columns"
+      class="box-border mt-10px p-10px mb-15px bg-white"
+      :row-key="getRowKeyId"
+      :data="data"
+      :pagination="false"
+    />
+    <div class="flex p-10px bg-white">
+      <span>城市单量统计</span>
+      <n-select
+        clearable
+        style="width: 100px"
+        filterable
+        v-model:value="status"
+        @update:value="handleStatus"
+        :options="option"
       />
-      <div class="flex mb-20px">
-        <span>城市单量统计</span>
-        <n-select
-          clearable
-          style="width: 100px"
-          filterable
-          v-model:value="status"
-          @update:value="handleStatus"
-          :options="option"
-        />
-      </div>
-      <Order :data="data" />
     </div>
+    <n-spin :show="loading" class="bg-white">
+      <Order :data="lineData" :xAxisData="dateData" :legendData="legendData" />
+    </n-spin>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
-import { tableDataItem } from "./type";
+import { defineComponent, ref, onMounted } from "vue";
+import { SelectOption } from "naive-ui";
+import { TableDataItemInter, ItemInter, ArrItemInter } from "./type";
 import Order from "./order.vue";
 import { getCityOrder } from "@/api/operationStatistics/operationStatistics";
 import { getInfluxList, getAllOpenCity } from "@/api/common/common";
@@ -88,53 +88,43 @@ export default defineComponent({
     const loading = ref(false);
     const status = ref("finished");
     const openCityData = ref<SelectOption[]>([]);
-    const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
       section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
       cityCode: "allCity",
     });
     const influxData = ref([]);
-    const message = useMessage();
+    const allData = ref<ItemInter[]>([]);
+    const data = ref<TableDataItemInter[]>([]);
 
-    function query(e: MouseEvent) {
-      e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
-    }
+    const legendData = ref<string[]>([]);
 
-    const data = ref([]);
+    const lineData = ref<ArrItemInter[]>([]);
+    const dateData = ref<string[]>([]);
 
     const columns = [
       {
         title: "流量方",
-        key: "flowSquare",
+        key: "influxName",
         align: "center",
       },
       {
         title: "完成单量",
-        key: "finishOrder",
+        key: "finished",
         align: "center",
       },
       {
         title: "取消单量",
-        key: "cancelOrder",
+        key: "cancelled",
         align: "center",
       },
       {
         title: "无效单量",
-        key: "invalidOrder",
+        key: "invalid",
         align: "center",
       },
       {
         title: "总计",
-        key: "total",
+        key: "orderCount",
         align: "center",
       },
     ];
@@ -152,8 +142,6 @@ export default defineComponent({
         });
         openCityData.value.unshift({ label: "全部", value: "allCity" });
         influxData.value = await getInfluxList();
-        // console.log(influxData);
-
         getCityOrderData();
         loading.value = false;
       } catch (err) {
@@ -164,25 +152,138 @@ export default defineComponent({
 
     const getCityOrderData = async () => {
       try {
+        loading.value = true;
+        legendData.value = [];
+        allData.value = [];
+        data.value = [];
+        dateData.value = [];
         let res = await getCityOrder({
           cityCode: queryForm.value.cityCode,
           beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
           endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
         });
-        console.log(res);
+
+        allData.value = res.data;
+
+        const yimin = res.data.filter((item: ItemInter) => item.influxCode === "IFT0001");
+        const xiecheng = res.data.filter((item: ItemInter) => item.influxCode === "IFT0002");
+        const zhangshanggaotie = res.data.filter(
+          (item: ItemInter) => item.influxCode === "IFT0003"
+        );
+        const rongheyueche = res.data.filter((item: ItemInter) => item.influxCode === "IFT0004");
+        const meituanyueche = res.data.filter((item: ItemInter) => item.influxCode === "IFT0005");
+        const goupuchuxing = res.data.filter((item: ItemInter) => item.influxCode === "IFT0006");
+        const caocaochuxing = res.data.filter((item: ItemInter) => item.influxCode === "IFT0007");
+        const feizhuyongche = res.data.filter((item: ItemInter) => item.influxCode === "IFT0008");
+        const haluochexing = res.data.filter((item: ItemInter) => item.influxCode === "IFT0009");
+        const yueche365 = res.data.filter((item: ItemInter) => item.influxCode === "IFT0010");
+
+        legendData.value.push(yimin[0].influxName);
+        legendData.value.push(xiecheng[0].influxName);
+        legendData.value.push(zhangshanggaotie[0].influxName);
+        legendData.value.push(rongheyueche[0].influxName);
+        legendData.value.push(meituanyueche[0].influxName);
+        legendData.value.push(goupuchuxing[0].influxName);
+        legendData.value.push(caocaochuxing[0].influxName);
+        legendData.value.push(feizhuyongche[0].influxName);
+        legendData.value.push(haluochexing[0].influxName);
+        legendData.value.push(yueche365[0].influxName);
+
+        handleTableData(yimin, yimin[0].influxCode, yimin[0].influxName);
+        handleTableData(xiecheng, xiecheng[0].influxCode, xiecheng[0].influxName);
+        handleTableData(
+          zhangshanggaotie,
+          zhangshanggaotie[0].influxCode,
+          zhangshanggaotie[0].influxName
+        );
+        handleTableData(rongheyueche, rongheyueche[0].influxCode, rongheyueche[0].influxName);
+        handleTableData(meituanyueche, meituanyueche[0].influxCode, meituanyueche[0].influxName);
+        handleTableData(goupuchuxing, goupuchuxing[0].influxCode, goupuchuxing[0].influxName);
+        handleTableData(caocaochuxing, caocaochuxing[0].influxCode, caocaochuxing[0].influxName);
+        handleTableData(feizhuyongche, feizhuyongche[0].influxCode, feizhuyongche[0].influxName);
+        handleTableData(haluochexing, haluochexing[0].influxCode, haluochexing[0].influxName);
+        handleTableData(yueche365, yueche365[0].influxCode, yueche365[0].influxName);
+
+        // 获取折线图数据
+        await getLineData(status.value);
+        loading.value = false;
       } catch (err) {
         console.log(err);
+        loading.value = false;
       }
     };
 
-    function handleStatus(value: string) {
-      console.log(value);
+    const handleTableData = (arr: ItemInter[], influxCode: string, influxName: string) => {
+      let finished = 0;
+      let cancelled = 0;
+      let invalid = 0;
+      let orderCount = 0;
+      for (let i = 0; i < arr.length; i++) {
+        orderCount += arr[i].orderCount;
+        if (arr[i].orderBelong === "finished") {
+          finished += arr[i].orderCount;
+        } else if (arr[i].orderBelong === "cancelled") {
+          cancelled += arr[i].orderCount;
+        } else if (arr[i].orderBelong === "invalid") {
+          invalid += arr[i].orderCount;
+        }
+      }
+      let item = { influxName, finished, cancelled, influxCode, invalid, orderCount };
+      data.value.push(item);
+    };
+
+    const getLineData = (type = "finished") => {
+      return new Promise((resolve) => {
+        lineData.value = [[], [], [], [], [], [], [], [], [], []];
+        let data = allData.value.filter((item: ItemInter) => item.orderBelong === type);
+        let arr: ArrItemInter[] = [[], [], [], [], [], [], [], [], [], []];
+        for (let key of data) {
+          if (key.influxCode === "IFT0001") {
+            dateData.value.push(key.date);
+            arr[0].push(key.orderCount);
+          } else if (key.influxCode === "IFT0002") {
+            arr[1].push(key.orderCount);
+          } else if (key.influxCode === "IFT0003") {
+            arr[2].push(key.orderCount);
+          } else if (key.influxCode === "IFT0004") {
+            arr[3].push(key.orderCount);
+          } else if (key.influxCode === "IFT0005") {
+            arr[4].push(key.orderCount);
+          } else if (key.influxCode === "IFT0006") {
+            arr[5].push(key.orderCount);
+          } else if (key.influxCode === "IFT0007") {
+            arr[6].push(key.orderCount);
+          } else if (key.influxCode === "IFT0008") {
+            arr[7].push(key.orderCount);
+          } else if (key.influxCode === "IFT0009") {
+            arr[8].push(key.orderCount);
+          } else if (key.influxCode === "IFT0010") {
+            arr[9].push(key.orderCount);
+          }
+        }
+        lineData.value = arr;
+        resolve(true);
+      });
+    };
+
+    function query() {
+      getCityOrderData();
+    }
+
+    async function handleStatus(value: string) {
+      loading.value = true;
+      status.value = value;
+      await getLineData(value);
+      loading.value = false;
     }
 
     return {
       loading,
+      lineData,
       openCityData,
       status,
+      dateData,
+      legendData,
       option: [
         {
           label: "完成",
@@ -203,7 +304,7 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.influxCode,
       rangeShortcuts,
 
       query,

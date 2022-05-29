@@ -1,7 +1,5 @@
 
 
-
-
 export enum sexEnum {
     "女",
     "男",
@@ -25,6 +23,7 @@ export enum OrderDataEnum {
     DRIVERENDSERVICES = 'driverEndServiceState', // 结束服务
     DRIVERSUBMISSIONCOST = 'driverSubmissionCostState', // 提交费用
     ORDERCOSTCREATE = 'orderCostCreateState', // 支付
+    ORDEREND = 'orderEndState', // 结束
 }
 
 export enum Dict {

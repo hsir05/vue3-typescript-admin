@@ -1,16 +1,24 @@
 <template>
   <div class="step pb-10px">
-    <div class="date mb-10px" v-if="isDate">{{ dayjs(date).format("YYYY-MM-DD") }}</div>
-    <div class="step-content" @click="handle">
-      <div class="step-icon-box">
-        <n-icon :component="orderData[orderState].icon" size="20" />
+    <template v-if="OrderDataEnum.ORDEREND !== orderState">
+      <div class="date mb-10px" v-if="isDate">{{ dayjs(date).format("YYYY-MM-DD") }}</div>
+      <div class="step-content" @click="handle">
+        <div class="step-icon-box">
+          <n-icon :component="orderData[orderState].icon" size="20" />
+        </div>
+        <div class="step-item-text pl-15px" v-if="orderData[orderState].text">
+          <p class="step-text mt-5px">{{ orderData[orderState].text }}</p>
+          <span class="time">
+            <n-icon size="14" class="icon-item mr-5px"> <TimeIcon /> </n-icon
+            >{{ dayjs(date).format("HH:mm:ss") }}
+          </span>
+        </div>
       </div>
-      <div class="step-item-text pl-15px">
-        <p class="step-text mt-5px">{{ orderData[orderState].text }}</p>
-        <span class="time">
-          <n-icon size="14" class="icon-item mr-5px"> <TimeIcon /> </n-icon
-          >{{ dayjs(date).format("HH:mm:ss") }}
-        </span>
+    </template>
+
+    <div class="step-content-end" v-else>
+      <div class="step-icon-box step-end">
+        <n-icon :component="orderData[orderState].icon" size="20" />
       </div>
     </div>
   </div>
@@ -18,6 +26,7 @@
 <script lang="ts" setup>
 import { orderData } from "@/config/table";
 import { toRefs } from "vue";
+import { OrderDataEnum } from "@/enums/dict";
 import { TimeOutline as TimeIcon } from "@vicons/ionicons5";
 import dayjs from "dayjs";
 const props = defineProps({
@@ -36,10 +45,10 @@ const props = defineProps({
 });
 const { orderState, date, isDate } = toRefs(props);
 
-const emit = defineEmits(["handleEvent"]);
+const emit = defineEmits(["update-event"]);
 
 const handle = () => {
-  emit("handleEvent");
+  emit("update-event", orderState.value);
 };
 </script>
 <style lang="scss">
@@ -53,7 +62,6 @@ const handle = () => {
     align-items: center;
     cursor: pointer;
     position: relative;
-
     @mixin line {
       content: " ";
       width: 4px;
@@ -62,7 +70,6 @@ const handle = () => {
       position: absolute;
       left: 22px;
     }
-
     &::before {
       @include line;
       top: -13px;
@@ -73,7 +80,6 @@ const handle = () => {
       bottom: -14px;
     }
   }
-
   .step-icon-box {
     width: 45px;
     height: 45px;
@@ -84,6 +90,18 @@ const handle = () => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+  .step-content-end {
+    @extend .step-content;
+    &::after {
+      display: none;
+    }
+  }
+  .step-end {
+    width: 30px;
+    height: 30px;
+    margin-left: 8px;
+    margin-top: 3px;
   }
 
   .step-item-text {

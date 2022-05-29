@@ -1,5 +1,7 @@
 import { objIner, OrderDataIner } from "@/interface/common/common"
-import { DocumentTextOutline as DocumentIcon, TimeOutline as TimeIcon } from "@vicons/ionicons5";
+import { DocumentTextOutline as DocumentIcon, CarSportOutline as CarIcon, FlagOutline as FlagIcon, PlayCircleOutline as PlayIcon, TimeOutline as TimeIcon, StopwatchOutline as StopIcon } from "@vicons/ionicons5";
+
+import { PayCircleOutlined as PayIcon, HourglassOutlined as HourglassIcon } from "@vicons/antd"
 import { OrderDataEnum } from "@/enums/dict"
 
 export const pageSizes = [
@@ -66,26 +68,30 @@ export const orderData: OrderDataIner = {
     },
     [OrderDataEnum.ACCEPTORDER]: {
         text: '接单',
-        icon: TimeIcon
+        icon: HourglassIcon
     },
     [OrderDataEnum.RECEPTIONPASSENGER]: {
         text: '去接乘客',
-        icon: DocumentIcon
+        icon: CarIcon
     },
     [OrderDataEnum.DRIVERARRIVERPICKUPADDRESS]: {
         text: '到达上车地点',
-        icon: DocumentIcon
+        icon: FlagIcon
     },
     [OrderDataEnum.DRIVERBEGINSERVICES]: {
         text: '开始服务',
-        icon: DocumentIcon
+        icon: PlayIcon
     },
     [OrderDataEnum.DRIVERENDSERVICES]: {
         text: '结束服务',
-        icon: DocumentIcon
+        icon: StopIcon
     },
     [OrderDataEnum.ORDERCOSTCREATE]: {
         text: '支付',
-        icon: DocumentIcon
+        icon: PayIcon
+    },
+    [OrderDataEnum.ORDEREND]: {
+        text: null,
+        icon: TimeIcon
     }
 }
