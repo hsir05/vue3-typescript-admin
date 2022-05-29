@@ -23,9 +23,9 @@
       </n-form-item>
 
       <div class="flex-center">
-        <n-form-item label="时间区间" path="section">
+        <n-form-item label="日期" path="section">
           <n-date-picker
-            v-model:value="queryForm.section"
+            v-model:value="queryForm.date"
             style="width: 250px"
             type="date"
             :update-value-on-close="true"
@@ -38,46 +38,46 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
-    <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
-      <n-data-table
-        :loading="loading"
-        ref="table"
-        striped
-        :columns="columns"
-        class="box-border mb-15px"
-        :row-key="getRowKeyId"
-        :data="data"
-        :pagination="false"
+    <n-data-table
+      :loading="loading"
+      ref="table"
+      striped
+      :columns="columns"
+      class="box-border p-10px mt-15px bg-white"
+      :row-key="getRowKeyId"
+      :data="data"
+      :pagination="false"
+    />
+    <div class="flex mt-10px p-10px bg-white">
+      <span>单量每小时分布</span>
+      <n-select
+        style="width: 100px"
+        filterable
+        v-model:value="status"
+        @update:value="handleStatus"
+        :options="option"
       />
-      <div class="flex mb-20px">
-        <span>单量每小时分布</span>
-        <n-select
-          clearable
-          style="width: 100px"
-          filterable
-          v-model:value="status"
-          @update:value="handleStatus"
-          :options="option"
-        />
-      </div>
-      <Order />
     </div>
+    <n-spin :show="loading" class="bg-white">
+      <Order :data="lineData" :xAxisData="dateData" />
+    </n-spin>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { defineComponent, ref, onMounted } from "vue";
+import { TableDataItemInter, ItemInter } from "./type";
 import Order from "./order.vue";
-// import { getCityOder } from "@/api/operationStatistics/operationStatistics";
-import { getInfluxList, getAllOpenCity } from "@/api/common/common";
+import dayjs from "dayjs";
+
+import { getOrderTimeIntervalDistributed } from "@/api/operationStatistics/operationStatistics";
+import { getAllOpenCity } from "@/api/common/common";
 export default defineComponent({
-  name: "CityStatistics",
+  name: "OrderDistribution",
   components: {
     Order,
   },
@@ -85,105 +85,127 @@ export default defineComponent({
     const loading = ref(false);
     const status = ref("finished");
     const openCityData = ref([]);
-    const queryFormRef = ref<FormInst | null>(null);
-    const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
-      cityCode: "allCity",
-    });
-    const message = useMessage();
 
-    function query(e: MouseEvent) {
-      e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
+    const lineData = ref<number[]>([]);
+    const dateData = ref<number[]>([]);
+
+    interface QueryFormInter {
+      date: string | number;
+      cityCode: string;
     }
-
-    const data = ref([]);
+    const queryForm = ref<QueryFormInter>({
+      date: new Date().getTime(),
+      cityCode: "110000",
+    });
+    interface DataInter {
+      hour06: number;
+      hour68: number;
+      hour810: number;
+      hour1012: number;
+      hour1214: number;
+      hour1416: number;
+      hour1618: number;
+      hour1820: number;
+      hour2022: number;
+      hour2224: number;
+      orderBelong: string;
+    }
+    const data = ref<DataInter[]>([]);
+    const allData = ref<ItemInter[]>([]);
 
     const columns = [
       {
         title: "类型",
-        key: "flowSquare",
+        key: "orderBelong",
         align: "center",
       },
       {
         title: "0至6时",
-        key: "flowSquare",
+        key: "hour06",
         align: "center",
       },
       {
         title: "6至8时",
-        key: "finishOrder",
+        key: "hour68",
         align: "center",
       },
       {
         title: "8至10时",
-        key: "cancelOrder",
+        key: "hour810",
         align: "center",
       },
       {
         title: "10至12时",
-        key: "invalidOrder",
+        key: "hour1012",
         align: "center",
       },
       {
         title: "12至14时",
-        key: "total",
+        key: "hour1214",
         align: "center",
       },
       {
         title: "14至16时",
-        key: "flowSquare",
+        key: "hour1416",
         align: "center",
       },
       {
         title: "16至18时",
-        key: "finishOrder",
+        key: "hour1618",
         align: "center",
       },
       {
         title: "18至20时",
-        key: "cancelOrder",
+        key: "hour1820",
         align: "center",
       },
       {
         title: "20至22时",
-        key: "invalidOrder",
+        key: "hour2022",
         align: "center",
       },
       {
         title: "22至24时",
-        key: "total",
+        key: "hour2224",
         align: "center",
       },
     ];
 
     onMounted(() => {
+      getAllOpenData();
       getData();
     });
 
-    const getData = async () => {
-      loading.value = true;
+    const getAllOpenData = async () => {
       try {
-        let openCity = await getAllOpenCity();
-        console.log(openCity);
+        let res = await getAllOpenCity();
+        openCityData.value = res.data.map((item: { cityName: string; cityCode: string }) => {
+          return { label: item.cityName, value: item.cityCode };
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-        let influx = await getInfluxList();
-        console.log(influx);
+    const getData = async () => {
+      try {
+        loading.value = true;
+        data.value = [];
+        let option = {
+          cityCode: queryForm.value.cityCode,
+          date: dayjs(queryForm.value.date).format("YYYY-MM-DD"),
+        };
+        let res = await getOrderTimeIntervalDistributed(option);
+        allData.value = res.data;
 
-        // let res = await getCityOder({
-        //   cityCode: "allCity",
-        //   beginDate: "2022-03-16",
-        //   endDate: "2022-03-18",
-        // });
-        // console.log(res);
+        let finished = await getHourData("finished", "完成订单");
+        let cancelled = await getHourData("cancelled", "取消订单");
+        let invalid = await getHourData("invalid", "无效订单");
+        data.value.push(finished);
+        data.value.push(cancelled);
+        data.value.push(invalid);
+
+        await getLineData(status.value);
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -191,14 +213,103 @@ export default defineComponent({
       }
     };
 
+    const getHourData = (type: string, typeName: string): Promise<DataInter> => {
+      return new Promise((resolve) => {
+        let obj = {
+          hour06: 0,
+          hour68: 0,
+          hour810: 0,
+          hour1012: 0,
+          hour1214: 0,
+          hour1416: 0,
+          hour1618: 0,
+          hour1820: 0,
+          hour2022: 0,
+          hour2224: 0,
+          orderBelong: typeName,
+        };
+        let arr = allData.value.filter((item: ItemInter) => item.orderBelong === type);
+        for (let key of arr) {
+          if (key.orderBelong === type) {
+            switch (key.hour) {
+              case 0:
+              case 1:
+              case 2:
+              case 3:
+              case 4:
+              case 5:
+                obj.hour06 += key.orderCount;
+                break;
+              case 6:
+              case 7:
+                obj.hour68 += key.orderCount;
+                break;
+              case 8:
+              case 9:
+                obj.hour810 += key.orderCount;
+                break;
+              case 10:
+              case 11:
+                obj.hour1012 += key.orderCount;
+                break;
+              case 12:
+              case 13:
+                obj.hour1214 += key.orderCount;
+                break;
+              case 14:
+              case 15:
+                obj.hour1416 += key.orderCount;
+                break;
+              case 16:
+              case 17:
+                obj.hour1618 += key.orderCount;
+                break;
+              case 18:
+              case 19:
+                obj.hour1820 += key.orderCount;
+                break;
+              case 20:
+              case 21:
+                obj.hour2022 += key.orderCount;
+                break;
+              case 22:
+              case 23:
+                obj.hour2224 += key.orderCount;
+                break;
+            }
+          }
+        }
+        resolve(obj);
+      });
+    };
+
+    const getLineData = (type = "finished"): Promise<boolean> => {
+      loading.value = true;
+      return new Promise((resolve) => {
+        dateData.value = [];
+        lineData.value = [];
+        let arr = allData.value.filter((item: ItemInter) => item.orderBelong === type);
+        dateData.value = arr.map((item: ItemInter) => item.hour);
+        lineData.value = arr.map((item: ItemInter) => item.orderCount);
+        loading.value = false;
+        resolve(true);
+      });
+    };
+
+    function query() {
+      getData();
+    }
+
     function handleStatus(value: string) {
-      console.log(value);
+      getLineData(value);
     }
 
     return {
       loading,
       openCityData,
       status,
+      lineData,
+      dateData,
       option: [
         {
           label: "完成",
@@ -219,7 +330,7 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.influxCode,
 
       query,
       handleStatus,

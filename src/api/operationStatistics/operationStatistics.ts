@@ -97,3 +97,17 @@ export function getCustomer(data: MonthInter) {
     data
   });
 }
+
+// ---------------订单当日时间区间分布---------------------
+//订单当日时间区间分布
+interface DistributedInter {
+    cityCode: string | null
+    date: string | null
+}
+export function getOrderTimeIntervalDistributed(data: DistributedInter) {    
+  return http.request({
+    url: '/operationAnalysis/getOrderTimeIntervalDistributed',
+    method: 'post',
+    data
+  });
+}
