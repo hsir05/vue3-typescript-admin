@@ -175,7 +175,6 @@ export default defineComponent({
     onMounted(() => {
       getOrderBusType();
       getOperateCompanyData();
-      getData();
     });
 
     const getOrderBusType = async () => {
@@ -199,6 +198,7 @@ export default defineComponent({
             return { label: item.operationCompanyName, value: item.operationCompanyId };
           }
         );
+        getData();
       } catch (err) {
         console.log(err);
       }

@@ -115,7 +115,36 @@ export const invoiceAppObj = (() => {
     return obj
 })()
 
-
+export const orderTypeOption = [
+    {
+        label: "订单类型",
+        value: "OT00000",
+    },
+    {
+        label: "立即",
+        value: "OT00001",
+    },
+    {
+        label: "预约",
+        value: "OT00002",
+    },
+    {
+        label: "接机",
+        value: "OT00003",
+    },
+    {
+        label: "送机",
+        value: "OT00004",
+    },
+    {
+        label: "半日租",
+        value: "OT00005",
+    },
+    {
+        label: "全日租",
+        value: "OT00006",
+    },
+]
 // 订单类型状态
 export const orderStateType = [
     {

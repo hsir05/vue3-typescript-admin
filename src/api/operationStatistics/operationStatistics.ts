@@ -1,5 +1,4 @@
 import { http } from '@/utils/http';
-import { getCompanyOderState } from "../type"
 
 
 //获取城市单量
@@ -28,50 +27,44 @@ export function getDriverOrder(data: DriverOderInter) {
     data
   });
 }
-//获取司机在线时长
-//获取添加班组列表
-export function getClass(data: getCompanyOderState) {    
+// ---------------司机在线时长---------------------
+//获取班组列表
+export function getDriverClazzs(data: {operationCompanyId: string}) {    
   return http.request({
-    url: '/driverClass/getDriverClazzs',
+    url: '/driverOnlineTime/getDriverClazzs',
     method: 'post',
     data
   });
 }
-//获取司机作息
-export function getDriverWorkRestRecord(data: getCompanyOderState) {    
-  return http.request({
-    url: '/driverWorkRestRecord/getDriverWorkRestRecord',
-    method: 'post',
-    data
-  });
+//按日统计司机在线时长（分钟
+interface OnlineInfoInter{
+    operationCompanyId: string | null
+    day: string | null
+    checkType: string | null
+    driverClazzId: string | null
+    // driverId: string | null
 }
-//按日统计司机在线时长
-export function getDriverDayTime(data: getCompanyOderState) {    
+export function findDriverDayOnlineTimeInfo(data: OnlineInfoInter) {    
   return http.request({
     url: '/driverOnlineTime/findDriverDayOnlineTimeInfo',
     method: 'post',
     data
   });
 }
-//按月统计司机在线时长
-export function getDriverMonthTime(data: getCompanyOderState) {    
+//按日统计司机在线时长（分钟
+interface RecordInter{
+    operationCompanyId: string | null
+    day: string | null
+    driverId: string | null
+}
+export function getDriverWorkRestRecord(data: RecordInter) {    
   return http.request({
-    url: '/driverOnlineTime/findDriverMonthOnlineTimeInfo',
+    url: '/driverOnlineTime/getDriverWorkRestRecord',
     method: 'post',
     data
   });
 }
-
-
-//获取企业单量
-export function getCompanyOder(data: getCompanyOderState) {    
-  return http.request({
-    url: '/order/getCompanyOrderStatistics',
-    method: 'post',
-    data
-  });
-}
-
+//-------------------------获取司机满意度------------------------
 //获取司机满意度
 interface SatisfactionInter {
     operationCompanyId: string
@@ -122,6 +115,21 @@ interface LocationsInter {
 export function findOrderLocations(data: LocationsInter) {    
   return http.request({
     url: '/operationAnalysis/findOrderLocations',
+    method: 'post',
+    data
+  });
+}
+
+// ---------------企业单量统计---------------------
+//企业单量统计
+interface CompanyOrderInter {
+    operationCompanyId: string | null
+    beginDate: string | null
+    endDate: string | null
+}
+export function getCompanyOrder(data: CompanyOrderInter) {    
+  return http.request({
+    url: '/operationAnalysis/getCompanyOrderStatistics',
     method: 'post',
     data
   });

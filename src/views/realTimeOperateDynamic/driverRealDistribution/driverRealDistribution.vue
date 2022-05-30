@@ -65,7 +65,7 @@ import busy from "@/assets/image/icon_driver_map_busy.png";
 import offDuty from "@/assets/image/icon_driver_map_offDuty.png";
 import rest from "@/assets/image/icon_driver_map_rest.png";
 
-const companyId = ref();
+const companyId = ref("0184fca0f7f6412d88783b003e4b5a56");
 const dirverNum = ref();
 const vehicleType = ref();
 const baiduMapRef = ref();

@@ -1,116 +1,115 @@
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
-<script lang="ts">
-import { defineComponent, ref, onMounted, Ref } from "vue";
+<script lang="ts" setup>
+import { ref, onMounted, watch, toRefs, Ref } from "vue";
 import { useEcharts } from "@/hooks/web/useEcharts";
-export default defineComponent({
-  name: "Order",
-  props: {
-    width: {
-      type: String as PropType<string>,
-      default: "100%",
-    },
-    height: {
-      type: String as PropType<string>,
-      default: "280px",
-    },
+import { ArrItemInter } from "./type";
+
+const props = defineProps({
+  width: {
+    type: String as PropType<string>,
+    default: "100%",
   },
-  setup() {
-    const chartRef = ref<HTMLDivElement | null>(null);
-
-    const { setOptions } = useEcharts(chartRef as Ref<HTMLDivElement>);
-
-    onMounted(() => {
-      setOptions({
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            lineStyle: {
-              width: 1,
-              color: "#019680",
-            },
-          },
-        },
-        xAxis: {
-          type: "category",
-          //   boundaryGap: false,
-          data: [
-            "6:00",
-            "7:00",
-            "8:00",
-            "9:00",
-            "10:00",
-            "11:00",
-            "12:00",
-            "13:00",
-            "14:00",
-            "15:00",
-            "16:00",
-            "17:00",
-            "18:00",
-            "19:00",
-            "20:00",
-            "21:00",
-            "22:00",
-            "23:00",
-          ],
-          splitLine: {
-            show: true,
-            lineStyle: {
-              width: 1,
-              type: "solid",
-              color: "rgba(226,226,226,0.5)",
-            },
-          },
-          axisTick: {
-            show: false,
-          },
-        },
-        yAxis: [
-          {
-            type: "value",
-            max: 80000,
-            splitNumber: 4,
-            axisTick: {
-              show: false,
-            },
-            splitArea: {
-              show: true,
-              areaStyle: {
-                color: ["rgba(255,255,255,0.2)", "rgba(226,226,226,0.2)"],
-              },
-            },
-          },
-        ],
-        grid: { left: "1%", right: "1%", top: "2  %", bottom: 0, containLabel: true },
-        series: [
-          {
-            smooth: true,
-            data: [
-              111, 222, 4000, 18000, 33333, 55555, 66666, 33333, 14000, 36000, 66666, 44444, 22222,
-              11111, 4000, 2000, 500, 333, 222, 111,
-            ],
-            type: "line",
-            itemStyle: {
-              color: "#5ab1ef",
-            },
-          },
-          {
-            smooth: true,
-            data: [
-              33, 66, 88, 333, 3333, 5000, 18000, 3000, 1200, 13000, 22000, 11000, 2221, 1201, 390,
-              198, 60, 30, 22, 11,
-            ],
-            type: "line",
-            itemStyle: {
-              color: "#019680",
-            },
-          },
-        ],
-      });
-    });
-    return { chartRef };
+  height: {
+    type: String as PropType<string>,
+    default: "300px",
+  },
+  text: {
+    type: String,
+    default: () => "",
+  },
+  subtext: {
+    type: String,
+    default: () => "",
+  },
+  data: {
+    type: Array as PropType<ArrItemInter[]>,
+    require: true,
+    default: () => [],
+  },
+  legendData: {
+    type: Array as PropType<string[]>,
+    require: true,
+    default: () => [],
+  },
+  xAxisData: {
+    type: Array as PropType<string[]>,
+    require: true,
+    default: () => [],
   },
 });
+const chartRef = ref<HTMLDivElement | null>(null);
+const lineData = ref<ArrItemInter[]>([]);
+const { setOptions } = useEcharts(chartRef as Ref<HTMLDivElement>);
+const { width, height, text, subtext, data, legendData, xAxisData } = toRefs(props);
+
+watch(data, (newValue) => {
+  lineData.value = newValue;
+  initLine();
+});
+lineData.value = data.value;
+onMounted(() => {
+  initLine();
+});
+
+const initLine = () => {
+  let option = {
+    title: {
+      text: text,
+      subtext: subtext,
+    },
+    legend: {
+      data: legendData,
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        lineStyle: {
+          width: 1,
+          color: "#019680",
+        },
+      },
+    },
+    xAxis: {
+      type: "category",
+      data: xAxisData,
+      axisTick: {
+        show: false,
+      },
+    },
+    yAxis: [
+      {
+        type: "value",
+      },
+    ],
+    series: [
+      {
+        data: [],
+        label: {
+          show: true,
+          position: "top",
+        },
+        type: "line",
+      },
+    ],
+  };
+  for (let i = 0; i < lineData.value.length; i++) {
+    option.series.push({
+      name: legendData.value[i],
+      type: "line",
+      smooth: true,
+      // @ts-ignore
+      data: lineData.value[i],
+    });
+  }
+  // @ts-ignore
+  setOptions(option);
+};
 </script>

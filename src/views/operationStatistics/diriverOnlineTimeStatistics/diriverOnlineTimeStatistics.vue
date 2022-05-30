@@ -10,9 +10,9 @@
       label-width="100"
       :model="queryForm"
     >
-      <n-form-item label="运营企业" path="companyId">
+      <n-form-item label="运营企业" path="operationCompanyId">
         <n-select
-          v-model:value="queryForm.companyId"
+          v-model:value="queryForm.operationCompanyId"
           clearable
           filterable
           placeholder="选择运营企业"
@@ -28,9 +28,9 @@
         </n-radio-group>
       </n-form-item>
 
-      <n-form-item label="统计时段" path="date">
+      <n-form-item label="统计时段" path="day">
         <n-date-picker
-          v-model:value="queryForm.date"
+          v-model:value="queryForm.day"
           :type="type === '1' ? 'date' : 'month'"
           clearable
           style="width: 180px"
@@ -45,14 +45,9 @@
       </n-form-item>
 
       <n-form-item :label="mode === '1' ? '司机班组' : '司机工号'" path="monitor">
-        <n-select
-          v-model:value="queryForm.monitor"
-          clearable
-          filterable
-          :placeholder="mode === '1' ? '司机班组' : '司机工号'"
-          style="width: 260px"
-          :options="operateCompanyOptions"
-        />
+        <!-- <n-select v-model:value="queryForm.monitor" clearable filterable
+                    :placeholder="mode === '1' ? '司机班组' : '司机工号'" style="width: 260px"
+                    :options="operateCompanyOptions" /> -->
       </n-form-item>
 
       <n-button attr-type="button" :loading="loading" class="ml-10px" type="primary" @click="query"
@@ -66,8 +61,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, ref, onMounted } from "vue";
+// import { getDriverClazzs, OnlineInfoInter, findDriverDayOnlineTimeInfo, getDriverWorkRestRecord } from "@/api/operationStatistics/operationStatistics"
+import { getDriverClazzs } from "@/api/operationStatistics/operationStatistics";
 import Order from "./order.vue";
 export default defineComponent({
   name: "DiriverOnlineTimeStatistics",
@@ -76,59 +72,54 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false);
-    const queryFormRef = ref<FormInst | null>(null);
     const type = ref("1");
     const mode = ref("1");
     const queryForm = ref({
-      date: null,
-      companyId: null,
-      monitor: null,
+      day: null,
+      operationCompanyId: "75e642e0096b4a41a2b2ecf933c92247",
+      checkType: null,
+      driverClazzId: null,
     });
-    const message = useMessage();
+
+    const clazzs = ref([]);
+
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      try {
+        let res = await getDriverClazzs({ operationCompanyId: queryForm.value.operationCompanyId });
+
+        clazzs.value = res.data.map((item: { id: string; name: string }) => {
+          return { label: item.name, value: item.id };
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const handleType = (value: string) => {
       console.log(value);
-      let { companyId, monitor } = unref(queryForm);
-      queryForm.value = {
-        date: null,
-        companyId,
-        monitor,
-      };
-      console.log(queryForm.value);
     };
     function handleMode(value: string) {
       console.log(value);
-      let { companyId, date } = unref(queryForm);
-      queryForm.value = {
-        monitor: null,
-        companyId,
-        date,
-      };
+      //     let { companyId, date } = unref(queryForm);
+      //     queryForm.value = {
+      //         monitor: null,
+      //         companyId,
+      //         date,
+      //     };
     }
 
     function query(e: MouseEvent) {
       e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-          //   let { companyId, beginDate: section[0], endDate: section[1] } = unref(queryForm)
-          console.log({
-            companyId: unref(queryForm).companyId,
-          });
-
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
     }
 
     return {
       loading,
       type,
       mode,
-      queryFormRef,
       queryForm,
       operateCompanyOptions: [],
 
@@ -143,6 +134,7 @@ export default defineComponent({
 .online-time {
   flex-wrap: wrap;
 }
+
 .diriver-online-time-line {
   background-color: $white;
 }

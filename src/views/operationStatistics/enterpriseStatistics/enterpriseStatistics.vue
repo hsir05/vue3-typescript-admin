@@ -1,5 +1,5 @@
 <template>
-  <div class="enterprise-statistics">
+  <div>
     <!-- 检索 -->
     <n-form
       ref="queryFormRef"
@@ -13,12 +13,12 @@
     >
       <n-form-item label="运营企业" label-placement="left">
         <n-select
-          v-model:value="queryForm.companyId"
+          v-model:value="queryForm.operationCompanyId"
           clearable
           filterable
           placeholder="选择运营企业"
           style="width: 260px"
-          :options="operateCompanyOptions"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -39,55 +39,69 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找</n-button
-        >
+          >查找
+        </n-button>
       </div>
     </n-form>
 
-    <div class="bg-white mt-10px p-10px" style="height: calc(100% - 95px)">
-      <n-data-table
-        :loading="loading"
-        ref="table"
-        striped
-        :columns="columns"
-        class="box-border mb-15px"
-        :row-key="getRowKeyId"
-        :data="data"
-        :pagination="false"
-      />
-      <div class="flex mb-20px">
-        <span>企业单量统计</span>
-
-        <div class="flex">
-          <n-select
-            style="width: 100px; margin-right: 10px"
-            filterable
-            v-model:value="orderType"
-            @update:value="handleOrderType"
-            :options="orderTypeOption"
-          />
-          <n-select
-            style="width: 100px"
-            filterable
-            v-model:value="status"
-            @update:value="handleStatus"
-            :options="orderStateType"
-          />
-        </div>
-      </div>
-      <Order />
+    <div class="flex mt-20px bg-white p-10px">
+      <span>单量总计</span>
+      <span>完成 / 取消</span>
     </div>
+
+    <n-data-table
+      :loading="loading"
+      ref="table"
+      striped
+      :columns="columns"
+      class="box-border mb-15px p-10px bg-white"
+      :row-key="getRowKeyId"
+      :data="data"
+      :pagination="false"
+    />
+    <div class="flex mt-20px bg-white p-10px">
+      <span>每日单量</span>
+      <div class="flex">
+        <n-select
+          style="width: 100px; margin-right: 10px"
+          filterable
+          v-model:value="orderType"
+          @update:value="handleOrderType"
+          :options="orderTypeOption"
+        />
+        <n-select
+          style="width: 100px"
+          filterable
+          v-model:value="status"
+          @update:value="handleStatus"
+          :options="orderStateType"
+        />
+      </div>
+    </div>
+
+    <n-spin :show="loading" class="bg-white">
+      <Order :data="lineData" :xAxisData="dateData" :legendData="legendData" />
+    </n-spin>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst } from "naive-ui";
-import { tableDataItem } from "./type";
+import { defineComponent, ref, h, onMounted } from "vue";
+import {
+  TableDataItemInter,
+  ArrItemInter,
+  ItemInter,
+  OrderItemInter,
+  DataItemInter,
+  VehicleTypeDataInter,
+} from "./type";
 import Order from "./order.vue";
+import dayjs from "dayjs";
 import { orderStateType } from "@/config/form";
-import { getCompanyOder } from "@/api/operationStatistics/operationStatistics";
-import { getInfluxList, getAllOperateCompany } from "@/api/common/common";
+import { getCompanyOrder } from "@/api/operationStatistics/operationStatistics";
+import { getAllOperateCompany, getDict } from "@/api/common/common";
+import { getVehicleType } from "@/api/operate/operate";
 import { rangeShortcuts } from "@/config/table";
+import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "EnterpriseStatistics",
   components: {
@@ -96,83 +110,256 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const status = ref("finished");
-    const orderType = ref("OT00001");
-    const queryFormRef = ref<FormInst | null>(null);
+    const orderType = ref("orderType");
+
+    interface OrderTypeInter {
+      entryCode: string;
+      entryId: string;
+      entryName: string;
+    }
+    const orderTypeData = ref<OrderTypeInter[]>([]);
+    const companyData = ref<ItemInter[]>([]);
+
+    const vehicleTypeData = ref<VehicleTypeDataInter[]>([]);
     const queryForm = ref({
       section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
-      companyId: "allCompany",
+      operationCompanyId: "allCompany",
     });
 
-    function query(e: MouseEvent) {
-      e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-        } else {
-          console.log(errors);
-        }
-      });
+    interface SelectObjInter {
+      [Symbol: string]: string[];
     }
+    const selectObj: SelectObjInter = {
+      orderType: ["立即", "预约", "接机", "送机", "半日租", "全日租"],
+      veichleType: [
+        "专车-经济型",
+        "专车-舒适型",
+        "专车-商务型",
+        "专车-豪华型",
+        "快车-经济型",
+        "快车-舒适型",
+        "快车-商务型",
+        "快车-豪华型",
+        "出租车",
+      ],
+    };
+    const legendData = ref<string[]>(["立即", "预约", "接机", "送机", "半日租", "全日租"]);
+    const lineData = ref<ArrItemInter[]>([]);
+    const dateData = ref<string[]>([]);
+    const allData = ref<DataItemInter[]>([]);
 
     const data = ref([]);
 
     const columns = [
       {
-        title: "立即",
-        key: "flowSquare",
+        title: "#",
+        key: "orderTypeName",
         align: "center",
+      },
+      {
+        title: "立即",
+        key: "liji",
+        align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.liji.finished}/${row.liji.cancelled}`);
+        },
       },
       {
         title: "预约",
-        key: "finishOrder",
+        key: "yuyue",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.yuyue.finished}/${row.yuyue.cancelled}`);
+        },
       },
       {
         title: "接机",
-        key: "cancelOrder",
+        key: "jieji",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.jieji.finished}/${row.jieji.cancelled}`);
+        },
       },
       {
         title: "送机",
-        key: "invalidOrder",
+        key: "songji",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.songji.finished}/${row.songji.cancelled}`);
+        },
       },
       {
         title: "半日租",
-        key: "total",
+        key: "banrizu",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.banrizu.finished}/${row.banrizu.cancelled}`);
+        },
       },
       {
         title: "全日租",
-        key: "total",
+        key: "quanrizu",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.quanrizu.finished}/${row.quanrizu.cancelled}`);
+        },
       },
       {
         title: "总计",
         key: "total",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.total.finished}/${row.total.cancelled}`);
+        },
       },
     ];
 
     onMounted(() => {
-      getData();
+      orderStateType.pop();
+      getAllData();
     });
+
+    const getAllData = async () => {
+      try {
+        let response = await getDict({ parentEntryCode: "OT00000" });
+        orderTypeData.value = response.data;
+
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyName: string; operationCompanyId: string }) => {
+            let obj = {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+            return obj;
+          }
+        );
+        companyData.value.unshift({ label: "全部", value: "allCompany" });
+
+        let result = await getVehicleType({ operationCompanyId: "" });
+        vehicleTypeData.value = result.data;
+
+        getData();
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async () => {
       loading.value = true;
       try {
-        let operationCompany = await getAllOperateCompany();
-        console.log(operationCompany);
+        let option = {
+          operationCompanyId: queryForm.value.operationCompanyId,
+          beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
+          endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
+        };
+        let res = await getCompanyOrder(option);
+        // console.log(res.data);
+        allData.value = res.data;
 
-        let influx = await getInfluxList();
-        console.log(influx);
+        let orderType: objInter = {
+          OT00001: "liji",
+          OT00002: "yuyue",
+          OT00003: "jieji",
+          OT00004: "songji",
+          OT00005: "banrizu",
+          OT00006: "quanrizu",
+        };
 
-        let res = await getCompanyOder({
-          companyId: "allCompany",
-          beginDate: "2022-03-16",
-          endDate: "2022-03-18",
-        });
-        console.log(res);
+        let total = {
+          orderTypeName: "总计",
+          liji: {
+            finished: 0,
+            cancelled: 0,
+          },
+          yuyue: {
+            finished: 0,
+            cancelled: 0,
+          },
+          jieji: {
+            finished: 0,
+            cancelled: 0,
+          },
+          songji: {
+            finished: 0,
+            cancelled: 0,
+          },
+          banrizu: {
+            finished: 0,
+            cancelled: 0,
+          },
+          quanrizu: {
+            finished: 0,
+            cancelled: 0,
+          },
+          total: {
+            finished: 0,
+            cancelled: 0,
+          },
+        };
+        for (let key of vehicleTypeData.value) {
+          let arr = res.data.filter(
+            (item: DataItemInter) => item.vehicleTypeId === key.vehicleTypeId
+          );
+          let tableData: OrderItemInter = {
+            liji: {
+              finished: 0,
+              cancelled: 0,
+            },
+            yuyue: {
+              finished: 0,
+              cancelled: 0,
+            },
+            jieji: {
+              finished: 0,
+              cancelled: 0,
+            },
+            songji: {
+              finished: 0,
+              cancelled: 0,
+            },
+            banrizu: {
+              finished: 0,
+              cancelled: 0,
+            },
+            quanrizu: {
+              finished: 0,
+              cancelled: 0,
+            },
+            total: {
+              finished: 0,
+              cancelled: 0,
+            },
+          };
+          tableData["orderTypeName"] = key.vehicleTypeName;
+          for (let key of arr) {
+            if (key.orderBelong === "finished") {
+              //@ts-ignore
+              tableData[orderType[key.orderTypeCode]].finished += key.orderCount;
+              //@ts-ignore
+              tableData.total.finished += key.orderCount;
+              //@ts-ignore
+              total[orderType[key.orderTypeCode]].finished += key.orderCount;
+              total.total.finished += key.orderCount;
+            }
+            if (key.orderBelong === "cancelled") {
+              //@ts-ignore
+              tableData[orderType[key.orderTypeCode]].cancelled += key.orderCount;
+              //@ts-ignore
+              tableData.total.cancelled += key.orderCount;
+              //@ts-ignore
+              total[orderType[key.orderTypeCode]].cancelled += key.orderCount;
+              total.total.cancelled += key.orderCount;
+            }
+          }
+          //@ts-ignore
+          data.value.push(tableData);
+        }
+        //@ts-ignore
+        data.value.push(total);
+
+        getLineData();
+
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -180,8 +367,39 @@ export default defineComponent({
       }
     };
 
+    const getLineData = () => {
+      let arr: Array<number[]> = [];
+      dateData.value = [];
+      if (orderType.value === "orderType") {
+        for (let key of orderTypeData.value) {
+          let linDataItem = allData.value.filter(
+            (item: DataItemInter) =>
+              item.orderTypeCode === key.entryCode && item.orderBelong === status.value
+          );
+
+          let arrNumber: number[] = linDataItem.map((item) => item.orderCount);
+          arr.push(arrNumber);
+        }
+      } else {
+        for (let key of vehicleTypeData.value) {
+          let linDataItem = allData.value.filter(
+            (item: DataItemInter) =>
+              item.vehicleTypeId === key.vehicleTypeId && item.orderBelong === status.value
+          );
+          let arrNumber: number[] = linDataItem.map((item) => item.orderCount);
+          arr.push(arrNumber);
+        }
+      }
+      lineData.value = arr;
+    };
+
+    function query() {
+      getData();
+    }
+
     function handleStatus(value: string) {
-      console.log(value);
+      legendData.value = selectObj[value];
+      getLineData();
     }
 
     function handleOrderType(value: string) {
@@ -192,26 +410,29 @@ export default defineComponent({
       loading,
       status,
       orderType,
-      orderStateType,
       orderTypeOption: [
         {
           label: "订单类型",
-          value: "OT00001",
+          value: "orderType",
         },
         {
           label: "车辆类型",
-          value: "OT00002",
+          value: "veichleType",
         },
       ],
       queryForm,
       columns,
       data,
+      legendData,
       pagination: {
         pageSize: 10,
       },
-      operateCompanyOptions: [],
-      getRowKeyId: (row: tableDataItem) => row.id,
+      companyData,
+      dateData,
+      lineData,
+      getRowKeyId: (row: TableDataItemInter) => row.id,
       rangeShortcuts,
+      orderStateType,
 
       query,
       handleStatus,

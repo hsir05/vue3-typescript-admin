@@ -117,7 +117,6 @@ export default defineComponent({
     const message = useMessage();
     const driversDrawerRef = ref();
     const driverStateData = ref();
-    const vehicleTypeData = ref([]);
     const companyData = ref([]);
 
     const basicTableRef = ref();
@@ -432,7 +431,6 @@ export default defineComponent({
       options: [],
       companyData,
       stateOptions,
-      vehicleTypeData,
 
       reloadPage,
       searchHandle,
