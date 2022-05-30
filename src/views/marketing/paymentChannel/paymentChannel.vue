@@ -10,9 +10,9 @@
       :show-feedback="false"
       :model="form"
     >
-      <n-form-item label="订单业务类型" path="orderType">
+      <n-form-item label="订单业务类型" path="orderBusinessType">
         <n-select
-          v-model:value="form.orderType"
+          v-model:value="form.orderBusinessType"
           clearable
           filterable
           placeholder="选择订单业务类型"
@@ -21,9 +21,9 @@
         />
       </n-form-item>
 
-      <n-form-item label="设备类型" path="equipType">
+      <n-form-item label="设备类型" path="deviceChannelType">
         <n-select
-          v-model:value="form.equipType"
+          v-model:value="form.deviceChannelType"
           clearable
           filterable
           placeholder="选择设备类型"
@@ -53,7 +53,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, h, ref } from "vue";
+import { defineComponent, h, onMounted, ref } from "vue";
 import { FormInst, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import ChannelModal from "./modal.vue";
@@ -63,27 +63,22 @@ import {
   ArrowForwardCircleOutline as ArrowIcon,
 } from "@vicons/ionicons5";
 import { tableDataItem } from "./type";
+
+import { getOrderPayChannelList } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "PaymentChannel",
   components: { ChannelModal },
   setup() {
     const form = ref({
-      orderType: null,
-      equipType: null,
+      deviceChannelType: null,
+      orderBusinessType: null,
     });
     const loading = ref(false);
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const channelModalRef = ref();
 
-    const data = ref([
-      {
-        id: "1312312",
-        paymentChannel: "钱包支付",
-        sort: 1,
-        status: 1,
-      },
-    ]);
+    const data = ref([]);
     const columns = [
       {
         title: "支付渠道",
@@ -148,6 +143,27 @@ export default defineComponent({
         },
       },
     ];
+
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      loading.value = true;
+      try {
+        let option = {
+          deviceChannelType: form.value.deviceChannelType,
+          orderBusinessType: form.value.orderBusinessType,
+        };
+        let res = await getOrderPayChannelList(option);
+        console.log(res.data);
+
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function query(e: MouseEvent) {
       e.preventDefault();

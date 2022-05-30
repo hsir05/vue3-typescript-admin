@@ -15,29 +15,44 @@
           clearable
           filterable
           v-model:value="form.paymentChannelType"
+          style="width: 280px"
           placeholder="选择支付渠道"
           :options="options"
         />
       </n-form-item>
 
       <n-form-item label="充值比率" path="rechargeRate">
-        <n-input-number v-model:value="form.rechargeRate" :min="0" clearable />
+        <n-input-number v-model:value="form.rechargeRate" :min="0" clearable style="width: 280px" />
       </n-form-item>
 
       <n-form-item label="最低起充金额" path="minimumRechargeAmount">
-        <n-input-number v-model:value="form.minimumRechargeAmount" clearable />
+        <n-input-number v-model:value="form.minimumRechargeAmount" clearable style="width: 280px" />
       </n-form-item>
 
       <n-form-item label="累计实充额度" path="cumulativeRechargeAmount">
-        <n-input-number v-model:value="form.cumulativeRechargeAmount" clearable />
+        <n-input-number
+          v-model:value="form.cumulativeRechargeAmount"
+          clearable
+          style="width: 280px"
+        />
       </n-form-item>
 
       <n-form-item label="开始时间" path="activityBeginTime">
-        <n-date-picker v-model:value="form.activityBeginTime" type="datetime" clearable />
+        <n-date-picker
+          v-model:value="form.activityBeginTime"
+          type="datetime"
+          clearable
+          style="width: 280px"
+        />
       </n-form-item>
 
       <n-form-item label="结束时间" path="activityEndTime">
-        <n-date-picker v-model:value="form.activityEndTime" type="datetime" clearable />
+        <n-date-picker
+          v-model:value="form.activityEndTime"
+          type="datetime"
+          clearable
+          style="width: 280px"
+        />
       </n-form-item>
 
       <n-form-item label="活动描述" path="activityDesc">
@@ -46,6 +61,7 @@
           type="textarea"
           clearable
           placeholder="输入活动描述"
+          style="width: 280px"
         />
       </n-form-item>
 
@@ -61,9 +77,15 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref } from "vue";
+import { defineComponent, reactive, toRefs, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
+import {
+  getRechargeDetail,
+  addRechargeActivity,
+  editRechargeActivity,
+} from "@/api/marketing/marketing";
 import { FormInter } from "./type";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "RechargeActivity",
   setup(_, { emit }) {
@@ -88,25 +110,82 @@ export default defineComponent({
 
     function openDrawer(t: string, customerWalletRechargeActivityId: string) {
       if (customerWalletRechargeActivityId) {
+        getDetail(customerWalletRechargeActivityId);
       }
       title.value = t;
       state.isDrawer = true;
     }
 
+    const getDetail = async (customerWalletRechargeActivityId: string) => {
+      try {
+        let res = await getRechargeDetail({ customerWalletRechargeActivityId });
+        console.log(res.data);
+        const {
+          paymentChannelType,
+          rechargeRate,
+          minimumRechargeAmount,
+          cumulativeRechargeAmount,
+          activityBeginTime,
+          activityEndTime,
+          activityDesc,
+        } = res.data;
+
+        form.value = {
+          customerWalletRechargeActivityId,
+          paymentChannelType,
+          rechargeRate,
+          minimumRechargeAmount,
+          cumulativeRechargeAmount,
+          activityBeginTime,
+          activityEndTime,
+          activityDesc,
+        };
+      } catch (err) {
+        state.loading = false;
+      }
+    };
+
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
-
-          handleSaveAfter();
-
-          message.success("验证成功");
+          try {
+            let res;
+            const {
+              paymentChannelType,
+              rechargeRate,
+              minimumRechargeAmount,
+              cumulativeRechargeAmount,
+              activityBeginTime,
+              activityEndTime,
+              activityDesc,
+              customerWalletRechargeActivityId,
+            } = form.value;
+            let option = {
+              paymentChannelType,
+              rechargeRate,
+              minimumRechargeAmount,
+              cumulativeRechargeAmount,
+              activityDesc,
+              activityBeginTime: dayjs(activityBeginTime).format("YYYY-MM-DD HH:mm:ss"),
+              activityEndTime: dayjs(activityEndTime).format("YYYY-MM-DD HH:mm:ss"),
+            };
+            if (!form.value.customerWalletRechargeActivityId) {
+              res = await addRechargeActivity(option);
+              console.log(res);
+            } else {
+              res = await editRechargeActivity({ customerWalletRechargeActivityId, ...option });
+            }
+            state.loading = false;
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+          } catch (err) {
+            console.log(err);
+            state.loading = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -116,7 +195,9 @@ export default defineComponent({
     }
 
     function handleReset() {
+      const customerWalletRechargeActivityId = form.value.customerWalletRechargeActivityId;
       form.value = {
+        customerWalletRechargeActivityId,
         paymentChannelType: null,
         rechargeRate: null,
         minimumRechargeAmount: null,
@@ -128,6 +209,7 @@ export default defineComponent({
       formRef.value?.restoreValidation();
     }
     function onCloseAfter() {
+      form.value.customerWalletRechargeActivityId = null;
       state.isDrawer = false;
       state.loading = false;
       state.disabled = false;

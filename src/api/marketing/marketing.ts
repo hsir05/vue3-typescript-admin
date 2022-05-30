@@ -191,13 +191,13 @@ export function getCouponDetail(data: { customerCouponId: string }) {
  * 代金券详情
  */
 interface GiftCouponInter {
-    customerId:string | null
-    couponName:string | null
-    customerCouponConsumeRuleId:string | null
-    couponDenomination:string | null
-    couponEffectiveTimeBegin:string | null
-    couponEffectiveTimeEnd:string | null
-    couponCount:string | null
+    customerId: string | null
+    couponName: string | null
+    customerCouponConsumeRuleId: string | null
+    couponDenomination: string | null
+    couponEffectiveTimeBegin: string | null
+    couponEffectiveTimeEnd: string | null
+    couponCount: string | null
 }
 export function giftCoupon(data: GiftCouponInter) {
     return http.request({
@@ -228,7 +228,7 @@ export function getExchangeCodePage(data: ExchangeCodePageInter) {
     });
 }
 // 兑换码详情
-export function getExchangeCodeDetail(data: {exchangeCodeId: string}) {
+export function getExchangeCodeDetail(data: { exchangeCodeId: string }) {
     return http.request({
         url: "/exchangeCode/detail",
         method: "post",
@@ -266,6 +266,62 @@ interface WalletRechargeActivityPageInter {
 export function getWalletRechargeActivityPage(data: WalletRechargeActivityPageInter) {
     return http.request({
         url: "/customerWalletRechargeActivity/page",
+        method: "post",
+        data: data,
+    });
+}
+
+// 详情
+export function getRechargeDetail(data: { customerWalletRechargeActivityId: string }) {
+    return http.request({
+        url: "/customerWalletRechargeActivity/detail",
+        method: "post",
+        data: data,
+    });
+}
+
+/**
+ * 新增充值活动
+ */
+interface RechargeActivityInter {
+    customerWalletRechargeActivityId?: string | null
+    paymentChannelType: string | null;
+    rechargeRate: number | null;
+    minimumRechargeAmount: number | null;
+    cumulativeRechargeAmount: number | null;
+    activityBeginTime: string | null;
+    activityEndTime: string | null;
+    activityDesc: string | null;
+}
+export function addRechargeActivity(data: RechargeActivityInter) {
+    return http.request({
+        url: "/customerWalletRechargeActivity/add",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 编辑充值活动
+ */
+export function editRechargeActivity(data: RechargeActivityInter) {
+    return http.request({
+        url: "/customerWalletRechargeActivity/edit",
+        method: "post",
+        data: data,
+    });
+}
+//-----------------订单支付渠道-------------------------
+
+/**
+ * 获取订单支付渠道列表
+ */
+interface ActivityInter {
+    deviceChannelType: string | null;
+    orderBusinessType: string | null;
+}
+export function getOrderPayChannelList(data: ActivityInter) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/list",
         method: "post",
         data: data,
     });

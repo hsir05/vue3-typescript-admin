@@ -36,6 +36,7 @@
       :columns="columns"
       :loading="loading"
       :itemCount="itemCount"
+      :isAddBtn="true"
       @reload-page="reloadPage"
       @on-add="handleAdd"
       @on-page="handlePage"
