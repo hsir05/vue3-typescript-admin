@@ -71,7 +71,7 @@
             filterable
             v-model:value="status"
             @update:value="handleStatus"
-            :options="option"
+            :options="orderStateType"
           />
         </div>
       </div>
@@ -81,9 +81,10 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst } from "naive-ui";
 import { tableDataItem } from "./type";
 import Order from "./order.vue";
+import { orderStateType } from "@/config/form";
 import { getCompanyOder } from "@/api/operationStatistics/operationStatistics";
 import { getInfluxList, getAllOperateCompany } from "@/api/common/common";
 import { rangeShortcuts } from "@/config/table";
@@ -98,20 +99,17 @@ export default defineComponent({
     const orderType = ref("OT00001");
     const queryFormRef = ref<FormInst | null>(null);
     const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
+      section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
       companyId: "allCompany",
     });
-    const message = useMessage();
 
     function query(e: MouseEvent) {
       e.preventDefault();
       queryFormRef.value?.validate((errors) => {
         if (!errors) {
           console.log(unref(queryForm));
-          message.success("验证成功");
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -194,20 +192,7 @@ export default defineComponent({
       loading,
       status,
       orderType,
-      option: [
-        {
-          label: "完成",
-          value: "finished",
-        },
-        {
-          label: "取消",
-          value: "cancelled",
-        },
-        {
-          label: "无效",
-          value: "invalid",
-        },
-      ],
+      orderStateType,
       orderTypeOption: [
         {
           label: "订单类型",

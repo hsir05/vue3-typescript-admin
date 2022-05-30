@@ -19,6 +19,7 @@
           placeholder="选择开通城市"
           style="width: 260px"
           :options="openCityData"
+          @update:value="handleCity"
         />
       </n-form-item>
 
@@ -46,60 +47,124 @@
 
     <div class="map">
       <n-select
-        clearable
         class="status-select"
         filterable
         v-model:value="status"
         @update:value="handleStatus"
-        :options="orderStatusData"
+        :options="orderStateType"
       />
-
       <Map ref="baiduMapRef" />
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { defineComponent, ref, onMounted } from "vue";
+import { FormInst } from "naive-ui";
+import { getAllOpenCity } from "@/api/common/common";
+import { orderStateType } from "@/config/form";
 import { rangeShortcuts } from "@/config/table";
 import Map from "@/components/Map/BaiduMap.vue";
+import { objInter } from "@/interface/common/common";
+import dayjs from "dayjs";
+import { ItemInter } from "./type";
+import { findOrderLocations } from "@/api/operationStatistics/operationStatistics";
 export default defineComponent({
   name: "CityOrderDistribution",
   components: { Map },
   setup() {
     const loading = ref(false);
-    const openCityData = ref([]);
-    const orderStatusData = ref([]);
+    const openCityData = ref<ItemInter[]>([]);
     const status = ref("finished");
     const baiduMapRef = ref();
     const queryFormRef = ref<FormInst | null>(null);
+    const allData = ref<objInter>({});
+    let obj: objInter = {
+      finished: "finishedList",
+      cancelled: "cancelledList",
+      invalid: "invalidList",
+    };
+
     const queryForm = ref({
-      section: [new Date("2022-03-16"), new Date("2022-03-18")],
-      cityCode: "allCity",
+      section: [new Date().getTime() - 6 * 60 * 60 * 1000 * 24, new Date().getTime()],
+      cityCode: "110000",
+      lat: 39.957932,
+      lng: 116.381003,
     });
-    const message = useMessage();
 
     onMounted(async () => {
-      const { renderBaiduMap } = baiduMapRef.value;
-      await renderBaiduMap(103.841521, 36.067212);
+      getAllCityData();
     });
 
-    function handleStatus(value: string) {
-      console.log(value);
-      message.success("验证成功");
+    const getAllCityData = async () => {
+      loading.value = true;
+      try {
+        let result = await getAllOpenCity();
+        openCityData.value = result.data.map(
+          (item: { cityCode: string; cityName: string; lng: number; lat: number }) => {
+            return { label: item.cityName, value: item.cityCode, lng: item.lng, lat: item.lat };
+          }
+        );
+
+        getData();
+
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    const getData = async () => {
+      loading.value = true;
+      try {
+        let option = {
+          cityCode: queryForm.value.cityCode,
+          beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
+          endDate: dayjs(queryForm.value.section[1]).format("YYYY-MM-DD") as string,
+        };
+        let res = await findOrderLocations(option);
+
+        allData.value = res.data;
+
+        const { renderBaiduMap, addHeartMap, refreshHeatMap } = baiduMapRef.value;
+        renderBaiduMap(queryForm.value.lng, queryForm.value.lat);
+        addHeartMap();
+
+        refreshHeatMap(allData.value[obj[status.value]]);
+
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    function handleCity(cityCode: string) {
+      let item: ItemInter | undefined = openCityData.value.find(
+        (item: ItemInter) => item.value === cityCode
+      );
+      if (item) {
+        queryForm.value.lng = item.lng;
+        queryForm.value.lat = item.lat;
+        queryForm.value.cityCode = cityCode;
+        const { renderBaiduMap } = baiduMapRef.value;
+        renderBaiduMap(item.lng, item.lat);
+      }
     }
 
-    function query(e: MouseEvent) {
-      e.preventDefault();
-      queryFormRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(unref(queryForm));
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
+    function handleStatus(value: string) {
+      loading.value = true;
+
+      const { refreshHeatMap } = baiduMapRef.value;
+      refreshHeatMap(allData.value[obj[value]]);
+
+      setTimeout(() => {
+        loading.value = false;
+      }, 500);
+    }
+
+    function query() {
+      getData();
     }
 
     return {
@@ -108,11 +173,12 @@ export default defineComponent({
       queryFormRef,
       status,
       queryForm,
-      orderStatusData,
       openCityData,
       rangeShortcuts,
+      orderStateType,
 
       handleStatus,
+      handleCity,
       query,
     };
   },
@@ -124,11 +190,12 @@ export default defineComponent({
   height: calc(100% - 90px);
   position: relative;
 }
+
 .status-select {
   width: 100px;
   position: absolute;
   top: 5px;
-  right: 90px;
+  right: 40px;
   z-index: 900;
 }
 </style>

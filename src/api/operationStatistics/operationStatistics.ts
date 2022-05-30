@@ -111,3 +111,18 @@ export function getOrderTimeIntervalDistributed(data: DistributedInter) {
     data
   });
 }
+
+// ---------------城市订单热力图---------------------
+//城市订单热力图
+interface LocationsInter {
+    cityCode: string | null
+    beginDate: string | null
+    endDate: string | null
+}
+export function findOrderLocations(data: LocationsInter) {    
+  return http.request({
+    url: '/operationAnalysis/findOrderLocations',
+    method: 'post',
+    data
+  });
+}

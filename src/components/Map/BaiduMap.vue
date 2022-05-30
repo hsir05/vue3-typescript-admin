@@ -50,6 +50,7 @@ const map = ref(null);
 const drawingManager = ref(null);
 const point = ref(null);
 const drivingRoute = ref(null);
+const heatmapOverlay = ref(null);
 
 let gridlines = []; // 用来存储网格线覆盖物的数组
 let nonEditablePoints = []; // 用来存储不可选择区块的数组
@@ -133,12 +134,7 @@ function drawingManagerInit() {
     overlay.remove();
   });
 }
-// 下单标志
-// function createOrderPoint(createOrderLng: number, createOrderLat: number) {
-//     // 下单地点标志
-//     let createOrderAddressPoint = new BMap.Point(createOrderLng, createOrderLat)
-//     orderMapBox.addOverlay(orderMapBox.getMarker(createOrderAddressPoint, orderTimelineListBox.options.icon.iconOrderCreate))
-// }
+
 // 车辆轨迹
 function trackIng(
   beginLng: number,
@@ -166,16 +162,34 @@ function trackIng(
   });
   drivingRoute.value.search(myP1, myP2);
 }
+// 添加地图热点
+function addHeartMap() {
+  map.value.enableScrollWheelZoom(true);
+  heatmapOverlay.value = new BMapLib.HeatmapOverlay({ radius: 10 });
+  map.value.addOverlay(heatmapOverlay.value);
+}
 
-// function addDrivingRoute(beginPoint, endPoint, startIcon, endIcon) {
-//     drivingRoute.value.clearResults()
-//     //为百度地图路径显示添加个性化图片
-//     drivingRoute.value.setMarkersSetCallback(function (result) {
-//         result[0].marker.setIcon(new BMap.Icon(startIcon, new BMap.Size(81, 33), {anchor: new BMap.Size(40, 33)}));
-//         result[1].marker.setIcon(new BMap.Icon(endIcon, new BMap.Size(81, 33), {anchor: new BMap.Size(40, 33)}));
-//     })
-//     drivingRoute.value.search(beginPoint, endPoint)
-// }
+function refreshHeatMap(pointList: { lng: number; lat: number }) {
+  let points = [];
+
+  for (let key of pointList) {
+    points.push({
+      lng: key.lng * 1e-6,
+      lat: key.lat * 1e-6,
+      count: 1,
+    });
+  }
+
+  if (points && points.length > 0) {
+    heatmapOverlay.value.setDataSet({
+      data: points,
+      max: 10,
+    });
+    heatmapOverlay.value.show();
+  } else {
+    heatmapOverlay.value && heatmapOverlay.value.hide();
+  }
+}
 
 // 给城市添加边界线
 function addBoundary(name) {
@@ -550,6 +564,8 @@ defineExpose({
   addMarker,
   createMarker,
   trackIng,
+  addHeartMap,
+  refreshHeatMap,
   map,
   drawingManager,
   currentOpenAreaPoints,

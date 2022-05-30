@@ -10,7 +10,7 @@ export interface CityItemInter {
   value: string;
 }
 
-export interface objIner { 
+export interface objInter { 
   [symbol: string]: string;
 }
 

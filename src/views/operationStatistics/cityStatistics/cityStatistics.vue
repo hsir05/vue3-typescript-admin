@@ -130,10 +130,10 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData();
+      getAllCityData();
     });
 
-    const getData = async () => {
+    const getAllCityData = async () => {
       loading.value = true;
       try {
         let result = await getAllOpenCity();

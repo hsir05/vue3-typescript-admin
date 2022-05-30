@@ -1,4 +1,4 @@
-import { objIner, OrderDataIner } from "@/interface/common/common"
+import { objInter, OrderDataIner } from "@/interface/common/common"
 import { DocumentTextOutline as DocumentIcon, CarSportOutline as CarIcon, FlagOutline as FlagIcon, PlayCircleOutline as PlayIcon, TimeOutline as TimeIcon, StopwatchOutline as StopIcon } from "@vicons/ionicons5";
 
 import { PayCircleOutlined as PayIcon, HourglassOutlined as HourglassIcon } from "@vicons/antd"
@@ -47,13 +47,13 @@ export const rangeShortcuts = {
   },
 };
 
-export const dealWay: objIner = {
+export const dealWay: objInter = {
     DDW0001: "订单收入",
     DDW0002: "订单奖励收入",
     DDW0003: "司机提现",
 };
 
-export const memberType: objIner = {
+export const memberType: objInter = {
     CMT0000: "客户会员类型", 
     CMT0001: "注册会员",
     CMT0002: "升级会员",
