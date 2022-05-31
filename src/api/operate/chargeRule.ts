@@ -13,25 +13,25 @@ export function baseList() {
  * 获取数据
  */
 export function getRuleData(type: string) {
-  let url = "/chargeRule/chargeRuleBaseList";
+  let url = "/chargeRule/chargeRuleBasePage";
   switch (type) {
     case "tab1":
-      url = "/chargeRule/chargeRuleBaseList";
+      url = "/chargeRule/chargeRuleBasePage";
       break;
     case "tab2":
-      url = "/chargeRule/chargeRuleBaseList";
+      url = "/chargeRule/chargeRuleMileageList";
       break;
     case "tab3":
-      url = "/chargeRule/chargeRuleBaseList";
+      url = "/chargeRule/chargeRuleDurationList";
       break;
     case "tab4":
-      url = "/chargeRule/chargeRuleBaseList";
+      url = "/chargeRule/chargeRuleWaitList";
       break;
     case "tab5":
-      url = "/chargeRule/chargeRuleBaseList";
+      url = "/chargeRule/chargeRuleCancelList";
       break;
     case "tab6":
-      url = "/chargeRule/chargeRuleBaseList";
+      url = "/chargeRule/chargeRuleFloatList";
       break;
   }
   return http.request({

@@ -9,8 +9,13 @@
         >添加</n-button
       >
     </div>
-    <div class="flex-align-start h-full">
-      <n-tabs type="segment" :class="{ isDis: 'tabs' }" :on-update:value="handleTabs">
+    <div class="flex-align-start bg-white h-full">
+      <n-tabs
+        type="segment"
+        :class="{ isDis: 'tabs' }"
+        v-model:value="tabsValue"
+        :on-update:value="handleTabs"
+      >
         <n-tab-pane name="tab1" tab="基础计费规则">
           <n-data-table
             ref="table"
@@ -18,10 +23,8 @@
             :loading="loading"
             :columns="columns"
             class="box-border"
-            min-height="calc(100vh - 300px)"
-            flex-height
             :row-key="getRowKeyId"
-            :pagination="false"
+            :pagination="pagination"
           />
         </n-tab-pane>
         <n-tab-pane name="tab2" tab="里程计费规则">
@@ -30,10 +33,8 @@
             :data="data"
             :columns="columns"
             class="box-border"
-            min-height="calc(100vh - 300px)"
-            flex-height
             :row-key="getRowKeyId"
-            :pagination="false"
+            :pagination="pagination"
           />
         </n-tab-pane>
         <n-tab-pane name="tab3" tab="时长计费规则">
@@ -42,10 +43,8 @@
             :data="data"
             :columns="columns"
             class="box-border"
-            min-height="calc(100vh - 300px)"
-            flex-height
             :row-key="getRowKeyId"
-            :pagination="false"
+            :pagination="pagination"
           />
         </n-tab-pane>
         <n-tab-pane name="tab4" tab="取消计费规则">
@@ -54,10 +53,8 @@
             :data="data"
             :columns="columns"
             class="box-border"
-            min-height="calc(100vh - 300px)"
-            flex-height
             :row-key="getRowKeyId"
-            :pagination="false"
+            :pagination="pagination"
           />
         </n-tab-pane>
         <n-tab-pane name="tab5" tab="等待计费规则">
@@ -66,10 +63,8 @@
             :data="data"
             :columns="columns"
             class="box-border"
-            min-height="calc(100vh - 300px)"
-            flex-height
             :row-key="getRowKeyId"
-            :pagination="false"
+            :pagination="pagination"
           />
         </n-tab-pane>
         <n-tab-pane name="tab6" tab="浮动计费规则">
@@ -78,10 +73,8 @@
             :data="data"
             :columns="columns"
             class="box-border"
-            min-height="calc(100vh - 300px)"
-            flex-height
             :row-key="getRowKeyId"
-            :pagination="false"
+            :pagination="pagination"
           />
         </n-tab-pane>
       </n-tabs>
@@ -92,15 +85,14 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw, onMounted } from "vue";
+import { defineComponent, ref, h, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { CreateOutline as CreateIcon, Add as AddIcon } from "@vicons/ionicons5";
 import ChargeRuleDrawer from "./chargeRuleDrawer.vue";
 import Distribution from "./distribution.vue";
-// import { useMessage } from "naive-ui";
 import { getRuleData } from "@/api/operate/chargeRule";
-import { PaginationInter } from "@/api/type";
 import { tableDataItem } from "./type";
+import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "ChargeRule",
   components: { ChargeRuleDrawer, AddIcon, Distribution },
@@ -109,9 +101,19 @@ export default defineComponent({
     const itemCount = ref(null);
     const isDis = ref(false);
     const chargeRuleDrawerRef = ref();
-    // const message = useMessage();
     const data = ref([]);
-    const columns = [
+
+    const tabsValue = ref("tab1");
+
+    let obj: objInter = {
+      tab1: "chargeRuleBaseDescription",
+      tab2: "chargeRuleMileageDesc",
+      tab3: "chargeRuleDurationDesc",
+      tab4: "chargeRuleWaitDesc",
+      tab5: "chargeRuleCancelDesc",
+      tab6: "chargeRuleFloatDesc",
+    };
+    const columns = ref([
       {
         title: "序号",
         key: "index",
@@ -123,20 +125,24 @@ export default defineComponent({
       },
       {
         title: "规则描述",
-        key: "ruleDescripot",
+        key: obj[tabsValue.value],
         align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
       },
       {
         title: "操作",
         key: "action",
         align: "center",
-        width: "200px",
+        width: 100,
         render(record: tableDataItem) {
           return h(TableActions as any, {
             actions: [
               {
                 label: "编辑",
                 type: "primary",
+                isIconBtn: true,
                 icon: CreateIcon,
                 onClick: handleEdit.bind(null, record),
                 auth: ["dict001"],
@@ -145,14 +151,15 @@ export default defineComponent({
           });
         },
       },
-    ];
+    ]);
 
     onMounted(() => {
       getData("tab1");
     });
 
     function handleTabs(value: string) {
-      console.log(value);
+      columns.value[1].key = obj[value];
+      tabsValue.value = value;
       data.value = [];
       getData(value);
     }
@@ -160,7 +167,6 @@ export default defineComponent({
       try {
         loading.value = true;
         let res = await getRuleData(type);
-        console.log(res);
         data.value = res.data;
         loading.value = false;
       } catch (err) {
@@ -170,7 +176,6 @@ export default defineComponent({
     };
 
     function handleAdd() {
-      console.log("点击了新增");
       const { openDrawer } = chargeRuleDrawerRef.value;
       openDrawer("新增");
     }
@@ -180,20 +185,10 @@ export default defineComponent({
       isDis.value = true;
     }
 
-    function handlePage(pagination: PaginationInter) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
-    }
-
-    function handlepagSize(pagination: PaginationInter) {
-      console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
-    }
-
     // 抽屉组件保存后处理
     function handleSaveAfter() {
-      console.log("抽屉组件保存后处理");
-      //   getData({ page: 1, pageSize: 10 });
+      data.value = [];
+      getData("tab1");
     }
 
     function handleAfer() {
@@ -205,14 +200,16 @@ export default defineComponent({
       isDis,
       loading,
       chargeRuleDrawerRef,
+      tabsValue,
+      pagination: {
+        pageSize: 10,
+      },
       getRowKeyId: (row: tableDataItem) => row.id,
       itemCount,
       columns,
       handleTabs,
-      handlePage,
       handleAdd,
       handleAfer,
-      handlepagSize,
       handleSaveAfter,
     };
   },
@@ -222,6 +219,7 @@ export default defineComponent({
 .charge-rule-box {
   height: 100%;
 }
+
 .tabs {
   width: calc(100% - 450px - 10px);
   transition: All ease;

@@ -10,7 +10,7 @@ interface CouponInter{
 }
 
 export interface TableDataItemInter extends CouponInter{
-    customerCouponConsumeRuleId?: string
+    customerCouponConsumeRuleId: string
 }
 
 export interface FormInter  {

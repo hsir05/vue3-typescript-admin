@@ -97,10 +97,6 @@ export default defineComponent({
     const data = ref<TableDataItemInter[]>([]);
 
     const columns = [
-      //   {
-      //     type: "selection",
-      //     align: "center",
-      //   },
       {
         title: "序号",
         key: "index",
@@ -190,7 +186,7 @@ export default defineComponent({
                 isIconBtn: true,
                 auth: ["dict002"],
                 popConfirm: {
-                  onPositiveClick: handleRemove.bind(null, record),
+                  onPositiveClick: handleRemove.bind(null, record.customerCouponConsumeRuleId),
                   title: "您确定删除?",
                 },
               },
@@ -267,11 +263,11 @@ export default defineComponent({
       openDrawer("新增代金券消费规则");
     }
 
-    async function handleRemove(record: Recordable) {
+    async function handleRemove(customerCouponConsumeRuleId: string) {
       try {
         loading.value = true;
         let res = await removeCoupon({
-          customerCouponConsumeRuleId: record.customerCouponConsumeRuleId,
+          customerCouponConsumeRuleId: customerCouponConsumeRuleId,
         });
         console.log(res);
         getData({ pageIndex: 1, pageSize: 10 });
