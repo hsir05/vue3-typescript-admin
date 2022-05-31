@@ -49,7 +49,7 @@
         :data="data"
         :columns="columns"
         class="box-border"
-        min-height="400px"
+        min-height="600px"
         flex-height
         :row-key="getRowKeyId"
         :pagination="false"
@@ -57,40 +57,32 @@
     </div>
 
     <div class="map">
-      <Map
-        ref="baiduMapRef"
-        :nonPointsData="remoteNonEditablePoints"
-        :currentPointsData="currentOpenAreaPoints"
-      />
+      <Map ref="baiduMapRef" />
 
       <div class="map-edit-area" v-if="isShow">
-        <div class="">
-          <n-icon size="24" style="vertical-align: middle">
-            <AlertIcon color="#f0a020" />
-          </n-icon>
-          <span class="ml-5px">新增或编辑区域时：</span>
-        </div>
-        <div class="ml-30px">
-          <p class="mt-5px">地图中<span style="color: #eba624">黄色区块</span>为不可编辑区块；</p>
-          <p class="mt-5px">地图中<span style="color: #89b929">绿色区块</span>为已选择区块；</p>
-          <p class="mt-5px">地图中空白区块为可选择区块。</p>
-        </div>
         <n-form
           ref="editFormRef"
           :rules="editRules"
-          size="small"
           label-placement="left"
-          :style="{ maxWidth: '250px', marginLeft: '25px', marginTop: '20px' }"
+          :style="{ maxWidth: '250px', marginLeft: '15px', marginTop: '20px' }"
           require-mark-placement="right-hanging"
           label-width="80"
           :model="editForm"
         >
-          <n-form-item label="区域名称" path="areaName">
-            <n-input v-model:value="editForm.areaName" clearable placeholder="输入区域名称" />
+          <n-form-item label="机场名称" path="airportName">
+            <n-input v-model:value="editForm.airportName" clearable placeholder="输入机场名称" />
           </n-form-item>
 
-          <n-form-item label="状态" path="areaLock">
-            <n-radio-group v-model:value="editForm.areaLock">
+          <n-form-item label="地址" path="airportAddressDetail">
+            <n-input
+              v-model:value="editForm.airportAddressDetail"
+              clearable
+              placeholder="输入地址"
+            />
+          </n-form-item>
+
+          <n-form-item label="状态" path="openLock">
+            <n-radio-group v-model:value="editForm.openLock">
               <n-space>
                 <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
                   item.label
@@ -99,51 +91,6 @@
             </n-radio-group>
           </n-form-item>
           <n-form-item label="操作">
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button attr-type="button" text type="primary" @click="handleAdjust">
-                  <n-icon size="20">
-                    <HandIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              调整地图位置
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleEditArea"
-                >
-                  <n-icon size="20">
-                    <CreatIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              选择区域
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleReset"
-                >
-                  <n-icon size="20">
-                    <ArrowBackIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              还原
-            </n-tooltip>
-
             <n-tooltip trigger="hover">
               <template #trigger>
                 <n-button
@@ -172,36 +119,23 @@ import Map from "@/components/Map/BaiduMap.vue";
 import { FormInst, SelectOption, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-import { TableItemInter, OpenAreaFormInter, NonDataInter, NonEditAreaPonitsInter } from "./type";
+import { TableItemInter, OpenAreaFormInter, EditFormInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { getAllOpenCity } from "@/api/common/common";
+import { getOpenCityAirportList, saveAirport, removeAirport } from "@/api/operate/operate";
 import {
-  getCityOpenArea,
-  removeArea,
-  saveOpenArea,
-  getOpenAreaPointList,
-  getNonEditablePointList,
-} from "@/api/operate/operate";
-import {
-  AlertCircle as AlertIcon,
   TrashOutline as TrashIcon,
-  CreateOutline as CreatIcon,
   SaveOutline as SaveOutIcon,
-  ArrowUndoCircleOutline as ArrowBackIcon,
   Add as AddIcon,
-  HandRightOutline as HandIcon,
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
 import { itemState } from "@/interface/common/common";
+import airportIcon from "@/assets/image/openCity_airport.png";
 export default defineComponent({
   name: "OpenArea",
   components: {
     Map,
     AddIcon,
-    AlertIcon,
-    HandIcon,
-    CreatIcon,
-    ArrowBackIcon,
     SaveOutIcon,
   },
   setup() {
@@ -220,41 +154,42 @@ export default defineComponent({
     const area = ref<string | null>();
 
     const openCityList = ref([]);
-    const currentOpenAreaPoints = ref<NonDataInter[]>([]);
-    const remoteNonEditablePoints = ref<NonDataInter[]>([]);
     const data = ref([]);
     const editFormRef = ref();
 
-    const editForm = ref<TableItemInter>({
-      areaName: null,
-      areaLock: 1,
-      areaCode: null,
+    const editForm = ref<EditFormInter>({
       cityCode: null,
+      airportName: null,
+      openLock: 1,
+      airportAddressDetail: null,
+      airportLat: null,
+      airportLng: null,
+      openCityAirportId: null,
     });
 
     const columns = [
       {
-        title: "区域名称",
-        key: "areaName",
+        title: "开通机场名称",
+        key: "airportName",
         align: "center",
       },
       {
-        title: "区域编码",
-        key: "areaCode",
+        title: "序列",
+        key: "openSeq",
         align: "center",
       },
       {
         title: "状态",
-        key: "areaLock",
+        key: "openLock",
         align: "center",
         render(row: TableItemInter) {
           return h(
             NTag,
             {
-              type: row.areaLock === 1 ? "error" : "success",
+              type: row.openLock === 1 ? "error" : "success",
             },
             {
-              default: () => (row.areaLock === 1 ? "锁定" : "正常"),
+              default: () => (row.openLock === 1 ? "锁定" : "正常"),
             }
           );
         },
@@ -280,7 +215,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: TrashIcon,
-                onClick: handleDelete.bind(null, record),
+                onClick: handleDelete.bind(null, record.openCityAirportId),
                 auth: ["dict001"],
               },
             ],
@@ -319,7 +254,7 @@ export default defineComponent({
         isShow.value = false;
         await formRef.value?.validate();
         loading.value = true;
-        let res = await getCityOpenArea({ cityCode: form.value.cityCode });
+        let res = await getOpenCityAirportList({ cityCode: form.value.cityCode });
         data.value = res.data;
         loading.value = false;
       } catch (err) {
@@ -337,11 +272,10 @@ export default defineComponent({
       };
     }
 
-    async function remove(areaCode: string) {
+    async function remove(openCityAirportId: string) {
       try {
         loading.value = true;
-        let res = await removeArea({ areaCode });
-        // console.log(res);
+        let res = await removeAirport({ openCityAirportId });
         message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {
@@ -349,46 +283,21 @@ export default defineComponent({
         loading.value = false;
       }
     }
-    // 调整地图
-    function handleAdjust() {
-      const { map, drawingManager } = baiduMapRef.value;
-      map.enableScrollWheelZoom();
-      map.enableDoubleClickZoom();
-      drawingManager.close();
-    }
 
-    // 还原
-    function handleReset() {
-      const { map, drawingManager, removeAllOverlay, addCurrentOpenAreaPieces } = baiduMapRef.value;
-      map.enableScrollWheelZoom();
-      map.enableDoubleClickZoom();
-      drawingManager.close();
-      removeAllOverlay();
-      addCurrentOpenAreaPieces(currentOpenAreaPoints.value);
-    }
     async function handleSave() {
       try {
         loading.value = true;
-
-        const { currentOpenAreaPoints } = baiduMapRef.value;
-
-        let pointsData = currentOpenAreaPoints.map((item: { lng: number; lat: number }) => {
-          return { lng: item.lng, lat: item.lat };
-        });
-        console.log(pointsData);
-
         let option = {
-          areaCode: editForm.value.areaCode,
-          areaName: editForm.value.areaName,
+          openCityAirportId: editForm.value.openCityAirportId,
           cityCode: form.value.cityCode,
-          areaLock: editForm.value.areaLock,
-          openAreaPointList: pointsData,
+          airportLng: editForm.value.airportLng,
+          airportLat: editForm.value.airportLat,
+          airportAddressDetail: editForm.value.airportName,
+          openLock: editForm.value.openLock,
+          airportName: editForm.value.airportName,
         };
-        let res = await saveOpenArea(option);
+        let res = await saveAirport(option);
         console.log(res);
-
-        handleAdjust();
-
         message.success(window.$tips[res.code]);
         loading.value = false;
       } catch (err) {
@@ -397,66 +306,19 @@ export default defineComponent({
       }
     }
 
-    const getNonEditAreaPonits = async (paramData: NonEditAreaPonitsInter) => {
-      try {
-        let option = {
-          areaCode: editForm.value.areaCode as string,
-          ...paramData,
-        };
-        let res = await getNonEditablePointList(option);
-        remoteNonEditablePoints.value = res.data;
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    async function getOpenAreaPoint(areaCode: string) {
-      try {
-        loading.value = true;
-        let res = await getOpenAreaPointList({ areaCode });
-        currentOpenAreaPoints.value = res.data;
-
-        let option = {
-          areaCode: editForm.value.areaCode as string,
-          lngMin: res.data[0].lng,
-          lngMax: res.data[res.data.length - 1].lng,
-          latMin: res.data[0].lat,
-          latMax: res.data[res.data.length - 1].lat,
-        };
-        let result = await getNonEditablePointList(option);
-        remoteNonEditablePoints.value = result.data;
-
-        const { renderBaiduMap, addMapEventListener, addBoundary, drawingManagerInit } =
-          baiduMapRef.value;
-
-        renderBaiduMap(form.value.lng, form.value.lat);
-        addMapEventListener();
-        addBoundary(form.value.cityName);
-        drawingManagerInit();
-
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    }
-
-    async function handleEdit(record: TableItemInter) {
+    async function handleEdit(record: EditFormInter) {
       isShow.value = true;
-      area.value = record.areaName;
-      getOpenAreaPoint(record.areaCode as string);
+      area.value = record.airportName;
+      const { renderBaiduMap, addMarker } = baiduMapRef.value;
+
+      renderBaiduMap(record.airportLng, record.airportLat);
+      addMarker(record.airportLng, record.airportLat, airportIcon);
       editForm.value = record;
     }
-    function handleDelete(record: TableItemInter) {
-      remove(record.areaCode as string);
+    function handleDelete(openCityAirportId: string) {
+      remove(openCityAirportId);
     }
     function handleAddArea() {}
-
-    function handleEditArea() {
-      const { map, drawingManager } = baiduMapRef.value;
-      map.disableScrollWheelZoom();
-      map.disableDoubleClickZoom();
-      drawingManager.open();
-    }
 
     return {
       loading,
@@ -465,8 +327,6 @@ export default defineComponent({
       form,
       formRef,
       openCityList,
-      remoteNonEditablePoints,
-      currentOpenAreaPoints,
       baiduMapRef,
       data,
       appTheme,
@@ -489,12 +349,8 @@ export default defineComponent({
 
       queryValue,
       handleSave,
-      handleAdjust,
-      handleReset,
       handleUpdateValue,
       handleAddArea,
-      handleEditArea,
-      getNonEditAreaPonits,
     };
   },
 });
@@ -506,7 +362,7 @@ export default defineComponent({
   justify-content: space-between;
 
   .open-area-left {
-    width: 390px;
+    width: 420px;
     background-color: $white;
   }
 
@@ -515,7 +371,7 @@ export default defineComponent({
   }
 
   .map {
-    width: calc(100% - 390px - 10px);
+    width: calc(100% - 420px - 10px);
     height: auto;
     overflow: scroll;
     background-color: $white;
@@ -530,7 +386,7 @@ export default defineComponent({
       left: 10px;
       top: 10px;
       width: 300px;
-      height: 270px;
+      height: 220px;
       background-color: $white;
       border-radius: 4px;
     }

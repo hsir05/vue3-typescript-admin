@@ -3,7 +3,6 @@
     <n-form
       ref="formRef"
       :rules="rules"
-      size="large"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '440px' }"
@@ -11,43 +10,34 @@
       label-width="140"
       :model="form"
     >
-      <n-form-item label="套餐价(元)" path="price">
-        <n-input v-model:value="form.price" clearable placeholder="输入套餐价" />
+      <n-form-item label="套餐价(元)" path="packagePrice">
+        <n-input-number v-model:value="form.packagePrice" clearable placeholder="输入套餐价" />
       </n-form-item>
-      <n-form-item label="包含里程(公)" path="distance">
-        <n-input v-model:value="form.distance" clearable placeholder="输入包含里程" />
+      <n-form-item label="包含里程(公)" path="containMileage">
+        <n-input-number v-model:value="form.containMileage" clearable placeholder="输入包含里程" />
       </n-form-item>
-      <n-form-item label="包含时长(分)" path="time">
-        <n-input v-model:value="form.time" clearable placeholder="输入包含时长" />
+      <n-form-item label="包含时长(分)" path="containDuration">
+        <n-input-number v-model:value="form.containDuration" clearable placeholder="输入包含时长" />
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
-          >保存</n-button
-        >
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
-          >重置</n-button
-        >
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >保存
+        </n-button>
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+          >重置
+        </n-button>
       </div>
     </n-form>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRaw, toRefs, ref, unref } from "vue";
-import { FormInst, useMessage, SelectOption } from "naive-ui";
+import { defineComponent, reactive, toRefs, ref } from "vue";
+import { FormInst, useMessage } from "naive-ui";
 import { statusOptions, sexOptions } from "@/config/form";
-import { tableDataItem } from "./type";
+import { FormInter } from "./type";
 import { FormItemRule } from "naive-ui";
+import { saveChargeRuleBase } from "@/api/operate/chargeRule";
 export default defineComponent({
   name: "ChargeRuleDrawer",
   emits: ["on-save-after"],
@@ -58,55 +48,37 @@ export default defineComponent({
       openCityData: [],
       disabled: false,
     });
-    const title = ref("菜单");
+    const title = ref("计费规则");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      ruleDescript: null,
-      orderType: null,
-      vehicleType: null,
-      price: null,
-      distance: null,
-      time: null,
+    const form = ref<FormInter>({
+      packagePrice: null,
+      containMileage: null,
+      containDuration: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
-      console.log(record);
-      if (record) {
-        form.value = { ...form.value, ...record };
-      }
+    function openDrawer(t: string) {
       title.value = t;
       state.isDrawer = true;
     }
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
-          state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
-
-          handleSaveAfter();
-
-          message.success("验证成功");
+          try {
+            state.loading = true;
+            let res = await saveChargeRuleBase(form.value);
+            message.success(window.$tips[res.code]);
+            handleSaveAfter();
+            state.loading = false;
+          } catch (err) {
+            state.loading = false;
+          }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
-    }
-
-    function handleUpdateValue(_: string, option: SelectOption) {
-      console.log(option);
-      // console.log(toRaw(form.value));
-      form.value = {
-        ...toRaw(form.value),
-      };
-      console.log(form.value);
-
-      //    form.value.city = unref(option).label
-      //    form.value.code = option.value
     }
 
     function handleSaveAfter() {
@@ -115,12 +87,9 @@ export default defineComponent({
 
     function handleReset() {
       form.value = {
-        ruleDescript: null,
-        orderType: null,
-        vehicleType: null,
-        price: null,
-        distance: null,
-        time: null,
+        packagePrice: null,
+        containMileage: null,
+        containDuration: null,
       };
       formRef.value?.restoreValidation();
     }
@@ -136,31 +105,30 @@ export default defineComponent({
       formRef,
       title,
       rules: {
-        // price: { required: true, trigger: ["blur", "input"], message: "请输入套餐价" },
-        // distance: { required: true, trigger: ["blur", "input"], message: "请填写正整数" },
-        // time: { required: true, trigger: ["blur", "input"], message: "请填写正整数" },
-
-        price: {
+        packagePrice: {
           required: true,
-          trigger: ["input"],
+          type: "number",
+          trigger: ["input", "blur"],
           validator: (rule: FormItemRule, value: string) => {
             console.log(rule);
             return /^1\d{10}$/.test(value);
           },
           message: "请填写正整数或两位小数",
         },
-        distance: {
+        containMileage: {
           required: true,
-          trigger: ["input"],
+          type: "number",
+          trigger: ["input", "blur"],
           validator: (rule: FormItemRule, value: string) => {
             console.log(rule);
             return /^\+?[1-9][0-9]*$/.test(value);
           },
           message: "请填写正整数",
         },
-        time: {
+        containDuration: {
           required: true,
-          trigger: ["input"],
+          type: "number",
+          trigger: ["input", "blur"],
           validator: (rule: FormItemRule, value: string) => {
             console.log(rule);
             return /^\+?[1-9][0-9]*$/.test(value);
@@ -172,7 +140,6 @@ export default defineComponent({
       sexOptions,
       form,
       openDrawer,
-      handleUpdateValue,
       handleReset,
       handleValidate,
       onCloseAfter,

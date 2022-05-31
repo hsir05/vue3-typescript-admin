@@ -1,20 +1,20 @@
 <template>
-  <div class="bg-white h-full ml-10px">
+  <div class="bg-white h-full ml-10px" v-if="isShow">
     <n-divider title-placement="left"> 开通业务分配基础计费规则 </n-divider>
     <n-form
-      ref="busionessFormRef"
-      :rules="businessRules"
+      ref="formRef"
+      :rules="rules"
       label-placement="left"
       :style="{ width: '395px', marginLeft: '10px', marginRight: '30px' }"
       require-mark-placement="right-hanging"
       label-width="90"
-      :model="businessForm"
+      :model="form"
     >
       <n-form-item label="订单类型" path="orderType">
         <n-select
           clearable
           filterable
-          v-model:value="businessForm.orderType"
+          v-model:value="form.orderType"
           placeholder="选择订单类型"
           :options="orderTypeData"
         />
@@ -24,7 +24,7 @@
         <n-select
           clearable
           filterable
-          v-model:value="businessForm.vehicleType"
+          v-model:value="form.vehicleType"
           placeholder="选择车辆类型"
           :options="vehicleTypeData"
         />
@@ -34,7 +34,7 @@
         <n-select
           clearable
           filterable
-          v-model:value="businessForm.openArea"
+          v-model:value="form.openArea"
           placeholder="选择开通区域"
           :options="openAreaData"
         />
@@ -58,51 +58,65 @@
 <script lang="ts">
 import { defineComponent, ref, toRefs, onMounted, reactive } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { DistributionInter } from "./type";
 import { getDict } from "@/api/common/common";
-import { getVehicleType } from "@/api/operate/operate";
+import { getVehicleType, getOpenAreaList } from "@/api/operate/operate";
 import { distributionRule } from "@/api/operate/chargeRule";
 export default defineComponent({
   name: "Distribution",
   emits: ["save-after"],
   setup(_, { emit }) {
     const loading = ref(false);
-    const busionessFormRef = ref<FormInst | null>(null);
+    const formRef = ref<FormInst | null>(null);
     const message = useMessage();
     const state = reactive({
-      orderTypeData: [],
-      vehicleTypeData: [],
-      openAreaData: [],
+      isShow: false,
     });
-    const businessForm = ref<tableDataItem>({
-      vehicleType: null,
+    const form = ref<DistributionInter>({
+      ruleId: null,
+      ruleType: null,
       orderType: null,
+      vehicleType: null,
       openArea: null,
     });
     const vehicleTypeData = ref([]);
     const orderTypeData = ref([]);
-    onMounted(() => {
+    const openAreaData = ref([]);
+    onMounted(async () => {
       getData();
     });
+
+    function openModal(ruleId: string, ruleType: string) {
+      form.value.ruleId = ruleId;
+      form.value.ruleType = ruleType;
+      state.isShow = true;
+    }
 
     const getData = () => {
       Promise.all([
         getVehicleType({ operationCompanyId: "" }),
         getDict({ parentEntryCode: "OT00000" }),
+        getOpenAreaList(),
       ])
         .then((res) => {
           let dataArr = res.map((item) => item.data);
+          console.log(dataArr);
           vehicleTypeData.value = dataArr[0].map(
-            (item: { chargeRuleBaseDescription: string; chargeRuleBaseId: string }) => {
+            (item: { vehicleTypeName: string; vehicleTypeId: string }) => {
               let obj = {
-                label: item.chargeRuleBaseDescription,
-                value: item.chargeRuleBaseId,
+                label: item.vehicleTypeName,
+                value: item.vehicleTypeId,
               };
               return obj;
             }
           );
 
-          orderTypeData.value = dataArr[1];
+          orderTypeData.value = dataArr[1].map((item: { entryName: string; entryCode: string }) => {
+            return { label: item.entryName, value: item.entryCode };
+          });
+          openAreaData.value = dataArr[2].map((item: { areaName: string; areaCode: string }) => {
+            return { label: item.areaName, value: item.areaCode };
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -111,7 +125,7 @@ export default defineComponent({
 
     function handleSubmit(e: MouseEvent) {
       e.preventDefault();
-      busionessFormRef.value?.validate(async (errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
           loading.value = true;
           try {
@@ -124,6 +138,7 @@ export default defineComponent({
             };
             let res = await distributionRule(option);
             console.log(res);
+            message.success(window.$tips[res.code]);
             emit("save-after");
             loading.value = false;
           } catch (err) {
@@ -132,18 +147,21 @@ export default defineComponent({
           }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
     function handleReset() {}
 
     return {
-      busionessFormRef,
-      businessForm,
+      formRef,
+      openModal,
+      form,
       loading,
+      vehicleTypeData,
+      orderTypeData,
+      openAreaData,
       ...toRefs(state),
-      businessRules: {
+      rules: {
         vehicleType: { required: true, trigger: ["blur", "change"], message: "请选择车辆类型" },
         orderType: { required: true, trigger: ["blur", "change"], message: "请选择订单类型" },
         openArea: { required: true, trigger: ["blur", "change"], message: "请选择开通区域" },

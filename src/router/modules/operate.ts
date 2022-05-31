@@ -47,6 +47,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operate/openingArea/openingArea.vue"),
       },
+       {
+        path: "/operate/opening-airport",
+        name: `operate_opening-airport`,
+        meta: {
+          title: "开通机场管理",
+        },
+        component: () => import("@/views/operate/openingAirport/openingAirport.vue"),
+      },
       {
         path: "/operate/virtual-vehicle",
         name: `operate_virtual-vehicle`,

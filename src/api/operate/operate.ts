@@ -172,11 +172,85 @@ export function getNonEditablePointList(data: NonEditInter) {
     data,
   });
 }
-
-/*****开通业务管理---------------------****/
+/*****开通机场管理---------------------****/
 
 /**
- * 获取开通区域
+ * 根据城市code查找机场列表
+ */
+export function getOpenCityAirportList(data: { cityCode: string | null }) {
+  return http.request({
+    url: "/openCityAirport/openCityAirportList",
+    method: "post",
+    data,
+  });
+}
+/**
+ * 删除开通机场
+ */
+export function removeAirport(data: { openCityAirportId: string | null }) {
+  return http.request({
+    url: "/openCityAirport/delete",
+    method: "post",
+    data,
+  });
+}
+/**
+ * 交换两个开通机场的序列
+ */
+export function swapOpenSeq(data: {
+  firstOpenCityAirportId: string | null;
+  secondOpenCityAirportId: string | null;
+}) {
+  return http.request({
+    url: "/openCityAirport/swapOpenSeq",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 保存开通机场
+ */
+interface AirInter {
+  openCityAirportId: string | null;
+  cityCode: string | null;
+  airportLng: number | null;
+  airportLat: number | null;
+  airportAddressDetail: string | null;
+  openLock: number | null;
+  airportName: string | null;
+}
+export function saveAirport(data: AirInter) {
+  return http.request({
+    url: "/openCityAirport/save",
+    method: "post",
+    data,
+  });
+}
+/**
+ * 校验机场名称唯一性
+ */
+export function uniqueOpenCityAirport(data: {
+  cityCode: string | null;
+  airportName: string | null;
+  oldAirportName: string | null;
+}) {
+  return http.request({
+    url: "/openCityAirport/uniqueOpenCityAirport",
+    method: "post",
+    data,
+  });
+}
+/*****开通业务管理---------------------****/
+
+export function getOpenAreaList() {
+  return http.request({
+    url: "/openArea/openAreaList",
+    method: "post"
+  });
+}
+/**
+ * 获取开通区域 
  */
 export function getCityOpenArea(data: { cityCode: string | null }) {
   return http.request({
@@ -187,7 +261,7 @@ export function getCityOpenArea(data: { cityCode: string | null }) {
 }
 
 /**
- * 开通区域编码查找该开通区域的开通业务列表
+ * 开通区域编码查找该开通区域的开通业务列表 
  */
 export function getOpenAreaBuss(data: { areaCode: string }) {
   return http.request({
@@ -279,78 +353,6 @@ export function removeAcceptOrderTime(data: { acceptOrderReserveTimeSettingId: s
   });
 }
 
-//----------开通机场--------
-/**
- * 删除接单预留时间设置
- */
-export function openCityAirportList(data: { cityCode: string | null }) {
-  return http.request({
-    url: "/openCityAirport/openCityAirportList",
-    method: "post",
-    data,
-  });
-}
-
-/**
- * 交换两个开通机场的序列
- */
-export function swapOpenSeq(data: {
-  firstOpenCityAirportId: string | null;
-  secondOpenCityAirportId: string | null;
-}) {
-  return http.request({
-    url: "/openCityAirport/swapOpenSeq",
-    method: "post",
-    data,
-  });
-}
-
-/**
- * 保存开通机场
- */
-interface airState {
-  openCityAirportId: string | null;
-  oldAirportName: string | null;
-  cityCode: string | null;
-  airportLng: string | null;
-  airportLat: string | null;
-  airportAddressDetail: string | null;
-  openLock: string | null;
-  airportName: string | null;
-}
-export function saveAirport(data: airState) {
-  return http.request({
-    url: "/openCityAirport/save",
-    method: "post",
-    data,
-  });
-}
-
-/**
- * 删除开通机场
- */
-export function deleteAirportList(data: { openCityAirportId: string | null }) {
-  return http.request({
-    url: "/openCityAirport/delete",
-    method: "post",
-    data,
-  });
-}
-
-/**
- * 校验机场名称唯一性
- */
-export function uniqueOpenCityAirport(data: {
-  cityCode: string | null;
-  airportName: string | null;
-  oldAirportName: string | null;
-}) {
-  return http.request({
-    url: "/openCityAirport/uniqueOpenCityAirport",
-    method: "post",
-    data,
-  });
-}
 
 //--------------虚拟车头管理-----------------
 /**

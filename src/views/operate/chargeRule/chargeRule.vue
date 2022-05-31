@@ -79,7 +79,7 @@
         </n-tab-pane>
       </n-tabs>
 
-      <Distribution v-if="isDis" @save-after="handleAfer" />
+      <Distribution ref="distributionRef" @save-after="handleAfer" />
     </div>
     <ChargeRuleDrawer :width="500" @on-save-after="handleSaveAfter" ref="chargeRuleDrawerRef" />
   </div>
@@ -91,7 +91,7 @@ import { CreateOutline as CreateIcon, Add as AddIcon } from "@vicons/ionicons5";
 import ChargeRuleDrawer from "./chargeRuleDrawer.vue";
 import Distribution from "./distribution.vue";
 import { getRuleData } from "@/api/operate/chargeRule";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "ChargeRule",
@@ -101,6 +101,7 @@ export default defineComponent({
     const itemCount = ref(null);
     const isDis = ref(false);
     const chargeRuleDrawerRef = ref();
+    const distributionRef = ref();
     const data = ref([]);
 
     const tabsValue = ref("tab1");
@@ -119,7 +120,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -136,7 +137,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: 100,
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -177,12 +178,23 @@ export default defineComponent({
 
     function handleAdd() {
       const { openDrawer } = chargeRuleDrawerRef.value;
-      openDrawer("新增");
+      openDrawer("新增计费规则");
     }
 
+    // base 基础，mileage里程，duration时长，wait等待，
+    // floatHoliday工作日浮动，floatWorkday节假日浮动，cancel取消
+    let orderTypeObj: objInter = {
+      tab1: "base",
+      tab2: "mileage",
+      tab3: "duration",
+      tab4: "cancel",
+      tab5: "wait",
+      tab6: "floatHoliday",
+    };
     function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      isDis.value = true;
+      isDis.value = false;
+      const { openModal } = distributionRef.value;
+      openModal(record, orderTypeObj[tabsValue.value]);
     }
 
     // 抽屉组件保存后处理
@@ -200,11 +212,12 @@ export default defineComponent({
       isDis,
       loading,
       chargeRuleDrawerRef,
+      distributionRef,
       tabsValue,
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.chargeRuleBaseId,
       itemCount,
       columns,
       handleTabs,

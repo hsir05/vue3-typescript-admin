@@ -509,7 +509,9 @@ function clearOverlays() {
 function addMarker(lng, lat, icon) {
   let marker;
   if (icon) {
-    marker = new BMap.Marker(new BMap.Point(lng, lat), { icon: icon });
+    marker = new BMap.Marker(new BMap.Point(lng, lat), {
+      icon: new BMap.Icon(icon, new BMap.Size(30, 33)),
+    });
   } else {
     marker = new BMap.Marker(new BMap.Point(lng, lat));
   }

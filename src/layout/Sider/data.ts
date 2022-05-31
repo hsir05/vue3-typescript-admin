@@ -72,6 +72,11 @@ export const menuOptions: MenuOption[] = [
         path: "/operate/opening-area",
         key: "operate-opening-area",
       },
+       {
+        label: "开通机场管理",
+        path: "/operate/opening-airport",
+        key: "operate-opening-airport",
+      },
       {
         label: "计费规则管理",
         path: "/operate/charge-rule",

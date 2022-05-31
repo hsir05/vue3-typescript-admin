@@ -89,71 +89,115 @@ export function floatList() {
 /**
  * 保存套餐计费规则
  */
-export function saveChargeRuleBase() {
+interface CharageRuleInter{
+    packagePrice:number | null
+    containMileage:number | null
+    containDuration:number | null
+}
+export function saveChargeRuleBase(data: CharageRuleInter) {
   return http.request({
     url: "/ChargeRule/saveChargeRuleBase",
     method: "post",
+    data
   });
 }
 /**
  * 保存里程计费规则
  */
-export function saveChargeRuleMileage() {
+interface MileageInter{
+    overMileage:number | null
+    mileagePrice:number | null
+}
+export function saveChargeRuleMileage(data: MileageInter[]) {
   return http.request({
     url: "/chargeRule/saveChargeRuleMileage",
     method: "post",
+    data
   });
 }
 
 /**
  * 保存时长计费规则
  */
-export function saveChargeRuleDuration() {
+interface DurationInter{
+    overDuration:number | null   
+    durationPrice:number | null
+}
+export function saveChargeRuleDuration(data: DurationInter[]) {
   return http.request({
     url: "/chargeRule/saveChargeRuleDuration",
     method: "post",
+    data
   });
 }
 /**
  * 保存等待计费规则
  */
-export function saveChargeRuleWait() {
+interface WaitInter{
+    waitDuration:number | null   
+    durationPrice:number | null
+}
+export function saveChargeRuleWait(data: WaitInter[]) {
   return http.request({
     url: "/chargeRule/saveChargeRuleWait",
     method: "post",
+    data
   });
 }
-
+// /**
+//  * 保存取消计费规则
+//  */
+// interface CancelInter{
+//     overCancelDuration:number | null   
+//     deductBasePricePrecent:number | null
+// }
+// export function saveChargeRuleCancel(data:CancelInter[]) {
+//   return http.request({
+//     url: "/chargeRule/saveChargeRuleCancel",
+//     method: "post",
+//     data
+//   });
+// }
 /**
  * 保存取消计费规则
  */
-export function saveChargeRuleCancel() {
+interface CancelInter{
+    overCancelDuration:number | null   
+    deductBasePricePrecent:number | null
+}
+export function saveChargeRuleCancel(data:CancelInter[]) {
   return http.request({
     url: "/chargeRule/saveChargeRuleCancel",
     method: "post",
+    data
   });
 }
 /**
  * 保存浮动计费规则
  */
-export function saveChargeRuleFloat() {
+interface FloatInter{
+    overCancelDuration:number | null   
+    deductBasePricePrecent:number | null
+}
+export function saveChargeRuleFloat(data:FloatInter) {
   return http.request({
     url: "/chargeRule/saveChargeRuleFloat",
     method: "post",
+    data
   });
 }
 
 /**
  * 向开通区域分配计费规则
  */
-interface ruleState {
-    ruleId: String | null
-    ruleType: String | null
-    orderType: String | null
-    vehicleType: String | null
-    openArea: String | null
+interface DistributionInter {
+    ruleId: string | null
+    ruleType: string | null
+    orderType: string | null
+    vehicleType: string | null
+    openArea: string | null
 }
-export function distributionRule(data: ruleState) {
+export function distributionRule(data: DistributionInter) {
   return http.request({
     url: "/chargeRule/dispatchRuleToOpenBusiness",
     method: "post",
