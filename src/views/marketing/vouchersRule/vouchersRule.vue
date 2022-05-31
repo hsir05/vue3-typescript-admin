@@ -75,7 +75,7 @@ import { getCouponConsumeRulePage, removeCoupon } from "@/api/marketing/marketin
 import { PaginationInter } from "@/api/type";
 import { FormInst, useMessage } from "naive-ui";
 import { getDict, getAllOpenCity } from "@/api/common/common";
-import { itemState, CityItemInter } from "@/interface/common/common";
+import { itemState, CommonItemInter } from "@/interface/common/common";
 export default defineComponent({
   name: "Vouchers",
   components: { BasicTable, VouchersRuleDrawer },
@@ -84,7 +84,7 @@ export default defineComponent({
     const vouchersRuleDrawerRef = ref();
     const basicTableRef = ref();
     const itemCount = ref(null);
-    const openCityData = ref<CityItemInter[]>([]);
+    const openCityData = ref<CommonItemInter[]>([]);
     const orderTypeData = ref([]);
     const queryValue = ref({
       customerCouponConsumeRuleNameLike: null,

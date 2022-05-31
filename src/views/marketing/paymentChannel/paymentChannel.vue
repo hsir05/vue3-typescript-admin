@@ -13,22 +13,20 @@
       <n-form-item label="订单业务类型" path="orderBusinessType">
         <n-select
           v-model:value="form.orderBusinessType"
-          clearable
           filterable
           placeholder="选择订单业务类型"
           style="width: 260px"
-          :options="options"
+          :options="orderBusTypeData"
         />
       </n-form-item>
 
       <n-form-item label="设备类型" path="deviceChannelType">
         <n-select
           v-model:value="form.deviceChannelType"
-          clearable
           filterable
           placeholder="选择设备类型"
           style="width: 260px"
-          :options="options"
+          :options="deviceChannelTypeData"
         />
       </n-form-item>
 
@@ -37,6 +35,8 @@
 
     <!-- 表格 -->
     <div class="p-10px mb-10px bg-white">
+      <n-button attr-type="button" type="primary" class="mb-10px" @click="handleAdd">新增</n-button>
+
       <n-data-table
         :loading="loading"
         ref="table"
@@ -54,7 +54,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, h, onMounted, ref } from "vue";
-import { FormInst, useMessage, NTag } from "naive-ui";
+import { NTag, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import ChannelModal from "./modal.vue";
 import {
@@ -62,46 +62,49 @@ import {
   ArrowBackCircleOutline as ArrowBackIcon,
   ArrowForwardCircleOutline as ArrowIcon,
 } from "@vicons/ionicons5";
-import { tableDataItem } from "./type";
-
-import { getOrderPayChannelList } from "@/api/marketing/marketing";
+import { TableDataItemInter, QueryFormInter } from "./type";
+import { getDict } from "@/api/common/common";
+import { CommonItemInter } from "@/interface/common/common";
+import { getOrderPayChannelList, upgradeSeq, lowerSeq } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "PaymentChannel",
   components: { ChannelModal },
   setup() {
-    const form = ref({
+    const form = ref<QueryFormInter>({
       deviceChannelType: null,
       orderBusinessType: null,
     });
-    const loading = ref(false);
     const message = useMessage();
-    const formRef = ref<FormInst | null>(null);
+    const loading = ref(false);
     const channelModalRef = ref();
+
+    const orderBusTypeData = ref<CommonItemInter[]>([]);
+    const deviceChannelTypeData = ref<CommonItemInter[]>([]);
 
     const data = ref([]);
     const columns = [
       {
         title: "支付渠道",
-        key: "paymentChannel",
+        key: "orderPayChannelTypeShowName",
         align: "center",
       },
       {
         title: "序列",
-        key: "sort",
+        key: "orderPayChannelTypeSeq",
         align: "center",
       },
       {
         title: "状态",
-        key: "status",
+        key: "orderPayChannelTypeLock",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableDataItemInter) {
           return h(
             NTag,
             {
-              type: row.status === 1 ? "success" : "error",
+              type: row.orderPayChannelTypeLock === 0 ? "success" : "error",
             },
             {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
+              default: () => (row.orderPayChannelTypeLock === 0 ? "正常" : "锁定"),
             }
           );
         },
@@ -111,7 +114,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "90px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -119,7 +122,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowBackIcon,
-                onClick: handleUp.bind(null, record),
+                onClick: handleUp.bind(null, record.orderPayChannelTypeShowId),
                 auth: ["dict001"],
               },
               {
@@ -127,7 +130,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowIcon,
-                onClick: handleDown.bind(null, record),
+                onClick: handleDown.bind(null, record.orderPayChannelTypeShowId),
                 auth: ["dict001"],
               },
               {
@@ -135,7 +138,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record.orderPayChannelTypeShowId),
                 auth: ["dict001"],
               },
             ],
@@ -145,8 +148,36 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData();
+      getSelectData();
     });
+
+    const getSelectData = async () => {
+      Promise.all([
+        getDict({ parentEntryCode: "OBT0000" }),
+        getDict({ parentEntryCode: "DCT0000" }),
+      ])
+        .then((res) => {
+          let dataArr = res.map((item) => item.data);
+          orderBusTypeData.value = dataArr[0].map(
+            (item: { entryName: string; entryCode: string }) => {
+              return { label: item.entryName, value: item.entryCode };
+            }
+          );
+
+          deviceChannelTypeData.value = dataArr[1].map(
+            (item: { entryName: string; entryCode: string }) => {
+              return { label: item.entryName, value: item.entryCode };
+            }
+          );
+          form.value.deviceChannelType = deviceChannelTypeData.value[0].value;
+          form.value.orderBusinessType = orderBusTypeData.value[0].value;
+
+          getData();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
 
     const getData = async () => {
       loading.value = true;
@@ -156,8 +187,7 @@ export default defineComponent({
           orderBusinessType: form.value.orderBusinessType,
         };
         let res = await getOrderPayChannelList(option);
-        console.log(res.data);
-
+        data.value = res.data;
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -167,27 +197,40 @@ export default defineComponent({
 
     function query(e: MouseEvent) {
       e.preventDefault();
-      formRef.value?.validate((errors) => {
-        if (!errors) {
-          message.success("验证成功");
-        } else {
-          console.log(errors);
-          message.error("验证失败");
-        }
-      });
+      getData();
     }
 
-    function handleUp(record: Recordable) {
-      console.log("点击了编辑", record.id);
-    }
-    function handleDown(record: Recordable) {
-      console.log("点击了编辑", record.id);
-    }
-
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleAdd() {
       const { handleModal } = channelModalRef.value;
-      handleModal("编辑钱包支付渠道", record);
+      handleModal();
+    }
+    async function handleUp(orderPayChannelTypeShowId: string) {
+      loading.value = true;
+      try {
+        let res = await upgradeSeq({ orderPayChannelTypeShowId });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    async function handleDown(orderPayChannelTypeShowId: string) {
+      loading.value = true;
+      try {
+        let res = await lowerSeq({ orderPayChannelTypeShowId });
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+
+        loading.value = false;
+      }
+    }
+
+    function handleEdit(orderPayChannelTypeShowId: string) {
+      const { handleModal } = channelModalRef.value;
+      handleModal(orderPayChannelTypeShowId);
     }
 
     return {
@@ -195,9 +238,11 @@ export default defineComponent({
       loading,
       channelModalRef,
       data,
-      options: [],
+      orderBusTypeData,
+      deviceChannelTypeData,
       columns,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      handleAdd,
+      getRowKeyId: (row: TableDataItemInter) => row.orderPayChannelTypeShowId,
 
       query,
     };

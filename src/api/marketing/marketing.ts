@@ -292,7 +292,7 @@ interface RechargeActivityInter {
     activityBeginTime: string | null;
     activityEndTime: string | null;
     activityDesc: string | null;
-}
+} 
 export function addRechargeActivity(data: RechargeActivityInter) {
     return http.request({
         url: "/customerWalletRechargeActivity/add",
@@ -322,6 +322,65 @@ interface ActivityInter {
 export function getOrderPayChannelList(data: ActivityInter) {
     return http.request({
         url: "/orderPayChannelTypeShow/list",
+        method: "post",
+        data: data,
+    });
+}
+
+/**
+ * 订单支付详情
+*/
+export function getOrderPayDetail(data: {orderPayChannelTypeShowId: string}) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/detail",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 新增订单支付渠道
+ */
+interface PayChannelInter {
+    orderPayChannelTypeShowId?: string | null;
+    orderPayChannelTypeShowName: string | null;
+    paymentChannelType: string | null;
+    orderPayChannelTypeShowDesc: string | null;
+    orderPayChannelTypeLock: number | null;
+}
+export function addPayChannelType(data: PayChannelInter) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/add",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 编辑订单支付渠道
+ */
+export function editPayChannelType(data: PayChannelInter) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/edit",
+        method: "post",
+        data: data,
+    });
+}
+
+/**
+ * 订单支付渠道序列前移
+*/
+export function upgradeSeq(data: {orderPayChannelTypeShowId: string}) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/upgradeSeq",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 订单支付渠道序列后移
+*/
+export function lowerSeq(data: {orderPayChannelTypeShowId: string}) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/lowerSeq",
         method: "post",
         data: data,
     });

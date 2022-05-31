@@ -59,7 +59,7 @@ import {
 import BasicTable from "@/components/Table/Table.vue";
 import AdDrawer from "./adDrawer.vue";
 import { TableDataItemInter } from "./type";
-import { itemState, CityItemInter } from "@/interface/common/common";
+import { itemState, CommonItemInter } from "@/interface/common/common";
 
 import { statusOptions } from "@/config/form";
 import { getAdPage, removeAd, upAdvertisement, downAdvertisement } from "@/api/marketing/marketing";
@@ -76,7 +76,7 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
 
-    const openCityData = ref<CityItemInter[]>([]);
+    const openCityData = ref<CommonItemInter[]>([]);
 
     const cityCodeEq = ref("all");
     const queryFormRef = ref<FormInst | null>(null);

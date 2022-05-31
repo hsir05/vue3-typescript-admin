@@ -5,7 +5,7 @@ export interface itemState {
   lat: number;
 }
 
-export interface CityItemInter {
+export interface CommonItemInter {
   label: string;
   value: string;
 }
