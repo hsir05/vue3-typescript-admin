@@ -71,7 +71,7 @@ import { defineComponent, reactive, toRefs, ref } from "vue";
 import WalletItem from "@/components/WalletItem/WalletItem.vue";
 
 import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 export default defineComponent({
   name: "Transfer",
   components: {
@@ -93,7 +93,7 @@ export default defineComponent({
       giveAmount: null,
     });
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record?: TableDataItemInter) {
       console.log(record);
       if (record) {
         console.log(record);

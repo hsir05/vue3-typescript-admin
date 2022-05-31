@@ -6,7 +6,6 @@ import { OUTPUT_DIR } from "./build/constant";
 import { loadEnv } from "vite";
 import pkg from "./package.json";
 import { format } from "date-fns";
-import { otherUrl } from "./src/config/config"
  
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {

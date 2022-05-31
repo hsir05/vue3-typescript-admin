@@ -58,7 +58,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from "vue";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 import WalletItem from "@/components/WalletItem/WalletItem.vue";
 import { FormInst, useMessage } from "naive-ui";
 export default defineComponent({
@@ -81,7 +81,7 @@ export default defineComponent({
       giveAmount: null,
     });
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record?: TableDataItemInter) {
       console.log(record);
       if (record) {
         console.log(record);
