@@ -209,6 +209,7 @@ export default defineComponent({
       try {
         let res = await upgradeSeq({ orderPayChannelTypeShowId });
         message.success(window.$tips[res.code]);
+        getData();
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -220,6 +221,7 @@ export default defineComponent({
       try {
         let res = await lowerSeq({ orderPayChannelTypeShowId });
         message.success(window.$tips[res.code]);
+        getData();
         loading.value = false;
       } catch (err) {
         console.log(err);

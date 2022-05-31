@@ -385,3 +385,76 @@ export function lowerSeq(data: {orderPayChannelTypeShowId: string}) {
         data: data,
     });
 }
+
+//-----------------预付款支付渠道-------------------------
+
+/**
+ * 获取订单支付渠道列表
+ */
+
+export function getAdvanceList(data: {deviceChannelType: string}) {
+    return http.request({
+        url: "/orderAdvancePayChannelTypeShow/list",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 预付款支付详情
+*/
+export function getAdvancePayDetail(data: {orderAdvancePayChannelTypeShowId: string}) {
+    return http.request({
+        url: "/orderAdvancePayChannelTypeShow/detail",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 新增预付款支付渠道
+ */
+interface AdvancePayChannelInter {
+    orderAdvancePayChannelTypeShowId?: string | null
+    orderAdvancePayChannelTypeShowName: string | null;
+    paymentChannelType: string | null;
+    deviceChannelType: string | null;
+    orderAdvancePayChannelTypeShowDesc: string | null;
+    orderAdvancePayChannelTypeLock: number | null;
+}
+export function addAdvancePayChannelType(data: AdvancePayChannelInter) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/add",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 编辑预付款支付渠道
+ */
+export function editAdvancePayChannelType(data: AdvancePayChannelInter) {
+    return http.request({
+        url: "/orderPayChannelTypeShow/edit",
+        method: "post",
+        data: data,
+    });
+}
+
+/**
+ * 预付款支付渠道序列前移
+*/
+export function upgradeAdvanceSeq(data: {orderAdvancePayChannelTypeShowId: string}) {
+    return http.request({
+        url: "/orderAdvancePayChannelTypeShow/upgradeSeq",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 预付款支付渠道序列后移
+*/
+export function lowerAdvanceSeq(data: {orderAdvancePayChannelTypeShowId: string}) {
+    return http.request({
+        url: "/orderAdvancePayChannelTypeShow/lowerSeq",
+        method: "post",
+        data: data,
+    });
+}

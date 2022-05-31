@@ -23,7 +23,7 @@
           filterable
           placeholder="选择支付渠道"
           style="width: 260px"
-          :options="deviceChannelTypeData"
+          :options="payChannelData"
         />
       </n-form-item>
 
@@ -46,8 +46,8 @@
       <n-form-item label="状态" path="orderPayChannelTypeLock">
         <n-radio-group v-model:value="form.orderPayChannelTypeLock">
           <n-space>
-            <n-radio value="1">正常</n-radio>
-            <n-radio :value="0">锁定</n-radio>
+            <n-radio :value="1">锁定</n-radio>
+            <n-radio :value="0">正常</n-radio>
           </n-space>
         </n-radio-group>
       </n-form-item>
@@ -67,7 +67,6 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { CommonItemInter } from "@/interface/common/common";
 import { FormInter } from "./type";
 import { getDict } from "@/api/common/common";
 import {
@@ -83,7 +82,7 @@ export default defineComponent({
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(false);
-    const deviceChannelTypeData = ref<CommonItemInter[]>([]);
+    const payChannelData = ref([]);
 
     const form = ref<FormInter>({
       orderPayChannelTypeShowName: null,
@@ -94,17 +93,16 @@ export default defineComponent({
     const formRef = ref<FormInst | null>(null);
 
     onMounted(() => {
-      getData();
+      getAllPayChannelData();
     });
 
-    const getData = async () => {
+    const getAllPayChannelData = async () => {
       try {
-        let res = await getDict({ parentEntryCode: "DCT0000" });
-        deviceChannelTypeData.value = res.data.map(
-          (item: { entryName: string; entryCode: string }) => {
-            return { label: item.entryName, value: item.entryCode };
-          }
-        );
+        let res = await getDict({ parentEntryCode: "PCT0000" });
+        console.log(res);
+        payChannelData.value = res.data.map((item: { entryCode: string; entryName: string }) => {
+          return { label: item.entryName, value: item.entryCode };
+        });
       } catch (err) {
         console.log(err);
       }
@@ -204,13 +202,13 @@ export default defineComponent({
       ModalRef,
       formRef,
       form,
-      deviceChannelTypeData,
+      payChannelData,
       loading,
       rules: {
         paymentChannelType: {
           required: true,
           trigger: ["blur", "change"],
-          message: "请输入支付渠道",
+          message: "请选择支付渠道",
         },
         orderPayChannelTypeShowName: {
           required: true,

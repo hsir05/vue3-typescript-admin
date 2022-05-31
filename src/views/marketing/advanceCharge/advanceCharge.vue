@@ -5,19 +5,19 @@
       ref="formRef"
       inline
       label-placement="left"
-      label-width="120"
+      label-width="100"
       class="pt-15px pb-15px bg-white mb-5px"
       :show-feedback="false"
       :model="form"
     >
-      <n-form-item label="设备类型" path="equipType">
+      <n-form-item label="设备类型" path="deviceChannelType">
         <n-select
-          v-model:value="form.equipType"
+          v-model:value="form.deviceChannelType"
           clearable
           filterable
           placeholder="选择设备类型"
           style="width: 260px"
-          :options="options"
+          :options="deviceChannelTypeData"
         />
       </n-form-item>
 
@@ -26,6 +26,8 @@
 
     <!-- 表格 -->
     <div class="p-10px mb-10px bg-white">
+      <n-button attr-type="button" type="primary" class="mb-10px" @click="handleAdd">新增</n-button>
+
       <n-data-table
         :loading="loading"
         ref="table"
@@ -42,59 +44,57 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, h, ref } from "vue";
+import { defineComponent, h, onMounted, ref } from "vue";
 import { FormInst, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import ChannelModal from "./modal.vue";
+import { CommonItemInter } from "@/interface/common/common";
+
 import {
   CreateOutline as CreateIcon,
   ArrowBackCircleOutline as ArrowBackIcon,
   ArrowForwardCircleOutline as ArrowIcon,
 } from "@vicons/ionicons5";
-import { tableDataItem } from "./type";
+import { getDict } from "@/api/common/common";
+import { getAdvanceList, lowerAdvanceSeq, upgradeAdvanceSeq } from "@/api/marketing/marketing";
+import { TableDataItemInter, QueryFormInter } from "./type";
 export default defineComponent({
   name: "AdvanceCharge",
   components: { ChannelModal },
   setup() {
-    const form = ref({
-      equipType: "",
+    const form = ref<QueryFormInter>({
+      deviceChannelType: "DCT0001",
     });
     const loading = ref(false);
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
     const channelModalRef = ref();
+    const deviceChannelTypeData = ref<CommonItemInter[]>([]);
 
-    const data = ref([
-      {
-        id: "1312312",
-        paymentChannel: "钱包支付",
-        sort: 1,
-        status: 1,
-      },
-    ]);
+    const data = ref([]);
     const columns = [
       {
         title: "支付渠道",
-        key: "paymentChannel",
+        key: "orderAdvancePayChannelTypeShowName",
         align: "center",
       },
       {
         title: "序列",
-        key: "sort",
+        key: "orderAdvancePayChannelTypeSeq",
         align: "center",
       },
       {
         title: "状态",
-        key: "status",
+        key: "orderAdvancePayChannelTypeLock",
         align: "center",
-        render(row: tableDataItem) {
+        render(row: TableDataItemInter) {
           return h(
             NTag,
             {
-              type: row.status === 1 ? "success" : "error",
+              type: row.orderAdvancePayChannelTypeLock === 0 ? "success" : "error",
             },
             {
-              default: () => (row.status === 1 ? "正常" : "锁定"),
+              default: () => (row.orderAdvancePayChannelTypeLock === 0 ? "正常" : "锁定"),
             }
           );
         },
@@ -104,7 +104,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "90px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -112,7 +112,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowBackIcon,
-                onClick: handleUp.bind(null, record),
+                onClick: handleUp.bind(null, record.orderAdvancePayChannelTypeShowId),
                 auth: ["dict001"],
               },
               {
@@ -120,7 +120,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowIcon,
-                onClick: handleDown.bind(null, record),
+                onClick: handleDown.bind(null, record.orderAdvancePayChannelTypeShowId),
                 auth: ["dict001"],
               },
               {
@@ -128,7 +128,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record.orderAdvancePayChannelTypeShowId),
                 auth: ["dict001"],
               },
             ],
@@ -136,6 +136,39 @@ export default defineComponent({
         },
       },
     ];
+
+    onMounted(() => {
+      getDevicesData();
+    });
+
+    const getDevicesData = async () => {
+      try {
+        let res = await getDict({ parentEntryCode: "DCT0000" });
+        deviceChannelTypeData.value = res.data.map(
+          (item: { entryName: string; entryCode: string }) => {
+            return { label: item.entryName, value: item.entryCode };
+          }
+        );
+
+        getData();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const getData = async () => {
+      try {
+        loading.value = true;
+        let res = await getAdvanceList({
+          deviceChannelType: form.value.deviceChannelType as string,
+        });
+        data.value = res.data;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     function query(e: MouseEvent) {
       e.preventDefault();
@@ -149,17 +182,39 @@ export default defineComponent({
       });
     }
 
-    function handleUp(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleAdd() {
+      const { handleModal } = channelModalRef.value;
+      handleModal(form.value.deviceChannelType);
     }
-    function handleDown(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    async function handleUp(orderAdvancePayChannelTypeShowId: string) {
+      loading.value = true;
+      try {
+        let res = await upgradeAdvanceSeq({ orderAdvancePayChannelTypeShowId });
+        getData();
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    async function handleDown(orderAdvancePayChannelTypeShowId: string) {
+      loading.value = true;
+      try {
+        let res = await lowerAdvanceSeq({ orderAdvancePayChannelTypeShowId });
+        getData();
+        message.success(window.$tips[res.code]);
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+
+        loading.value = false;
+      }
     }
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record.id);
+    function handleEdit(orderAdvancePayChannelTypeShowId: string) {
       const { handleModal } = channelModalRef.value;
-      handleModal("编辑钱包支付渠道", record);
+      handleModal(form.value.deviceChannelType, orderAdvancePayChannelTypeShowId);
     }
 
     return {
@@ -169,8 +224,9 @@ export default defineComponent({
       data,
       options: [],
       columns,
-      getRowKeyId: (row: tableDataItem) => row.id,
-
+      deviceChannelTypeData,
+      getRowKeyId: (row: TableDataItemInter) => row.orderAdvancePayChannelTypeShowId,
+      handleAdd,
       query,
     };
   },

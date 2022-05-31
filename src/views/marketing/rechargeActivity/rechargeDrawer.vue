@@ -241,8 +241,41 @@ export default defineComponent({
       form,
       payChannelData,
       rules: {
-        startTime: { required: true, trigger: ["blur", "input"], message: "请选择广告生效时间" },
-        endTime: { required: true, trigger: ["blur", "input"], message: "请选择广告失效时间" },
+        paymentChannelType: {
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请选择支付渠道",
+        },
+        rechargeRate: {
+          required: true,
+          type: "number",
+          trigger: ["blur", "input"],
+          message: "请输入充值比率",
+        },
+        minimumRechargeAmount: {
+          required: true,
+          type: "number",
+          trigger: ["blur", "input"],
+          message: "请输入最低起充金额",
+        },
+        cumulativeRechargeAmount: {
+          required: true,
+          type: "number",
+          trigger: ["blur", "input"],
+          message: "请输入累计实充额度",
+        },
+        activityBeginTime: {
+          type: "number",
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请选择广告生效时间",
+        },
+        activityEndTime: {
+          type: "number",
+          required: true,
+          trigger: ["blur", "input"],
+          message: "请选择广告失效时间",
+        },
         adUrl: { required: true, trigger: ["blur", "input"], message: "请上传广告" },
       },
 
