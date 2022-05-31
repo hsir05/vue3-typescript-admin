@@ -95,10 +95,6 @@ export default defineComponent({
     const data = ref([]);
 
     const columns = [
-      //   {
-      //     type: "selection",
-      //     align: "center",
-      //   },
       {
         title: "序号",
         key: "index",
@@ -110,7 +106,7 @@ export default defineComponent({
       },
       {
         title: "所在企业名称",
-        key: "enterpriseName",
+        key: "operationCompanyName",
         align: "center",
         ellipsis: {
           tooltip: true,

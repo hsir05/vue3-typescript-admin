@@ -17,7 +17,7 @@
           v-model:value="form.paymentChannelType"
           style="width: 280px"
           placeholder="选择支付渠道"
-          :options="options"
+          :options="payChannelData"
         />
       </n-form-item>
 
@@ -77,8 +77,9 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
+import { defineComponent, reactive, onMounted, toRefs, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
+import { getDict } from "@/api/common/common";
 import {
   getRechargeDetail,
   addRechargeActivity,
@@ -107,6 +108,7 @@ export default defineComponent({
       activityEndTime: null,
       activityDesc: null,
     });
+    const payChannelData = ref([]);
 
     function openDrawer(t: string, customerWalletRechargeActivityId: string) {
       if (customerWalletRechargeActivityId) {
@@ -115,6 +117,22 @@ export default defineComponent({
       title.value = t;
       state.isDrawer = true;
     }
+
+    onMounted(() => {
+      getAllPayChannelData();
+    });
+
+    const getAllPayChannelData = async () => {
+      try {
+        let res = await getDict({ parentEntryCode: "PCT0000" });
+        console.log(res);
+        payChannelData.value = res.data.map((item: { entryCode: string; entryName: string }) => {
+          return { label: item.entryName, value: item.entryCode };
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getDetail = async (customerWalletRechargeActivityId: string) => {
       try {
@@ -221,7 +239,7 @@ export default defineComponent({
       title,
       formRef,
       form,
-      options: [],
+      payChannelData,
       rules: {
         startTime: { required: true, trigger: ["blur", "input"], message: "请选择广告生效时间" },
         endTime: { required: true, trigger: ["blur", "input"], message: "请选择广告失效时间" },

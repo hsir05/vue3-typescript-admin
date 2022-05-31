@@ -95,10 +95,6 @@ export default defineComponent({
     const data = ref([]);
 
     const columns = [
-      //   {
-      //     type: "selection",
-      //     align: "center",
-      //   },
       {
         title: "序号",
         key: "index",
