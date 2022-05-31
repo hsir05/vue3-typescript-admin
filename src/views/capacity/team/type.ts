@@ -7,6 +7,7 @@ export interface ItemInter {
   number: number;
   createTime: string;
   avatar: string;
+  driverCount: number
 }
 
 export interface MemberItemIter {

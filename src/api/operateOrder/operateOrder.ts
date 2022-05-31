@@ -202,17 +202,17 @@ export function getOrderInvalidDetail(data: {orderId: string}) {
 /**
  * 评论订单
  */
-interface OrderEvaluationInter {
-    page: PaginationInter;
-    search: {
-        timeGe: null,
-            timeLe: null,
-            plateNumberEq: null,
-            orderTypeEq: null,
-            driverNoEq: null,
-            customerPhoneEq: null,
-    };
-}
+// interface OrderEvaluationInter {
+//     page: PaginationInter;
+//     search: {
+//         timeGe: null,
+//             timeLe: null,
+//             plateNumberEq: null,
+//             orderTypeEq: null,
+//             driverNoEq: null,
+//             customerPhoneEq: null,
+//     };
+// }
 export function getOrderEvaluationPage(data: {}) {
     return http.request({
         url: "/orderEvaluation/page",

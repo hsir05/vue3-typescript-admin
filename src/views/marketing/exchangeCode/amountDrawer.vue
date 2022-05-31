@@ -67,7 +67,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, unref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 export default defineComponent({
   name: "AmountDrawer",
   setup() {
@@ -87,7 +87,7 @@ export default defineComponent({
       end: null,
     });
 
-    function openDrawer(t: string, record?: tableDataItem) {
+    function openDrawer(t: string, record?: TableDataItemInter) {
       if (record) {
         console.log(record);
         message.success("验证成功");

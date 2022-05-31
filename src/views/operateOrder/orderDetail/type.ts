@@ -3,3 +3,8 @@ export interface TableDataItemInter{
     orderPayTime: number
     dealSerialNumber: number
 }
+
+export interface DataItemInter{
+    flowOutBeginTime: number
+    flowOutEndTime: number
+}

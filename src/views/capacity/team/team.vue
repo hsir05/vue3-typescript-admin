@@ -4,7 +4,6 @@
     <n-form
       ref="formRef"
       inline
-      :rule="rule"
       :show-feedback="false"
       label-placement="left"
       label-width="80"
@@ -52,7 +51,7 @@
           :key="item.operationCompanyDriverClazzId"
           :item="item"
           @on-member="handleMember(item)"
-          @on-see="handleSee"
+          @on-see="handleSee(item)"
         />
       </div>
       <n-empty v-if="!data.length" class="empty" />
@@ -74,6 +73,8 @@
       </n-pagination>
     </div>
     <TeamDrawer ref="teamDrawerRef" />
+
+    <TeamDetailDrawer ref="teamDetailDrawerRef" />
   </div>
 </template>
 <script lang="ts">
@@ -84,16 +85,19 @@ import { pageSizes } from "@/config/table";
 import { getDriverClazzPage } from "@/api/capacity/capacity";
 import { getAllOperateCompany } from "@/api/common/common";
 import { PaginationInter } from "@/api/type";
+import TeamDetailDrawer from "./teamDetailDrawer.vue";
 import { ItemInter } from "./type";
 export default defineComponent({
   name: "Team",
   components: {
     TeamItem,
     TeamDrawer,
+    TeamDetailDrawer,
   },
   setup() {
     const loading = ref(false);
     const teamDrawerRef = ref();
+    const teamDetailDrawerRef = ref();
     const companyData = ref([]);
     const queryValue = ref({
       operationCompanyDriverClazzEntryLike: null,
@@ -162,7 +166,10 @@ export default defineComponent({
       const { openDrawer } = teamDrawerRef.value;
       openDrawer(record.operationCompanyDriverClazzId);
     }
-    function handleSee() {}
+    function handleSee(record: Recordable) {
+      const { openDrawer } = teamDetailDrawerRef.value;
+      openDrawer(record.operationCompanyDriverClazzId);
+    }
 
     function handlePage(page: number) {
       pagination.page = page;
@@ -177,7 +184,7 @@ export default defineComponent({
       pageSizes,
       ...toRefs(pagination),
       itemCount,
-      rule: {},
+      teamDetailDrawerRef,
       companyData,
       queryValue,
       data,

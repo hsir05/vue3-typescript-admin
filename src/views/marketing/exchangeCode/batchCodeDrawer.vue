@@ -51,7 +51,7 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { RefreshCircleOutline as RefreshIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import CodeDetailModal from "./codeDetailModal.vue";
 
-import { tableDataItem } from "./type";
+import { TableDataItemInter } from "./type";
 export default defineComponent({
   name: "BatchCodeDrawer",
   components: { CodeDetailModal, CodeDrawer },
@@ -81,7 +81,7 @@ export default defineComponent({
         key: "index",
         align: "center",
         width: 70,
-        render(_: tableDataItem, rowIndex: number) {
+        render(_: TableDataItemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
@@ -120,7 +120,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "90px",
-        render(record: tableDataItem) {
+        render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -145,7 +145,7 @@ export default defineComponent({
       },
     ];
 
-    function openDrawer(record?: tableDataItem) {
+    function openDrawer(record?: TableDataItemInter) {
       if (record) {
         console.log(record);
         message.success("验证成功");
@@ -185,7 +185,7 @@ export default defineComponent({
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: tableDataItem) => row.id,
+      getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
       query,
       handleBatchVoucher,
       openDrawer,
