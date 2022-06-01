@@ -1,80 +1,95 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import type { UserConfig, ConfigEnv } from "vite";
+import { wrapperEnv } from "./build/utils";
+import { createVitePlugins } from "./build/vite/plugin";
 import { resolve } from "path";
-import Components from "unplugin-vue-components/vite";
-import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
-import { visualizer } from "rollup-plugin-visualizer";
-import compressPlugin from "vite-plugin-compression";
-import { createHtmlPlugin } from "vite-plugin-html";
-import WindiCSS from 'vite-plugin-windicss'
+import { OUTPUT_DIR } from "./build/constant";
+import { loadEnv } from "vite";
+import pkg from "./package.json";
+import { format } from "date-fns";
+ 
+const { dependencies, devDependencies, name, version } = pkg;
+const __APP_INFO__ = {
+  pkg: { dependencies, devDependencies, name, version },
+  lastBuildTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+};
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    Components({
-      resolvers: [
-        // naive ui 的自动引入，只需要这一句
-        NaiveUiResolver(),
-        // AntDesign vue 的自动引入，只需要这一句
-        // AntDesignVueResolver()
+export default ({ command, mode }: ConfigEnv): UserConfig => {
+  const root = process.cwd(); // 项目根目录
+  const env = loadEnv(mode, root);
+  const viteEnv = wrapperEnv(env);
+  const { VITE_PUBLIC_PATH, VITE_PORT, VITE_DROP_CONSOLE } = viteEnv;
+  const isBuild = command === "build";
+
+  return {
+    base: VITE_PUBLIC_PATH, //开发或生产环境服务的 公共基础路径
+    plugins: createVitePlugins(viteEnv, isBuild),
+    resolve: {
+      alias: [
+        {
+          find: /\/#\//,
+          replacement: resolve(process.cwd(), ".", "types") + "/",
+        },
+        {
+          find: "@",
+          replacement: resolve(process.cwd(), ".", "src") + "/",
+        },
       ],
-    }),
-    visualizer({
-      open: true, // 是否直接打开报告
-      gzipSize: true, // 是否显示 gzipSize
-      brotliSize: false, // 是否显示brotliSize
-    }),
-    compressPlugin({
-      ext: ".gz", // 选择压缩后的文件名
-      algorithm: "gzip", // 何中方式压缩 brotliCompress gzip
-      deleteOriginFile: false, // 是否删除原文件
-    }),
-    createHtmlPlugin({
-      minify: true,
-      /**
-       * 在这里写entry后，你将不需要在`index.html`内添加 script 标签，原有标签需要删除
-       * @default src/main.ts
-       */
-      entry: "src/main.ts",
-      /**
-       * 如果你想将 `index.html`存放在指定文件夹，可以修改它，否则不需要配置
-       * @default index.html
-       */
-      //   template: 'public/index.html',
-
-      /**
-       * 需要注入 index.html ejs 模版的数据
-       */
-      inject: {
-        data: {
-          title: "益民出行综合管理平台",
-          //   injectScript: `<script src="./inject.js"></script>`,
+      dedupe: ["vue"],
+    },
+    define: {
+      // 定义全局变量替换方式。每项在开发时会被定义为全局变量，而在构建时则是静态替换
+      __APP_INFO__: JSON.stringify(__APP_INFO__),
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          charset: false, // 解决scss编译报警告问题
+          additionalData: '@import "@/assets/styles/var.scss";',
         },
       },
-    }),
-    WindiCSS(),
-  ],
-  resolve: {
-    alias: [
-      {
-        find: /\/#\//,
-        replacement: resolve(process.cwd(), ".", "types") + "/",
-      },
-      {
-        find: "@",
-        replacement: resolve(process.cwd(), ".", "src") + "/",
-      },
-    ],
-    dedupe: ["vue"],
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: '@import "@/assets/styles/main.scss";',
+    },
+    server: {
+      host: true,
+      port: VITE_PORT,
+      proxy: {
+        "/api": {
+          target: "http://test-ngcxpm-api.yiminyueche.com",
+          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
+          rewrite: (path) => {
+              return path.replace("/api", "")
+          },
+        },
+        "/customerInvoiceApplication/platform": {
+          target: "http://testcxcustomer.yiminyueche.com",
+          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
+        //   rewrite: (path) => {
+        //       return path.replace("/api/customerInvoiceApplication/platform", "/customerInvoiceApplication/platform")
+        //   },
+        },
+        "/attachFile/upload": {
+          target: "http://test-ngcxpm-api.yiminyueche.com",
+          changeOrigin: true,
+        },
       },
     },
-  },
-  server: {
-    host: "0.0.0.0",
-  },
-});
+    optimizeDeps: {
+      //在预构建中强制排除的依赖项。
+      include: [],
+      exclude: ["vue-demi"], // vue-demi同时支持Vue2和3的通用Vue库的开发工具
+    },
+    build: {
+      target: "es2015",
+      outDir: OUTPUT_DIR, //指定输出路径
+      terserOptions: {
+        compress: {
+          // 通过false以完全跳过压缩。传递一个对象以指定自定义压缩选项。
+          keep_infinity: true,
+          drop_console: VITE_DROP_CONSOLE,
+        //   drop_console: false,
+        },
+      },
+      brotliSize: false, //启用/禁用 brotli 压缩大小报告
+      chunkSizeWarningLimit: 2000, // 可以通过合并来对您的块进行后处理。
+    },
+  };
+};

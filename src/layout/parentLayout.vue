@@ -1,44 +1,44 @@
 <template>
-  <n-layout has-sider content-style="height:100vh">
-    <LayoutSider />
-    <n-layout content-style="height:100vh">
-      <LayoutHeader />
-      <n-layout-content
-        content-style="padding: 24px;height: calc(100vh - 70px)"
-      >
-        <RouterView />
-      </n-layout-content>
-      <!-- <n-layout-footer>成府路</n-layout-footer> -->
+  <n-layout :has-sider="navMode === 'vertical'" content-style="height:100vh">
+    <LayoutSider v-if="navMode === 'vertical'" />
+    <LayoutHeader v-if="navMode === 'horizontal-mix'" />
+    <n-layout :has-sider="navMode === 'horizontal-mix'">
+      <LayoutHeader v-if="navMode === 'vertical' || navMode === 'horizontal'" />
+      <LayoutSider v-if="navMode === 'horizontal-mix'" />
+      <n-layout>
+        <Tabs v-if="isTabs" :collapsed="getCollapsed" />
+        <LayoutContent />
+        <LayoutFooter v-if="showFooter" />
+      </n-layout>
     </n-layout>
   </n-layout>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-import LayoutSider from "./sider/Sider.vue";
-import LayoutHeader from "./header/Header.vue";
+import LayoutSider from "./Sider/index.vue";
+import LayoutHeader from "./Header/index.vue";
+import LayoutFooter from "./Footer/index.vue";
+import LayoutContent from "./Content/index.vue";
+import Tabs from "./Tabs/index.vue";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 export default defineComponent({
   name: "ParentLayout",
   components: {
     LayoutSider,
     LayoutHeader,
+    LayoutFooter,
+    LayoutContent,
+    Tabs,
   },
   setup() {
-    return {};
+    const { isTabs, getCollapsed, navMode, showFooter } = useProjectSetting();
+
+    return {
+      isTabs,
+      getCollapsed,
+      navMode,
+      showFooter,
+    };
   },
 });
 </script>
-<style lang="scss">
-.n-layout-header,
-.n-layout-footer {
-  background: rgba(128, 128, 128, 0.2);
-  padding: 24px;
-}
-
-.n-layout-sider {
-  background: rgba(128, 128, 128, 0.3);
-}
-
-.n-layout-content {
-  background: rgba(128, 128, 128, 0.4);
-}
-</style>

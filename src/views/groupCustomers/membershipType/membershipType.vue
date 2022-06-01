@@ -1,0 +1,250 @@
+<template>
+  <div class="h-full overflow-hidden box-border">
+    <!-- 搜索 -->
+    <n-form
+      ref="formRef"
+      inline
+      label-placement="left"
+      label-width="90"
+      class="pt-15px pb-15px bg-white mb-5px"
+      :show-feedback="false"
+      :model="queryValue"
+    >
+      <n-form-item label="会员名称" path="groupCustomerMemberNameLike">
+        <n-input
+          v-model:value="queryValue.groupCustomerMemberNameLike"
+          clearable
+          placeholder="输入会员名称"
+          style="width: 150px"
+        />
+      </n-form-item>
+
+      <n-form-item label="会员状态" path="groupCustomerMemberLockEq">
+        <n-radio-group v-model:value="queryValue.groupCustomerMemberLockEq">
+          <n-radio :value="null">全部</n-radio>
+          <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">{{
+            item.label
+          }}</n-radio>
+        </n-radio-group>
+      </n-form-item>
+
+      <n-form-item>
+        <n-button attr-type="button" type="primary" @click="searchHandle">查询</n-button>
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
+      </n-form-item>
+    </n-form>
+
+    <!-- 表格 -->
+    <BasicTable
+      :data="data"
+      ref="basicTableRef"
+      :isAddBtn="true"
+      :columns="columns"
+      :loading="loading"
+      :rowKey="getRowKeyId"
+      :itemCount="itemCount"
+      @reload-page="reloadPage"
+      @on-add="handleAdd"
+      @on-page="handlePage"
+      @on-pagination="handlepagSize"
+    />
+    <MemberDrawer ref="memberDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <!-- <DetailDrawer ref="detailDrawerRef" :width="650" @on-save-after="handleSaveAfter" /> -->
+  </div>
+</template>
+<script lang="ts">
+import { defineComponent, ref, h, toRaw, onMounted } from "vue";
+import TableActions from "@/components/TableActions/TableActions.vue";
+import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import BasicTable from "@/components/Table/Table.vue";
+// import DetailDrawer from "@/components/memberDetail/memberDetailDrawer.vue";
+import { NTag } from "naive-ui";
+import MemberDrawer from "./memberDrawer.vue";
+import { TableItemInter } from "./type";
+import { lockOptions } from "@/config/form";
+import { getGroupMemberPage } from "@/api/groupCustomers/groupCustomers";
+import { PaginationInter } from "@/api/type";
+// import { memberType } from "@/config/table"
+export default defineComponent({
+  name: "MembershipType",
+  components: { MemberDrawer, BasicTable },
+  setup() {
+    const loading = ref(false);
+    const memberDrawerRef = ref();
+    const basicTableRef = ref();
+    const itemCount = ref(null);
+    const queryValue = ref({
+      groupCustomerMemberNameLike: null,
+      groupCustomerMemberLockEq: null,
+    });
+    const detailDrawerRef = ref();
+    const data = ref<TableItemInter[]>([]);
+
+    const columns = [
+      {
+        title: "序号",
+        key: "index",
+        align: "center",
+        width: 70,
+        render(_: TableItemInter, rowIndex: number) {
+          return h("span", `${rowIndex + 1}`);
+        },
+      },
+      {
+        title: "会员名称",
+        key: "groupCustomerMemberName",
+        align: "center",
+      },
+      {
+        title: "会员描述",
+        key: "groupCustomerMemberDesc",
+        align: "center",
+        ellipsis: {
+          tooltip: true,
+        },
+      },
+      {
+        title: "会员类型",
+        key: "groupCustomerMemberType",
+        align: "center",
+        // render(row: TableItemInter) {
+        //     return h("span", memberType[row.groupCustomerMemberType]);
+        // },
+      },
+      {
+        title: "会员状态",
+        key: "groupCustomerMemberLock",
+        align: "center",
+        render(row: TableItemInter) {
+          return h(
+            NTag,
+            {
+              type: row.groupCustomerMemberLock === 1 ? "error" : "success",
+            },
+            {
+              default: () => (row.groupCustomerMemberLock === 1 ? "锁定" : "正常"),
+            }
+          );
+        },
+      },
+      {
+        title: "操作",
+        key: "action",
+        align: "center",
+        width: "200px",
+        render(record: TableItemInter) {
+          return h(TableActions as any, {
+            actions: [
+              {
+                label: "详情",
+                type: "primary",
+                icon: EyeIcon,
+                isIconBtn: true,
+                onClick: handleEdit.bind(null, record, true),
+                auth: ["dict001"],
+              },
+              {
+                label: "编辑",
+                type: "primary",
+                isIconBtn: true,
+                icon: CreateIcon,
+                onClick: handleEdit.bind(null, record, false),
+                auth: ["dict001"],
+              },
+            ],
+          });
+        },
+      },
+    ];
+
+    onMounted(() => {
+      getData({ pageIndex: 1, pageSize: 10 });
+    });
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        let search = { ...queryValue.value };
+        let res = await getGroupMemberPage({ page, search: search });
+        console.log(res);
+
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    function handleEdit(record: Recordable, bool: boolean) {
+      const { openDrawer } = memberDrawerRef.value;
+      openDrawer(
+        bool ? "查看集团客户会员类型" : "编辑集团客户会员类型",
+        record.groupCustomerMemberId,
+        bool
+      );
+    }
+
+    function handleAdd() {
+      const { openDrawer } = memberDrawerRef.value;
+      openDrawer("新增集团客户会员类型");
+    }
+
+    const searchHandle = (e: MouseEvent) => {
+      e.preventDefault();
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
+    };
+    const reset = () => {
+      queryValue.value = {
+        groupCustomerMemberNameLike: null,
+        groupCustomerMemberLockEq: null,
+      };
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
+    };
+
+    function reloadPage() {
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
+
+    function handlePage(pagination: PaginationInter) {
+      getData(toRaw(pagination));
+    }
+    function handlepagSize(pagination: PaginationInter) {
+      getData(toRaw(pagination));
+    }
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+      getData({ pageIndex: 1, pageSize: 10 });
+    }
+
+    return {
+      queryValue,
+      data,
+      loading,
+      memberDrawerRef,
+      detailDrawerRef,
+      basicTableRef,
+      lockOptions,
+      columns,
+      itemCount,
+      getRowKeyId: (row: TableItemInter) => row.groupCustomerMemberId,
+
+      reloadPage,
+      handleAdd,
+      searchHandle,
+      reset,
+      handlePage,
+      handlepagSize,
+      handleSaveAfter,
+    };
+  },
+});
+</script>
