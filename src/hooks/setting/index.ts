@@ -4,7 +4,7 @@ import { getAppEnvConfig } from '@/utils/env';
 export const useGlobSetting = (): Readonly<GlobConfig> => {
     const {
         // VITE_GLOB_APP_TITLE,
-        // VITE_GLOB_API_URL,
+        VITE_GLOB_API_URL,
         VITE_GLOB_APP_SHORT_NAME,
         VITE_GLOB_API_URL_PREFIX,
         VITE_GLOB_UPLOAD_URL,
@@ -22,8 +22,8 @@ export const useGlobSetting = (): Readonly<GlobConfig> => {
     const glob: Readonly<GlobConfig> = {
         // title: VITE_GLOB_APP_TITLE,
         title: VITE_GLOB_APP_SHORT_NAME,
-        // apiUrl: VITE_GLOB_API_URL,
-        apiUrl: "",
+        apiUrl: VITE_GLOB_API_URL,
+        // apiUrl: "",
         shortName: VITE_GLOB_APP_SHORT_NAME,
         urlPrefix: VITE_GLOB_API_URL_PREFIX,
         uploadUrl: VITE_GLOB_UPLOAD_URL,
