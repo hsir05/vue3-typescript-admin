@@ -4,7 +4,6 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
-    '// AppLogo': typeof import('./src/components/AppLogo/AppLogo.vue')['default']
     Application: typeof import('./src/components/Application/Application.vue')['default']
     BaiduMap: typeof import('./src/components/Map/BaiduMap.vue')['default']
     BasicDrawer: typeof import('./src/components/BasicDrawer/BasicDrawer.vue')['default']

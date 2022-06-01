@@ -1,5 +1,5 @@
 import { App } from "vue";
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import { createRouterGuard } from "./routeGuard";
 import { RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute } from "@/router/base";
 
@@ -25,7 +25,8 @@ routeModuleList.sort(sortRoute);
 export const constantRouter: RouteRecordRaw[] = [ RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute];
 
 const router = createRouter({
-  history: createWebHistory(),
+//   history: createWebHistory(),
+  history: createWebHashHistory(''),
   routes: [...routeModuleList, ...constantRouter],
   strict: true,
   scrollBehavior: () => ({ left: 0, top: 0 }),

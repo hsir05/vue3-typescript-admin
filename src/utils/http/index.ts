@@ -244,6 +244,8 @@ const transform: AxiosTransform = {
 };
 
 function createAxios(opt?: Partial<CreateAxiosOptions>) {
+    console.log('-------------------------',globSetting.apiUrl);
+    
   return new VAxios(
     deepMerge(
       {
@@ -269,8 +271,8 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 消息提示类型
           errorMessageMode: "none",
           // 接口地址
-        //   apiUrl: globSetting.apiUrl,
-          apiUrl: "",
+          apiUrl: globSetting.apiUrl,
+        //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
           // 接口拼接地址
           urlPrefix: urlPrefix,
           //  是否加入时间戳

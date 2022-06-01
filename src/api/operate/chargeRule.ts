@@ -5,7 +5,7 @@ import { http } from "@/utils/http";
  */
 export function baseList() {
   return http.request({
-    url: "/chargeRule/chargeRuleBaseList",
+    url: "/chargeRule/chargeRuleBasePage",
     method: "post",
   });
 }
