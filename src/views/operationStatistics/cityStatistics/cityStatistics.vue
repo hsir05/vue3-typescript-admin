@@ -141,7 +141,9 @@ export default defineComponent({
           return { label: item.cityName, value: item.cityCode };
         });
         openCityData.value.unshift({ label: "全部", value: "allCity" });
-        influxData.value = await getInfluxList();
+        let res = await getInfluxList();
+        influxData.value = res.data;
+
         getCityOrderData();
         loading.value = false;
       } catch (err) {
@@ -178,31 +180,28 @@ export default defineComponent({
         const haluochexing = res.data.filter((item: ItemInter) => item.influxCode === "IFT0009");
         const yueche365 = res.data.filter((item: ItemInter) => item.influxCode === "IFT0010");
 
-        legendData.value.push(yimin[0].influxName);
-        legendData.value.push(xiecheng[0].influxName);
-        legendData.value.push(zhangshanggaotie[0].influxName);
-        legendData.value.push(rongheyueche[0].influxName);
-        legendData.value.push(meituanyueche[0].influxName);
-        legendData.value.push(goupuchuxing[0].influxName);
-        legendData.value.push(caocaochuxing[0].influxName);
-        legendData.value.push(feizhuyongche[0].influxName);
-        legendData.value.push(haluochexing[0].influxName);
-        legendData.value.push(yueche365[0].influxName);
+        legendData.value = influxData.value.map((item: { entryName: string }) => item.entryName);
+        // legendData.value.push(yimin[0].influxName);
+        // legendData.value.push(xiecheng[0].influxName);
+        // legendData.value.push(zhangshanggaotie[0].influxName);
+        // legendData.value.push(rongheyueche[0].influxName);
+        // legendData.value.push(meituanyueche[0].influxName);
+        // legendData.value.push(goupuchuxing[0].influxName);
+        // legendData.value.push(caocaochuxing[0].influxName);
+        // legendData.value.push(feizhuyongche[0].influxName);
+        // legendData.value.push(haluochexing[0].influxName);
+        // legendData.value.push(yueche365[0].influxName);
 
-        handleTableData(yimin, yimin[0].influxCode, yimin[0].influxName);
-        handleTableData(xiecheng, xiecheng[0].influxCode, xiecheng[0].influxName);
-        handleTableData(
-          zhangshanggaotie,
-          zhangshanggaotie[0].influxCode,
-          zhangshanggaotie[0].influxName
-        );
-        handleTableData(rongheyueche, rongheyueche[0].influxCode, rongheyueche[0].influxName);
-        handleTableData(meituanyueche, meituanyueche[0].influxCode, meituanyueche[0].influxName);
-        handleTableData(goupuchuxing, goupuchuxing[0].influxCode, goupuchuxing[0].influxName);
-        handleTableData(caocaochuxing, caocaochuxing[0].influxCode, caocaochuxing[0].influxName);
-        handleTableData(feizhuyongche, feizhuyongche[0].influxCode, feizhuyongche[0].influxName);
-        handleTableData(haluochexing, haluochexing[0].influxCode, haluochexing[0].influxName);
-        handleTableData(yueche365, yueche365[0].influxCode, yueche365[0].influxName);
+        handleTableData(yimin, yimin[0].influxCode, legendData.value[0]);
+        handleTableData(xiecheng, xiecheng[0].influxCode, legendData.value[1]);
+        handleTableData(zhangshanggaotie, zhangshanggaotie[0].influxCode, legendData.value[2]);
+        handleTableData(rongheyueche, rongheyueche[0].influxCode, legendData.value[3]);
+        handleTableData(meituanyueche, meituanyueche[0].influxCode, legendData.value[4]);
+        handleTableData(goupuchuxing, goupuchuxing[0].influxCode, legendData.value[5]);
+        handleTableData(caocaochuxing, caocaochuxing[0].influxCode, legendData.value[6]);
+        handleTableData(feizhuyongche, feizhuyongche[0].influxCode, legendData.value[7]);
+        handleTableData(haluochexing, haluochexing[0].influxCode, legendData.value[8]);
+        handleTableData(yueche365, yueche365[0].influxCode, legendData.value[9]);
 
         // 获取折线图数据
         await getLineData(status.value);

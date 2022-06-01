@@ -31,7 +31,7 @@
         >
       </div>
       <div class="btn-bg flex">
-        <n-button attr-type="button" type="primary">当前选中区域：{{ area }}</n-button>
+        <!-- <n-button attr-type="button" type="primary">当前选中区域：{{ area }}</n-button> -->
 
         <n-button attr-type="button" type="primary" @click="handleAddArea">
           <template #icon>
@@ -57,8 +57,7 @@
     </div>
 
     <div class="map">
-      <Map ref="baiduMapRef" />
-
+      <Map ref="baiduMapRef" v-if="mapShow" />
       <div class="map-edit-area" v-if="isShow">
         <n-form
           ref="editFormRef"
@@ -84,61 +83,58 @@
           <n-form-item label="状态" path="openLock">
             <n-radio-group v-model:value="editForm.openLock">
               <n-space>
-                <n-radio :value="item.value" v-for="item in statusOptions" :key="item.value">{{
+                <n-radio :value="item.value" v-for="item in lockOptions" :key="item.value">{{
                   item.label
                 }}</n-radio>
               </n-space>
             </n-radio-group>
           </n-form-item>
-          <n-form-item label="操作">
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleSave"
-                >
-                  <n-icon size="20">
-                    <SaveOutIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              保存
-            </n-tooltip>
-          </n-form-item>
+          <div class="text-center">
+            <n-button
+              attr-type="button"
+              :loading="loading"
+              class="mb-10px"
+              size="small"
+              type="primary"
+              @click="handleSave"
+              >保存</n-button
+            >
+          </div>
         </n-form>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, onMounted } from "vue";
+import { defineComponent, ref, h, onMounted, nextTick } from "vue";
 import Map from "@/components/Map/BaiduMap.vue";
 import { FormInst, SelectOption, useMessage, NTag } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { TableItemInter, OpenAreaFormInter, EditFormInter } from "./type";
-import { statusOptions } from "@/config/form";
+import { lockOptions } from "@/config/form";
 import { getAllOpenCity } from "@/api/common/common";
-import { getOpenCityAirportList, saveAirport, removeAirport } from "@/api/operate/operate";
+import {
+  getOpenCityAirportList,
+  saveAirport,
+  swapOpenSeq,
+  removeAirport,
+} from "@/api/operate/operate";
 import {
   TrashOutline as TrashIcon,
-  SaveOutline as SaveOutIcon,
-  // ArrowBackCircleOutline as ArrowBackIcon,
-  //   ArrowForwardCircleOutline as ArrowIcon,
+  ArrowBackCircleOutline as ArrowBackIcon,
+  ArrowForwardCircleOutline as ArrowIcon,
   Add as AddIcon,
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
 import { itemState } from "@/interface/common/common";
 import airportIcon from "@/assets/image/openCity_airport.png";
+import { cloneDeep } from "lodash-es";
 export default defineComponent({
   name: "OpenArea",
   components: {
     Map,
     AddIcon,
-    SaveOutIcon,
   },
   setup() {
     const form = ref<OpenAreaFormInter>({
@@ -149,23 +145,23 @@ export default defineComponent({
     });
     const loading = ref(false);
     const isShow = ref(false);
+    const mapShow = ref(true);
     const formRef = ref<FormInst | null>(null);
     const baiduMapRef = ref();
     const message = useMessage();
     const { appTheme } = useProjectSetting();
-    const area = ref<string | null>();
 
     const openCityList = ref([]);
-    const data = ref([]);
-    const editFormRef = ref();
+    const data = ref<TableItemInter[]>([]);
+    const editFormRef = ref<FormInst | null>(null);
 
     const editForm = ref<EditFormInter>({
-      cityCode: null,
+      cityCode: "110000",
       airportName: null,
       openLock: 1,
       airportAddressDetail: null,
-      airportLat: null,
-      airportLng: null,
+      airportLat: 39.930936,
+      airportLng: 116.406299,
       openCityAirportId: null,
     });
 
@@ -205,22 +201,22 @@ export default defineComponent({
         render(record: TableItemInter, index: number) {
           return h(TableActions as any, {
             actions: [
-              //      {
-              //     label: "前移",
-              //     type: "primary",
-              //     isIconBtn: true,
-              //     icon: ArrowBackIcon,
-              //     onClick: handleUp.bind(null, record.openCityAirportId),
-              //     auth: ["dict001"],
-              //   },
-              //   {
-              //     label: "后移",
-              //     type: "primary",
-              //     isIconBtn: true,
-              //     icon: ArrowIcon,
-              //     onClick: handleDown.bind(null, record.openCityAirportId),
-              //     auth: ["dict001"],
-              //   },
+              {
+                label: "前移",
+                type: "primary",
+                isIconBtn: true,
+                icon: ArrowBackIcon,
+                onClick: handleToggle.bind(null, index, "up"),
+                auth: ["dict001"],
+              },
+              {
+                label: "后移",
+                type: "primary",
+                isIconBtn: true,
+                icon: ArrowIcon,
+                onClick: handleToggle.bind(null, index, "down"),
+                auth: ["dict001"],
+              },
               {
                 label: "编辑",
                 type: "primary",
@@ -289,85 +285,117 @@ export default defineComponent({
         lng: option.lng as number,
         lat: option.lat as number,
       };
+      editForm.value = { ...form.value, ...editForm.value };
+      isShow.value = false;
     }
 
     async function remove(openCityAirportId: string) {
       try {
         loading.value = true;
         let res = await removeAirport({ openCityAirportId });
+        getData();
         message.success(window.$tips[res.code]);
         loading.value = false;
+        mapShow.value = false;
       } catch (err) {
         console.log(err);
         loading.value = false;
       }
     }
 
-    async function handleSave() {
-      try {
-        loading.value = true;
-        let option = {
-          openCityAirportId: editForm.value.openCityAirportId,
-          cityCode: form.value.cityCode,
-          airportLng: editForm.value.airportLng,
-          airportLat: editForm.value.airportLat,
-          airportAddressDetail: editForm.value.airportName,
-          openLock: editForm.value.openLock,
-          airportName: editForm.value.airportName,
-        };
-        let res = await saveAirport(option);
-        console.log(res);
-        message.success(window.$tips[res.code]);
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
+    async function handleSave(e: MouseEvent) {
+      e.preventDefault();
+      editFormRef.value?.validate(async (errors) => {
+        if (!errors) {
+          try {
+            loading.value = true;
+            let option = {
+              openCityAirportId: editForm.value.openCityAirportId,
+              cityCode: form.value.cityCode,
+              airportLng: editForm.value.airportLng,
+              airportLat: editForm.value.airportLat,
+              airportAddressDetail: editForm.value.airportName,
+              openLock: editForm.value.openLock,
+              airportName: editForm.value.airportName,
+            };
+            let res = await saveAirport(option);
+            console.log(res);
+            getData();
+            message.success(window.$tips[res.code]);
+            isShow.value = false;
+            mapShow.value = false;
+            loading.value = false;
+          } catch (err) {
+            console.log(err);
+            loading.value = false;
+          }
+        } else {
+          console.log(errors);
+        }
+      });
     }
 
     async function handleEdit(record: EditFormInter) {
       isShow.value = true;
-      area.value = record.airportName;
-      const { renderBaiduMap, addMarker } = baiduMapRef.value;
-
-      renderBaiduMap(record.airportLng, record.airportLat);
-      addMarker(record.airportLng, record.airportLat, airportIcon);
-      editForm.value = record;
+      mapShow.value = true;
+      nextTick(() => {
+        const { renderBaiduMap, addMarker } = baiduMapRef.value;
+        renderBaiduMap(record.airportLng, record.airportLat);
+        addMarker(record.airportLng, record.airportLat, airportIcon);
+        editForm.value = cloneDeep(record);
+      });
     }
     function handleDelete(openCityAirportId: string) {
       remove(openCityAirportId);
     }
-    //  async function handleUp(orderPayChannelTypeShowId: string) {
-    //   loading.value = true;
-    //   try {
-    //     let res = await upgradeSeq({ orderPayChannelTypeShowId });
-    //     message.success(window.$tips[res.code]);
-    //     getData();
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // }
-    // async function handleDown(orderPayChannelTypeShowId: string) {
-    //   loading.value = true;
-    //   try {
-    //     let res = await lowerSeq({ orderPayChannelTypeShowId });
-    //     message.success(window.$tips[res.code]);
-    //     getData();
-    //     loading.value = false;
-    //   } catch (err) {
-    //     console.log(err);
+    async function handleToggle(index: number, type: string) {
+      if (index === 0 && type === "up") {
+        message.success("已经是第一个了");
+        return false;
+      }
+      if (index === data.value.length - 1 && type === "down") {
+        message.success("已经是最后一个了");
+        return false;
+      }
+      loading.value = true;
+      try {
+        let option = {
+          firstOpenCityAirportId:
+            type === "up"
+              ? data.value[index - 1].openCityAirportId
+              : data.value[index].openCityAirportId,
+          secondOpenCityAirportId:
+            type === "up"
+              ? data.value[index].openCityAirportId
+              : data.value[index + 1].openCityAirportId,
+        };
+        let res = await swapOpenSeq(option);
+        message.success(window.$tips[res.code]);
+        getData();
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    function handleAddArea() {
+      isShow.value = true;
+      mapShow.value = true;
+      nextTick(() => {
+        editForm.value.airportName = null;
+        editForm.value.airportAddressDetail = null;
+        editForm.value.openCityAirportId = null;
 
-    //     loading.value = false;
-    //   }
-    // }
-    function handleAddArea() {}
+        const { renderBaiduMap } = baiduMapRef.value;
+        renderBaiduMap(editForm.value.airportLng, editForm.value.airportLat);
+      });
+
+      // addMarker(editForm.value.airportLng, editForm.value.airportLat, airportIcon);
+    }
 
     return {
       loading,
       isShow,
-      area,
       form,
       formRef,
       openCityList,
@@ -376,8 +404,9 @@ export default defineComponent({
       appTheme,
       editForm,
       editFormRef,
+      mapShow,
       columns,
-      statusOptions,
+      lockOptions,
       getRowKeyId: (row: TableItemInter) => row.cityCode,
       rule: {
         trigger: ["input", "blur"],
@@ -388,7 +417,12 @@ export default defineComponent({
         },
       },
       editRules: {
-        areaName: { required: true, trigger: ["blur", "change"], message: "请输入区域名称" },
+        airportName: { required: true, trigger: ["blur", "change"], message: "请输入机场名称" },
+        airportAddressDetail: {
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请输入地址",
+        },
       },
 
       getData,
@@ -430,7 +464,7 @@ export default defineComponent({
       left: 10px;
       top: 10px;
       width: 300px;
-      height: 220px;
+      height: 230px;
       background-color: $white;
       border-radius: 4px;
     }
