@@ -25,7 +25,7 @@
           :loading="loading"
           class="ml-10px"
           type="primary"
-          @click="queryValue"
+          @click="getData"
         >
           查找</n-button
         >
@@ -126,6 +126,8 @@ import { getOpenCityAirportList, saveAirport, removeAirport } from "@/api/operat
 import {
   TrashOutline as TrashIcon,
   SaveOutline as SaveOutIcon,
+  // ArrowBackCircleOutline as ArrowBackIcon,
+  //   ArrowForwardCircleOutline as ArrowIcon,
   Add as AddIcon,
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
@@ -176,6 +178,7 @@ export default defineComponent({
       {
         title: "序列",
         key: "openSeq",
+        width: 70,
         align: "center",
       },
       {
@@ -198,10 +201,26 @@ export default defineComponent({
         title: "操作",
         key: "actions",
         align: "center",
-        width: 100,
+        width: 200,
         render(record: TableItemInter, index: number) {
           return h(TableActions as any, {
             actions: [
+              //      {
+              //     label: "前移",
+              //     type: "primary",
+              //     isIconBtn: true,
+              //     icon: ArrowBackIcon,
+              //     onClick: handleUp.bind(null, record.openCityAirportId),
+              //     auth: ["dict001"],
+              //   },
+              //   {
+              //     label: "后移",
+              //     type: "primary",
+              //     isIconBtn: true,
+              //     icon: ArrowIcon,
+              //     onClick: handleDown.bind(null, record.openCityAirportId),
+              //     auth: ["dict001"],
+              //   },
               {
                 label: "编辑",
                 type: "primary",
@@ -241,7 +260,7 @@ export default defineComponent({
           };
           return obj;
         });
-        queryValue();
+        getData();
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -249,7 +268,7 @@ export default defineComponent({
       }
     };
 
-    async function queryValue() {
+    async function getData() {
       try {
         isShow.value = false;
         await formRef.value?.validate();
@@ -318,6 +337,31 @@ export default defineComponent({
     function handleDelete(openCityAirportId: string) {
       remove(openCityAirportId);
     }
+    //  async function handleUp(orderPayChannelTypeShowId: string) {
+    //   loading.value = true;
+    //   try {
+    //     let res = await upgradeSeq({ orderPayChannelTypeShowId });
+    //     message.success(window.$tips[res.code]);
+    //     getData();
+    //     loading.value = false;
+    //   } catch (err) {
+    //     console.log(err);
+    //     loading.value = false;
+    //   }
+    // }
+    // async function handleDown(orderPayChannelTypeShowId: string) {
+    //   loading.value = true;
+    //   try {
+    //     let res = await lowerSeq({ orderPayChannelTypeShowId });
+    //     message.success(window.$tips[res.code]);
+    //     getData();
+    //     loading.value = false;
+    //   } catch (err) {
+    //     console.log(err);
+
+    //     loading.value = false;
+    //   }
+    // }
     function handleAddArea() {}
 
     return {
@@ -347,7 +391,7 @@ export default defineComponent({
         areaName: { required: true, trigger: ["blur", "change"], message: "请输入区域名称" },
       },
 
-      queryValue,
+      getData,
       handleSave,
       handleUpdateValue,
       handleAddArea,
@@ -362,7 +406,7 @@ export default defineComponent({
   justify-content: space-between;
 
   .open-area-left {
-    width: 420px;
+    width: 480px;
     background-color: $white;
   }
 
@@ -371,7 +415,7 @@ export default defineComponent({
   }
 
   .map {
-    width: calc(100% - 420px - 10px);
+    width: calc(100% - 480px - 10px);
     height: auto;
     overflow: scroll;
     background-color: $white;
