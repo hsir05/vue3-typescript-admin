@@ -20,7 +20,7 @@ export enum OrderDataEnum {
     RECEPTIONPASSENGER = 'receptionPassengerState', //去接乘客 
     DRIVERARRIVERPICKUPADDRESS = 'driverArrivePickupAddressState', //到达上车地点
     DRIVERBEGINSERVICES = 'driverBeginServiceState', //开始服务 
-    DRIVERENDSERVICES = 'driverEndServiceState', // 结束服务
+    DRIVERENDSERVICES = 'driverEndServiceState', // 结束服务 
     DRIVERSUBMISSIONCOST = 'driverSubmissionCostState', // 提交费用
     ORDERCOSTCREATE = 'orderCostCreateState', // 支付
     ORDEREND = 'orderEndState', // 结束
