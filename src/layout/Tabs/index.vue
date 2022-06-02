@@ -31,7 +31,7 @@
             @click.stop="goPage(tab)"
             @contextmenu="handleContextMenu($event, tab)"
           >
-            <span :class="{ 'tabs-card-scroll-item-active': activeKey === tab.path }">{{
+            <span :class="{ 'tabs-card-scroll-item-active': activeKey === tab.fullPath }">{{
               tab.meta?.title
             }}</span>
             <n-icon
@@ -219,12 +219,12 @@ export default defineComponent({
       ];
     });
 
-    function goPage(e: RouteItem) {
-      const { fullPath } = e;
+    function goPage(tab: RouteItem) {
+      if (tab.fullPath === route.fullPath) return;
 
-      if (fullPath === route.fullPath) return;
-      state.activeKey = fullPath;
-      router.push({ path: fullPath });
+      state.activeKey = tab.fullPath;
+
+      router.push({ path: tab.path, query: { ...tab.query } });
     }
     function closeTabItem(e: RouteItem) {
       const { fullPath } = e;

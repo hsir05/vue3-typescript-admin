@@ -3,6 +3,8 @@ import { PARENTLAYOUT } from "@/router/constant";
 import { FileTrayFullOutline } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
 
+
+//activeMenu: "" 用于没有菜单,有页面的功能
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/operate-order",
@@ -49,10 +51,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/operateOrder/invalidOrder/invalidOrder.vue"),
       },
       {
-        path: "/operate-order/finished-detail",
-        name: `operate-order_finished-detail`,
+        path: "/operate-order/order-detail",
+        name: `operate-order_order-detail`,
         meta: {
-          title: "已完成订单详情",
+          title: "订单详情",
+          activeMenu: ""
         },
         component: () => import("@/views/operateOrder/orderDetail/orderDetail.vue"),
       },

@@ -294,7 +294,7 @@ export default defineComponent({
 
     function handleDetail(orderId: string) {
       router.push({
-        path: "/operate-order/finished-detail",
+        path: "/operate-order/order-detail",
         query: { id: orderId, orderState: "channel" },
       });
     }

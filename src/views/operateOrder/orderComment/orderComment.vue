@@ -204,7 +204,7 @@ export default defineComponent({
 
     function handleDetail(record: Recordable) {
       console.log("点击了编辑", record.id);
-      router.push({ path: "/operate-order/finished-detail", query: { id: record.id } });
+      router.push({ path: "/operate-order/order-detail", query: { id: record.id } });
     }
 
     const searchHandle = (e: MouseEvent) => {
