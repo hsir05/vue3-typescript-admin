@@ -244,8 +244,6 @@ const transform: AxiosTransform = {
 };
 
 function createAxios(opt?: Partial<CreateAxiosOptions>) {
-    console.log('-------------------------',globSetting.apiUrl);
-    
   return new VAxios(
     deepMerge(
       {

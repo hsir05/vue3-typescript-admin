@@ -76,6 +76,7 @@ export default defineComponent({
     const mode = ref("1");
     const queryForm = ref({
       day: null,
+      month: null,
       operationCompanyId: "75e642e0096b4a41a2b2ecf933c92247",
       checkType: null,
       driverClazzId: null,

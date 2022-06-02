@@ -51,6 +51,7 @@ const drawingManager = ref(null);
 const point = ref(null);
 const drivingRoute = ref(null);
 const heatmapOverlay = ref(null);
+const type = ref(false);
 
 let gridlines = []; // 用来存储网格线覆盖物的数组
 let nonEditablePoints = []; // 用来存储不可选择区块的数组
@@ -84,12 +85,6 @@ function addMapEventListener() {
       let nePoint = bounds.getNorthEast(); //可视区域右上角(东北角）
       let swPoint = bounds.getSouthWest(); //可视区域左下角(西南角)
 
-      //   // 清除覆盖物
-      //   for (let key of currentOpenAreaPoints) {
-      //     removeOverlay(key.piece);
-      //   }
-      //   currentOpenAreaPoints = [];
-
       // 清除全部网格线
       if (options.showGrid) {
         clearAllGrid();
@@ -101,7 +96,7 @@ function addMapEventListener() {
       paramData.lngMax = calculateKey(nePoint.lng);
       paramData.latMin = calculateKey(swPoint.lat);
       paramData.latMax = calculateKey(nePoint.lat);
-      emit("update-nonEditArea", paramData);
+      emit("update-non-edit", paramData, type.value);
     }, 200);
   });
 }
@@ -203,6 +198,10 @@ function addBoundary(name) {
     }
   });
 }
+
+function mapMode(bool: boolean) {
+  type.value = bool;
+}
 // 绘制地图上的网格线
 function drawGrid(nePoint, swPoint) {
   let dValue = Number((0.1 / options.gridPrecision).toFixed(2)); // 两个相邻关键点之间经度或纬度之间的相差值
@@ -236,8 +235,14 @@ function drawGrid(nePoint, swPoint) {
   }
   removeAllOverlay();
   clearOutSideNonEditablePieces(nePoint, swPoint);
-  addCurrentOpenAreaPieces(openAreaPointList.value);
-  addNonEditablePieces(remoteNonEditablePointsData.value, nePoint, swPoint);
+
+  if (type.value) {
+    // addCurrentOpenAreaPieces(remoteNonEditablePointsData.value);
+    addNonEditablePieces(remoteNonEditablePointsData.value, nePoint, swPoint);
+  } else {
+    addCurrentOpenAreaPieces(openAreaPointList.value);
+    addNonEditablePieces(remoteNonEditablePointsData.value, nePoint, swPoint);
+  }
 }
 // 在地图上添加区块,会返回地图上添加的区块覆盖物
 function addPiece(keyLng, keyLat, style) {
@@ -293,14 +298,24 @@ function addNonEditablePieces(data, nePoint, swPoint) {
         // 判断返回的不可选关键点（或区块）是不是已经在可编辑区块列表中，如果在，从可编辑区块列表中删除
         for (let i = currentOpenAreaPoints.value.length - 1; i >= 0; i--) {
           if (
-            currentOpenAreaPoints[i].lng === openAreaPoint.lng &&
-            currentOpenAreaPoints[i].lat === openAreaPoint.lat
+            currentOpenAreaPoints.value[i].lng === openAreaPoint.lng &&
+            currentOpenAreaPoints.value[i].lat === openAreaPoint.lat
           ) {
             removeOverlay(currentOpenAreaPoints.value[i].piece);
             currentOpenAreaPoints.value.splice(i, 1);
             break;
           }
         }
+        // for (let i = currentOpenAreaPoints.value.length - 1; i >= 0; i--) {
+        //     if (
+        //         currentOpenAreaPoints.value[i].lng === openAreaPoint.lng &&
+        //         currentOpenAreaPoints.value[i].lat === openAreaPoint.lat
+        //     ) {
+        //         removeOverlay(currentOpenAreaPoints.value[i].piece);
+        //         currentOpenAreaPoints.value.splice(i, 1);
+        //         break;
+        //     }
+        // }
         // 判断已经存在的不可选区块中有没有该不可选择的区块，没有的话，就添加覆盖物及nonEditablePoints中的元素
         let isExist = false;
         for (let i = 0; i < nonEditablePoints.length; i++) {
@@ -569,6 +584,7 @@ defineExpose({
   addHeartMap,
   refreshHeatMap,
   map,
+  mapMode,
   drawingManager,
   currentOpenAreaPoints,
 });

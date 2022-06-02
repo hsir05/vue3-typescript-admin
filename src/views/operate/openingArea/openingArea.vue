@@ -61,6 +61,7 @@
         ref="baiduMapRef"
         :nonPointsData="remoteNonEditablePoints"
         :currentPointsData="currentOpenAreaPoints"
+        @update-non-edit="getNonEditAreaPonits"
       />
 
       <div class="map-edit-area" v-if="isShow">
@@ -78,15 +79,19 @@
         <n-form
           ref="editFormRef"
           :rules="editRules"
-          size="small"
           label-placement="left"
-          :style="{ maxWidth: '250px', marginLeft: '25px', marginTop: '20px' }"
+          :style="{ marginLeft: '15px', marginTop: '20px' }"
           require-mark-placement="right-hanging"
           label-width="80"
           :model="editForm"
         >
           <n-form-item label="区域名称" path="areaName">
-            <n-input v-model:value="editForm.areaName" clearable placeholder="输入区域名称" />
+            <n-input
+              v-model:value="editForm.areaName"
+              style="width: 240px"
+              clearable
+              placeholder="输入区域名称"
+            />
           </n-form-item>
 
           <n-form-item label="状态" path="areaLock">
@@ -98,69 +103,48 @@
               </n-space>
             </n-radio-group>
           </n-form-item>
-          <n-form-item label="操作">
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button attr-type="button" text type="primary" @click="handleAdjust">
-                  <n-icon size="20">
-                    <HandIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              调整地图位置
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleEditArea"
-                >
-                  <n-icon size="20">
-                    <CreatIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              选择区域
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleReset"
-                >
-                  <n-icon size="20">
-                    <ArrowBackIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              还原
-            </n-tooltip>
-
-            <n-tooltip trigger="hover">
-              <template #trigger>
-                <n-button
-                  attr-type="button"
-                  class="ml-10px"
-                  text
-                  type="primary"
-                  @click="handleSave"
-                >
-                  <n-icon size="20">
-                    <SaveOutIcon />
-                  </n-icon>
-                </n-button>
-              </template>
-              保存
-            </n-tooltip>
-          </n-form-item>
+          <div>
+            <n-button
+              attr-type="button"
+              :loading="loading"
+              size="small"
+              class="ml-10px"
+              type="primary"
+              @click="handleAdjust"
+            >
+              调整地图位置</n-button
+            >
+            <n-button
+              attr-type="button"
+              :loading="loading"
+              size="small"
+              class="ml-10px"
+              type="primary"
+              @click="handleEditArea"
+            >
+              选择区域</n-button
+            >
+            <n-button
+              attr-type="button"
+              :loading="loading"
+              size="small"
+              class="ml-10px"
+              type="primary"
+              @click="handleReset"
+            >
+              还原</n-button
+            >
+            <n-button
+              attr-type="button"
+              :loading="loading"
+              size="small"
+              class="ml-10px"
+              type="primary"
+              @click="handleSave"
+            >
+              保存</n-button
+            >
+          </div>
         </n-form>
       </div>
     </div>
@@ -185,11 +169,7 @@ import {
 import {
   AlertCircle as AlertIcon,
   TrashOutline as TrashIcon,
-  CreateOutline as CreatIcon,
-  SaveOutline as SaveOutIcon,
-  ArrowUndoCircleOutline as ArrowBackIcon,
   Add as AddIcon,
-  HandRightOutline as HandIcon,
   CreateOutline as CreateIcon,
 } from "@vicons/ionicons5";
 import { itemState } from "@/interface/common/common";
@@ -199,10 +179,6 @@ export default defineComponent({
     Map,
     AddIcon,
     AlertIcon,
-    HandIcon,
-    CreatIcon,
-    ArrowBackIcon,
-    SaveOutIcon,
   },
   setup() {
     const form = ref<OpenAreaFormInter>({
@@ -356,7 +332,6 @@ export default defineComponent({
       map.enableDoubleClickZoom();
       drawingManager.close();
     }
-
     // 还原
     function handleReset() {
       const { map, drawingManager, removeAllOverlay, addCurrentOpenAreaPieces } = baiduMapRef.value;
@@ -396,15 +371,19 @@ export default defineComponent({
         loading.value = false;
       }
     }
-
-    const getNonEditAreaPonits = async (paramData: NonEditAreaPonitsInter) => {
+    const getNonEditAreaPonits = async (paramData: NonEditAreaPonitsInter, type: boolean) => {
       try {
         let option = {
-          areaCode: editForm.value.areaCode as string,
+          areaCode: type ? null : (editForm.value.areaCode as string),
           ...paramData,
         };
+
         let res = await getNonEditablePointList(option);
         remoteNonEditablePoints.value = res.data;
+        if (type) {
+          const { drawingManagerInit } = baiduMapRef.value;
+          drawingManagerInit();
+        }
       } catch (err) {
         console.log(err);
       }
@@ -425,9 +404,9 @@ export default defineComponent({
         let result = await getNonEditablePointList(option);
         remoteNonEditablePoints.value = result.data;
 
-        const { renderBaiduMap, addMapEventListener, addBoundary, drawingManagerInit } =
+        const { renderBaiduMap, mapMode, addMapEventListener, addBoundary, drawingManagerInit } =
           baiduMapRef.value;
-
+        mapMode(false);
         renderBaiduMap(form.value.lng, form.value.lat);
         addMapEventListener();
         addBoundary(form.value.cityName);
@@ -449,7 +428,30 @@ export default defineComponent({
     function handleDelete(record: TableItemInter) {
       remove(record.areaCode as string);
     }
-    function handleAddArea() {}
+    async function handleAddArea() {
+      editForm.value = {
+        areaName: null,
+        areaLock: 1,
+        areaCode: null,
+        cityCode: null,
+      };
+      isShow.value = true;
+      const {
+        renderBaiduMap,
+        addBoundary,
+        mapMode,
+        addMapEventListener,
+        drawingManagerInit,
+        clearOverlays,
+      } = baiduMapRef.value;
+      renderBaiduMap(form.value.lng, form.value.lat);
+      clearOverlays();
+      addBoundary();
+
+      mapMode(true);
+      addMapEventListener();
+      drawingManagerInit();
+    }
 
     function handleEditArea() {
       const { map, drawingManager } = baiduMapRef.value;
@@ -529,8 +531,8 @@ export default defineComponent({
       padding: 10px;
       left: 10px;
       top: 10px;
-      width: 300px;
-      height: 270px;
+      width: 350px;
+      height: 290px;
       background-color: $white;
       border-radius: 4px;
     }

@@ -159,7 +159,7 @@ export function getOpenAreaPointList(data: { areaCode: string }) {
  * 获取坐标范围内，区域不可选择的点
  */
 interface NonEditInter {
-  areaCode?: string;
+  areaCode?: string | null;
   lngMin: number;
   lngMax: number;
   latMin: number;
