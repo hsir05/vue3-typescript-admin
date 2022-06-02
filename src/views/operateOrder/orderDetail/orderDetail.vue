@@ -19,7 +19,10 @@
     <div class="right">
       <Map ref="baiduMapRef" class="map" />
 
-      <component :is="componentId" :detail="detail" />
+      <transition name="fade-slide" mode="out-in" appear>
+        <component :is="componentId" :detail="detail" />
+      </transition>
+
       <!-- 表格 -->
       <OrderAdvance />
     </div>
