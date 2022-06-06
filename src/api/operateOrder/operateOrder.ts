@@ -15,7 +15,7 @@ export function getOrderAdvance(data: {orderId: string}) {
 /**
  * 根据订单流水号查询行程录音文件
  */
-export function getOrderSoundRecordingAttachfile(data: {orderId: string}) {
+export function getOrderSoundfile(data: {orderNo: string}) {
     return http.request({
         url: "/orderSoundRecordingAttachfile/listByOrderNo",
         method: "post",

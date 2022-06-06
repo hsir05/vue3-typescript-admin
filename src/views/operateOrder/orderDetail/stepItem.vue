@@ -3,7 +3,7 @@
     <template v-if="OrderDataEnum.ORDEREND !== orderState">
       <div class="date mb-10px" v-if="isDate">{{ dayjs(date).format("YYYY-MM-DD") }}</div>
       <div class="step-content" @click="handle">
-        <div class="step-icon-box">
+        <div :class="['step-icon-box', isActive ? 'active' : '']">
           <n-icon :component="orderData[orderState].icon" size="20" />
         </div>
         <div class="step-item-text pl-15px" v-if="orderData[orderState].text">
@@ -28,6 +28,7 @@ import { orderData } from "@/config/table";
 import { toRefs } from "vue";
 import { OrderDataEnum } from "@/enums/dict";
 import { TimeOutline as TimeIcon } from "@vicons/ionicons5";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import dayjs from "dayjs";
 const props = defineProps({
   orderState: {
@@ -42,14 +43,24 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isActive: {
+    type: Boolean,
+    default: false,
+  },
+  index: {
+    type: Number,
+    default: 0,
+  },
 });
-const { orderState, date, isDate } = toRefs(props);
+const { orderState, date, isDate, isActive, index } = toRefs(props);
 
 const emit = defineEmits(["update-event"]);
 
 const handle = () => {
-  emit("update-event", orderState.value);
+  emit("update-event", orderState.value, index.value);
 };
+
+const { appTheme } = useProjectSetting();
 </script>
 <style lang="scss">
 .step {
@@ -65,7 +76,7 @@ const handle = () => {
     @mixin line {
       content: " ";
       width: 4px;
-      height: 16px;
+      height: 15px;
       background-color: #e5e5e5;
       position: absolute;
       left: 22px;
@@ -90,6 +101,7 @@ const handle = () => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
   }
   .step-content-end {
     @extend .step-content;
@@ -117,6 +129,12 @@ const handle = () => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+  .active {
+    background-color: v-bind(appTheme);
+    .n-icon {
+      color: white;
+    }
   }
 }
 </style>

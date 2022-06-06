@@ -1,5 +1,5 @@
 <template>
-  <n-descriptions label-placement="left" bordered :column="3" class="mt-10px">
+  <n-descriptions label-placement="left" bordered :column="3" class="mt-15px">
     <n-descriptions-item label="接单地点">{{
       detail?.driverAcceptOrderAddress
     }}</n-descriptions-item>
@@ -8,7 +8,7 @@
       >{{ detail?.driverFullName }}{{ detail?.driverNo }}</n-descriptions-item
     >
     <n-descriptions-item label="司机手机号">{{ detail?.driverPhone }}</n-descriptions-item>
-    <n-descriptions-item label="所属运营企业">{{
+    <n-descriptions-item label="所属运营企业" :span="2">{{
       detail?.operationCompanyName
     }}</n-descriptions-item>
     <n-descriptions-item label="所属班级">{{
@@ -20,13 +20,19 @@
     <n-descriptions-item label="车辆品牌/车系">{{ detail?.vehicleBrand }}</n-descriptions-item>
     <n-descriptions-item label="车辆颜色" :span="2">{{ detail?.vehicleColor }}</n-descriptions-item>
     <n-descriptions-item label="抽成比率">
-      流量方抽成比率:{{ detail?.influxDivideRate }} 平台抽成比率:{{
-        detail?.platformDivideRate
-      }}
-      代理商抽成比率:{{ detail?.agencyDivideRate }} 企业抽成比率:{{
-        detail?.companyDivideRate
-      }}
-      司机抽成比率:{{ detail?.driverDivideRate }}
+      <n-tag type="success"> 流量方抽成比率:{{ detail?.influxDivideRate * 100 }}% </n-tag>
+      <n-tag type="success" class="ml-10px"
+        >平台抽成比率:{{ detail?.platformDivideRate * 100 }}%</n-tag
+      >
+      <n-tag type="success" class="ml-10px"
+        >代理商抽成比率:{{ detail?.agencyDivideRate * 100 }}%
+      </n-tag>
+      <n-tag type="success" class="ml-10px"
+        >企业抽成比率:{{ detail?.companyDivideRate * 100 }}%</n-tag
+      >
+      <n-tag type="success" class="ml-10px"
+        >司机抽成比率:{{ detail?.driverDivideRate * 100 }}%</n-tag
+      >
     </n-descriptions-item>
   </n-descriptions>
 </template>
@@ -47,11 +53,11 @@ interface DetailInter {
   orderServiceDuration: string | null;
   vehicleColor: string | null;
 
-  influxDivideRate: number | null;
-  platformDivideRate: string | null;
-  agencyDivideRate: string | null;
-  companyDivideRate: string | null;
-  driverDivideRate: string | null;
+  influxDivideRate: number;
+  platformDivideRate: number;
+  agencyDivideRate: number;
+  companyDivideRate: number;
+  driverDivideRate: number;
 }
 const props = defineProps({
   detail: {

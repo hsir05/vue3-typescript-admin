@@ -10,6 +10,8 @@
           :date="item.date || null"
           :orderState="item.orderState"
           :isDate="item.isDate"
+          :isActive="index === activeIndex"
+          :index="index"
           v-for="(item, index) in step"
           :key="index"
           @update-event="handleEvent"
@@ -22,9 +24,6 @@
       <transition name="fade-slide" mode="out-in" appear>
         <component :is="componentId" :detail="detail" />
       </transition>
-
-      <!-- 表格 -->
-      <OrderAdvance />
     </div>
   </div>
 </template>
@@ -33,11 +32,17 @@ import { defineComponent, ref, toRefs, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { TableDataItemInter, StepInter } from "./type";
 import Map from "@/components/Map/BaiduMap.vue";
-import OrderAdvance from "./orderAdvance.vue";
+
 import CustomerInfo from "./customerInfo.vue";
 import AcceptOrder from "./acceptOrder.vue";
 import StepItem from "./stepItem.vue";
 import CreateOrder from "./createOrder.vue";
+import ReceptionPassenger from "./receptionPassenger.vue";
+import DriverArrivePickupAddress from "./driverArrivePickupAddress.vue";
+import DriverBeginService from "./driverBeginService.vue";
+import DriverEndService from "./driverEndService.vue";
+import DriverSubmissionCost from "./driverSubmissionCost.vue";
+import OrderCostCreate from "./orderCostCreate.vue";
 import { objInter } from "@/interface/common/common";
 import {
   getOrderDetail,
@@ -51,7 +56,19 @@ import endIcon from "@/assets/image/icon_end_address.png";
 import { OrderDataEnum } from "@/enums/dict";
 export default defineComponent({
   name: "FinisherOrderDetail",
-  components: { Map, OrderAdvance, StepItem, CustomerInfo, CreateOrder, AcceptOrder },
+  components: {
+    Map,
+    StepItem,
+    CustomerInfo,
+    CreateOrder,
+    AcceptOrder,
+    ReceptionPassenger,
+    DriverArrivePickupAddress,
+    DriverBeginService,
+    DriverEndService,
+    DriverSubmissionCost,
+    OrderCostCreate,
+  },
   setup() {
     const route = useRoute();
     const loading = ref(false);
@@ -59,7 +76,7 @@ export default defineComponent({
 
     const step = ref<StepInter[]>([]);
     const detail = ref();
-    const orderAdvance = ref();
+    const activeIndex = ref(0);
 
     const state = reactive({
       componentId: "CreateOrder",
@@ -268,11 +285,18 @@ export default defineComponent({
       });
     };
 
-    const handleEvent = (orderState: string) => {
-      console.log(orderState);
+    const handleEvent = (orderState: string, index: number) => {
+      console.log(index);
+      activeIndex.value = index;
       let componentsObj: objInter = {
         createOrderState: "CreateOrder",
         acceptOrderState: "acceptOrder",
+        receptionPassengerState: "receptionPassenger",
+        driverArrivePickupAddressState: "driverArrivePickupAddress",
+        driverBeginServiceState: "driverBeginService",
+        driverEndServiceState: "driverEndService",
+        driverSubmissionCostState: "driverSubmissionCost",
+        orderCostCreateState: "orderCostCreate",
       };
       state.componentId = componentsObj[orderState];
     };
@@ -282,8 +306,8 @@ export default defineComponent({
       baiduMapRef,
       ...toRefs(state),
       loading,
+      activeIndex,
       detail,
-      orderAdvance,
       step,
       handleEvent,
     };

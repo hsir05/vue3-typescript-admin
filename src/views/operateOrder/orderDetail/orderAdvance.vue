@@ -22,7 +22,6 @@ import { TableDataItemInter } from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import OrderAdvanceFlowOutModal from "./orderAdvanceFlowOutModal.vue";
-
 const route = useRoute();
 const loading = ref(false);
 const orderAdvanceFlowOutModalRef = ref();
