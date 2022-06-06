@@ -4,6 +4,8 @@ export interface TableDataItemInter {
   orderPlaceVehicleList: OrderTypeInter[]
   orderType: string
   orderState: string
+  influxCode: string
+  influxOrderNo: string
 }
 
 interface OrderTypeInter{

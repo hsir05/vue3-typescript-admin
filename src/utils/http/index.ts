@@ -16,6 +16,7 @@ import { RequestOptions, Result, CreateAxiosOptions } from "./types";
 
 import { useAppUserStore } from "@/store/modules/useUserStore";
 import { useMessage, useDialog } from "naive-ui";
+import { otherUrl } from "@/config/config";
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix || "";
@@ -269,7 +270,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 消息提示类型
           errorMessageMode: "none",
           // 接口地址
-          apiUrl: globSetting.apiUrl,
+          apiUrl: globSetting.apiUrl, 
         //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
           // 接口拼接地址
           urlPrefix: urlPrefix,
@@ -292,9 +293,9 @@ export const http = createAxios();
 // 项目，多个不同 api 地址，直接在这里导出多个
 // src/api ts 里面接口，就可以单独使用这个请求，
 // import { httpTwo } from '@/utils/http/axios'
-// export const httpTwo = createAxios({
-//   requestOptions: {
-//     apiUrl: 'http://localhost:9001',
-//     urlPrefix: 'api',
-//   },
-// });
+export const otherHttp = createAxios({
+  requestOptions: {
+    apiUrl: otherUrl,
+    urlPrefix: '',
+  },
+});

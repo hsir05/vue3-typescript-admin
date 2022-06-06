@@ -125,13 +125,15 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useRouter } from "vue-router";
 import { EyeOutline as EyeIcon, GitBranchOutline as GitBranchIcon } from "@vicons/ionicons5";
+import { IssuesCloseOutlined as IssuesCloseIcon } from "@vicons/antd";
 import BasicTable from "@/components/Table/Table.vue";
 import { TableDataItemInter, QueryForm } from "./type";
 import { statusOptions } from "@/config/form";
-import { getOrderPage } from "@/api/operateOrder/operateOrder";
+import { getOrderPage, singleFinishOrder } from "@/api/operateOrder/operateOrder";
 import { getDict } from "@/api/common/common";
 import { PaginationInter } from "@/api/type";
 import { objInter } from "@/interface/common/common";
+import { useDialog, useMessage } from "naive-ui";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "ServingOrder",
@@ -142,6 +144,8 @@ export default defineComponent({
     const basicTableRef = ref();
     const itemCount = ref(null);
     const router = useRouter();
+    const dialog = useDialog();
+    const message = useMessage();
     const queryValue = ref<QueryForm>({
       timeGe: null,
       timeLe: null,
@@ -267,7 +271,7 @@ export default defineComponent({
         title: "操作",
         key: "action",
         align: "center",
-        width: "130px",
+        width: "170px",
         render(record: TableDataItemInter) {
           return h(TableActions as any, {
             actions: [
@@ -280,11 +284,49 @@ export default defineComponent({
                 auth: ["dict001"],
               },
               {
+                label: "人工派单",
+                type: "primary",
+                isIconBtn: true,
+                icon: GitBranchIcon,
+                isShow: record.orderState === "OS00001" ? false : true,
+                onClick: handleManualDispatcht.bind(null, record.orderId),
+                auth: ["dict001"],
+              },
+              {
+                label: "价格调整",
+                type: "primary",
+                isIconBtn: true,
+                icon: GitBranchIcon,
+                isShow: !(
+                  record.orderState === "OS00007" &&
+                  (record.influxCode === "IFT0001" ||
+                    record.influxCode === "IFT0005" ||
+                    record.influxCode === "IFT0009")
+                ),
+                onClick: handlePriceAdjustment.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
                 label: "订单改派",
                 type: "primary",
                 isIconBtn: true,
                 icon: GitBranchIcon,
+                isShow: !(
+                  record.orderState === "OS00002" ||
+                  record.orderState === "OS00003" ||
+                  record.orderState === "OS00004" ||
+                  record.orderState === "OS00005"
+                ),
                 onClick: handleReassignment.bind(null, record.orderId),
+                auth: ["dict001"],
+              },
+              {
+                label: "结单",
+                type: "primary",
+                isIconBtn: true,
+                icon: IssuesCloseIcon,
+                isShow: !(record.orderState === "OS00007" || record.orderState === "OS00008"),
+                onClick: handleClosureOrder.bind(null, record.influxOrderNo),
                 auth: ["dict001"],
               },
             ],
@@ -338,11 +380,39 @@ export default defineComponent({
         query: { id: orderId, orderState: "serving" },
       });
     }
-
+    // 价格调整
+    function handlePriceAdjustment(record: Recordable) {
+      console.log(record);
+    }
+    // 人工派单
+    function handleManualDispatcht() {}
+    // 单个结单
+    function handleClosureOrder(influxOrderNo: string) {
+      console.log(influxOrderNo);
+      dialog.warning({
+        title: "提示",
+        content: "您确定结单？",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: async () => {
+          try {
+            loading.value = true;
+            let res = await singleFinishOrder({ influxOrderNo });
+            console.log(res);
+            message.success(window.$tips(res.code));
+            loading.value = false;
+          } catch (err) {
+            console.log(err);
+            loading.value = false;
+          }
+        },
+        onNegativeClick: () => {},
+      });
+    }
+    //订单改派
     function handleReassignment(orderId: string) {
       console.log(orderId);
     }
-
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       const { resetPagination } = basicTableRef.value;

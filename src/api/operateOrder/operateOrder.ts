@@ -1,7 +1,7 @@
 import { http } from "@/utils/http";
 import { PaginationInter } from "../type";
-
-
+import { otherHttp } from "@/utils/http"
+import { ContentTypeEnum } from "@/enums/httpEnum";
 /**
  * 查询预付款信息
  */
@@ -81,7 +81,27 @@ export function getOrderDetail(data: {orderId: string}) {
     });
 }
 
-
+/**
+ * 批量结单
+ */
+export function batchFinishOrder(data: {orderId: string}) {
+    return otherHttp.request({
+        url: "/order/batchFinishOrder",
+        method: "post",
+        data: data,
+        headers: { Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.FORM_URLENCODED },
+    });
+}
+/**
+ * 单个结单
+ */
+export function singleFinishOrder(data: {influxOrderNo: string}) {
+    return http.request({
+        url: "/order/batchFinishOrder",
+        method: "post",
+        data: data,
+    });
+}
 //-----------------已完成订单-------------------------
 
 /**
@@ -202,20 +222,31 @@ export function getOrderInvalidDetail(data: {orderId: string}) {
 /**
  * 评论订单
  */
-// interface OrderEvaluationInter {
-//     page: PaginationInter;
-//     search: {
-//         timeGe: null,
-//             timeLe: null,
-//             plateNumberEq: null,
-//             orderTypeEq: null,
-//             driverNoEq: null,
-//             customerPhoneEq: null,
-//     };
-// }
-export function getOrderEvaluationPage(data: {}) {
+interface OrderEvaluationInter {
+    page: PaginationInter;
+    search: {
+        orderNoEq: string | null
+        customerPhoneEq: string | null
+        serviceStarEq: string | null
+        evaluationTimeGe: string | null
+        evaluationTimeLe: string | null
+    };
+}
+export function getOrderEvaluationPage(data: OrderEvaluationInter) {
     return http.request({
         url: "/orderEvaluation/page",
+        method: "post",
+        data: data,
+    });
+}
+
+/**
+ * 查询订单类型
+*/
+
+export function getOrderType(data: {orderId: string}) {
+    return http.request({
+        url: "/orderEvaluation/getOrderType",
         method: "post",
         data: data,
     });

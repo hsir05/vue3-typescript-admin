@@ -1,5 +1,7 @@
 import { http } from "@/utils/http";
 import { PaginationInter } from "../type";
+import { otherHttp } from "@/utils/http"
+
 //-----------------个人会员类型管理-------------------------
 
 /**
@@ -331,7 +333,7 @@ export function downloadRelativeItinerary(data:{customerInvoiceApplicationId: st
  * 调用第三方地址
 */
 export function sendMail(data:{customerInvoiceApplicationId: string | null; contactMail: string | null}) {
-  return http.request({
+  return otherHttp.request({
     url: `/customerInvoiceApplication/platform/invoiceMail`,
     method: 'post',
     data:data

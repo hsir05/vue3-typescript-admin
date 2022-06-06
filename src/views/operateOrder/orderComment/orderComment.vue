@@ -10,9 +10,9 @@
       class="pt-15px pb-15px bg-white mb-5px"
       :model="queryValue"
     >
-      <n-form-item label="订单号" path="orderNo">
+      <n-form-item label="订单号" path="orderNoEq">
         <n-input
-          v-model:value="queryValue.orderNo"
+          v-model:value="queryValue.orderNoEq"
           clearable
           placeholder="输入流量方订单号"
           style="width: 150px"
@@ -20,7 +20,7 @@
       </n-form-item>
       <n-form-item label="下单客户电话" path="customerPhoneEq">
         <n-input
-          v-model:value="queryValue.orderNo"
+          v-model:value="queryValue.customerPhoneEq"
           clearable
           placeholder="输入下单客户电话"
           :maxlength="11"
@@ -28,36 +28,27 @@
         />
       </n-form-item>
 
-      <n-form-item label="司机工号" path="driverNoEq">
-        <n-input
-          v-model:value="queryValue.driverNoEq"
-          clearable
-          placeholder="输入司机工号"
-          style="width: 150px"
-        />
-      </n-form-item>
-
-      <n-form-item label="评论星级" path="serviceStar">
+      <n-form-item label="评论星级" path="serviceStarEq">
         <n-select
-          v-model:value="queryValue.serviceStar"
+          v-model:value="queryValue.serviceStarEq"
           placeholder="选择评论星级"
           :options="options"
           style="width: 150px"
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(起始)" path="timeGe">
+      <n-form-item label="交易时间(起始)" path="evaluationTimeGe">
         <n-date-picker
-          v-model:value="queryValue.timeGe"
+          v-model:value="queryValue.evaluationTimeGe"
           type="date"
           style="width: 150px"
           clearable
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(结束)" path="timeLe">
+      <n-form-item label="交易时间(结束)" path="evaluationTimeLe">
         <n-date-picker
-          v-model:value="queryValue.timeLe"
+          v-model:value="queryValue.evaluationTimeLe"
           type="date"
           style="width: 150px"
           clearable
@@ -93,7 +84,7 @@ import { TableDataItemInter, FormInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
-import { getOrderEvaluationPage } from "@/api/operateOrder/operateOrder";
+import { getOrderEvaluationPage, getOrderType } from "@/api/operateOrder/operateOrder";
 export default defineComponent({
   name: "OrderComment",
   components: { BasicTable },
@@ -103,13 +94,12 @@ export default defineComponent({
     const itemCount = ref(null);
     const router = useRouter();
     const queryValue = ref<FormInter>({
-      timeGe: null,
-      timeLe: null,
-      orderNo: null,
-      orderTypeEq: null,
-      driverNoEq: null,
+      orderNoEq: null,
       customerPhoneEq: null,
-      serviceStar: null,
+      serviceStarEq: null,
+      orderTypeEq: null,
+      evaluationTimeGe: null,
+      evaluationTimeLe: null,
     });
 
     const data = ref<TableDataItemInter[]>([]);
@@ -175,7 +165,7 @@ export default defineComponent({
                 type: "primary",
                 icon: EyeIcon,
                 isIconBtn: true,
-                onClick: handleDetail.bind(null, record),
+                onClick: handleDetail.bind(null, record.orderId),
                 auth: ["dict001"],
               },
             ],
@@ -191,8 +181,8 @@ export default defineComponent({
     const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
-        // let search = { ...queryValue.value };
-        let res = await getOrderEvaluationPage({ page, search: {} });
+        let search = { ...queryValue.value };
+        let res = await getOrderEvaluationPage({ page, search: search });
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -202,10 +192,37 @@ export default defineComponent({
       }
     };
 
-    function handleDetail(record: Recordable) {
-      console.log("点击了编辑", record.id);
-      router.push({ path: "/operate-order/order-detail", query: { id: record.id } });
+    async function handleDetail(orderId: string) {
+      try {
+        let res = await getOrderType({ orderId });
+        console.log(res.data);
+        if (res.data) {
+          switch (res.data) {
+            case "orderServinged":
+              pathTo(orderId, "serving");
+              break;
+            case "orderFinished":
+              pathTo(orderId, "finished");
+              break;
+            case "orderCancelled":
+              pathTo(orderId, "channel");
+              break;
+            case "orderInvalided":
+              pathTo(orderId, "invalid");
+              break;
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
+
+    const pathTo = (id: string, type: string) => {
+      router.push({
+        path: "/operate-order/order-detail",
+        query: { id: id, orderState: type },
+      });
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
@@ -215,13 +232,12 @@ export default defineComponent({
     };
     const reset = () => {
       queryValue.value = {
-        timeGe: null,
-        timeLe: null,
-        orderNo: null,
-        orderTypeEq: null,
-        driverNoEq: null,
+        orderNoEq: null,
         customerPhoneEq: null,
-        serviceStar: null,
+        serviceStarEq: null,
+        orderTypeEq: null,
+        evaluationTimeGe: null,
+        evaluationTimeLe: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
@@ -236,7 +252,7 @@ export default defineComponent({
 
     function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
-      //   getData(toRaw(pagination));
+      getData(toRaw(pagination));
     }
     function handlepagSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));

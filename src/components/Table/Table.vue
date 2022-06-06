@@ -85,7 +85,7 @@ export default defineComponent({
     const pagination = reactive({
       pageIndex: 1,
       pageSize: 10,
-      sort: [],
+      //   sort: [],
     });
 
     const getTableHeight = computed(
