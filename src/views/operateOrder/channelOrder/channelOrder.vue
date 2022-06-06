@@ -128,6 +128,9 @@ import { statusOptions } from "@/config/form";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 import { getOrderChannelPage } from "@/api/operateOrder/operateOrder";
+
+import { getDict } from "@/api/common/common";
+import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "ChannelOrder",
   components: { BasicTable },
@@ -151,6 +154,9 @@ export default defineComponent({
     });
 
     const data = ref<TableDataItemInter[]>([]);
+
+    const orderObj: objInter = {};
+    const orderBusObj: objInter = {};
 
     const columns = [
       {
@@ -177,8 +183,8 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
-        render() {
-          return h("span", "暂无");
+        render(row: TableDataItemInter) {
+          return h("span", row.orderBusinessType ? orderBusObj[row.orderBusinessType] : "暂无");
         },
       },
       {
@@ -188,13 +194,13 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
-        render() {
-          return h("span", "暂无");
+        render(row: TableDataItemInter) {
+          return h("span", row.orderType ? orderObj[row.orderType] : "暂无");
         },
       },
       {
         title: "下单客户电话",
-        key: "orderType",
+        key: "customerPhone",
         align: "center",
         ellipsis: {
           tooltip: true,
@@ -224,24 +230,24 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
-        render() {
-          return h("span", "暂无");
+        render(row: TableDataItemInter) {
+          return h("span", row.operationCompanyName ? row.operationCompanyName : "暂无");
         },
       },
       {
         title: "司机工号",
         key: "driverNo",
         align: "center",
-        render() {
-          return h("span", "暂无");
+        render(row: TableDataItemInter) {
+          return h("span", row.driverNo ? row.driverNo : "暂无");
         },
       },
       {
         title: "车牌号",
         key: "plateNumber",
         align: "center",
-        render() {
-          return h("span", "暂无");
+        render(row: TableDataItemInter) {
+          return h("span", row.plateNumber ? row.plateNumber : "暂无");
         },
       },
       {
@@ -275,8 +281,30 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
+      getOrderTypeData();
     });
+
+    const getOrderTypeData = async () => {
+      try {
+        loading.value = true;
+        let res = await getDict({ parentEntryCode: "OT00000" });
+        let result = await getDict({ parentEntryCode: "OBT0000" });
+        for (let key of res.data) {
+          if (!orderObj[key.entryCode]) {
+            orderObj[key.entryCode] = key.entryName;
+          }
+        }
+
+        for (let key of result.data) {
+          if (!orderObj[key.entryCode]) {
+            orderBusObj[key.entryCode] = key.entryName;
+          }
+        }
+        getData({ pageIndex: 1, pageSize: 10 });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async (page: PaginationInter) => {
       loading.value = true;

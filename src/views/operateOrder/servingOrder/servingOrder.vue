@@ -129,7 +129,9 @@ import BasicTable from "@/components/Table/Table.vue";
 import { TableDataItemInter, QueryForm } from "./type";
 import { statusOptions } from "@/config/form";
 import { getOrderPage } from "@/api/operateOrder/operateOrder";
+import { getDict } from "@/api/common/common";
 import { PaginationInter } from "@/api/type";
+import { objInter } from "@/interface/common/common";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "ServingOrder",
@@ -154,6 +156,9 @@ export default defineComponent({
     });
 
     const data = ref<TableDataItemInter[]>([]);
+
+    const orderObj: objInter = {};
+    const orderStateObj: objInter = {};
 
     const columns = [
       {
@@ -194,6 +199,10 @@ export default defineComponent({
           tooltip: true,
         },
         align: "center",
+
+        render(row: TableDataItemInter) {
+          return h("span", orderObj[row.orderType]);
+        },
       },
       {
         title: "下单客户电话",
@@ -239,6 +248,9 @@ export default defineComponent({
         title: "订单状态",
         key: "orderState",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", orderStateObj[row.orderState]);
+        },
       },
       {
         title: "用车时间",
@@ -282,8 +294,29 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
+      getOrderTypeData();
     });
+
+    const getOrderTypeData = async () => {
+      try {
+        loading.value = true;
+        let res = await getDict({ parentEntryCode: "OT00000" });
+        let result = await getDict({ parentEntryCode: "OS00000" });
+        for (let key of res.data) {
+          if (!orderObj[key.entryCode]) {
+            orderObj[key.entryCode] = key.entryName;
+          }
+        }
+        for (let key of result.data) {
+          if (!orderObj[key.entryCode]) {
+            orderStateObj[key.entryCode] = key.entryName;
+          }
+        }
+        getData({ pageIndex: 1, pageSize: 10 });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async (page: PaginationInter) => {
       loading.value = true;

@@ -62,8 +62,6 @@ watch(
   () => {
     // // updateMenu();
     const matched = currentRoute.matched;
-    console.log(currentRoute.query.orderState);
-
     state.openKeys = matched.map((item) => item.path);
     const activeMenu: string = (currentRoute.meta?.activeMenu as string) || "";
     // selectedKeys.value = activeMenu ? (activeMenu as string) : (currentRoute.path as string);

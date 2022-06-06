@@ -169,6 +169,7 @@ import { getCityOpenArea } from "@/api/operate/operate";
 import { getAllOpenCity, getDict, getAllOperateCompany } from "@/api/common/common";
 import { getUndertakeBus, getAreaUndertakeBus, saveUndertakeBus } from "@/api/capacity/capacity";
 import { cloneDeep } from "lodash-es";
+
 export default defineComponent({
   name: "UndertakeBusiness",
   setup() {
@@ -180,7 +181,6 @@ export default defineComponent({
     const loading = ref(false);
     const isShow = ref(false);
     const isEdit = ref(false);
-    // const viewKey = ref(new Date().getTime());
     const areaCode = ref<string | null>(null);
 
     const cityCode = ref(null);

@@ -8,13 +8,17 @@
     <n-descriptions-item label="订单状态">{{ detail?.orderState }}</n-descriptions-item>
     <n-descriptions-item label="客户手机号">{{ detail?.customerPhone }} </n-descriptions-item>
     <n-descriptions-item label="乘车人手机号">{{ detail?.passengerPhone }} </n-descriptions-item>
-    <n-descriptions-item label="司机姓名[工号]" :span="2">
+    <n-descriptions-item label="司机姓名[工号]" :span="2" v-if="detail?.driverFullName">
       {{ detail?.driverFullName }}
       <span v-if="detail?.driverNo">[{{ detail?.driverNo }}]</span>
     </n-descriptions-item>
-    <n-descriptions-item label="司机手机号">{{ detail?.driverPhone }} </n-descriptions-item>
-    <n-descriptions-item label="车牌号">{{ detail?.plateNumber }} </n-descriptions-item>
-    <n-descriptions-item label="车辆类型" :span="2"
+    <n-descriptions-item label="司机手机号" v-if="detail?.driverPhone"
+      >{{ detail?.driverPhone }}
+    </n-descriptions-item>
+    <n-descriptions-item label="车牌号" v-if="detail?.plateNumber"
+      >{{ detail?.plateNumber }}
+    </n-descriptions-item>
+    <n-descriptions-item label="车辆类型" :span="2" v-if="detail?.vehicleTypeName"
       >{{ detail?.vehicleTypeName }}
     </n-descriptions-item>
   </n-descriptions>

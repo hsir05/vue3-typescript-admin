@@ -1,6 +1,12 @@
 export interface TableDataItemInter{
     orderId: string
     orderCancelTime:number
+    operationCompanyName: string
+    driverNo: string
+    plateNumber: string | null
+    orderBusinessType: string | null
+    orderType: string | null
+    
 }
 
 export interface FormInter {

@@ -32,17 +32,19 @@ import { defineComponent, ref, toRefs, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { TableDataItemInter, StepInter } from "./type";
 import Map from "@/components/Map/BaiduMap.vue";
-
-import CustomerInfo from "./customerInfo.vue";
-import AcceptOrder from "./acceptOrder.vue";
 import StepItem from "./stepItem.vue";
-import CreateOrder from "./createOrder.vue";
-import ReceptionPassenger from "./receptionPassenger.vue";
-import DriverArrivePickupAddress from "./driverArrivePickupAddress.vue";
-import DriverBeginService from "./driverBeginService.vue";
-import DriverEndService from "./driverEndService.vue";
-import DriverSubmissionCost from "./driverSubmissionCost.vue";
-import OrderCostCreate from "./orderCostCreate.vue";
+
+import CustomerInfo from "./components/customerInfo.vue";
+import AcceptOrder from "./components/acceptOrder.vue";
+import CreateOrder from "./components/createOrder.vue";
+import ReceptionPassenger from "./components/receptionPassenger.vue";
+import DriverArrivePickupAddress from "./components/driverArrivePickupAddress.vue";
+import DriverBeginService from "./components/driverBeginService.vue";
+import DriverEndService from "./components/driverEndService.vue";
+import DriverSubmissionCost from "./components/driverSubmissionCost.vue";
+import OrderCostCreate from "./components/orderCostCreate.vue";
+import InvalidOrder from "./components/invalidOrder.vue";
+import CancelOrder from "./components/cancelOrder.vue";
 import { objInter } from "@/interface/common/common";
 import {
   getOrderDetail,
@@ -68,6 +70,8 @@ export default defineComponent({
     DriverEndService,
     DriverSubmissionCost,
     OrderCostCreate,
+    InvalidOrder,
+    CancelOrder,
   },
   setup() {
     const route = useRoute();
@@ -111,15 +115,17 @@ export default defineComponent({
         console.log(res.data);
         detail.value = res.data;
 
-        let str = "";
-        for (let i = 0; i < detail.value.orderPlaceVehicleList.length; i++) {
-          if (i === detail.value.orderPlaceVehicleList.length - 1) {
-            str += detail.value.orderPlaceVehicleList[i].vehicleTypeName;
-          } else {
-            str += detail.value.orderPlaceVehicleList[i].vehicleTypeName + ",";
+        if (detail.value.orderPlaceVehicleList) {
+          let str = "";
+          for (let i = 0; i < detail.value.orderPlaceVehicleList.length; i++) {
+            if (i === detail.value.orderPlaceVehicleList.length - 1) {
+              str += detail.value.orderPlaceVehicleList[i].vehicleTypeName;
+            } else {
+              str += detail.value.orderPlaceVehicleList[i].vehicleTypeName + ",";
+            }
           }
+          detail.value.vehicleTypeName = str;
         }
-        detail.value.vehicleTypeName = str;
 
         await getOrderStep();
         await handleMap();
@@ -135,6 +141,8 @@ export default defineComponent({
       return new Promise((resolve) => {
         const {
           orderCreateTime,
+          orderInvalidTime,
+          orderCancelTime,
           driverAcceptOrderTime,
           driverReceptionPassengerTime,
           driverArrivePickupAddressTime,
@@ -143,15 +151,34 @@ export default defineComponent({
           orderCostCreateTime,
           driverSubmissionCostTime,
         } = detail.value;
+
         if (!orderCreateTime) {
           resolve(true);
           return;
         }
+
         step.value.push({
           orderState: OrderDataEnum.CREATEORDER,
           date: orderCreateTime,
           isDate: true,
         });
+
+        // 无效订单
+        if (orderInvalidTime) {
+          step.value.push({
+            orderState: OrderDataEnum.INVALIDORDER,
+            date: orderInvalidTime,
+            isDate: !isSameDay(new Date(orderCreateTime), new Date(orderInvalidTime)),
+          });
+        }
+        // 取消订单
+        if (!driverAcceptOrderTime && orderCancelTime) {
+          step.value.push({
+            orderState: OrderDataEnum.CACELORDER,
+            date: orderCancelTime,
+            isDate: !isSameDay(new Date(orderCreateTime), new Date(orderCancelTime)),
+          });
+        }
         if (!driverAcceptOrderTime) {
           step.value.push({ orderState: OrderDataEnum.ORDEREND });
           resolve(true);
@@ -188,6 +215,16 @@ export default defineComponent({
             isDate: !isSameDay(new Date(orderCreateTime), new Date(driverAcceptOrderTime)),
           });
         }
+
+        // 取消订单
+        if (orderCancelTime) {
+          step.value.push({
+            orderState: OrderDataEnum.CACELORDER,
+            date: orderCancelTime,
+            isDate: !isSameDay(new Date(driverAcceptOrderTime), new Date(orderCancelTime)),
+          });
+        }
+
         if (!driverReceptionPassengerTime) {
           step.value.push({ orderState: OrderDataEnum.ORDEREND });
           resolve(true);
@@ -286,17 +323,18 @@ export default defineComponent({
     };
 
     const handleEvent = (orderState: string, index: number) => {
-      console.log(index);
       activeIndex.value = index;
       let componentsObj: objInter = {
         createOrderState: "CreateOrder",
-        acceptOrderState: "acceptOrder",
-        receptionPassengerState: "receptionPassenger",
-        driverArrivePickupAddressState: "driverArrivePickupAddress",
-        driverBeginServiceState: "driverBeginService",
-        driverEndServiceState: "driverEndService",
-        driverSubmissionCostState: "driverSubmissionCost",
-        orderCostCreateState: "orderCostCreate",
+        invalidOrder: "InvalidOrder",
+        acceptOrderState: "AcceptOrder",
+        receptionPassengerState: "ReceptionPassenger",
+        driverArrivePickupAddressState: "DriverArrivePickupAddress",
+        driverBeginServiceState: "DriverBeginService",
+        driverEndServiceState: "DriverEndService",
+        driverSubmissionCostState: "DriverSubmissionCost",
+        orderCostCreateState: "OrderCostCreate",
+        cancelOrderState: "CancelOrder",
       };
       state.componentId = componentsObj[orderState];
     };

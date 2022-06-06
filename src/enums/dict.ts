@@ -16,7 +16,9 @@ export enum registerStateEnum {
 // 订单状态
 export enum OrderDataEnum {
     CREATEORDER = 'createOrderState',//下单
+    INVALIDORDER = 'invalidOrder',//无效单
     ACCEPTORDER = 'acceptOrderState', //接单
+    CACELORDER = 'cancelOrderState', //取消订单
     RECEPTIONPASSENGER = 'receptionPassengerState', //去接乘客 
     DRIVERARRIVERPICKUPADDRESS = 'driverArrivePickupAddressState', //到达上车地点
     DRIVERBEGINSERVICES = 'driverBeginServiceState', //开始服务 

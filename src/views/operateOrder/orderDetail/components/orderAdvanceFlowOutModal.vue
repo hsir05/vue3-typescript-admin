@@ -15,7 +15,7 @@
 import { defineComponent, ref, h } from "vue";
 import BasicModal from "@/components/Modal/Modal.vue";
 import dayjs from "dayjs";
-import { DataItemInter } from "./type";
+import { DataItemInter } from "../type";
 export default defineComponent({
   name: "OrderAdvanceModal",
   components: { BasicModal },

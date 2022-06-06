@@ -12,7 +12,7 @@
       detail?.operationCompanyName
     }}</n-descriptions-item>
     <n-descriptions-item label="所属班级">{{
-      detail?.operationCompanyDriverClazzName
+      detail?.operationCompanyDriverClazzName || "暂无"
     }}</n-descriptions-item>
     <n-descriptions-item label="车牌号">{{ detail?.plateNumber }}</n-descriptions-item>
     <n-descriptions-item label="车辆类型">{{ detail?.vehicleTypeName }}</n-descriptions-item>
@@ -20,17 +20,28 @@
     <n-descriptions-item label="车辆品牌/车系">{{ detail?.vehicleBrand }}</n-descriptions-item>
     <n-descriptions-item label="车辆颜色" :span="2">{{ detail?.vehicleColor }}</n-descriptions-item>
     <n-descriptions-item label="抽成比率">
-      <n-tag type="success"> 流量方抽成比率:{{ detail?.influxDivideRate * 100 }}% </n-tag>
+      <n-tag type="success" v-if="detail?.influxDivideRate && detail?.influxDivideRate !== 0">
+        流量方抽成比率:{{ detail?.influxDivideRate * 100 }}%
+      </n-tag>
       <n-tag type="success" class="ml-10px"
         >平台抽成比率:{{ detail?.platformDivideRate * 100 }}%</n-tag
       >
-      <n-tag type="success" class="ml-10px"
+      <n-tag
+        type="success"
+        class="ml-10px"
+        v-if="detail?.agencyDivideRate && detail?.agencyDivideRate !== 0"
         >代理商抽成比率:{{ detail?.agencyDivideRate * 100 }}%
       </n-tag>
-      <n-tag type="success" class="ml-10px"
+      <n-tag
+        type="success"
+        class="ml-10px"
+        v-if="detail?.companyDivideRate && detail?.companyDivideRate !== 0"
         >企业抽成比率:{{ detail?.companyDivideRate * 100 }}%</n-tag
       >
-      <n-tag type="success" class="ml-10px"
+      <n-tag
+        type="success"
+        class="ml-10px"
+        v-if="detail?.driverDivideRate && detail?.driverDivideRate !== 0"
         >司机抽成比率:{{ detail?.driverDivideRate * 100 }}%</n-tag
       >
     </n-descriptions-item>

@@ -132,6 +132,7 @@ const { appTheme } = useProjectSetting();
   }
   .active {
     background-color: v-bind(appTheme);
+    border-color: v-bind(appTheme);
     .n-icon {
       color: white;
     }

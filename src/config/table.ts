@@ -1,7 +1,7 @@
 import { objInter, OrderDataIner } from "@/interface/common/common"
 import { DocumentTextOutline as DocumentIcon, CarSportOutline as CarIcon, FlagOutline as FlagIcon, PlayCircleOutline as PlayIcon, TimeOutline as TimeIcon, StopwatchOutline as StopIcon } from "@vicons/ionicons5";
 
-import { PayCircleOutlined as PayIcon, HourglassOutlined as HourglassIcon, MoneyCollectOutlined as MoneyIcon } from "@vicons/antd"
+import { PayCircleOutlined as PayIcon,RollbackOutlined as RollbackIcon, HourglassOutlined as HourglassIcon, ContainerTwotone as ContainerIcon, MoneyCollectOutlined as MoneyIcon } from "@vicons/antd"
 import { OrderDataEnum } from "@/enums/dict"
 
 export const pageSizes = [
@@ -66,9 +66,17 @@ export const orderData: OrderDataIner = {
         text: '下单',
         icon: DocumentIcon
     },
+     [OrderDataEnum.INVALIDORDER]: {
+        text: '无效订单',
+        icon: ContainerIcon
+    },
     [OrderDataEnum.ACCEPTORDER]: {
-        text: '接单',
+        text: '接单', 
         icon: HourglassIcon
+    },
+     [OrderDataEnum.CACELORDER]: {
+        text: '取消订单', 
+        icon: RollbackIcon
     },
     [OrderDataEnum.RECEPTIONPASSENGER]: {
         text: '去接乘客',

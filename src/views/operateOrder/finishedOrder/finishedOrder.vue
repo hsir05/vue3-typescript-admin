@@ -133,6 +133,8 @@ import { TableDataItemInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { getOrderFinishedPage } from "@/api/operateOrder/operateOrder";
 import { PaginationInter } from "@/api/type";
+import { getDict } from "@/api/common/common";
+import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "FinishedOrder",
   components: { BasicTable },
@@ -156,6 +158,8 @@ export default defineComponent({
     });
 
     const data = ref<TableDataItemInter[]>([]);
+    const orderObj: objInter = {};
+    const orderBusObj: objInter = {};
 
     const columns = [
       {
@@ -182,6 +186,9 @@ export default defineComponent({
         ellipsis: {
           tooltip: true,
         },
+        render(row: TableDataItemInter) {
+          return h("span", orderBusObj[row.orderBusinessType]);
+        },
       },
       {
         title: "订单类型",
@@ -189,6 +196,9 @@ export default defineComponent({
         align: "center",
         ellipsis: {
           tooltip: true,
+        },
+        render(row: TableDataItemInter) {
+          return h("span", orderObj[row.orderType]);
         },
       },
       {
@@ -229,6 +239,9 @@ export default defineComponent({
         title: "支付金额",
         key: "orderPayAmount",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h("span", `${row.orderPayAmount}元`);
+        },
       },
       {
         title: "支付时间",
@@ -261,8 +274,30 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
+      getOrderTypeData();
     });
+
+    const getOrderTypeData = async () => {
+      try {
+        loading.value = true;
+        let res = await getDict({ parentEntryCode: "OT00000" });
+        let result = await getDict({ parentEntryCode: "OBT0000" });
+        for (let key of res.data) {
+          if (!orderObj[key.entryCode]) {
+            orderObj[key.entryCode] = key.entryName;
+          }
+        }
+
+        for (let key of result.data) {
+          if (!orderObj[key.entryCode]) {
+            orderBusObj[key.entryCode] = key.entryName;
+          }
+        }
+        getData({ pageIndex: 1, pageSize: 10 });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async (page: PaginationInter) => {
       loading.value = true;

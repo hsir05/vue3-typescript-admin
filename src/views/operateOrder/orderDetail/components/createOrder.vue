@@ -10,38 +10,50 @@
       <n-descriptions-item label="订单算费类型">{{ detail?.orderChargeType }}</n-descriptions-item>
       <n-descriptions-item label="结单方式">{{ detail?.finishOrderType }}</n-descriptions-item>
       <n-descriptions-item label="是否选择钱包余额扣费">{{
-        detail?.orderWalletBalanceDeduction
+        isNumber(detail?.orderWalletBalanceDeduction)
+          ? detail?.orderWalletBalanceDeduction === 0
+            ? "否"
+            : "是"
+          : "暂无"
       }}</n-descriptions-item>
       <n-descriptions-item label="乘车人手机号">{{ detail?.passengerPhone }}</n-descriptions-item>
       <n-descriptions-item label="乘车人称呼"
-        >{{ detail?.passengerGender ? "暂无" : detail?.passengerGender === 0 ? "女士" : "先生" }}
+        >{{
+          isNumber(detail?.passengerGender)
+            ? detail?.passengerGender === 0
+              ? "女士"
+              : "男士"
+            : "暂无"
+        }}
       </n-descriptions-item>
-      <n-descriptions-item label="用车时间">{{ detail?.orderServiceDuration }}</n-descriptions-item>
+      <n-descriptions-item label="用车时间">{{
+        detail?.orderServiceDuration || "暂无"
+      }}</n-descriptions-item>
       <n-descriptions-item label="下单地点" :span="2">{{
-        detail?.customerCreateOrderAddress
+        detail?.customerCreateOrderAddress || "暂无"
       }}</n-descriptions-item>
-      <n-descriptions-item label="订单预计时长">{{
-        detail?.orderEstimateDuration
-      }}</n-descriptions-item>
+      <n-descriptions-item label="订单预计时长"
+        >{{ detail?.orderEstimateDuration }} 分钟</n-descriptions-item
+      >
       <n-descriptions-item label="订单留言" :span="2">{{
-        detail?.orderMessage
+        detail?.orderMessage || "暂无"
       }}</n-descriptions-item>
-      <n-descriptions-item label="订单预计里程">{{
-        detail?.orderEstimateMileage
-      }}</n-descriptions-item>
+      <n-descriptions-item label="订单预计里程"
+        >{{ detail?.orderEstimateMileage }} 公里</n-descriptions-item
+      >
       <n-descriptions-item label="上车地点" :span="2">{{
         detail?.orderBeginAddress
       }}</n-descriptions-item>
-      <n-descriptions-item label="需付预付款金额(元)">{{
-        detail?.needAdvanceAmount
-      }}</n-descriptions-item>
+      <n-descriptions-item label="需付预付款金额"
+        >{{ detail?.needAdvanceAmount }} 元</n-descriptions-item
+      >
       <n-descriptions-item label="下车地点" :span="2">{{
         detail?.orderEndAddress
       }}</n-descriptions-item>
 
-      <n-descriptions-item label="已付预付款金额(元)">{{
-        detail?.paidAdvanceAmount
-      }}</n-descriptions-item>
+      <n-descriptions-item label="已付预付款金额"
+        >{{ detail?.paidAdvanceAmount }} 元</n-descriptions-item
+      >
       <n-descriptions-item label="下单车型信息">{{ detail?.vehicleTypeName }}</n-descriptions-item>
     </n-descriptions>
     <!-- 表格 -->
@@ -50,7 +62,7 @@
 </template>
 <script lang="ts" setup>
 import { toRefs } from "vue";
-
+import { isNumber } from "@/utils/is";
 import OrderAdvance from "./orderAdvance.vue";
 
 interface DetailInter {
