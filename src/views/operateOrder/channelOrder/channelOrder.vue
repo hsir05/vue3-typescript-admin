@@ -22,16 +22,16 @@
         <n-select
           v-model:value="queryValue.influxCodeEq"
           placeholder="选择流量方"
-          :options="options"
+          :options="influxData"
           style="width: 150px"
         />
       </n-form-item>
-
+      , , , ,
       <n-form-item label="订单类型" path="orderTypeEq">
         <n-select
           v-model:value="queryValue.orderTypeEq"
           placeholder="选择订单类型"
-          :options="options"
+          :options="orderData"
           style="width: 150px"
         />
       </n-form-item>
@@ -48,7 +48,7 @@
         <n-select
           v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
           style="width: 150px"
         />
       </n-form-item>
@@ -71,11 +71,11 @@
         />
       </n-form-item>
 
-      <n-form-item label="订单状态" path="orderStateEq">
+      <n-form-item label="业务类型" path="orderStateEq">
         <n-select
           v-model:value="queryValue.orderStateEq"
           placeholder="选择订单状态"
-          :options="options"
+          :options="orderBusData"
           style="width: 150px"
         />
       </n-form-item>
@@ -114,7 +114,16 @@
       @reload-page="reloadPage"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
-    />
+    >
+      <template #toolbarRight>
+        <n-button attr-type="button" type="primary" class="ml-10px" @click="download"
+          >导出行程单</n-button
+        >
+        <n-button attr-type="button" type="primary" class="ml-10px" @click="downloadInfo"
+          >导出对账信息</n-button
+        >
+      </template>
+    </BasicTable>
   </div>
 </template>
 <script lang="ts">
@@ -123,13 +132,17 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { useRouter } from "vue-router";
+import { useMessage } from "naive-ui";
 import { TableDataItemInter, FormInter } from "./type";
 import { statusOptions } from "@/config/form";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
-import { getOrderChannelPage } from "@/api/operateOrder/operateOrder";
-
-import { getDict } from "@/api/common/common";
+import {
+  getOrderChannelPage,
+  downloadOrderCancelled,
+  downloadStatement,
+} from "@/api/operateOrder/operateOrder";
+import { getDict, getInfluxList, getAllOperateCompany, downloadFile } from "@/api/common/common";
 import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "ChannelOrder",
@@ -156,7 +169,13 @@ export default defineComponent({
     const data = ref<TableDataItemInter[]>([]);
 
     const orderObj: objInter = {};
+    const message = useMessage();
     const orderBusObj: objInter = {};
+
+    const influxData = ref([]);
+    const orderData = ref([]);
+    const orderBusData = ref([]);
+    const companyData = ref([]);
 
     const columns = [
       {
@@ -281,29 +300,65 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getOrderTypeData();
+      getAllData();
     });
 
-    const getOrderTypeData = async () => {
-      try {
-        loading.value = true;
-        let res = await getDict({ parentEntryCode: "OT00000" });
-        let result = await getDict({ parentEntryCode: "OBT0000" });
-        for (let key of res.data) {
-          if (!orderObj[key.entryCode]) {
-            orderObj[key.entryCode] = key.entryName;
-          }
-        }
+    const getAllData = async () => {
+      Promise.all([
+        getAllOperateCompany(),
+        getDict({ parentEntryCode: "OT00000" }),
+        getDict({ parentEntryCode: "OBT0000" }),
+        getInfluxList(),
+      ])
+        .then((res) => {
+          let dataArr = res.map((item) => item.data);
 
-        for (let key of result.data) {
-          if (!orderObj[key.entryCode]) {
-            orderBusObj[key.entryCode] = key.entryName;
+          companyData.value = dataArr[0].map(
+            (item: { operationCompanyName: string; operationCompanyId: string }) => {
+              let obj = {
+                label: item.operationCompanyName,
+                value: item.operationCompanyId,
+              };
+              return obj;
+            }
+          );
+          orderData.value = dataArr[1].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          orderBusData.value = dataArr[2].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          influxData.value = dataArr[3].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+
+          for (let key of dataArr[1]) {
+            if (!orderObj[key.entryCode]) {
+              orderObj[key.entryCode] = key.entryName;
+            }
           }
-        }
-        getData({ pageIndex: 1, pageSize: 10 });
-      } catch (err) {
-        console.log(err);
-      }
+          for (let key of dataArr[2]) {
+            if (!orderObj[key.entryCode]) {
+              orderBusObj[key.entryCode] = key.entryName;
+            }
+          }
+          getData({ pageIndex: 1, pageSize: 10 });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
 
     const getData = async (page: PaginationInter) => {
@@ -326,6 +381,31 @@ export default defineComponent({
         query: { id: orderId, orderState: "channel" },
       });
     }
+
+    const download = async () => {
+      try {
+        if (itemCount.value && itemCount.value >= 3000) {
+          message.success("数据超过3000条,请通过条件筛选后下载");
+          return;
+        }
+        let res = await downloadStatement({ search: { ...queryValue.value } });
+        await downloadFile(res, "行程单");
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    const downloadInfo = async () => {
+      try {
+        if (itemCount.value && itemCount.value >= 3000) {
+          message.success("数据超过3000条,请通过条件筛选后下载");
+          return;
+        }
+        let res = await downloadOrderCancelled({ search: { ...queryValue.value } });
+        await downloadFile(res, "行程单");
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
@@ -377,13 +457,18 @@ export default defineComponent({
       loading,
       basicTableRef,
       statusOptions,
-      options: [],
+      companyData,
+      influxData,
+      orderData,
+      orderBusData,
       columns,
       itemCount,
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
 
       reloadPage,
       searchHandle,
+      downloadInfo,
+      download,
       reset,
       handlePage,
       handlepagSize,

@@ -309,9 +309,7 @@ export function confirmInvoice(data:{customerInvoiceApplicationId: string; invoi
   return http.request({
     url: '/customerInvoiceApplication/confirmInvoice',
     method: 'post',
-    headers: {
-        responseType: 'blob'
-    },
+    // responseType: 'blob',
     data:data
   });
 }
@@ -322,9 +320,7 @@ export function downloadRelativeItinerary(data:{customerInvoiceApplicationId: st
   return http.request({
     url: '/customerInvoiceApplication/exportRelativeItineraryData',
     method: 'post',
-    headers: {
-        responseType: 'blob'
-    },
+    responseType: 'blob',
     data:data
   });
 }

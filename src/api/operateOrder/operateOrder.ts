@@ -5,7 +5,7 @@ import { ContentTypeEnum } from "@/enums/httpEnum";
 /**
  * 查询预付款信息
  */
-export function getOrderAdvance(data: {orderId: string}) {
+export function getOrderAdvance(data: { orderId: string }) {
     return http.request({
         url: "/orderAdvance/listByOrderId",
         method: "post",
@@ -15,7 +15,7 @@ export function getOrderAdvance(data: {orderId: string}) {
 /**
  * 根据订单流水号查询行程录音文件
  */
-export function getOrderSoundfile(data: {orderNo: string}) {
+export function getOrderSoundfile(data: { orderNo: string }) {
     return http.request({
         url: "/orderSoundRecordingAttachfile/listByOrderNo",
         method: "post",
@@ -25,7 +25,7 @@ export function getOrderSoundfile(data: {orderNo: string}) {
 /**
  * 查询订单异常支付记录
  */
-export function getNetworkPaymentOrderData(data: {orderId: string}) {
+export function getNetworkPaymentOrderData(data: { orderId: string }) {
     return http.request({
         url: "/networkPaymentOrderData/listByOrderId",
         method: "post",
@@ -35,7 +35,7 @@ export function getNetworkPaymentOrderData(data: {orderId: string}) {
 /**
  * 查询订单支付记录
  */
-export function getOrderPayInfo(data: {orderId: string}) {
+export function getOrderPayInfo(data: { orderId: string }) {
     return http.request({
         url: "/orderPayInfo/listByOrderIdd",
         method: "post",
@@ -73,7 +73,7 @@ export function getOrderPage(data: OrderPageInter) {
 /**
  * 服务中订单详情
  */
-export function getOrderDetail(data: {orderId: string}) {
+export function getOrderDetail(data: { orderId: string }) {
     return http.request({
         url: "/order/detail",
         method: "post",
@@ -84,7 +84,7 @@ export function getOrderDetail(data: {orderId: string}) {
 /**
  * 批量结单
  */
-export function batchFinishOrder(data: {orderId: string}) {
+export function batchFinishOrder(data: { orderId: string }) {
     return otherHttp.request({
         url: "/order/batchFinishOrder",
         method: "post",
@@ -95,7 +95,7 @@ export function batchFinishOrder(data: {orderId: string}) {
 /**
  * 单个结单
  */
-export function singleFinishOrder(data: {influxOrderNo: string}) {
+export function singleFinishOrder(data: { influxOrderNo: string }) {
     return http.request({
         url: "/order/batchFinishOrder",
         method: "post",
@@ -118,8 +118,8 @@ interface OrderFinishedInter {
         driverNoEq: string | null;
         plateNumberEq: string | null;
         orderBusinessTypeEq: string | null;
-        useVehicleTimeGe: string | null;
-        useVehicleTimeLe: string | null;
+        useVehicleTimeGe: number | null;
+        useVehicleTimeLe: number | null;
     };
 }
 export function getOrderFinishedPage(data: OrderFinishedInter) {
@@ -129,10 +129,34 @@ export function getOrderFinishedPage(data: OrderFinishedInter) {
         data: data,
     });
 }
+// 到处行程单
+interface DownloadInter {
+    search: {
+        useVehicleTimeGe: number | null
+        useVehicleTimeLe: number | null
+        influxCodeEq: string | null
+        plateNumberEq: string | null
+        orderTypeEq: string | null
+        orderBusinessTypeEq: string | null
+        operationCompanyIdEq: string | null
+        driverNoEq: string | null
+        influxOrderNoEq: string | null
+        customerPhoneEq: string | null
+    }
+}
+export function downloadOrderFinished(data: DownloadInter) {
+    return http.request({
+        url: "/orderFinished/exportOrderFinished",
+        method: "post",
+        data: data,
+        responseType: 'blob',
+    });
+}
+
 /**
  * 已完成订单详情
  */
-export function getOrderFinishedDetail(data: {orderId: string}) {
+export function getOrderFinishedDetail(data: { orderId: string }) {
     return http.request({
         url: "/orderFinished/detail",
         method: "post",
@@ -148,17 +172,17 @@ export function getOrderFinishedDetail(data: {orderId: string}) {
 interface OrderChannelInter {
     page: PaginationInter;
     search: {
-        timeGe: string | null;
-        timeLe: string | null;
-        influxOrderNoEq: string | null;
-        influxCodeEq: string | null;
-        operationCompanyIdEq: string | null;
-        orderStateEq: string | null;
-        plateNumberEq: string | null;
-        orderTypeEq: string | null;
-        driverNoEq: string | null;
-        customerPhoneEq: string | null;
-        orderBusinessType: string | null;
+         timeGe: number | null
+        timeLe: number | null
+        influxOrderNoEq: string | null
+        influxCodeEq: string | null
+        operationCompanyIdEq: string | null
+        orderStateEq: string | null
+        plateNumberEq: string | null
+        orderTypeEq: string | null
+        driverNoEq: string | null
+        customerPhoneEq: string | null
+        orderBusinessType: string | null 
     };
 }
 
@@ -172,11 +196,62 @@ export function getOrderChannelPage(data: OrderChannelInter) {
 /**
  * 已取消订单详情
  */
-export function getOrderCannelDetail(data: {orderId: string}) {
+export function getOrderCannelDetail(data: { orderId: string }) {
     return http.request({
         url: "/orderCancelled/detail",
         method: "post",
         data: data,
+    });
+}
+
+
+// 导出已取消订单行程单
+interface OrderCancelledInter {
+    search: {
+        timeGe: number | null
+        timeLe: number | null
+        influxOrderNoEq: string | null
+        influxCodeEq: string | null
+        operationCompanyIdEq: string | null
+        orderStateEq: string | null
+        plateNumberEq: string | null
+        orderTypeEq: string | null
+        driverNoEq: string | null
+        customerPhoneEq: string | null
+        orderBusinessType: string | null 
+    }
+}
+export function downloadOrderCancelled(data: OrderCancelledInter) {
+    return http.request({
+        url: "/orderCancelled/exportOrderCancelled",
+        method: "post",
+        data: data,
+        responseType: 'blob',
+    });
+}
+
+// 导出已取消订单行程单
+interface StatementInter {
+    search: {
+        timeGe: number | null
+        timeLe: number | null
+        influxOrderNoEq: string | null
+        influxCodeEq: string | null
+        operationCompanyIdEq: string | null
+        orderStateEq: string | null
+        plateNumberEq: string | null
+        orderTypeEq: string | null
+        driverNoEq: string | null
+        customerPhoneEq: string | null
+        orderBusinessType: string | null 
+    }
+}
+export function downloadStatement(data: StatementInter) {
+    return http.request({
+        url: "/orderCancelled/exportStatement",
+        method: "post",
+        data: data,
+        responseType: 'blob',
     });
 }
 //-----------------无效订单-------------------------
@@ -210,7 +285,7 @@ export function getOrderInvalidPage(data: OrderInvalidInter) {
 /**
  * 无效订单详情
  */
-export function getOrderInvalidDetail(data: {orderId: string}) {
+export function getOrderInvalidDetail(data: { orderId: string }) {
     return http.request({
         url: "/orderInvalid/detail",
         method: "post",
@@ -244,7 +319,7 @@ export function getOrderEvaluationPage(data: OrderEvaluationInter) {
  * 查询订单类型
 */
 
-export function getOrderType(data: {orderId: string}) {
+export function getOrderType(data: { orderId: string }) {
     return http.request({
         url: "/orderEvaluation/getOrderType",
         method: "post",

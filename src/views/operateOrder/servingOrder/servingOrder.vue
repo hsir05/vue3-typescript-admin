@@ -22,7 +22,7 @@
         <n-select
           v-model:value="queryValue.influxCodeEq"
           placeholder="选择流量方"
-          :options="options"
+          :options="influxData"
           style="width: 150px"
         />
       </n-form-item>
@@ -31,7 +31,7 @@
         <n-select
           v-model:value="queryValue.orderTypeEq"
           placeholder="选择订单类型"
-          :options="options"
+          :options="orderData"
           style="width: 150px"
         />
       </n-form-item>
@@ -48,7 +48,7 @@
         <n-select
           v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
           style="width: 150px"
         />
       </n-form-item>
@@ -75,7 +75,7 @@
         <n-select
           v-model:value="queryValue.orderStateEq"
           placeholder="选择订单状态"
-          :options="options"
+          :options="orderStateData"
           style="width: 150px"
         />
       </n-form-item>
@@ -84,6 +84,7 @@
         <n-date-picker
           v-model:value="queryValue.timeGe"
           type="date"
+          :is-date-disabled="disablePreviousDate"
           style="width: 150px"
           clearable
         />
@@ -92,6 +93,7 @@
       <n-form-item label="交易时间(结束)" path="timeLe">
         <n-date-picker
           v-model:value="queryValue.timeLe"
+          :is-date-disabled="disablePreviousDate"
           type="date"
           style="width: 150px"
           clearable
@@ -128,9 +130,8 @@ import { EyeOutline as EyeIcon, GitBranchOutline as GitBranchIcon } from "@vicon
 import { IssuesCloseOutlined as IssuesCloseIcon } from "@vicons/antd";
 import BasicTable from "@/components/Table/Table.vue";
 import { TableDataItemInter, QueryForm } from "./type";
-import { statusOptions } from "@/config/form";
 import { getOrderPage, singleFinishOrder } from "@/api/operateOrder/operateOrder";
-import { getDict } from "@/api/common/common";
+import { getDict, getInfluxList, getAllOperateCompany } from "@/api/common/common";
 import { PaginationInter } from "@/api/type";
 import { objInter } from "@/interface/common/common";
 import { useDialog, useMessage } from "naive-ui";
@@ -163,6 +164,10 @@ export default defineComponent({
 
     const orderObj: objInter = {};
     const orderStateObj: objInter = {};
+    const influxData = ref([]);
+    const orderData = ref([]);
+    const orderStateData = ref([]);
+    const companyData = ref([]);
 
     const columns = [
       {
@@ -336,28 +341,68 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getOrderTypeData();
+      getAllData();
     });
 
-    const getOrderTypeData = async () => {
-      try {
-        loading.value = true;
-        let res = await getDict({ parentEntryCode: "OT00000" });
-        let result = await getDict({ parentEntryCode: "OS00000" });
-        for (let key of res.data) {
-          if (!orderObj[key.entryCode]) {
-            orderObj[key.entryCode] = key.entryName;
+    const getAllData = async () => {
+      Promise.all([
+        getAllOperateCompany(),
+        getDict({ parentEntryCode: "OT00000" }),
+        getDict({ parentEntryCode: "OS00000" }),
+        getInfluxList(),
+      ])
+        .then((res) => {
+          let dataArr = res.map((item) => item.data);
+
+          companyData.value = dataArr[0].map(
+            (item: { operationCompanyName: string; operationCompanyId: string }) => {
+              let obj = {
+                label: item.operationCompanyName,
+                value: item.operationCompanyId,
+              };
+              return obj;
+            }
+          );
+          orderData.value = dataArr[1].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          orderStateData.value = dataArr[2].map(
+            (item: { entryName: string; entryCode: string }) => {
+              let obj = {
+                label: item.entryName,
+                value: item.entryCode,
+              };
+              return obj;
+            }
+          );
+          influxData.value = dataArr[3].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+
+          for (let key of dataArr[1]) {
+            if (!orderObj[key.entryCode]) {
+              orderObj[key.entryCode] = key.entryName;
+            }
           }
-        }
-        for (let key of result.data) {
-          if (!orderObj[key.entryCode]) {
-            orderStateObj[key.entryCode] = key.entryName;
+          for (let key of dataArr[2]) {
+            if (!orderObj[key.entryCode]) {
+              orderStateObj[key.entryCode] = key.entryName;
+            }
           }
-        }
-        getData({ pageIndex: 1, pageSize: 10 });
-      } catch (err) {
-        console.log(err);
-      }
+
+          getData({ pageIndex: 1, pageSize: 10 });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
 
     const getData = async (page: PaginationInter) => {
@@ -463,10 +508,15 @@ export default defineComponent({
       loading,
       userDrawerRef,
       basicTableRef,
-      statusOptions,
-      options: [],
+      orderStateData,
+      companyData,
+      influxData,
+      orderData,
       columns,
       itemCount,
+      disablePreviousDate(ts: number) {
+        return ts >= 4102329600000 && ts <= 1451577600000;
+      },
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
 
       reloadPage,

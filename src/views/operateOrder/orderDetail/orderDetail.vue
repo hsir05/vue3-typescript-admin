@@ -133,7 +133,6 @@ export default defineComponent({
         }
 
         await getOrderStep();
-        // console.log(optionObj.value);
         const beginLng = detail.value.orderBeginAddressLongitude * 1e-6;
         const beginLat = detail.value.orderBeginAddressLatitude * 1e-6;
         const endLng = detail.value.orderEndAddressLongitude * 1e-6;
@@ -412,6 +411,24 @@ export default defineComponent({
           acceptLat: detail.value.driverReceptionPassengerAddressLatitude * 1e-6,
           otherIcon: receptionIcon,
         },
+        invalidOrder: {
+          beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
+          beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
+          endLng: detail.value.orderEndAddressLongitude * 1e-6,
+          endLat: detail.value.orderEndAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+          otherIcon: null,
+        },
+        cancelOrderState: {
+          beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
+          beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
+          endLng: detail.value.orderEndAddressLongitude * 1e-6,
+          endLat: detail.value.orderEndAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+          otherIcon: null,
+        },
         driverArrivePickupAddressState: {
           beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
           beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
@@ -460,8 +477,6 @@ export default defineComponent({
           endIcon: null,
         },
       };
-      console.log({ ...optionObj[orderState] });
-
       await handleMap({ ...optionObj[orderState] });
     };
 

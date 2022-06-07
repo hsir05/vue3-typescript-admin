@@ -5,7 +5,6 @@
       ref="formRef"
       inline
       label-placement="left"
-      :show-feedback="false"
       label-width="120"
       style="flex-wrap: wrap"
       class="pt-15px pb-15px bg-white mb-5px"
@@ -23,7 +22,7 @@
         <n-select
           v-model:value="queryValue.influxCodeEq"
           placeholder="选择流量方"
-          :options="options"
+          :options="influxData"
           style="width: 150px"
         />
       </n-form-item>
@@ -32,7 +31,7 @@
         <n-select
           v-model:value="queryValue.orderTypeEq"
           placeholder="选择订单类型"
-          :options="options"
+          :options="orderData"
           style="width: 150px"
         />
       </n-form-item>
@@ -49,7 +48,7 @@
         <n-select
           v-model:value="queryValue.operationCompanyIdEq"
           placeholder="选择运营企业"
-          :options="options"
+          :options="companyData"
           style="width: 150px"
         />
       </n-form-item>
@@ -72,11 +71,11 @@
         />
       </n-form-item>
 
-      <n-form-item label="订单状态" path="orderBusinessTypeEq" v-if="isActive">
+      <n-form-item label="业务类型" path="orderBusinessTypeEq" v-if="isActive">
         <n-select
           v-model:value="queryValue.orderBusinessTypeEq"
-          placeholder="选择订单状态"
-          :options="options"
+          placeholder="选择业务类型"
+          :options="orderBusData"
           style="width: 150px"
         />
       </n-form-item>
@@ -84,6 +83,7 @@
       <n-form-item label="交易时间(起始)" path="useVehicleTimeGe" v-if="isActive">
         <n-date-picker
           v-model:value="queryValue.useVehicleTimeGe"
+          :is-date-disabled="disablePreviousDate"
           type="date"
           style="width: 150px"
           clearable
@@ -93,6 +93,7 @@
       <n-form-item label="交易时间(结束)" path="useVehicleTimeLe" v-if="isActive">
         <n-date-picker
           v-model:value="queryValue.useVehicleTimeLe"
+          :is-date-disabled="disablePreviousDate"
           type="date"
           style="width: 150px"
           clearable
@@ -119,7 +120,13 @@
       @reload-page="reloadPage"
       @on-page="handlePage"
       @on-pagination="handlepagSize"
-    />
+    >
+      <template #toolbarRight>
+        <n-button attr-type="button" type="primary" class="ml-10px" @click="download"
+          >导出行程单</n-button
+        >
+      </template>
+    </BasicTable>
   </div>
 </template>
 <script lang="ts">
@@ -127,13 +134,13 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
+import { useMessage } from "naive-ui";
 import { useRouter } from "vue-router";
 import dayjs from "dayjs";
 import { TableDataItemInter } from "./type";
-import { statusOptions } from "@/config/form";
-import { getOrderFinishedPage } from "@/api/operateOrder/operateOrder";
+import { getOrderFinishedPage, downloadOrderFinished } from "@/api/operateOrder/operateOrder";
 import { PaginationInter } from "@/api/type";
-import { getDict } from "@/api/common/common";
+import { getDict, getInfluxList, getAllOperateCompany, downloadFile } from "@/api/common/common";
 import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "FinishedOrder",
@@ -153,13 +160,18 @@ export default defineComponent({
       driverNoEq: null,
       plateNumberEq: null,
       orderBusinessTypeEq: null,
-      useVehicleTimeGe: null,
-      useVehicleTimeLe: null,
+      useVehicleTimeGe: new Date().getTime() - 6 * 60 * 60 * 1000 * 24,
+      useVehicleTimeLe: new Date().getTime(),
     });
-
+    const message = useMessage();
     const data = ref<TableDataItemInter[]>([]);
     const orderObj: objInter = {};
     const orderBusObj: objInter = {};
+
+    const influxData = ref([]);
+    const orderData = ref([]);
+    const orderBusData = ref([]);
+    const companyData = ref([]);
 
     const columns = [
       {
@@ -274,29 +286,65 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getOrderTypeData();
+      getAllData();
     });
 
-    const getOrderTypeData = async () => {
-      try {
-        loading.value = true;
-        let res = await getDict({ parentEntryCode: "OT00000" });
-        let result = await getDict({ parentEntryCode: "OBT0000" });
-        for (let key of res.data) {
-          if (!orderObj[key.entryCode]) {
-            orderObj[key.entryCode] = key.entryName;
-          }
-        }
+    const getAllData = async () => {
+      Promise.all([
+        getAllOperateCompany(),
+        getDict({ parentEntryCode: "OT00000" }),
+        getDict({ parentEntryCode: "OBT0000" }),
+        getInfluxList(),
+      ])
+        .then((res) => {
+          let dataArr = res.map((item) => item.data);
 
-        for (let key of result.data) {
-          if (!orderObj[key.entryCode]) {
-            orderBusObj[key.entryCode] = key.entryName;
+          companyData.value = dataArr[0].map(
+            (item: { operationCompanyName: string; operationCompanyId: string }) => {
+              let obj = {
+                label: item.operationCompanyName,
+                value: item.operationCompanyId,
+              };
+              return obj;
+            }
+          );
+          orderData.value = dataArr[1].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          orderBusData.value = dataArr[2].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          influxData.value = dataArr[3].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+
+          for (let key of dataArr[1]) {
+            if (!orderObj[key.entryCode]) {
+              orderObj[key.entryCode] = key.entryName;
+            }
           }
-        }
-        getData({ pageIndex: 1, pageSize: 10 });
-      } catch (err) {
-        console.log(err);
-      }
+          for (let key of dataArr[2]) {
+            if (!orderObj[key.entryCode]) {
+              orderBusObj[key.entryCode] = key.entryName;
+            }
+          }
+          getData({ pageIndex: 1, pageSize: 10 });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
 
     const getData = async (page: PaginationInter) => {
@@ -310,6 +358,19 @@ export default defineComponent({
       } catch (err) {
         console.log(err);
         loading.value = false;
+      }
+    };
+
+    const download = async () => {
+      try {
+        if (itemCount.value && itemCount.value >= 3000) {
+          message.success("数据超过3000条,请通过条件筛选后下载");
+          return;
+        }
+        let res = await downloadOrderFinished({ search: { ...queryValue.value } });
+        await downloadFile(res, "行程单");
+      } catch (err) {
+        console.log(err);
       }
     };
     function handleDetail(orderId: string) {
@@ -335,8 +396,8 @@ export default defineComponent({
         driverNoEq: null,
         plateNumberEq: null,
         orderBusinessTypeEq: null,
-        useVehicleTimeGe: null,
-        useVehicleTimeLe: null,
+        useVehicleTimeGe: new Date().getTime() - 6 * 60 * 60 * 1000 * 24,
+        useVehicleTimeLe: new Date().getTime(),
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
@@ -370,10 +431,16 @@ export default defineComponent({
       loading,
       isActive,
       basicTableRef,
-      statusOptions,
-      options: [],
+      companyData,
+      influxData,
+      orderData,
+      orderBusData,
       columns,
       itemCount,
+      download,
+      disablePreviousDate(ts: number) {
+        return ts >= 4102329600000 && ts <= 1451577600000;
+      },
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
       reloadPage,
       toggleActive,

@@ -86,6 +86,7 @@ import {
 import BasicTable from "@/components/Table/Table.vue";
 import InvoiceDrawer from "./invoiceDrawer.vue";
 import SendMail from "./sendModal.vue";
+import { downloadFile } from "@/api/common/common";
 import { TableDataItemInter } from "./type";
 import { invoiceAppOptions, invoiceAppObj } from "@/config/form";
 import {
@@ -313,6 +314,8 @@ export default defineComponent({
     // 确认开票
     function handleConfirmInvoice(customerInvoiceApplicationId: string) {
       console.log(customerInvoiceApplicationId);
+      // let res = await confirmInvoice({ customerInvoiceApplicationId });
+      // downloadFile(res, "发票相关行程单")
     }
     // 重新邮寄
     function handleReInvoice(customerInvoiceApplicationId: string) {
@@ -325,19 +328,7 @@ export default defineComponent({
     async function handleDownload(customerInvoiceApplicationId: string) {
       try {
         let res = await downloadRelativeItinerary({ customerInvoiceApplicationId });
-        console.log(res);
-        // 创建一个新的url，此url指向新建的Blob对象
-        // let url = window.URL.createObjectURL(new Blob([data]))
-        let url = "data:text/csv;charset=utf-8,\ufeff" + encodeURIComponent(res);
-        // 创建a标签，并隐藏改a标签
-        let link = document.createElement("a");
-        link.style.display = "none";
-        // a标签的href属性指定下载链接
-        link.href = url;
-        //setAttribute() 方法添加指定的属性，并为其赋指定的值。
-        link.setAttribute("download", "发票关联行程单" + ".xlsx");
-        document.body.appendChild(link);
-        link.click();
+        downloadFile(res, "发票相关行程单");
       } catch (err) {
         console.log(err);
       }

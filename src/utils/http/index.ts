@@ -97,6 +97,10 @@ const transform: AxiosTransform = {
     // if (code === ResultEnum.SUCCESS) {
     //   return result;
     // }
+    if (!success && !code && !message) {
+        return data
+    }
+    
     if (success) {
       return data;
     } else {

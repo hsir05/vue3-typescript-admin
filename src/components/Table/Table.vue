@@ -5,7 +5,9 @@
       <n-button-group>
         <n-button type="primary" @click="handleAdd" v-if="getBindValues.isAddBtn"
           ><template #icon>
-            <n-icon><AddIcon /></n-icon> </template
+            <n-icon>
+              <AddIcon />
+            </n-icon> </template
           >添加</n-button
         >
         <n-button
@@ -24,13 +26,13 @@
       </n-button-group>
 
       <div class="flex align-center">
-        <slot name="toolbarRight"></slot>
         <!-- 提示 -->
         <!-- <Explain title="配置说明">配置说明</Explain> -->
         <!--密度-->
         <Density :tableSize="tableSize" @handle-density="handleDensity" />
         <!--当前刷新-->
         <Reload @reload-data="reloadPage" />
+        <slot name="toolbarRight"></slot>
       </div>
     </div>
     <!-- 表格 -->
