@@ -26,7 +26,6 @@
           style="width: 150px"
         />
       </n-form-item>
-      , , , ,
       <n-form-item label="订单类型" path="orderTypeEq">
         <n-select
           v-model:value="queryValue.orderTypeEq"
@@ -153,8 +152,8 @@ export default defineComponent({
     const itemCount = ref(null);
     const router = useRouter();
     const queryValue = ref<FormInter>({
-      timeGe: null,
-      timeLe: null,
+      timeGe: new Date().getTime() - 6 * 60 * 60 * 1000 * 24,
+      timeLe: new Date().getTime(),
       influxOrderNoEq: null,
       influxCodeEq: null,
       operationCompanyIdEq: null,
@@ -416,8 +415,8 @@ export default defineComponent({
     };
     const reset = () => {
       queryValue.value = {
-        timeGe: null,
-        timeLe: null,
+        timeGe: new Date().getTime() - 6 * 60 * 60 * 1000 * 24,
+        timeLe: new Date().getTime(),
         influxOrderNoEq: null,
         influxCodeEq: null,
         operationCompanyIdEq: null,
