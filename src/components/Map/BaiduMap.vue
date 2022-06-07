@@ -137,11 +137,22 @@ function trackIng(
   endLng: number,
   endLat: number,
   startIcon,
-  endIcon
+  endIcon?,
+  acceptLng?,
+  acceptLat?,
+  otherIcon?
 ) {
   let myP1 = new BMap.Point(beginLng, beginLat); //起点
   let myP2 = new BMap.Point(endLng, endLat); //终点
 
+  if (otherIcon) {
+    addMarker(acceptLng, acceptLat, otherIcon, 80);
+  }
+
+  if (!endIcon) {
+    addMarker(beginLng, beginLat, startIcon, 80);
+    return;
+  }
   drivingRoute.value = new BMap.DrivingRoute(map.value, {
     renderOptions: { map: map.value, autoViewport: true },
   });
@@ -521,11 +532,11 @@ function clearOverlays() {
   currentOpenAreaPoints.value.splice(0, currentOpenAreaPoints.value.length);
 }
 // 添加单个点覆盖物
-function addMarker(lng, lat, icon) {
+function addMarker(lng, lat, icon, width = 30) {
   let marker;
   if (icon) {
     marker = new BMap.Marker(new BMap.Point(lng, lat), {
-      icon: new BMap.Icon(icon, new BMap.Size(30, 33)),
+      icon: new BMap.Icon(icon, new BMap.Size(width, 33)),
     });
   } else {
     marker = new BMap.Marker(new BMap.Point(lng, lat));

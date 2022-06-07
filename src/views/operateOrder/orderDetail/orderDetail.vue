@@ -33,7 +33,6 @@ import { useRoute } from "vue-router";
 import { TableDataItemInter, StepInter } from "./type";
 import Map from "@/components/Map/BaiduMap.vue";
 import StepItem from "./stepItem.vue";
-
 import CustomerInfo from "./components/customerInfo.vue";
 import AcceptOrder from "./components/acceptOrder.vue";
 import CreateOrder from "./components/createOrder.vue";
@@ -55,6 +54,12 @@ import {
 import { isSameDay } from "@/utils/index";
 import startIcon from "@/assets/image/icon_begin_address.png";
 import endIcon from "@/assets/image/icon_end_address.png";
+import acceptIcon from "@/assets/image/icon_driver_accept_order.png";
+import pickupIcon from "@/assets/image/icon_driver_arrive_pickup_address.png";
+import receptionIcon from "@/assets/image/icon_driver_reception_passenger.png";
+import submissionIcon from "@/assets/image/icon_driver_submission_cost.png";
+import serviceIcon from "@/assets/image/icon_end_service.png";
+// import createIcon from "@/assets/image/icon_order_create.png";
 import { OrderDataEnum } from "@/enums/dict";
 export default defineComponent({
   name: "FinisherOrderDetail",
@@ -128,7 +133,12 @@ export default defineComponent({
         }
 
         await getOrderStep();
-        await handleMap();
+        // console.log(optionObj.value);
+        const beginLng = detail.value.orderBeginAddressLongitude * 1e-6;
+        const beginLat = detail.value.orderBeginAddressLatitude * 1e-6;
+        const endLng = detail.value.orderEndAddressLongitude * 1e-6;
+        const endLat = detail.value.orderEndAddressLatitude * 1e-6;
+        await handleMap({ beginLng, beginLat, endLng, endLat, startIcon, endIcon });
 
         loading.value = false;
       } catch (err) {
@@ -308,21 +318,37 @@ export default defineComponent({
       });
     };
 
-    const handleMap = (): Promise<boolean> => {
+    interface MapOptionInter {
+      beginLng: number;
+      beginLat: number;
+      endLng: number;
+      endLat: number;
+      startIcon: string;
+      endIcon: string | null;
+      acceptLng?: number | null;
+      acceptLat?: number | null;
+      otherIcon?: string | null;
+    }
+    const handleMap = (option: MapOptionInter): Promise<boolean> => {
       return new Promise((resolve) => {
-        const beginLng = detail.value.orderBeginAddressLongitude * 1e-6;
-        const beginEnd = detail.value.orderBeginAddressLatitude * 1e-6;
-        const endLng = detail.value.orderEndAddressLongitude * 1e-6;
-        const EndLat = detail.value.orderEndAddressLatitude * 1e-6;
         const { renderBaiduMap, trackIng } = baiduMapRef.value;
-        renderBaiduMap(beginLng, beginEnd);
-        trackIng(beginLng, beginEnd, endLng, EndLat, startIcon, endIcon);
-
+        renderBaiduMap(option.beginLng, option.beginLat);
+        trackIng(
+          option.beginLng,
+          option.beginLat,
+          option.endLng,
+          option.endLat,
+          option.startIcon,
+          option.endIcon,
+          option.acceptLng,
+          option.acceptLat,
+          option.otherIcon
+        );
         resolve(true);
       });
     };
 
-    const handleEvent = (orderState: string, index: number) => {
+    const handleEvent = async (orderState: string, index: number) => {
       activeIndex.value = index;
       let componentsObj: objInter = {
         createOrderState: "CreateOrder",
@@ -337,6 +363,106 @@ export default defineComponent({
         cancelOrderState: "CancelOrder",
       };
       state.componentId = componentsObj[orderState];
+      console.log(orderState);
+
+      interface OptionInter {
+        [Symbol: string]: {
+          beginLng: number;
+          beginLat: number;
+          endLng: number;
+          endLat: number;
+          startIcon: string;
+          endIcon: string | null;
+          acceptLng?: number;
+          acceptLat?: number;
+          otherIcon?: string | null;
+        };
+      }
+      const optionObj: OptionInter = {
+        createOrderState: {
+          beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
+          beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
+          endLng: detail.value.orderEndAddressLongitude * 1e-6,
+          endLat: detail.value.orderEndAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+          otherIcon: null,
+        },
+        acceptOrderState: {
+          beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
+          beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
+          endLng: detail.value.orderEndAddressLongitude * 1e-6,
+          endLat: detail.value.orderEndAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+
+          acceptLng: detail.value.driverAcceptOrderAddressLongitude * 1e-6,
+          acceptLat: detail.value.driverAcceptOrderAddressLatitude * 1e-6,
+          otherIcon: acceptIcon,
+        },
+        receptionPassengerState: {
+          beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
+          beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
+          endLng: detail.value.orderEndAddressLongitude * 1e-6,
+          endLat: detail.value.orderEndAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+
+          acceptLng: detail.value.driverReceptionPassengerAddressLongitude * 1e-6,
+          acceptLat: detail.value.driverReceptionPassengerAddressLatitude * 1e-6,
+          otherIcon: receptionIcon,
+        },
+        driverArrivePickupAddressState: {
+          beginLng: detail.value.orderBeginAddressLongitude * 1e-6,
+          beginLat: detail.value.orderBeginAddressLatitude * 1e-6,
+          endLng: detail.value.orderEndAddressLongitude * 1e-6,
+          endLat: detail.value.orderEndAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+
+          acceptLng: detail.value.driverArrivePickupAddressLongitude * 1e-6,
+          acceptLat: detail.value.driverArrivePickupAddressLatitude * 1e-6,
+          otherIcon: pickupIcon,
+        },
+        driverBeginServiceState: {
+          beginLng: detail.value.driverBeginServiceAddressLongitude * 1e-6,
+          beginLat: detail.value.driverBeginServiceAddressLatitude * 1e-6,
+          endLng: detail.value.driverEndServiceAddressLongitude * 1e-6,
+          endLat: detail.value.driverEndServiceAddressLatitude * 1e-6,
+          startIcon: startIcon,
+          endIcon: endIcon,
+        },
+        driverEndServiceState: {
+          beginLng: detail.value.driverEndServiceAddressLongitude * 1e-6,
+          beginLat: detail.value.driverEndServiceAddressLatitude * 1e-6,
+          endLng: detail.value.driverEndServiceAddressLongitude * 1e-6,
+          endLat: detail.value.driverEndServiceAddressLatitude * 1e-6,
+          startIcon: serviceIcon,
+          endIcon: null,
+        },
+        driverSubmissionCostState: {
+          beginLng: detail.value.driverEndServiceAddressLongitude * 1e-6,
+          beginLat: detail.value.driverEndServiceAddressLatitude * 1e-6,
+          endLng: detail.value.driverSubmissionCostAddressLongitude * 1e-6,
+          endLat: detail.value.driverSubmissionCostAddressLatitude * 1e-6,
+          startIcon: serviceIcon,
+          endIcon: serviceIcon,
+          acceptLng: detail.value.driverSubmissionCostAddressLongitude * 1e-6,
+          acceptLat: detail.value.driverSubmissionCostAddressLatitude * 1e-6,
+          otherIcon: submissionIcon,
+        },
+        orderCostCreateState: {
+          beginLng: detail.value.driverBeginServiceAddressLongitude * 1e-6,
+          beginLat: detail.value.driverBeginServiceAddressLatitude * 1e-6,
+          endLng: detail.value.driverEndServiceAddressLongitude * 1e-6,
+          endLat: detail.value.driverEndServiceAddressLatitude * 1e-6,
+          startIcon: serviceIcon,
+          endIcon: null,
+        },
+      };
+      console.log({ ...optionObj[orderState] });
+
+      await handleMap({ ...optionObj[orderState] });
     };
 
     return {
@@ -361,13 +487,13 @@ export default defineComponent({
 }
 
 .left {
-  width: 500px;
+  width: 520px;
   height: 100%;
   overflow-y: scroll;
 }
 
 .right {
-  width: calc(100% - 500px - 15px);
+  width: calc(100% - 520px - 15px);
   height: 100%;
   padding: 5px;
   background-color: $white;
@@ -376,7 +502,7 @@ export default defineComponent({
   overflow-y: scroll;
 
   .map {
-    height: 320px;
+    height: 420px;
   }
 }
 </style>
