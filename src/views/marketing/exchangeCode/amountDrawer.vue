@@ -87,6 +87,7 @@ import { FormInst, useMessage } from "naive-ui";
 import { QueryFormInter, TableDataItemInter } from "./type";
 import { rules } from "./data";
 import { addExchangeCodeWalletAmount, uniqueExchangeCode } from "@/api/marketing/marketing";
+import dayjs from "dayjs";
 export default defineComponent({
   name: "AmountDrawer",
   setup: function () {
@@ -125,7 +126,21 @@ export default defineComponent({
         if (!errors) {
           state.loading = true;
           try {
-            let res = await addExchangeCodeWalletAmount(form.value);
+            let option = {
+              exchangeCode: form.value.exchangeCode,
+              exchangeCodeEffectiveTimeBegin: dayjs(
+                form.value.exchangeCodeEffectiveTimeBegin
+              ).format("YYYY-MM-DD HH:mm:ss") as string,
+              exchangeCodeEffectiveTimeEnd: dayjs(form.value.exchangeCodeEffectiveTimeEnd).format(
+                "YYYY-MM-DD HH:mm:ss"
+              ) as string,
+              exchangeCodeUsableCount: form.value.exchangeCodeUsableCount,
+              walletAmount: {
+                exchangeRechargeAmount: form.value.walletAmount.exchangeRechargeAmount,
+                exchangeGiftAmount: form.value.walletAmount.exchangeGiftAmount,
+              },
+            };
+            let res = await addExchangeCodeWalletAmount(option);
             console.log(res);
             message.success(window.$tips[res.code]);
           } catch (err) {
@@ -133,7 +148,7 @@ export default defineComponent({
           }
           state.loading = false;
         } else {
-          console.log(errors);
+          //console.log(errors);
           state.loading = false;
         }
       });
@@ -220,7 +235,7 @@ export default defineComponent({
       }
       try {
         let res = await uniqueExchangeCode({
-          exchangeCode: form.value.exchangeCode,
+          exchangeCodeId: form.value.exchangeCode,
         });
         if (res.data.UniqueBooleanResult) {
           form.value.exchangeCode = null;

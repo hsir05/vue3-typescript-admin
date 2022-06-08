@@ -256,7 +256,6 @@ export function getRecordPagePage(data: RecordPageInter) {
  * 兑换码兑换金额
  */
 interface AddExchangeCodeWalletAmountInter {
-
   exchangeCode: string | null,
   exchangeCodeEffectiveTimeBegin: string | null,
   exchangeCodeEffectiveTimeEnd: string | null,
@@ -265,7 +264,6 @@ interface AddExchangeCodeWalletAmountInter {
     exchangeRechargeAmount: number | null,
     exchangeGiftAmount: number | null
   }
-
 }
 export function addExchangeCodeWalletAmount(data: AddExchangeCodeWalletAmountInter) {
   return http.request({
