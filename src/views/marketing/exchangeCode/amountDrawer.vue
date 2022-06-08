@@ -26,23 +26,31 @@
       <n-form-item label="生效时间" path="exchangeCodeEffectiveTimeBegin">
         <n-date-picker
           v-model:value="form.exchangeCodeEffectiveTimeBegin"
-          style="width: 260px" type="datetime" clearable
-          :is-date-disabled="disablePreviousDate"/>
+          style="width: 260px"
+          type="datetime"
+          clearable
+          :is-date-disabled="disablePreviousDate"
+        />
       </n-form-item>
 
       <n-form-item label="失效时间" path="exchangeCodeEffectiveTimeEnd">
-        <n-date-picker v-model:value="form.exchangeCodeEffectiveTimeEnd" type="datetime" style="width: 260px" clearable
-                       :is-date-disabled="disablePreviousDate"/>
+        <n-date-picker
+          v-model:value="form.exchangeCodeEffectiveTimeEnd"
+          type="datetime"
+          style="width: 260px"
+          clearable
+          :is-date-disabled="disablePreviousDate"
+        />
       </n-form-item>
 
       <n-form-item label="可兑换次数" path="exchangeCodeUsableCount">
         <n-input-number
           v-model:value="form.exchangeCodeUsableCount"
           style="width: 260px"
-          :min=1
+          :min="1"
           clearable
           placeholder="可兑换次数"
-          :maxLength=9999999999
+          :maxLength="9999999999"
         />
       </n-form-item>
 
@@ -50,10 +58,10 @@
         <n-input-number
           v-model:value="form.walletAmount.exchangeRechargeAmount"
           style="width: 260px"
-          :min=0.01
+          :min="0.01"
           clearable
           placeholder="兑换实充金额"
-          :maxLength=99999999.99
+          :maxLength="99999999.99"
         />
       </n-form-item>
 
@@ -74,11 +82,11 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import {defineComponent, reactive, ref, toRefs, unref} from "vue";
-import {FormInst, useMessage} from "naive-ui";
-import {QueryFormInter, TableDataItemInter} from "./type";
+import { defineComponent, reactive, ref, toRefs } from "vue";
+import { FormInst, useMessage } from "naive-ui";
+import { QueryFormInter, TableDataItemInter } from "./type";
 import { rules } from "./data";
-import {addExchangeCodeWalletAmount,uniqueExchangeCode} from "@/api/marketing/marketing";
+import { addExchangeCodeWalletAmount, uniqueExchangeCode } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "AmountDrawer",
   setup: function () {
@@ -97,9 +105,9 @@ export default defineComponent({
       exchangeCodeEffectiveTimeEnd: null,
       exchangeCodeUsableCount: null,
       walletAmount: {
-        exchangeRechargeAmount:null,
-        exchangeGiftAmount:null
-      }
+        exchangeRechargeAmount: null,
+        exchangeGiftAmount: null,
+      },
     });
 
     function openDrawer(t: string, record?: TableDataItemInter) {
@@ -120,7 +128,6 @@ export default defineComponent({
             let res = await addExchangeCodeWalletAmount(form.value);
             console.log(res);
             message.success(window.$tips[res.code]);
-            handleSaveAfter();
           } catch (err) {
             console.log(err);
           }
@@ -140,7 +147,62 @@ export default defineComponent({
     //生成随机数字字符（不包含0,1,o,O,i,I,l,L不容易区分字符）
     const randomWord = (range: number) => {
       let str = "",
-        arr = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        arr = [
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "j",
+          "k",
+          "m",
+          "n",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z",
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K",
+          "M",
+          "N",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+          "W",
+          "X",
+          "Y",
+          "Z",
+        ];
       for (let i = 0; i < range; i++) {
         let pos = Math.round(Math.random() * (arr.length - 1));
         str += arr[pos];
@@ -180,7 +242,7 @@ export default defineComponent({
       onCloseAfter,
       randomWord,
       disablePreviousDate,
-      uniqueExchangeCodeValue
+      uniqueExchangeCodeValue,
     };
   },
 });

@@ -257,13 +257,13 @@ export function getRecordPagePage(data: RecordPageInter) {
  */
 interface AddExchangeCodeWalletAmountInter {
 
-  exchangeCode: string,
-  exchangeCodeEffectiveTimeBegin: string,
-  exchangeCodeEffectiveTimeEnd: string,
-  exchangeCodeUsableCount: number,
+  exchangeCode: string | null,
+  exchangeCodeEffectiveTimeBegin: string | null,
+  exchangeCodeEffectiveTimeEnd: string | null,
+  exchangeCodeUsableCount: number | null,
   walletAmount: {
-    exchangeRechargeAmount: number,
-    exchangeGiftAmount: number
+    exchangeRechargeAmount: number | null,
+    exchangeGiftAmount: number | null
   }
 
 }
@@ -275,11 +275,11 @@ export function addExchangeCodeWalletAmount(data: AddExchangeCodeWalletAmountInt
   });
 }
 //检验兑换码是否重复
-export function uniqueExchangeCode(exchangeCode: string) {
+export function uniqueExchangeCode(data: { exchangeCodeId: string }) {
   return http.request({
     url: "/exchangeCode/uniqueExchangeCode",
     method: "post",
-    data: exchangeCode,
+    data: data,
   });
 }
 //-----------------钱包充值活动管理-------------------------
