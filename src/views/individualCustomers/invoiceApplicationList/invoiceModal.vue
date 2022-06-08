@@ -1,7 +1,7 @@
 <template>
   <BasicModal
     width="650px"
-    title="重发电子发票"
+    title="个人客户开票"
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
@@ -16,12 +16,20 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="电子邮箱" path="contactMail">
-        <n-input v-model:value="form.contactMail" placeholder="输入电子邮箱" clearable />
+      <n-form-item label="开票方式" path="invoiceWay">
+        <n-select
+          clearable
+          filterable
+          v-model:value="form.invoiceWay"
+          placeholder="选择开票方式"
+          :options="invoiceWayData"
+        />
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button attr-type="button" type="primary" @click="handleValidate">提交</n-button>
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >提交</n-button
+        >
       </div>
     </n-form>
   </BasicModal>
@@ -30,10 +38,10 @@
 import { defineComponent, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { repeatSendMail } from "@/api/individualCustomers/individualCustomers";
-import { FormInter } from "./type";
+import { invoiceOpen } from "@/api/individualCustomers/individualCustomers";
+import { InvoiceOpenFormInter } from "./type";
 export default defineComponent({
-  name: "ConfirmInvoiceModal",
+  name: "InvoiceModal",
   components: { BasicModal },
   emits: ["on-save-after"],
   setup(_, { emit }) {
@@ -41,8 +49,8 @@ export default defineComponent({
     const message = useMessage();
     const loading = ref(false);
 
-    const form = ref<FormInter>({
-      contactMail: null,
+    const form = ref<InvoiceOpenFormInter>({
+      invoiceWay: null,
       customerInvoiceApplicationId: null,
     });
     const formRef = ref<FormInst | null>(null);
@@ -57,7 +65,7 @@ export default defineComponent({
         if (!errors) {
           try {
             loading.value = true;
-            let res = await repeatSendMail(form.value);
+            let res = await invoiceOpen(form.value);
             emit("on-save-after");
             message.success(window.$tips[res.code]);
             loading.value = false;
@@ -72,7 +80,10 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { contactMail: null, customerInvoiceApplicationId: null };
+      form.value = {
+        invoiceWay: null,
+        customerInvoiceApplicationId: null,
+      };
       formRef.value?.restoreValidation();
     }
 
@@ -82,12 +93,27 @@ export default defineComponent({
       form,
       loading,
       rules: {
-        contactMail: { required: true, trigger: ["blur", "input"], message: "请输入处理结果" },
+        invoiceWay: {
+          type: "number",
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请选择开票方式",
+        },
       },
 
       handleModal,
       handleValidate,
       handleReset,
+      invoiceWayData: [
+        {
+          label: "电子发票",
+          value: 0,
+        },
+        {
+          label: "纸质发票",
+          value: 1,
+        },
+      ],
     };
   },
 });

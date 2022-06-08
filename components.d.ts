@@ -11,6 +11,7 @@ declare module 'vue' {
     Explain: typeof import('./src/components/Explain/Explain.vue')['default']
     MessageContent: typeof import('./src/components/MessageContent/index.vue')['default']
     Modal: typeof import('./src/components/Modal/Modal.vue')['default']
+    NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBadge: typeof import('naive-ui')['NBadge']
     NBreadcrumb: typeof import('naive-ui')['NBreadcrumb']

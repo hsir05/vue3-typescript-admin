@@ -51,15 +51,10 @@ export function download() {
 }
 
 // 下载
-// @ts-ignore
-export function downloadFile(data: string, filename: string = "文件", type = "application/vnd.ms-excel") {
+export function downloadFile(data: string, filename: string = "文件", type = ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel") {
     return new Promise((resolve) => {
 
-        const blob = new Blob([data], {
-            // type是需要对应的文件类型
-            type:
-                ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
-        });
+        const blob = new Blob([data], { type: type });
         const fileName = filename + ".xlsx";
         if ("download" in document.createElement("a")) {
             // // 非IE下载
@@ -78,21 +73,6 @@ export function downloadFile(data: string, filename: string = "文件", type = "
             //@ts-ignore
             navigator.msSaveBlob(blob, fileName);
         }
-
-        // // 获取heads中的filename文件名
-        // let downloadElement = document.createElement('a');
-        // // 文件流转blob对象下载 创建下载的链接
-        // let href = window.URL.createObjectURL(new Blob([data], { type: type }));
-        // downloadElement.href = href;
-        // // 下载后文件名
-        // downloadElement.setAttribute("download", filename + ".xlsx");
-        // document.body.appendChild(downloadElement);
-        // // 点击下载
-        // downloadElement.click();
-        // // 下载完成移除元素
-        // document.body.removeChild(downloadElement);
-        // // 释放掉blob对象
-        // window.URL.revokeObjectURL(href);
         resolve(true)
     })
 }

@@ -16,8 +16,21 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="电子邮箱" path="contactMail">
-        <n-input v-model:value="form.contactMail" placeholder="输入电子邮箱" clearable />
+      <n-form-item label="快递名称" path="expressName">
+        <n-input
+          v-model:value="form.expressName"
+          placeholder="输入快递名称"
+          :maxlength="20"
+          clearable
+        />
+      </n-form-item>
+      <n-form-item label="快递单号" path="expressNum">
+        <n-input
+          v-model:value="form.expressNum"
+          placeholder="输入快递单号"
+          :maxlength="50"
+          clearable
+        />
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -31,7 +44,7 @@ import { defineComponent, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
 import { sendMail } from "@/api/individualCustomers/individualCustomers";
-import { FormInter } from "./type";
+import { MailFormInter } from "./type";
 export default defineComponent({
   name: "SendModal",
   components: { BasicModal },
@@ -41,8 +54,9 @@ export default defineComponent({
     const message = useMessage();
     const loading = ref(false);
 
-    const form = ref<FormInter>({
-      contactMail: null,
+    const form = ref<MailFormInter>({
+      expressName: null,
+      expressNum: null,
       customerInvoiceApplicationId: null,
     });
     const formRef = ref<FormInst | null>(null);
@@ -72,7 +86,11 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { contactMail: null, customerInvoiceApplicationId: null };
+      form.value = {
+        expressName: null,
+        expressNum: null,
+        customerInvoiceApplicationId: null,
+      };
       formRef.value?.restoreValidation();
     }
 

@@ -17,11 +17,22 @@
       :model="form"
     >
       <n-form-item label="电子邮箱" path="contactMail">
-        <n-input v-model:value="form.contactMail" placeholder="输入电子邮箱" clearable />
+        <n-input
+          v-model:value="form.contactMail"
+          maxlength="25"
+          show-count
+          style="width: 380px"
+          type="textarea"
+          placeholder="输入电子邮箱"
+          round
+          clearable
+        />
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button attr-type="button" type="primary" @click="handleValidate">提交</n-button>
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+          >提交</n-button
+        >
       </div>
     </n-form>
   </BasicModal>
@@ -31,9 +42,9 @@ import { defineComponent, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
 import { repeatSendMail } from "@/api/individualCustomers/individualCustomers";
-import { FormInter } from "./type";
+import { RepeatFormInter } from "./type";
 export default defineComponent({
-  name: "ConfirmInvoiceModal",
+  name: "RepeatSendMailModal",
   components: { BasicModal },
   emits: ["on-save-after"],
   setup(_, { emit }) {
@@ -41,7 +52,7 @@ export default defineComponent({
     const message = useMessage();
     const loading = ref(false);
 
-    const form = ref<FormInter>({
+    const form = ref<RepeatFormInter>({
       contactMail: null,
       customerInvoiceApplicationId: null,
     });
@@ -72,7 +83,10 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = { contactMail: null, customerInvoiceApplicationId: null };
+      form.value = {
+        contactMail: null,
+        customerInvoiceApplicationId: null,
+      };
       formRef.value?.restoreValidation();
     }
 
@@ -82,7 +96,7 @@ export default defineComponent({
       form,
       loading,
       rules: {
-        contactMail: { required: true, trigger: ["blur", "input"], message: "请输入处理结果" },
+        contactMail: { required: true, trigger: ["blur", "input"], message: "请输入申请退回理由" },
       },
 
       handleModal,

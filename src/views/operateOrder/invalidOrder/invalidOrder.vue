@@ -22,7 +22,16 @@
         <n-select
           v-model:value="queryValue.influxCodeEq"
           placeholder="选择流量方"
-          :options="options"
+          :options="influxData"
+          style="width: 150px"
+        />
+      </n-form-item>
+
+      <n-form-item label="订单业务类型" path="orderBusinessTypeEq">
+        <n-select
+          v-model:value="queryValue.orderBusinessTypeEq"
+          placeholder="选择订单业务类型"
+          :options="orderBusData"
           style="width: 150px"
         />
       </n-form-item>
@@ -31,7 +40,16 @@
         <n-select
           v-model:value="queryValue.orderTypeEq"
           placeholder="选择订单类型"
-          :options="options"
+          :options="orderData"
+          style="width: 150px"
+        />
+      </n-form-item>
+
+      <n-form-item label="联系人电话" path="passengerPhone">
+        <n-input
+          v-model:value="queryValue.passengerPhone"
+          clearable
+          placeholder="输入联系人电话"
           style="width: 150px"
         />
       </n-form-item>
@@ -44,55 +62,22 @@
           style="width: 150px"
         />
       </n-form-item>
-      <n-form-item label="运营企业" path="operationCompanyIdEq">
-        <n-select
-          v-model:value="queryValue.operationCompanyIdEq"
-          placeholder="选择运营企业"
-          :options="options"
-          style="width: 150px"
-        />
-      </n-form-item>
 
-      <n-form-item label="司机工号" path="driverNoEq">
-        <n-input
-          v-model:value="queryValue.driverNoEq"
-          clearable
-          placeholder="输入司机工号"
-          style="width: 150px"
-        />
-      </n-form-item>
-
-      <n-form-item label="车牌号" path="plateNumberEq">
-        <n-input
-          v-model:value="queryValue.plateNumberEq"
-          clearable
-          placeholder="输入车牌号"
-          style="width: 150px"
-        />
-      </n-form-item>
-
-      <n-form-item label="订单状态" path="orderStateEq">
-        <n-select
-          v-model:value="queryValue.orderStateEq"
-          placeholder="选择订单状态"
-          :options="options"
-          style="width: 150px"
-        />
-      </n-form-item>
-
-      <n-form-item label="交易时间(起始)" path="timeGe">
+      <n-form-item label="交易时间(起始)" path="orderInvalidTimeGe">
         <n-date-picker
-          v-model:value="queryValue.timeGe"
+          v-model:value="queryValue.orderInvalidTimeGe"
           type="date"
+          :is-date-disabled="disablePreviousDate"
           style="width: 150px"
           clearable
         />
       </n-form-item>
 
-      <n-form-item label="交易时间(结束)" path="timeLe">
+      <n-form-item label="交易时间(结束)" path="orderInvalidTimeLe">
         <n-date-picker
-          v-model:value="queryValue.timeLe"
+          v-model:value="queryValue.orderInvalidTimeLe"
           type="date"
+          :is-date-disabled="disablePreviousDate"
           style="width: 150px"
           clearable
         />
@@ -125,12 +110,11 @@ import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { useRouter } from "vue-router";
 import { TableDataItemInter, FormInter } from "./type";
-import { statusOptions } from "@/config/form";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 import { getOrderInvalidPage } from "@/api/operateOrder/operateOrder";
 
-import { getDict } from "@/api/common/common";
+import { getDict, getInfluxList } from "@/api/common/common";
 import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "InvalidOrder",
@@ -141,23 +125,24 @@ export default defineComponent({
     const itemCount = ref(null);
     const router = useRouter();
     const queryValue = ref<FormInter>({
-      timeGe: null,
-      timeLe: null,
       influxOrderNoEq: null,
       influxCodeEq: null,
-      operationCompanyIdEq: null,
-      orderStateEq: null,
-      plateNumberEq: null,
+      orderBusinessTypeEq: null,
       orderTypeEq: null,
-      driverNoEq: null,
+      passengerPhone: null,
       customerPhoneEq: null,
-      orderBusinessType: null,
+      orderInvalidTimeGe: null,
+      orderInvalidTimeLe: null,
     });
 
     const data = ref<TableDataItemInter[]>([]);
 
     const orderObj: objInter = {};
     const orderBusObj: objInter = {};
+
+    const influxData = ref([]);
+    const orderData = ref([]);
+    const orderBusData = ref([]);
 
     const columns = [
       {
@@ -268,29 +253,55 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getOrderTypeData();
+      getAllData();
     });
 
-    const getOrderTypeData = async () => {
-      try {
-        loading.value = true;
-        let res = await getDict({ parentEntryCode: "OT00000" });
-        let result = await getDict({ parentEntryCode: "OBT0000" });
-        for (let key of res.data) {
-          if (!orderObj[key.entryCode]) {
-            orderObj[key.entryCode] = key.entryName;
-          }
-        }
+    const getAllData = async () => {
+      Promise.all([
+        getDict({ parentEntryCode: "OT00000" }),
+        getDict({ parentEntryCode: "OBT0000" }),
+        getInfluxList(),
+      ])
+        .then((res) => {
+          let dataArr = res.map((item) => item.data);
 
-        for (let key of result.data) {
-          if (!orderObj[key.entryCode]) {
-            orderBusObj[key.entryCode] = key.entryName;
+          orderData.value = dataArr[0].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          orderBusData.value = dataArr[1].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+          influxData.value = dataArr[2].map((item: { entryName: string; entryCode: string }) => {
+            let obj = {
+              label: item.entryName,
+              value: item.entryCode,
+            };
+            return obj;
+          });
+
+          for (let key of dataArr[0]) {
+            if (!orderObj[key.entryCode]) {
+              orderObj[key.entryCode] = key.entryName;
+            }
           }
-        }
-        getData({ pageIndex: 1, pageSize: 10 });
-      } catch (err) {
-        console.log(err);
-      }
+          for (let key of dataArr[1]) {
+            if (!orderObj[key.entryCode]) {
+              orderBusObj[key.entryCode] = key.entryName;
+            }
+          }
+          getData({ pageIndex: 1, pageSize: 10 });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
 
     const getData = async (page: PaginationInter) => {
@@ -323,17 +334,14 @@ export default defineComponent({
     };
     const reset = () => {
       queryValue.value = {
-        timeGe: null,
-        timeLe: null,
         influxOrderNoEq: null,
         influxCodeEq: null,
-        operationCompanyIdEq: null,
-        orderStateEq: null,
-        plateNumberEq: null,
+        orderBusinessTypeEq: null,
         orderTypeEq: null,
-        driverNoEq: null,
+        passengerPhone: null,
         customerPhoneEq: null,
-        orderBusinessType: null,
+        orderInvalidTimeGe: null,
+        orderInvalidTimeLe: null,
       };
       const { resetPagination } = basicTableRef.value;
       resetPagination();
@@ -365,9 +373,13 @@ export default defineComponent({
       data,
       loading,
       basicTableRef,
-      statusOptions,
-      options: [],
+      influxData,
+      orderBusData,
+      orderData,
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
+      disablePreviousDate(ts: number) {
+        return ts >= 4102329600000 && ts <= 1451577600000;
+      },
       columns,
       itemCount,
 

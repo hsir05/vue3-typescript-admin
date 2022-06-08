@@ -272,9 +272,9 @@ export function getOverviewPage(data:OverviewPageInter) {
     data: data
   });
 }
-// ----------------个人客户发票申请分页--------------------
+// ----------------个人客户发票申请管理--------------------
 /**
- * 所有个人钱包交易总览分页
+ * 个人客户发票申请分页
 */
 interface InvoiceAppPageInter{
   page: PaginationInter;
@@ -324,13 +324,64 @@ export function downloadRelativeItinerary(data:{customerInvoiceApplicationId: st
     data:data
   });
 }
+
 /**
- * 发送邮件
+ * 发电子发票
+*/
+export function sendMail(data:{customerInvoiceApplicationId: string | null; expressName: string | null,expressNum: string | null}) {
+  return http.request({
+    url: `/customerInvoiceApplication/postInvoice`,
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 重发电子发票
  * 调用第三方地址
 */
-export function sendMail(data:{customerInvoiceApplicationId: string | null; contactMail: string | null}) {
+export function repeatSendMail(data:{customerInvoiceApplicationId: string | null; contactMail: string | null}) {
   return otherHttp.request({
     url: `/customerInvoiceApplication/platform/invoiceMail`,
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 开票
+*/
+export function invoiceOpen(data:{customerInvoiceApplicationId: string | null; invoiceWay: number | null}) {
+  return otherHttp.request({
+    url: `/customerInvoiceApplication/platform/invoiceOpen`,
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 重新开票
+*/
+export function invoiceReOpen(data:{customerInvoiceApplicationId: string | null;}) {
+  return otherHttp.request({
+    url: `/customerInvoiceApplication/platform/invoiceReOpen`,
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 打印
+*/
+export function invoicePrint(data:{customerInvoiceApplicationId: string | null;}) {
+  return otherHttp.request({
+    url: `/customerInvoiceApplication/platform/invoicePrint`,
+    method: 'post',
+    data:data
+  });
+}
+/**
+ * 开票申请退回
+*/
+export function returnInvoice(data:{customerInvoiceApplicationId: string | null; invoiceApplicationReturnReason: string | null}) {
+  return http.request({
+    url: `/customerInvoiceApplication/returnInvoice`,
     method: 'post',
     data:data
   });

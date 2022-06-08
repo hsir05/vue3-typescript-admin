@@ -160,7 +160,29 @@ export const orderStateType = [
         value: "invalid",
     }
 ]
-
+// 服务星级
+export const starOptions = [
+    {
+        label: "1星",
+        value: '1'
+    },
+    {
+        label: "2星",
+        value: '2'
+    },
+    {
+        label: "3星",
+        value: '3'
+    },
+    {
+        label: "4星",
+        value: '4'
+    },
+     {
+        label: "5星",
+        value: '5'
+    },
+]
 // 产品类型 
 export const goodsTypeOptions = [
     {
