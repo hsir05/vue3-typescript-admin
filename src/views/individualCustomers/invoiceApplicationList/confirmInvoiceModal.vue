@@ -30,7 +30,7 @@
 import { defineComponent, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { sendMail } from "@/api/individualCustomers/individualCustomers";
+import { repeatSendMail } from "@/api/individualCustomers/individualCustomers";
 import { FormInter } from "./type";
 export default defineComponent({
   name: "ConfirmInvoiceModal",
@@ -57,7 +57,7 @@ export default defineComponent({
         if (!errors) {
           try {
             loading.value = true;
-            let res = await sendMail(form.value);
+            let res = await repeatSendMail(form.value);
             emit("on-save-after");
             message.success(window.$tips[res.code]);
             loading.value = false;
