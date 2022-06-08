@@ -14,5 +14,10 @@ export interface QueryFormInter{
 }
 export interface FormInter{
     groupCustomerInvoiceApplicationId: string | null; 
+    invoiceApplicationReturnReason: string | null
+}
+export interface ConfirmFormInter{
+    groupCustomerInvoiceApplicationId: string | null; 
     note: string | null
 }
+

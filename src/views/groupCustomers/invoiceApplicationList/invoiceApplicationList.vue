@@ -67,24 +67,21 @@
     <InvoiceDrawer ref="invoiceDrawerRef" :width="700" @on-save-after="handleSaveAfter" />
 
     <BackModal ref="backModalRef" @on-save-after="handleSaveAfter" />
+    <ConfirmModal ref="ConfirmModalRef" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import {
-  DownloadOutline as GitIcon,
   ArrowBackCircleOutline as ArrowBackIcon,
   EyeOutline as EyeIcon,
-  MailOutline as MailIcon,
-  PrintOutline as PrintIcon,
   TicketOutline as TicketIcon,
-  MailOpenOutline as MailOpenIcon,
-  CopyOutline as CopyIcon,
 } from "@vicons/ionicons5";
 
 import BasicTable from "@/components/Table/Table.vue";
 import InvoiceDrawer from "./invoiceDrawer.vue";
+import ConfirmModal from "./confirmModal.vue";
 import { invoiceAppOptions, invoiceAppObj } from "@/config/form";
 import { TableDataItemInter, QueryFormInter } from "./type";
 import BackModal from "./backModal.vue";
@@ -93,13 +90,14 @@ import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "InvoiceApplicationList",
-  components: { BasicTable, InvoiceDrawer, BackModal },
+  components: { BasicTable, InvoiceDrawer, BackModal, ConfirmModal },
   setup() {
     const loading = ref(false);
     const invoiceDrawerRef = ref();
     const basicTableRef = ref();
     const sendMailRef = ref();
     const backModalRef = ref();
+    const confirmModalRef = ref();
     const itemCount = ref(null);
     const queryValue = ref<QueryFormInter>({
       groupCustomerNameLike: null,
@@ -190,51 +188,12 @@ export default defineComponent({
                 auth: ["dict001"],
               },
               {
-                label: "开票",
+                label: "确认开票成功",
                 type: "primary",
                 icon: TicketIcon,
                 isIconBtn: true,
                 isShow: record.invoiceApplicationState === 0 ? false : true,
                 onClick: handleConfirmInvoice.bind(null, record.groupCustomerInvoiceApplicationId),
-                auth: ["dict001"],
-              },
-              {
-                label: "重新开票",
-                type: "primary",
-                icon: CopyIcon,
-                isIconBtn: true,
-                isShow:
-                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
-                onClick: handleReInvoice.bind(null, record.groupCustomerInvoiceApplicationId),
-                auth: ["dict001"],
-              },
-              {
-                label: "打印",
-                type: "primary",
-                icon: PrintIcon,
-                isIconBtn: true,
-                isShow:
-                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
-                onClick: handlePrint.bind(null, record.groupCustomerInvoiceApplicationId),
-                auth: ["dict001"],
-              },
-              {
-                label: "寄出",
-                type: "primary",
-                icon: MailOpenIcon,
-                isIconBtn: true,
-                isShow: record.invoiceApplicationState === 6 ? false : true,
-                onClick: handleMail.bind(null, record.groupCustomerInvoiceApplicationId),
-                auth: ["dict001"],
-              },
-              {
-                label: "重寄",
-                type: "primary",
-                icon: MailIcon,
-                isIconBtn: true,
-                isShow:
-                  record.invoiceApplicationState === 0 && record.invoiceWay === 1 ? false : true,
-                onClick: handleMail.bind(null, record.groupCustomerInvoiceApplicationId),
                 auth: ["dict001"],
               },
               {
@@ -244,30 +203,6 @@ export default defineComponent({
                 isIconBtn: true,
                 isShow: record.invoiceApplicationState === 0 ? false : true,
                 onClick: handleBack.bind(null, record.groupCustomerInvoiceApplicationId),
-                auth: ["dict001"],
-              },
-              {
-                label: "作废",
-                type: "primary",
-                icon: ArrowBackIcon,
-                isIconBtn: true,
-                isShow: record.invoiceApplicationState === 4 ? false : true,
-                onClick: handleBack.bind(null, record.groupCustomerInvoiceApplicationId),
-                auth: ["dict001"],
-              },
-              {
-                label: "导出相关行程单",
-                type: "primary",
-                icon: GitIcon,
-                isIconBtn: true,
-                isShow:
-                  (record.invoiceApplicationState === 1 ||
-                    record.invoiceApplicationState === 6 ||
-                    record.invoiceApplicationState === 7) &&
-                  record.invoiceApplicationTypeCode === "IAT0002"
-                    ? false
-                    : true,
-                onClick: handleDownload.bind(null, record.groupCustomerInvoiceApplicationId),
                 auth: ["dict001"],
               },
             ],
@@ -299,23 +234,12 @@ export default defineComponent({
       const { openDrawer } = invoiceDrawerRef.value;
       openDrawer(groupCustomerInvoiceApplicationId);
     }
-
-    // 邮寄
-    function handleMail(groupCustomerInvoiceApplicationId: string) {
-      const { handleModal } = sendMailRef.value;
-      handleModal(groupCustomerInvoiceApplicationId);
-    }
-    // 打印
-    function handlePrint(groupCustomerInvoiceApplicationId: string) {
-      console.log(groupCustomerInvoiceApplicationId);
-    }
-    // 确认开票
+    // 确认开票成功
     function handleConfirmInvoice(groupCustomerInvoiceApplicationId: string) {
       console.log(groupCustomerInvoiceApplicationId);
-    }
-    // 重新邮寄
-    function handleReInvoice(groupCustomerInvoiceApplicationId: string) {
-      console.log(groupCustomerInvoiceApplicationId);
+
+      const { handleModal } = confirmModalRef.value;
+      handleModal(groupCustomerInvoiceApplicationId);
     }
     // 退回
     function handleBack(groupCustomerInvoiceApplicationId: string) {
@@ -323,27 +247,6 @@ export default defineComponent({
       const { handleModal } = backModalRef.value;
       handleModal(groupCustomerInvoiceApplicationId);
     }
-    async function handleDownload(groupCustomerInvoiceApplicationId: string) {
-      // try {
-      //     let res = await downloadRelativeItinerary({groupCustomerInvoiceApplicationId})
-      console.log(groupCustomerInvoiceApplicationId);
-      //      // 创建一个新的url，此url指向新建的Blob对象
-      //     // let url = window.URL.createObjectURL(new Blob([data]))
-      //     let url = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(res);
-      //     // 创建a标签，并隐藏改a标签
-      //     let link = document.createElement('a')
-      //     link.style.display = 'none'
-      //     // a标签的href属性指定下载链接
-      //     link.href = url
-      //     //setAttribute() 方法添加指定的属性，并为其赋指定的值。
-      //     link.setAttribute('download', '发票关联行程单' + '.xlsx')
-      //     document.body.appendChild(link)
-      //     link.click()
-      // } catch (err) {
-      //     console.log(err);
-      // }
-    }
-
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       console.log(queryValue.value);

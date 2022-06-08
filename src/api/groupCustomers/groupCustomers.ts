@@ -272,7 +272,7 @@ export function getGrdInvoiceDetail(data:{groupCustomerInvoiceApplicationId: str
 }
 /**
  * 集团客户申请开票
-*/
+*/ 
 export function confirmInvoice(data:{groupCustomerInvoiceApplicationId: string | null; note: string | null}) {
   return http.request({
     url: '/groupCustomerInvoiceApplication/confirmInvoice',
@@ -283,7 +283,7 @@ export function confirmInvoice(data:{groupCustomerInvoiceApplicationId: string |
 /**
  * 集团客户发票申请退回
 */
-export function returnInvoice(data:{groupCustomerInvoiceApplicationId: string | null; note: string | null}) {
+export function returnInvoice(data:{groupCustomerInvoiceApplicationId: string | null; invoiceApplicationReturnReason: string | null}) {
   return http.request({
     url: '/groupCustomerInvoiceApplication/returnInvoice',
     method: 'post',

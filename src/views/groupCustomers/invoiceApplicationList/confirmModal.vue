@@ -1,7 +1,7 @@
 <template>
   <BasicModal
     width="650px"
-    title="集团客户发票申请退回"
+    title="集团客户发票确认开票成功"
     ref="ModalRef"
     :maskClosable="true"
     @on-cancel="handleReset"
@@ -16,10 +16,11 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="退回原因" path="invoiceApplicationReturnReason">
+      <n-form-item label="开票成功备注" path="note">
         <n-input
-          v-model:value="form.invoiceApplicationReturnReason"
-          placeholder="输入退回原因"
+          v-model:value="form.note"
+          type="textarea"
+          placeholder="输入开票成功备注"
           clearable
         />
       </n-form-item>
@@ -34,10 +35,10 @@
 import { defineComponent, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { returnInvoice } from "@/api/groupCustomers/groupCustomers";
-import { FormInter } from "./type";
+import { confirmInvoice } from "@/api/groupCustomers/groupCustomers";
+import { ConfirmFormInter } from "./type";
 export default defineComponent({
-  name: "BackModal",
+  name: "ConfirmModal",
   components: { BasicModal },
   emits: ["on-save-after"],
   setup(_, { emit }) {
@@ -45,8 +46,8 @@ export default defineComponent({
     const message = useMessage();
     const loading = ref(false);
 
-    const form = ref<FormInter>({
-      invoiceApplicationReturnReason: null,
+    const form = ref<ConfirmFormInter>({
+      note: null,
       groupCustomerInvoiceApplicationId: null,
     });
     const formRef = ref<FormInst | null>(null);
@@ -61,7 +62,7 @@ export default defineComponent({
         if (!errors) {
           try {
             loading.value = true;
-            let res = await returnInvoice(form.value);
+            let res = await confirmInvoice(form.value);
             emit("on-save-after");
             message.success(window.$tips[res.code]);
             loading.value = false;
@@ -76,10 +77,7 @@ export default defineComponent({
     }
 
     function handleReset() {
-      form.value = {
-        invoiceApplicationReturnReason: null,
-        groupCustomerInvoiceApplicationId: null,
-      };
+      form.value = { note: null, groupCustomerInvoiceApplicationId: null };
       formRef.value?.restoreValidation();
     }
 
@@ -89,7 +87,7 @@ export default defineComponent({
       form,
       loading,
       rules: {
-        note: { required: true, trigger: ["blur", "input"], message: "请输入退回原因" },
+        note: { required: true, trigger: ["blur", "input"], message: "请输入开票成功备注" },
       },
 
       handleModal,
