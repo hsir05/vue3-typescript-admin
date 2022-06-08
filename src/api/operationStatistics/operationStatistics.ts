@@ -7,7 +7,7 @@ interface CityOderInter {
     beginDate: string
     endDate: string
 }
-export function getCityOrder(data: CityOderInter) {    
+export function getCityOrder(data: CityOderInter) {
   return http.request({
     url: '/operationAnalysis/getCityOrderStatistics',
     method: 'post',
@@ -20,7 +20,7 @@ interface DriverOderInter {
     beginDate: string
     endDate: string
 }
-export function getDriverOrder(data: DriverOderInter) {    
+export function getDriverOrder(data: DriverOderInter) {
   return http.request({
     url: '/operationAnalysis/getDriverOrderStatistics',
     method: 'post',
@@ -29,7 +29,7 @@ export function getDriverOrder(data: DriverOderInter) {
 }
 // ---------------司机在线时长---------------------
 //获取班组列表
-export function getDriverClazzs(data: {operationCompanyId: string}) {    
+export function getDriverClazzs(data: {operationCompanyId: string}) {
   return http.request({
     url: '/driverOnlineTime/getDriverClazzs',
     method: 'post',
@@ -38,15 +38,31 @@ export function getDriverClazzs(data: {operationCompanyId: string}) {
 }
 //按日统计司机在线时长（分钟
 interface OnlineInfoInter{
-    operationCompanyId: string | null
-    day: string | null
-    checkType: string | null
-    driverClazzId: string | null
-    // driverId: string | null
+  operationCompanyId: string | null
+  day: string | null
+  checkType: string | null
+  driverClazzId: string | null
+  driverId: string | null
 }
-export function findDriverDayOnlineTimeInfo(data: OnlineInfoInter) {    
+export function findDriverDayOnlineTimeInfo(data: OnlineInfoInter) {
   return http.request({
     url: '/driverOnlineTime/findDriverDayOnlineTimeInfo',
+    method: 'post',
+    data
+  });
+}
+
+//按月统计司机在线时长（分钟
+interface OnlineInfoMonthInter{
+  operationCompanyId: string | null
+  month: string | null
+  checkType: string | null
+  driverClazzId: string | null
+  driverId: string | null
+}
+export function findDriverMonthOnlineTimeInfo(data: OnlineInfoMonthInter) {
+  return http.request({
+    url: '/driverOnlineTime/findDriverMonthOnlineTimeInfo',
     method: 'post',
     data
   });
@@ -57,7 +73,7 @@ interface RecordInter{
     day: string | null
     driverId: string | null
 }
-export function getDriverWorkRestRecord(data: RecordInter) {    
+export function getDriverWorkRestRecord(data: RecordInter) {
   return http.request({
     url: '/driverOnlineTime/getDriverWorkRestRecord',
     method: 'post',
@@ -71,7 +87,7 @@ interface SatisfactionInter {
     beginDate: string
     endDate: string
 }
-export function getSatisfaction(data: SatisfactionInter) {    
+export function getSatisfaction(data: SatisfactionInter) {
   return http.request({
     url: '/operationAnalysis/getDriverServiceSatisfiedStatistics',
     method: 'post',
@@ -83,7 +99,7 @@ export function getSatisfaction(data: SatisfactionInter) {
 interface MonthInter {
     month: string | null
 }
-export function getCustomer(data: MonthInter) {    
+export function getCustomer(data: MonthInter) {
   return http.request({
     url: '/operationAnalysis/customerStatisticsMonth',
     method: 'post',
@@ -97,7 +113,7 @@ interface DistributedInter {
     cityCode: string | null
     date: string | null
 }
-export function getOrderTimeIntervalDistributed(data: DistributedInter) {    
+export function getOrderTimeIntervalDistributed(data: DistributedInter) {
   return http.request({
     url: '/operationAnalysis/getOrderTimeIntervalDistributed',
     method: 'post',
@@ -112,7 +128,7 @@ interface LocationsInter {
     beginDate: string | null
     endDate: string | null
 }
-export function findOrderLocations(data: LocationsInter) {    
+export function findOrderLocations(data: LocationsInter) {
   return http.request({
     url: '/operationAnalysis/findOrderLocations',
     method: 'post',
@@ -127,7 +143,7 @@ interface CompanyOrderInter {
     beginDate: string | null
     endDate: string | null
 }
-export function getCompanyOrder(data: CompanyOrderInter) {    
+export function getCompanyOrder(data: CompanyOrderInter) {
   return http.request({
     url: '/operationAnalysis/getCompanyOrderStatistics',
     method: 'post',

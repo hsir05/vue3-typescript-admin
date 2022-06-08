@@ -68,6 +68,15 @@ const initLine = () => {
       bottom: "3%",
       containLabel: true,
     },
+    toolbox: {
+      orient: "vertical",
+      top: "middle",
+      feature: {
+        magicType: {
+          type: ["line", "bar", "tiled", "stack"],
+        },
+      },
+    },
     tooltip: {
       trigger: "axis",
       axisPointer: {
