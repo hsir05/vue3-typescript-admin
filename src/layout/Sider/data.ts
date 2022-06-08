@@ -379,6 +379,11 @@ export const menuOptions: MenuOption[] = [
         label: "钱包充值活动管理",
       },
       {
+        path: "/marketing/wallet-channel",
+        key: "/marketing/wallet-channel",
+        label: "钱包充值渠道管理",
+      },
+      {
         path: "/marketing/payment-channel",
         key: "/marketing/payment-channel",
         label: "订单支付渠道管理",

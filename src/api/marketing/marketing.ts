@@ -338,6 +338,74 @@ export function editRechargeActivity(data: RechargeActivityInter) {
         data: data,
     });
 }
+//-----------------钱包充值渠道管理-------------------------
+/**
+ * 钱包充值渠道分页
+ */
+
+export function getWalletChannelPage(data: {deviceChannelType: string | null}) {
+    return http.request({
+        url: "/customerWalletRechargeChannel/list",
+        method: "post",
+        data: data,
+    });
+}
+
+// 详情
+export function getWalletChannelDetail(data: { customerWalletRechargeChannelShowId: string }) {
+    return http.request({
+        url: "/customerWalletRechargeChannel/detail",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 钱包充值渠道序列前移
+*/
+export function walletUpgradeSeq(data: {customerWalletRechargeChannelShowId: string}) {
+    return http.request({
+        url: "/customerWalletRechargeChannel/upgradeSeq",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 钱包充值渠道序列后移
+*/
+export function walletLowerSeq(data: {customerWalletRechargeChannelShowId: string}) {
+    return http.request({
+        url: "/customerWalletRechargeChannel/lowerSeq",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 新增钱包充值渠道
+ */
+interface WalletChannelInter { 
+    customerWalletRechargeChannelShowId?: string | null;
+    customerWalletRechargeChannelShowName: string | null;
+    paymentChannelType: string | null;
+    deviceChannelType: string | null;
+    customerWalletRechargeChannelLock: number | null;
+}
+export function addWalletChannelType(data: WalletChannelInter) {
+    return http.request({
+        url: "/customerWalletRechargeChannel/add",
+        method: "post",
+        data: data,
+    });
+}
+/**
+ * 编辑钱包充值渠道
+ */
+export function editWalletChannelType(data: WalletChannelInter) {
+    return http.request({
+        url: "/customerWalletRechargeChannel/edit",
+        method: "post",
+        data: data,
+    });
+}
 //-----------------订单支付渠道-------------------------
 
 /**

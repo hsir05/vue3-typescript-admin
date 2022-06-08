@@ -10,16 +10,6 @@
       :show-feedback="false"
       :model="form"
     >
-      <n-form-item label="订单业务类型" path="orderBusinessType">
-        <n-select
-          v-model:value="form.orderBusinessType"
-          filterable
-          placeholder="选择订单业务类型"
-          style="width: 260px"
-          :options="orderBusTypeData"
-        />
-      </n-form-item>
-
       <n-form-item label="设备类型" path="deviceChannelType">
         <n-select
           v-model:value="form.deviceChannelType"
@@ -65,14 +55,14 @@ import {
 import { TableDataItemInter, QueryFormInter } from "./type";
 import { getDict } from "@/api/common/common";
 import { CommonItemInter } from "@/interface/common/common";
-import { getOrderPayChannelList, upgradeSeq, lowerSeq } from "@/api/marketing/marketing";
+import { getWalletChannelPage, walletUpgradeSeq, walletLowerSeq } from "@/api/marketing/marketing";
 export default defineComponent({
   name: "PaymentChannel",
   components: { ChannelModal },
   setup() {
     const form = ref<QueryFormInter>({
       deviceChannelType: null,
-      orderBusinessType: null,
+      //   orderBusinessType: null,
     });
     const message = useMessage();
     const loading = ref(false);
@@ -84,27 +74,27 @@ export default defineComponent({
     const data = ref([]);
     const columns = [
       {
-        title: "支付渠道",
-        key: "orderPayChannelTypeShowName",
+        title: "充值渠道",
+        key: "customerWalletRechargeChannelShowName",
         align: "center",
       },
       {
         title: "序列",
-        key: "orderPayChannelTypeSeq",
+        key: "customerWalletRechargeChannelShowSeq",
         align: "center",
       },
       {
         title: "状态",
-        key: "orderPayChannelTypeLock",
+        key: "customerWalletRechargeChannelLock",
         align: "center",
         render(row: TableDataItemInter) {
           return h(
             NTag,
             {
-              type: row.orderPayChannelTypeLock === 0 ? "success" : "error",
+              type: row.customerWalletRechargeChannelLock === 0 ? "success" : "error",
             },
             {
-              default: () => (row.orderPayChannelTypeLock === 0 ? "正常" : "锁定"),
+              default: () => (row.customerWalletRechargeChannelLock === 0 ? "正常" : "锁定"),
             }
           );
         },
@@ -122,7 +112,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowBackIcon,
-                onClick: handleUp.bind(null, record.orderPayChannelTypeShowId),
+                onClick: handleUp.bind(null, record.customerWalletRechargeChannelShowId),
                 auth: ["dict001"],
               },
               {
@@ -130,7 +120,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: ArrowIcon,
-                onClick: handleDown.bind(null, record.orderPayChannelTypeShowId),
+                onClick: handleDown.bind(null, record.customerWalletRechargeChannelShowId),
                 auth: ["dict001"],
               },
               {
@@ -138,7 +128,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record.orderPayChannelTypeShowId),
+                onClick: handleEdit.bind(null, record.customerWalletRechargeChannelShowId),
                 auth: ["dict001"],
               },
             ],
@@ -170,7 +160,7 @@ export default defineComponent({
             }
           );
           form.value.deviceChannelType = deviceChannelTypeData.value[0].value;
-          form.value.orderBusinessType = orderBusTypeData.value[0].value;
+          //   form.value.orderBusinessType = orderBusTypeData.value[0].value;
 
           getData();
         })
@@ -184,9 +174,8 @@ export default defineComponent({
       try {
         let option = {
           deviceChannelType: form.value.deviceChannelType,
-          orderBusinessType: form.value.orderBusinessType,
         };
-        let res = await getOrderPayChannelList(option);
+        let res = await getWalletChannelPage(option);
         data.value = res.data;
         loading.value = false;
       } catch (err) {
@@ -199,43 +188,43 @@ export default defineComponent({
       e.preventDefault();
       getData();
     }
-
-    function handleAdd() {
-      const { handleModal } = channelModalRef.value;
-      handleModal();
-    }
     function handleSaveAfter() {
       getData();
     }
-    async function handleUp(orderPayChannelTypeShowId: string) {
-      loading.value = true;
-      try {
-        let res = await upgradeSeq({ orderPayChannelTypeShowId });
-        message.success(window.$tips[res.code]);
-        getData();
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    }
-    async function handleDown(orderPayChannelTypeShowId: string) {
-      loading.value = true;
-      try {
-        let res = await lowerSeq({ orderPayChannelTypeShowId });
-        message.success(window.$tips[res.code]);
-        getData();
-        loading.value = false;
-      } catch (err) {
-        console.log(err);
 
-        loading.value = false;
-      }
-    }
-
-    function handleEdit(orderPayChannelTypeShowId: string) {
+    function handleAdd() {
       const { handleModal } = channelModalRef.value;
-      handleModal(orderPayChannelTypeShowId);
+      handleModal(form.value.deviceChannelType);
+    }
+    async function handleUp(customerWalletRechargeChannelShowId: string) {
+      loading.value = true;
+      try {
+        let res = await walletUpgradeSeq({ customerWalletRechargeChannelShowId });
+        message.success(window.$tips[res.code]);
+        getData();
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
+    async function handleDown(customerWalletRechargeChannelShowId: string) {
+      loading.value = true;
+      try {
+        let res = await walletLowerSeq({ customerWalletRechargeChannelShowId });
+        message.success(window.$tips[res.code]);
+        getData();
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+
+        loading.value = false;
+      }
+    }
+
+    function handleEdit(customerWalletRechargeChannelShowId: string) {
+      const { handleModal } = channelModalRef.value;
+      handleModal(form.value.deviceChannelType, customerWalletRechargeChannelShowId);
     }
 
     return {
@@ -246,9 +235,9 @@ export default defineComponent({
       orderBusTypeData,
       deviceChannelTypeData,
       columns,
-      handleSaveAfter,
       handleAdd,
-      getRowKeyId: (row: TableDataItemInter) => row.orderPayChannelTypeShowId,
+      handleSaveAfter,
+      getRowKeyId: (row: TableDataItemInter) => row.customerWalletRechargeChannelShowId,
 
       query,
     };

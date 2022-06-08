@@ -67,7 +67,7 @@ import { tableDataItem } from "./type";
 import BasicTable from "@/components/Table/Table.vue";
 import { PaginationInter } from "@/api/type";
 import { getMeiTuanPage } from "@/api/workOrder/workOrder";
-import { processStateData, refundTypeData } from "@/config/form";
+import { processStateData, refundTypeData, questionType } from "@/config/form";
 export default defineComponent({
   name: "MeiTuanOrder",
   components: { BasicTable },
@@ -107,6 +107,9 @@ export default defineComponent({
         title: "问题分类",
         key: "faqId",
         align: "center",
+        render(row: tableDataItem) {
+          return h("span", questionType[row.faqId]);
+        },
       },
       {
         title: "处理状态",
