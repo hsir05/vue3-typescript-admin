@@ -3,7 +3,7 @@
     <n-descriptions label-placement="left" bordered :column="2">
       <n-descriptions-item label="客户手机号"> {{ detail?.customerPhone }} </n-descriptions-item>
       <n-descriptions-item label="发票申请类型">
-        {{ detail?.invoiceApplicationType }}
+        {{ invoiceAppTypeObj[detail?.invoiceApplicationType] }}
       </n-descriptions-item>
       <n-descriptions-item label="发票金额(元)"> {{ detail?.invoiceAmount }} </n-descriptions-item>
       <n-descriptions-item label="发票类型">
@@ -56,6 +56,7 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs } from "vue";
 import dayjs from "dayjs";
+import { objInter } from "@/interface/common/common";
 import { getIndInvoiceDetail } from "@/api/individualCustomers/individualCustomers";
 export default defineComponent({
   name: "InvoiceDrawer",
@@ -73,6 +74,16 @@ export default defineComponent({
       }
       state.isDrawer = true;
     }
+
+    //   发票申请类型
+    //   按钱包充值金额 ：IAT0001
+    //   按支付订单：IAT0002
+    //   按购买代金券：IAT0003
+    const invoiceAppTypeObj: objInter = {
+      IAT0001: "按钱包充值金额",
+      IAT0002: "按支付订单",
+      IAT0003: "按购买代金券",
+    };
 
     const getDetail = async (customerInvoiceApplicationId: string) => {
       try {
@@ -95,6 +106,7 @@ export default defineComponent({
 
     return {
       ...toRefs(state),
+      invoiceAppTypeObj,
       detail,
       dayjs,
       openDrawer,

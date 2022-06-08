@@ -242,7 +242,7 @@ export default defineComponent({
     function handleAgent(record: Recordable) {
       dialog.warning({
         title: "提示",
-        content: "你确定修改代理状态？",
+        content: "您确定修改代理状态？",
         positiveText: "确定",
         negativeText: "取消",
         onPositiveClick: () => {
