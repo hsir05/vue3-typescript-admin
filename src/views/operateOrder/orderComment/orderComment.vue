@@ -118,6 +118,7 @@ export default defineComponent({
         title: "订单号",
         key: "orderNo",
         align: "center",
+        width: 230,
       },
       {
         title: "下单客户电话",

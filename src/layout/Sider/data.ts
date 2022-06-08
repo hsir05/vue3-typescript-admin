@@ -174,7 +174,7 @@ export const menuOptions: MenuOption[] = [
   },
   {
     label: "个人客户会员关系管理",
-    key: "/individual-customers-member",
+    key: "/individual-customers",
     icon: renderIcon(PersonIcon),
     children: [
       {
@@ -217,7 +217,7 @@ export const menuOptions: MenuOption[] = [
 
   {
     label: "集团客户会员关系管理",
-    key: "/group-customers-member",
+    key: "/group-customers",
     icon: renderIcon(PeopleIcon),
     children: [
       {
