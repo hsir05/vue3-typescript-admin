@@ -76,7 +76,6 @@
 import { defineComponent, reactive, toRefs, ref, onMounted } from "vue";
 import { FormInst, useMessage, SelectOption } from "naive-ui";
 import BasicUpload from "@/components/Upload/Upload.vue";
-import { uploadUrl } from "@/config/config";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import { getAllOpenCity } from "@/api/common/common";
 import { itemState } from "@/interface/common/common";
@@ -266,7 +265,7 @@ export default defineComponent({
       formRef,
       openCityData,
       form,
-      uploadUrl,
+      uploadUrl: import.meta.env.VITE_GLOB_UPLOAD_URL,
       UploadTypeEnum,
       rules: {
         advertisementEffectiveTimeBegin: {

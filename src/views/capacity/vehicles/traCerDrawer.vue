@@ -103,7 +103,6 @@ import { trcRules } from "./data";
 import { TraCerInter } from "./type";
 import { UploadTypeEnum } from "@/enums/httpEnum";
 import BasicUpload from "@/components/Upload/Upload.vue";
-import { uploadUrl } from "@/config/config";
 export default defineComponent({
   name: "TraCerDrawer",
   components: { BasicUpload },
@@ -203,7 +202,7 @@ export default defineComponent({
       ...toRefs(state),
       formRef,
       trcRules,
-      uploadUrl,
+      uploadUrl: import.meta.env.VITE_GLOB_UPLOAD_URL,
       vehiclePhotoList,
       transportList,
       form,

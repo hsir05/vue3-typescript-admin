@@ -1,6 +1,5 @@
 import type { PropType } from "vue";
 import { NUpload } from "naive-ui";
-import { uploadUrl } from "@/config/config";
 import { useAppUserStore } from "@/store/modules/useUserStore";
 
 const userStore = useAppUserStore();
@@ -17,7 +16,7 @@ export const basicProps = {
   },
   action: {
     type: String,
-    default: uploadUrl,
+    default: import.meta.env.VITE_GLOB_UPLOAD_URL,
   },
   headers: {
     type: Object as PropType<uploadHeaders>,
