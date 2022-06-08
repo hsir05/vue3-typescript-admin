@@ -10,8 +10,6 @@ export function getDict(data: DictInter) {
   });
 }
 
-
-
 //-----------------------登录管理----------------------------
 //获取验证码
 export function getCaptcha(data: {account: string, password: string}) {
@@ -221,6 +219,87 @@ export function getUserDetail(data: {adminId:string}) {
 export function removeUser(data: {adminId:string}) {
   return http.request({
     url: '/admin/delete',
+    method: 'post',
+    data
+  });
+}
+
+//-----------------------------系统权限------------------------ 
+/**
+ * 获取权限分页
+*/
+interface AuthPageInter {
+  page: PaginationInter;
+  search: {
+    nameLike: string | null;
+    codeLike: string | null;
+    urlLike: string | null;
+    stateEq: string | null;
+    createTimeGe: string | null;
+    createTimeLe: string | null;
+  };
+}
+export function getAuthPage(data: AuthPageInter) {
+  return http.request({
+    url: '/authority/page',
+    method: 'post',
+    data:data
+  });
+}
+/***
+ * 添加权限
+*/
+interface AuthAddInter{
+    authorityId?: string | null
+    name: string | null
+    code: string | null
+    url: string | null
+    state: number | null
+}
+export function addAuth(data: AuthAddInter) {
+  return http.request({
+    url: '/role/add',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 编辑权限
+*/
+export function editAuth(data: AuthAddInter) {
+  return http.request({
+    url: '/role/edit',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 权限详情
+*/
+export function getAuthDetail(data: {authorityId:string}) {
+  return http.request({
+    url: '/authority/detail',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 删除权限
+*/
+export function removeAuth(data: {authorityId:string}) {
+  return http.request({
+    url: '/admin/delete',
+    method: 'post',
+    data
+  });
+}
+
+/***
+ * 角色名称去重
+*/
+export function authNameUniqueCheck(data: {name: string | null;}) {
+  return http.request({
+    url: '/authority/nameUniqueCheck',
     method: 'post',
     data
   });

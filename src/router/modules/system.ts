@@ -15,14 +15,14 @@ const routes: Array<RouteRecordRaw> = [
       sort: 1,
     },
     children: [
-      {
-        path: "/system/dict",
-         name: `system_dict`,
-        meta: {
-          title: "字典管理",
-        },
-        component: () => import("@/views/system/dict/dict.vue"),
-      },
+    //   {
+    //     path: "/system/dict",
+    //      name: `system_dict`,
+    //     meta: {
+    //       title: "字典管理",
+    //     },
+    //     component: () => import("@/views/system/dict/dict.vue"),
+    //   },
       {
         path: "/system/menus",
         name: "system_menu",
@@ -46,6 +46,14 @@ const routes: Array<RouteRecordRaw> = [
           title: "角色管理",
         },
         component: () => import("@/views/system/role/role.vue"),
+      },
+      {
+        path: "/system/auth",
+        name: `system_auth`,
+        meta: {
+          title: "权限管理",
+        },
+        component: () => import("@/views/system/auth/auth.vue"),
       },
     ],
   },

@@ -45,6 +45,11 @@ export const menuOptions: MenuOption[] = [
         path: "/system/role",
         key: "/system/role",
       },
+       {
+        label: "权限管理",
+        path: "/system/auth",
+        key: "/system/auth",
+      },
     ],
   },
   {
