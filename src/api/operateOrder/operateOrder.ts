@@ -230,7 +230,7 @@ export function downloadOrderCancelled(data: OrderCancelledInter) {
     });
 }
 
-// 导出已取消订单行程单
+// 导出行程单
 interface StatementInter {
     search: {
         timeGe: number | null
@@ -262,17 +262,14 @@ export function downloadStatement(data: StatementInter) {
 interface OrderInvalidInter {
     page: PaginationInter;
     search: {
-        timeGe: string | null;
-        timeLe: string | null;
         influxOrderNoEq: string | null;
         influxCodeEq: string | null;
-        operationCompanyIdEq: string | null;
-        orderStateEq: string | null;
-        plateNumberEq: string | null;
+        orderBusinessTypeEq: string | null;
         orderTypeEq: string | null;
-        driverNoEq: string | null;
+        passengerPhone: string | null;
         customerPhoneEq: string | null;
-        orderBusinessType: string | null;
+        orderInvalidTimeGe: number | null;
+        orderInvalidTimeLe: number | null;
     };
 }
 export function getOrderInvalidPage(data: OrderInvalidInter) {

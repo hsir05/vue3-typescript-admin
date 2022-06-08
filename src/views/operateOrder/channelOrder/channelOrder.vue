@@ -21,6 +21,7 @@
       <n-form-item label="流量方" path="influxCodeEq">
         <n-select
           v-model:value="queryValue.influxCodeEq"
+          clearable
           placeholder="选择流量方"
           :options="influxData"
           style="width: 150px"
@@ -29,6 +30,7 @@
       <n-form-item label="订单类型" path="orderTypeEq">
         <n-select
           v-model:value="queryValue.orderTypeEq"
+          clearable
           placeholder="选择订单类型"
           :options="orderData"
           style="width: 150px"
@@ -39,6 +41,7 @@
         <n-input
           v-model:value="queryValue.customerPhoneEq"
           clearable
+          :maxlength="11"
           placeholder="输入下单客户电话"
           style="width: 150px"
         />
@@ -46,6 +49,7 @@
       <n-form-item label="运营企业" path="operationCompanyIdEq">
         <n-select
           v-model:value="queryValue.operationCompanyIdEq"
+          clearable
           placeholder="选择运营企业"
           :options="companyData"
           style="width: 150px"
@@ -73,6 +77,7 @@
       <n-form-item label="业务类型" path="orderStateEq">
         <n-select
           v-model:value="queryValue.orderStateEq"
+          clearable
           placeholder="选择订单状态"
           :options="orderBusData"
           style="width: 150px"
@@ -387,10 +392,13 @@ export default defineComponent({
           message.success("数据超过3000条,请通过条件筛选后下载");
           return;
         }
+        loading.value = true;
         let res = await downloadStatement({ search: { ...queryValue.value } });
         await downloadFile(res, "行程单");
+        loading.value = false;
       } catch (err) {
         console.log(err);
+        loading.value = false;
       }
     };
     const downloadInfo = async () => {
@@ -399,10 +407,13 @@ export default defineComponent({
           message.success("数据超过3000条,请通过条件筛选后下载");
           return;
         }
+        loading.value = true;
         let res = await downloadOrderCancelled({ search: { ...queryValue.value } });
-        await downloadFile(res, "行程单");
+        await downloadFile(res, "对账信息");
+        loading.value = false;
       } catch (err) {
         console.log(err);
+        loading.value = false;
       }
     };
 

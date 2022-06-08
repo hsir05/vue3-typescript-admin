@@ -32,7 +32,7 @@
         <n-select
           v-model:value="queryValue.serviceStarEq"
           placeholder="选择评论星级"
-          :options="options"
+          :options="starOptions"
           style="width: 150px"
         />
       </n-form-item>
@@ -81,7 +81,7 @@ import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
 import { useRouter } from "vue-router";
 import { TableDataItemInter, FormInter } from "./type";
-import { statusOptions } from "@/config/form";
+import { starOptions } from "@/config/form";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 import { getOrderEvaluationPage, getOrderType } from "@/api/operateOrder/operateOrder";
@@ -270,7 +270,7 @@ export default defineComponent({
       loading,
       basicTableRef,
       getRowKeyId: (row: TableDataItemInter) => row.orderId,
-      statusOptions,
+      starOptions,
       options: [],
       columns,
       itemCount,

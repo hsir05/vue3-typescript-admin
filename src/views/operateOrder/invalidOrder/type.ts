@@ -1,20 +1,17 @@
-export interface TableDataItemInter{
+export interface TableDataItemInter {
     orderId: string
-    orderCancelTime:number
+    orderCancelTime: number
     orderBusinessType: string
-    orderType:string
+    orderType: string
 }
 
 export interface FormInter {
-    timeGe: string | null;
-        timeLe: string | null;
-        influxOrderNoEq: string | null;
-        influxCodeEq: string | null;
-        operationCompanyIdEq: string | null;
-        orderStateEq: string | null;
-        plateNumberEq: string | null;
-        orderTypeEq: string | null;
-        driverNoEq: string | null;
-        customerPhoneEq: string | null;
-        orderBusinessType: string | null;
+    influxOrderNoEq: string | null;
+    influxCodeEq: string | null;
+    orderBusinessTypeEq: string | null;
+    orderTypeEq: string | null;
+    passengerPhone: string | null;
+    customerPhoneEq: string | null;
+    orderInvalidTimeGe: number | null;
+    orderInvalidTimeLe: number | null;
 }
