@@ -103,6 +103,7 @@ import {
   downloadRelativeItinerary,
   invoicePrint,
   invoiceReOpen,
+  invoiceInvalid,
 } from "@/api/individualCustomers/individualCustomers";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
@@ -286,7 +287,7 @@ export default defineComponent({
                 icon: ArrowBackIcon,
                 isIconBtn: true,
                 isShow: record.invoiceApplicationState === 4 ? false : true,
-                onClick: handleBack.bind(null, record.customerInvoiceApplicationId),
+                onClick: handleInvalid.bind(null, record.customerInvoiceApplicationId),
                 auth: ["dict001"],
               },
               {
@@ -363,6 +364,27 @@ export default defineComponent({
     function handleRepeatMail(customerInvoiceApplicationId: string) {
       const { handleModal } = repeatSendMailModalRef.value;
       handleModal(customerInvoiceApplicationId);
+    }
+    // 作废
+    async function handleInvalid(customerInvoiceApplicationId: string) {
+      dialog.warning({
+        title: "提示",
+        content: "确定作废?",
+        positiveText: "确定",
+        negativeText: "取消",
+        onPositiveClick: async () => {
+          try {
+            loading.value = false;
+            let res = await invoiceInvalid({ customerInvoiceApplicationId });
+            message.success(window.$tips[res.code]);
+            loading.value = false;
+          } catch (err) {
+            console.log(err);
+            loading.value = false;
+          }
+        },
+        onNegativeClick: () => {},
+      });
     }
     // 打印
     async function handlePrint(customerInvoiceApplicationId: string) {

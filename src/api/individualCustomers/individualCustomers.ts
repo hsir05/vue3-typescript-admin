@@ -357,6 +357,16 @@ export function invoiceOpen(data:{customerInvoiceApplicationId: string | null; i
   });
 }
 /**
+ * 开票
+*/
+export function invoiceInvalid(data:{customerInvoiceApplicationId: string | null;}) {
+  return otherHttp.request({
+    url: `/customerInvoiceApplication/platform/invoiceInvalid`,
+    method: 'post',
+    data:data
+  });
+}
+/**
  * 重新开票
 */
 export function invoiceReOpen(data:{customerInvoiceApplicationId: string | null;}) {
