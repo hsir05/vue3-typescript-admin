@@ -14,7 +14,7 @@
 <script lang="ts">
 import { useEcharts } from "@/hooks/web/useEcharts";
 import { defineComponent, onMounted, ref, Ref, toRefs } from "vue";
-import { MontherResultInter } from './type';
+import { MonthResultInter} from './type';
 export default defineComponent({
   name: "Order",
   props: {
@@ -37,7 +37,7 @@ export default defineComponent({
       default: () => [],
     },
     dayData: {
-      type: Object as PropType<MontherResultInter>,
+      type: Object as PropType<MonthResultInter>,
       require: true,
       default: () => {},
     },
