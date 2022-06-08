@@ -74,7 +74,7 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import {defineComponent, reactive, ref, toRefs, unref} from "vue";
+import {defineComponent, reactive, ref, toRefs} from "vue";
 import {FormInst, useMessage} from "naive-ui";
 import {QueryFormInter, TableDataItemInter} from "./type";
 import { rules } from "./data";
@@ -120,7 +120,6 @@ export default defineComponent({
             let res = await addExchangeCodeWalletAmount(form.value);
             console.log(res);
             message.success(window.$tips[res.code]);
-            handleSaveAfter();
           } catch (err) {
             console.log(err);
           }
