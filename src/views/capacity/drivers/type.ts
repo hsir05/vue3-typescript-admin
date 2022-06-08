@@ -16,11 +16,11 @@ export interface tableDataItem {
 }
 
 export interface DriverAddressInter{
-    driverId: string
-    driverHomeAddress: string
-    driverHomeAddressDetail: string
-    lng: number
-    lat: number
+    driverId: string | null
+    driverHomeAddress: string | null
+    driverHomeAddressDetail: string | null
+    lng: number | null
+    lat: number | null
 }
 
 export interface CertificatesState {

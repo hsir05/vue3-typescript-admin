@@ -85,10 +85,6 @@ export default defineComponent({
 
     const columns = [
       {
-        type: "selection",
-        align: "center",
-      },
-      {
         title: "序号",
         key: "index",
         align: "center",

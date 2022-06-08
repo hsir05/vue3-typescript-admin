@@ -397,15 +397,15 @@ export function initPassword(data: { driverId: string }) {
  * 保存家庭住址
  */
 interface DriverAddress {
-    driverId: string
-    driverHomeAddress: string
-    driverHomeAddressDetail: string
-    lng: number
-    lat: number
+    driverId: string |null
+    driverHomeAddress: string |null
+    driverHomeAddressDetail: string |null
+    lng: number | null
+    lat: number | null
 }
 export function saveDriverAddress(data: DriverAddress) {
   return http.request({
-    url: "/operationCompanyDriver/saveHomeAddress",
+    url: "/operationCompanyDriver/editHomeAddress",
     method: "post",
     data: data,
   });

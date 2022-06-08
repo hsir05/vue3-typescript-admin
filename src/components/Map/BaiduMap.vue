@@ -546,16 +546,27 @@ function addMarker(lng, lat, icon, width = 30) {
   return marker;
 }
 
-function createMarker() {
-  let marker = new BMap.Marker(point.value, {
-    enableDragging: true,
-  }); // 创建标注
+function createMarker(icon) {
+  let marker;
+  if (icon) {
+    marker = new BMap.Marker(point.value, {
+      enableDragging: true,
+      icon: new BMap.Icon(icon, new BMap.Size(30, 33)),
+    });
+  } else {
+    marker = new BMap.Marker(point.value, { enableDragging: true });
+  }
+  let geoc = new BMap.Geocoder();
+  // 创建标注
   map.value.addOverlay(marker); // 将标注添加到地图中
   // marker.disableDragging();     // 不可拖拽
   marker.addEventListener("dragend", function () {
-    var nowPoint = marker.getPosition(); // 拖拽完成之后坐标的位置
-    console.log(nowPoint);
-    emit("on-dragend", nowPoint.lng, nowPoint.lat);
+    geoc.getLocation(marker.getPosition(), function (rs) {
+      let address = rs.address;
+      let lng = marker.getPosition().lng;
+      let lat = marker.getPosition().lat;
+      emit("on-dragend", lng, lat, address);
+    });
   });
 }
 

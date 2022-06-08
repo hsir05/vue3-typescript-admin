@@ -42,16 +42,13 @@
     </n-form>
 
     <div class="map-box">
-      <BaiduMap ref="baiduMapRef" />
+      <BaiduMap ref="baiduMapRef" @on-dragend="handleDragend" />
     </div>
 
     <div class="text-center flex-center mt-20px">
       <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
         >保存
       </n-button>
-      <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
-        >重置</n-button
-      >
     </div>
   </BasicDrawer>
 </template>
@@ -62,6 +59,7 @@ import { saveDriverAddress, getDriverDetail } from "@/api/capacity/capacity";
 import BaiduMap from "@/components/Map/BaiduMap.vue";
 import { DriverAddressInter } from "./type";
 import { addressRules } from "./data";
+import homeIcon from "@/assets/image/icon_home.png";
 export default defineComponent({
   name: "AddressDrawer",
   components: { BaiduMap },
@@ -77,9 +75,9 @@ export default defineComponent({
 
     const formRef = ref<FormInst | null>(null);
     const form = ref<DriverAddressInter>({
-      driverId: " ",
-      driverHomeAddress: " ",
-      driverHomeAddressDetail: " ",
+      driverId: null,
+      driverHomeAddress: null,
+      driverHomeAddressDetail: null,
       lng: 0,
       lat: 0,
     });
@@ -89,7 +87,11 @@ export default defineComponent({
         if (!errors) {
           state.loading = true;
           try {
-            let res = await saveDriverAddress(form.value);
+            let res = await saveDriverAddress({
+              ...form.value,
+              lng: Math.trunc((form.value.lng as number) * 1000000),
+              lat: Math.trunc((form.value.lat as number) * 1000000),
+            });
             console.log(res);
             message.success(window.$tips[res.code]);
             handleSaveAfter();
@@ -123,28 +125,29 @@ export default defineComponent({
           driverId,
           driverHomeAddress,
           driverHomeAddressDetail,
-          lng: driverHomeAddressLongitude || 103.824048,
-          lat: driverHomeAddressLatitude || 36.061509,
+          lng: driverHomeAddressLongitude * 1e-6 || 103.824048,
+          lat: driverHomeAddressLatitude * 1e-6 || 36.061509,
         };
         console.log(form.value);
 
-        const { renderBaiduMap } = baiduMapRef.value;
-        const { createMarker } = await renderBaiduMap(form.value.lng, form.value.lat);
-        createMarker((lng: number, lat: number) => {
-          console.log(lng, lat);
-        });
-
+        const { renderBaiduMap, createMarker } = baiduMapRef.value;
+        renderBaiduMap(form.value.lng, form.value.lat);
+        createMarker(homeIcon);
         state.loading = false;
       } catch (err) {
         console.log(err);
-        message.error("司机信息获取失败,请稍候重试");
         state.loading = false;
       }
     };
-
-    function handleReset() {}
+    function handleDragend(lng: number, lat: number, address: string) {
+      form.value.lng = lng;
+      form.value.lat = lat;
+      form.value.driverHomeAddress = address;
+      form.value.driverHomeAddressDetail = address;
+    }
 
     function handleSaveAfter() {
+      form.value.driverId = null;
       emit("on-save-after");
     }
 
@@ -162,8 +165,8 @@ export default defineComponent({
       addressRules,
       onCloseAfter,
       openDrawer,
-      handleReset,
       handleValidate,
+      handleDragend,
     };
   },
 });
