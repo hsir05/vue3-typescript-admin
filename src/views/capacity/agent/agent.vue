@@ -87,11 +87,8 @@ export default defineComponent({
       },
       {
         title: "登录账号",
-        key: "loginCredential",
+        key: "companyLoginCredential.loginAccount",
         align: "center",
-        render(row: tableDataItem) {
-          return h("span", { value: row.loginCredential ? row.loginCredential.loginAccount : "" });
-        },
       },
       {
         title: "联系人",
@@ -115,20 +112,21 @@ export default defineComponent({
       },
       {
         title: "状态",
-        key: "loginCredential",
+        key: "companyLoginCredential.loginCredentialState",
         align: "center",
         render(row: tableDataItem) {
-          if (!row.loginCredential) {
+          if (!row.companyLoginCredential) {
             return h("span", " ");
           } else {
             return h(
               NTag,
               {
-                type: row.loginCredential.loginCredentialState === 1 ? "success" : "error",
+                type: row.companyLoginCredential.loginCredentialState === 0 ? "success" : "error",
                 onClick: handleStatus.bind(null, row),
               },
               {
-                default: () => (row.loginCredential.loginCredentialState === 1 ? "正常" : "锁定"),
+                default: () =>
+                  row.companyLoginCredential.loginCredentialState === 0 ? "正常" : "锁定",
               }
             );
           }

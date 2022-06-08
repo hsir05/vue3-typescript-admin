@@ -149,7 +149,9 @@ export default defineComponent({
           operationCompanyAgencyContactGender,
           operationCompanyAgencyContactName,
           operationCompanyAgencyContactPhone,
-          loginCredential: record.loginCredential ? record.loginCredential.loginAccount : null,
+          loginCredential: record.companyLoginCredential
+            ? record.companyLoginCredential.loginAccount
+            : null,
         };
         if (record.operationCompanyList) {
           let agentCompany: allowCompanyState[] = cloneDeep(record.operationCompanyList);

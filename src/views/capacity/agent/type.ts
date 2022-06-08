@@ -20,7 +20,7 @@ export interface itemState {
 
 
 export interface tableDataItem extends itemState {
-   loginCredential: loginCredentialProps;
+   companyLoginCredential: loginCredentialProps;
   operationCompanyList: allowCompanyState[] | null
 }
 
