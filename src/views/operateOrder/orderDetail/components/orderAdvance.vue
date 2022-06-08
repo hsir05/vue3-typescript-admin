@@ -18,7 +18,7 @@
 import { ref, onMounted, h } from "vue";
 import { getOrderAdvance } from "@/api/operateOrder/operateOrder";
 import { useRoute } from "vue-router";
-import { TableDataItemInter } from "./type";
+import { TableDataItemInter } from "../type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import OrderAdvanceFlowOutModal from "./orderAdvanceFlowOutModal.vue";
