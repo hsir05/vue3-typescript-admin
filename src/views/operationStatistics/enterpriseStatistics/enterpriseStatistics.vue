@@ -39,7 +39,7 @@
           class="ml-10px"
           type="primary"
           @click="query"
-          >查找
+        >查找
         </n-button>
       </div>
     </n-form>
@@ -126,24 +126,8 @@ export default defineComponent({
       operationCompanyId: "allCompany",
     });
 
-    interface SelectObjInter {
-      [Symbol: string]: string[];
-    }
-    const selectObj: SelectObjInter = {
-      orderType: ["立即", "预约", "接机", "送机", "半日租", "全日租"],
-      veichleType: [
-        "专车-经济型",
-        "专车-舒适型",
-        "专车-商务型",
-        "专车-豪华型",
-        "快车-经济型",
-        "快车-舒适型",
-        "快车-商务型",
-        "快车-豪华型",
-        "出租车",
-      ],
-    };
-    const legendData = ref<string[]>(["立即", "预约", "接机", "送机", "半日租", "全日租"]);
+
+    const legendData = ref<string[]>([]);
     const lineData = ref<ArrItemInter[]>([]);
     const dateData = ref<string[]>([]);
     const allData = ref<DataItemInter[]>([]);
@@ -220,6 +204,7 @@ export default defineComponent({
     });
 
     const getAllData = async () => {
+      loading.value = true;
       try {
         let response = await getDict({ parentEntryCode: "OT00000" });
         orderTypeData.value = response.data;
@@ -240,14 +225,17 @@ export default defineComponent({
         vehicleTypeData.value = result.data;
 
         getData();
+        loading.value = false;
       } catch (err) {
         console.log(err);
+        loading.value = false;
       }
     };
 
     const getData = async () => {
-      loading.value = true;
       try {
+        loading.value = true;
+        data.value = [];
         let option = {
           operationCompanyId: queryForm.value.operationCompanyId,
           beginDate: dayjs(queryForm.value.section[0]).format("YYYY-MM-DD") as string,
@@ -370,24 +358,50 @@ export default defineComponent({
     const getLineData = () => {
       let arr: Array<number[]> = [];
       dateData.value = [];
+      legendData.value = [];
+      for (let i = 0; i < allData.value.length; i++) {
+        let date = allData.value[i].date;
+        if (dateData.value.indexOf(date) === -1) {
+          dateData.value.push(date);
+        }
+      }
       if (orderType.value === "orderType") {
         for (let key of orderTypeData.value) {
-          let linDataItem = allData.value.filter(
-            (item: DataItemInter) =>
-              item.orderTypeCode === key.entryCode && item.orderBelong === status.value
-          );
-
-          let arrNumber: number[] = linDataItem.map((item) => item.orderCount);
-          arr.push(arrNumber);
+          legendData.value.push(key.entryName);
+          let seriesData: Array<number> = [];
+          for (let i = 0; i < dateData.value.length; i++) {
+            let orderCount = 0;
+            for (let j = 0; j < allData.value.length; j++) {
+              if (
+                allData.value[j].date === dateData.value[i] &&
+                allData.value[j].orderBelong === status.value &&
+                allData.value[j].orderTypeCode === key.entryCode
+              ) {
+                orderCount += allData.value[j].orderCount;
+              }
+            }
+            seriesData.push(orderCount);
+          }
+          arr.push(seriesData);
         }
       } else {
         for (let key of vehicleTypeData.value) {
-          let linDataItem = allData.value.filter(
-            (item: DataItemInter) =>
-              item.vehicleTypeId === key.vehicleTypeId && item.orderBelong === status.value
-          );
-          let arrNumber: number[] = linDataItem.map((item) => item.orderCount);
-          arr.push(arrNumber);
+          legendData.value.push(key.vehicleTypeName);
+          let seriesData: Array<number> = [];
+          for (let i = 0; i < dateData.value.length; i++) {
+            let orderCount = 0;
+            for (let j = 0; j < allData.value.length; j++) {
+              if (
+                allData.value[j].date === dateData.value[i] &&
+                allData.value[j].orderBelong === status.value &&
+                allData.value[j].vehicleTypeId === key.vehicleTypeId
+              ) {
+                orderCount += allData.value[j].orderCount;
+              }
+            }
+            seriesData.push(orderCount);
+          }
+          arr.push(seriesData);
         }
       }
       lineData.value = arr;
@@ -397,13 +411,12 @@ export default defineComponent({
       getData();
     }
 
-    function handleStatus(value: string) {
-      legendData.value = selectObj[value];
+    function handleStatus() {
       getLineData();
     }
 
-    function handleOrderType(value: string) {
-      console.log(value);
+    function handleOrderType() {
+      getLineData();
     }
 
     return {

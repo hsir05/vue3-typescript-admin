@@ -7,6 +7,7 @@ import {
   MapChart,
   PictorialBarChart,
   GaugeChart,
+  HeatmapChart
 } from 'echarts/charts';
 
 import {
@@ -48,6 +49,7 @@ echarts.use([
   VisualMapComponent,
   TimelineComponent,
   CalendarComponent,
+  HeatmapChart
 ]);
 
 export default echarts;

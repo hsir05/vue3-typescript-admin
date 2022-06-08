@@ -1666,9 +1666,9 @@
   "resolved" "https://registry.npmmirror.com/entities/-/entities-3.0.1.tgz"
   "version" "3.0.1"
 
-"esbuild-darwin-64@0.14.22":
-  "integrity" "sha512-d8Ceuo6Vw6HM3fW218FB6jTY6O3r2WNcTAU0SGsBkXZ3k8SDoRLd3Nrc//EqzdgYnzDNMNtrWegK2Qsss4THhw=="
-  "resolved" "https://registry.npmmirror.com/esbuild-darwin-64/-/esbuild-darwin-64-0.14.22.tgz"
+"esbuild-windows-64@0.14.22":
+  "integrity" "sha512-AxjIDcOmx17vr31C5hp20HIwz1MymtMjKqX4qL6whPj0dT9lwxPexmLj6G1CpR3vFhui6m75EnBEe4QL82SYqw=="
+  "resolved" "https://registry.npmmirror.com/esbuild-windows-64/-/esbuild-windows-64-0.14.22.tgz"
   "version" "0.14.22"
 
 "esbuild@^0.14.14", "esbuild@>=0.13":
@@ -2175,11 +2175,6 @@
   "integrity" "sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw=="
   "resolved" "https://registry.npmmirror.com/fs.realpath/-/fs.realpath-1.0.0.tgz"
   "version" "1.0.0"
-
-"fsevents@~2.3.2":
-  "integrity" "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA=="
-  "resolved" "https://registry.npmmirror.com/fsevents/-/fsevents-2.3.2.tgz"
-  "version" "2.3.2"
 
 "function-bind@^1.1.1":
   "integrity" "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="
