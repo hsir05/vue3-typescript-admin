@@ -9,7 +9,7 @@ export function getInfluxList() {
 }
 
 /**
- * 获取所有运营企业 
+ * 获取所有运营企业
 */
 export function getAllOperateCompany() {
     return http.request({
@@ -18,7 +18,7 @@ export function getAllOperateCompany() {
     });
 }
 /**
- * 获取所有可代理运营企业 
+ * 获取所有可代理运营企业
 */
 export function getAencyCompany() {
     return http.request({

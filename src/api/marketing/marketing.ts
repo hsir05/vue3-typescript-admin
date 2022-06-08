@@ -252,6 +252,36 @@ export function getRecordPagePage(data: RecordPageInter) {
         data: data,
     });
 }
+/**
+ * 兑换码兑换金额
+ */
+interface AddExchangeCodeWalletAmountInter {
+
+  exchangeCode: string,
+  exchangeCodeEffectiveTimeBegin: string,
+  exchangeCodeEffectiveTimeEnd: string,
+  exchangeCodeUsableCount: number,
+  walletAmount: {
+    exchangeRechargeAmount: number,
+    exchangeGiftAmount: number
+  }
+
+}
+export function addExchangeCodeWalletAmount(data: AddExchangeCodeWalletAmountInter) {
+  return http.request({
+    url: "/exchangeCode/addExchangeCodeWalletAmount",
+    method: "post",
+    data: data,
+  });
+}
+//检验兑换码是否重复
+export function uniqueExchangeCode(exchangeCode: string) {
+  return http.request({
+    url: "/exchangeCode/uniqueExchangeCode",
+    method: "post",
+    data: exchangeCode,
+  });
+}
 //-----------------钱包充值活动管理-------------------------
 
 /**
@@ -292,7 +322,7 @@ interface RechargeActivityInter {
     activityBeginTime: string | null;
     activityEndTime: string | null;
     activityDesc: string | null;
-} 
+}
 export function addRechargeActivity(data: RechargeActivityInter) {
     return http.request({
         url: "/customerWalletRechargeActivity/add",
