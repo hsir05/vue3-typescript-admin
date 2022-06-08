@@ -258,7 +258,7 @@ interface AuthAddInter{
 }
 export function addAuth(data: AuthAddInter) {
   return http.request({
-    url: '/role/add',
+    url: '/authority/add',
     method: 'post',
     data
   });
@@ -268,7 +268,7 @@ export function addAuth(data: AuthAddInter) {
 */
 export function editAuth(data: AuthAddInter) {
   return http.request({
-    url: '/role/edit',
+    url: '/authority/edit',
     method: 'post',
     data
   });
@@ -288,7 +288,7 @@ export function getAuthDetail(data: {authorityId:string}) {
 */
 export function removeAuth(data: {authorityId:string}) {
   return http.request({
-    url: '/admin/delete',
+    url: '/authority/delete',
     method: 'post',
     data
   });

@@ -10,13 +10,13 @@
       label-width="100"
       :model="form"
     >
-      <n-form-item label="角色名称" path="name">
+      <n-form-item label="权限名称" path="name">
         <n-input
           v-model:value="form.name"
           clearable
           :maxlength="20"
           @blur="nameUnique"
-          placeholder="输角色名称"
+          placeholder="输入权限名称"
         />
       </n-form-item>
       <n-form-item label="CODE" path="code">
@@ -70,7 +70,7 @@ import { addAuth, editAuth, getAuthDetail, authNameUniqueCheck } from "@/api/sys
 export default defineComponent({
   name: "AuthDrawer",
   setup(_, { emit }) {
-    const title = ref("角色");
+    const title = ref("权限");
     const data = reactive({
       isDrawer: false,
       loading: false,
@@ -182,7 +182,7 @@ export default defineComponent({
           validator: (rule: FormItemRule, value: string) => {
             return verifyCN(rule, value);
           },
-          message: "请输入中文角色名称",
+          message: "请输入中文权限名称",
         },
         code: {
           required: true,
