@@ -295,11 +295,89 @@ export function removeAuth(data: {authorityId:string}) {
 }
 
 /***
- * 角色名称去重
+ * 权限名称去重
 */
 export function authNameUniqueCheck(data: {name: string | null;}) {
   return http.request({
     url: '/authority/nameUniqueCheck',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 权限编码去重
+*/
+export function codeUniqueCheck(data: {code: string | null;}) {
+  return http.request({
+    url: '/authority/codeUniqueCheck',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 权限url去重
+*/
+export function urlUniqueCheck(data: {url: string | null;}) {
+  return http.request({
+    url: '/authority/urlUniqueCheck',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 修改权限状态
+*/
+export function modifyAuthState(data: {authorityId: string | null;}) {
+  return http.request({
+    url: '/authority/modifyState',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 指定角色权限列表查询
+*/
+export function listViaRole(data: {roleId: string | null;}) {
+  return http.request({
+    url: '/authority/listViaRole',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 指定管理员权限列表查询
+*/
+export function listViaAdmin(data: {adminId: string | null;}) {
+  return http.request({
+    url: '/authority/listViaAdmin',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 角色赋权
+*/
+interface AuthToRoleInter {
+    authorityIdList: string[]
+    roleId:string
+}
+export function grantToRole(data: AuthToRoleInter) {
+  return http.request({
+    url: '/authority/grantToRole',
+    method: 'post',
+    data
+  });
+}
+/***
+ * 角色权限回收
+*/
+interface RevokeFromRoleInter {
+    authorityIdList: string[]
+    roleId:string
+}
+export function revokeFromRole(data: RevokeFromRoleInter) {
+  return http.request({
+    url: '/authority/revokeFromRole',
     method: 'post',
     data
   });
