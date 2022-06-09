@@ -19,7 +19,7 @@
           placeholder="输角色名称"
         />
       </n-form-item>
-      <n-form-item label="父级" path="parentRoleId">
+      <n-form-item label="父级名称" path="parentRoleId">
         <n-select
           v-model:value="form.parentRoleId"
           clearable
@@ -61,12 +61,17 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
-import { FormInst, useMessage, FormItemRule, SelectOption } from "naive-ui";
-import { verifyCN } from "@/utils/verify";
+import { defineComponent, reactive, toRefs, onMounted, ref } from "vue";
+import { FormInst, useMessage, SelectOption } from "naive-ui";
 import { RoleFormInter } from "./type";
 import { lockOptions } from "@/config/form";
-import { addRole, editRole, getRoleDetail, nameUniqueCheck } from "@/api/system/system";
+import {
+  addRole,
+  editRole,
+  getRoleDetail,
+  getAllRoles,
+  nameUniqueCheck,
+} from "@/api/system/system";
 export default defineComponent({
   name: "RoleDrawer",
   setup(_, { emit }) {
@@ -80,7 +85,7 @@ export default defineComponent({
     const message = useMessage();
     const form = ref<RoleFormInter>({
       name: null,
-      parentRoleId: "388927c1f9d642d48d827f461820ac8b",
+      parentRoleId: null,
       description: null,
       createTime: null,
       state: 1,
@@ -94,6 +99,20 @@ export default defineComponent({
       title.value = t;
       data.isDrawer = true;
     }
+    onMounted(() => {
+      getCurrentRoles();
+    });
+
+    const getCurrentRoles = async () => {
+      try {
+        let res = await getAllRoles();
+        rolesOptions.value = res.data.map((item: { name: string; roleId: string }) => {
+          return { label: item.name, value: item.roleId };
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getDetail = async (roleId: string) => {
       try {
@@ -136,6 +155,9 @@ export default defineComponent({
 
     async function nameUnique() {
       try {
+        if (!form.value.name) {
+          return false;
+        }
         let res = await nameUniqueCheck({
           name: form.value.name,
           parentRoleId: form.value.parentRoleId as string,
@@ -175,10 +197,13 @@ export default defineComponent({
         name: {
           required: true,
           trigger: ["blur", "input"],
-          validator: (rule: FormItemRule, value: string) => {
-            return verifyCN(rule, value);
-          },
-          message: "请输入中文角色名称",
+          pattern: /^[\u4E00-\u9FA5]{2,10}$/,
+          message: "请输入2到10位的中文角色名称",
+        },
+        parentRoleId: {
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请输入父级角色",
         },
       },
       lockOptions,

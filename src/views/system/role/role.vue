@@ -91,6 +91,20 @@ export default defineComponent({
         key: "name",
         align: "center",
       },
+
+      {
+        title: "描述",
+        key: "description",
+        align: "center",
+      },
+      {
+        title: "角色创建时间",
+        key: "createTime",
+        align: "center",
+        render(record: TableItemInter) {
+          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
+        },
+      },
       {
         title: "状态",
         key: "state",
@@ -105,19 +119,6 @@ export default defineComponent({
               default: () => (row.state === 1 ? "锁定" : "正常"),
             }
           );
-        },
-      },
-      {
-        title: "描述",
-        key: "description",
-        align: "center",
-      },
-      {
-        title: "角色创建时间",
-        key: "createTime",
-        align: "center",
-        render(record: TableItemInter) {
-          return h("span", dayjs(record.createTime).format("YYYY-MM-DD HH:mm"));
         },
       },
       {

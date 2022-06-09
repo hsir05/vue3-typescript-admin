@@ -30,11 +30,11 @@ export const menuOptions: MenuOption[] = [
     key: "/system",
     icon: renderIcon(AlbumIcon),
     children: [
-      {
-        label: "字典管理",
-        path: "/system/dict",
-        key: "/system/dict",
-      },
+    //   {
+    //     label: "字典管理",
+    //     path: "/system/dict",
+    //     key: "/system/dict",
+    //   },
       {
         label: "用户管理",
         path: "/system/user",

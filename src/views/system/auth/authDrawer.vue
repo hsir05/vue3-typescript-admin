@@ -50,10 +50,20 @@
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
+        <n-button
+          attr-type="button"
+          :loading="loading"
+          :disabled="disabled"
+          type="primary"
+          @click="handleValidate"
           >保存
         </n-button>
-        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
+        <n-button
+          attr-type="button"
+          type="warning"
+          :disabled="disabled"
+          class="ml-10px"
+          @click="handleReset"
           >重置
         </n-button>
       </div>
@@ -107,6 +117,7 @@ export default defineComponent({
         form.value = res.data;
       } catch (err) {
         console.log(err);
+        data.disabled = true;
         data.loading = false;
       }
     };

@@ -10,8 +10,8 @@
       :show-feedback="false"
       :model="queryValue"
     >
-      <n-form-item label="角色名称" path="nameLike">
-        <n-input v-model:value="queryValue.nameLike" clearable placeholder="输入角色名称" />
+      <n-form-item label="权限名称" path="nameLike">
+        <n-input v-model:value="queryValue.nameLike" clearable placeholder="输入权限名称" />
       </n-form-item>
 
       <n-form-item label="状态" path="stateEq">
