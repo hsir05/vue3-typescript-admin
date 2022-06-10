@@ -45,14 +45,21 @@
     />
 
     <RoleDrawer ref="roleDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+
+    <RoleAuthDrawer ref="roleAuthDrawerRef" :width="800" @on-save-after="handleSaveAfter" />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
-import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+import {
+  TrashOutline as RemoveIcon,
+  CreateOutline as CreateIcon,
+  ServerOutline as ServerIcon,
+} from "@vicons/ionicons5";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import BasicTable from "@/components/Table/Table.vue";
 import RoleDrawer from "./roleDrawer.vue";
+import RoleAuthDrawer from "./roleAuthDrawer.vue";
 import { NButton, useMessage } from "naive-ui";
 import { lockOptions } from "@/config/form";
 import { TableItemInter } from "./type";
@@ -61,11 +68,12 @@ import { getRolesPage, removeRole, modifyRoleState } from "@/api/system/system";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "Roles",
-  components: { BasicTable, RoleDrawer },
+  components: { BasicTable, RoleDrawer, RoleAuthDrawer },
   setup() {
     const loading = ref(false);
     const roleDrawerRef = ref();
     const basicTableRef = ref();
+    const roleAuthDrawerRef = ref();
     const itemCount = ref(null);
     const message = useMessage();
     const queryValue = ref({
@@ -140,6 +148,14 @@ export default defineComponent({
                 auth: ["dict001"],
               },
               {
+                label: "角色赋权",
+                type: "primary",
+                icon: ServerIcon,
+                isIconBtn: true,
+                onClick: handleToAuth.bind(null, record.roleId, record.name),
+                auth: ["dict001"],
+              },
+              {
                 label: "删除",
                 type: "error",
                 icon: RemoveIcon,
@@ -188,6 +204,11 @@ export default defineComponent({
       }
     }
 
+    function handleToAuth(roleId: string, name: string) {
+      const { openDrawer } = roleAuthDrawerRef.value;
+      openDrawer(roleId, name);
+    }
+
     function handleEdit(roleId: string) {
       const { openDrawer } = roleDrawerRef.value;
       openDrawer("编辑角色", roleId);
@@ -221,6 +242,9 @@ export default defineComponent({
         createTimeGe: null,
         createTimeLe: null,
       };
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {
@@ -249,6 +273,7 @@ export default defineComponent({
       data,
       roleDrawerRef,
       basicTableRef,
+      roleAuthDrawerRef,
       getRowKeyId: (row: TableItemInter) => row.roleId,
       lockOptions,
       itemCount,

@@ -245,7 +245,7 @@ export default defineComponent({
         url: {
           required: true,
           trigger: ["blur", "input"],
-          pattern: /^([a-zA-Z]+)+$/,
+          // pattern: /^(/[a-zA-Z]+)+$/,
           message: "请输入英文格式权限路径",
         },
       },

@@ -7,6 +7,7 @@ export interface RoleInfoInter{
 export interface TableItemInter {
   adminId: string;
   name: string;
+  
   account: string;
   phone: string;
   sex: number;
@@ -16,7 +17,8 @@ export interface TableItemInter {
   roles: RoleInfoInter[]
 }
 export interface UserFormInter{
-    adminId?: string | null
+    adminId?: string | null 
+    pwd: string | null
     name: string | null
     sex: number | null
     phone: string | null

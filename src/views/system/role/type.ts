@@ -16,3 +16,8 @@ export interface RoleFormInter {
     createTime?: number | null;
     state: number | null;
 }
+
+export interface RoleAuthFormInter{
+    roleId: string | null;
+    authorityIdList: string[]
+}

@@ -188,7 +188,7 @@ interface UserInter{
 }
 export function addUser(data: UserInter) {
   return http.request({
-    url: '/role/add',
+    url: '/admin/add',
     method: 'post',
     data
   });
@@ -198,7 +198,7 @@ export function addUser(data: UserInter) {
 */
 export function editUser(data: UserInter) {
   return http.request({
-    url: '/role/edit',
+    url: '/admin/edit',
     method: 'post',
     data
   });
@@ -370,7 +370,7 @@ export function listViaAdmin(data: {adminId: string | null;}) {
 */
 interface AuthToRoleInter {
     authorityIdList: string[]
-    roleId:string
+    roleId:string | null
 }
 export function grantToRole(data: AuthToRoleInter) {
   return http.request({

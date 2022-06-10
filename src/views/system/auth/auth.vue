@@ -225,6 +225,9 @@ export default defineComponent({
         createTimeGe: null,
         createTimeLe: null,
       };
+      const { resetPagination } = basicTableRef.value;
+      resetPagination();
+      getData({ pageIndex: 1, pageSize: 10 });
     };
 
     function reloadPage() {

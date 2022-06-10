@@ -11,10 +11,13 @@
       :model="form"
     >
       <n-form-item label="帐号" path="account">
-        <n-input v-model:value="form.account" clearable placeholder="输入帐号" />
+        <n-input v-model:value="form.account" clearable :maxlength="20" placeholder="输入帐号" />
       </n-form-item>
       <n-form-item label="用户名称" path="name">
-        <n-input v-model:value="form.name" clearable placeholder="输入用户名称" />
+        <n-input v-model:value="form.name" clearable :maxlength="4" placeholder="输入用户名称" />
+      </n-form-item>
+      <n-form-item label="密码" path="pwd">
+        <n-input v-model:value="form.pwd" clearable :maxlength="4" placeholder="输入密码" />
       </n-form-item>
       <n-form-item label="性别" path="sex">
         <n-select v-model:value="form.sex" placeholder="选择性别" :options="sexOptions" />
@@ -23,7 +26,7 @@
         <n-input v-model:value="form.phone" clearable placeholder="输入电话号码" :maxlength="11" />
       </n-form-item>
       <n-form-item label="邮箱" path="email">
-        <n-input v-model:value="form.email" clearable placeholder="输入邮箱" />
+        <n-input v-model:value="form.email" :maxlength="50" clearable placeholder="输入邮箱" />
       </n-form-item>
       <n-form-item label="角色" path="roleIds">
         <n-select
@@ -59,7 +62,7 @@ import { FormInst, SelectOption, useMessage } from "naive-ui";
 import { rules } from "./data";
 import { lockOptions, sexOptions } from "@/config/form";
 import { addUser, editUser, getUserDetail, getAllRoles } from "@/api/system/system";
-// import md5 from "blueimp-md5";
+import md5 from "blueimp-md5";
 import { UserFormInter } from "./type";
 export default defineComponent({
   name: "UserDrawer",
@@ -80,6 +83,7 @@ export default defineComponent({
       account: null,
       email: null,
       roleIds: null,
+      pwd: null,
       state: 0,
     });
     onMounted(() => {
@@ -130,8 +134,17 @@ export default defineComponent({
           data.loading = true;
           try {
             let res;
-            const { adminId, name, sex, phone, account, email, state, roleIds } = form.value;
-            let option = { name, sex, phone, account, email, state, roleIds };
+            const { adminId, name, sex, phone, account, email, state, roleIds, pwd } = form.value;
+            let option = {
+              name,
+              sex,
+              phone,
+              account,
+              email,
+              state,
+              roleIds,
+              pwd: md5(pwd as string),
+            };
             if (!form.value.adminId) {
               res = await addUser(option);
               console.log(res);
@@ -158,6 +171,7 @@ export default defineComponent({
     function handleReset() {
       form.value = {
         name: null,
+        pwd: null,
         sex: null,
         phone: null,
         account: null,
