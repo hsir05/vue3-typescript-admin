@@ -136,7 +136,7 @@ export function nameUniqueCheck(data: {name: string | null; parentRoleId:string 
 /***
  * 修改角色状态
 */
-export function modifyState(data: {roleId: string}) {
+export function modifyRoleState(data: {roleId: string}) {
   return http.request({
     url: '/role/modifyState',
     method: 'post',
@@ -220,6 +220,17 @@ export function removeUser(data: {adminId:string}) {
   return http.request({
     url: '/admin/delete',
     method: 'post',
+    data
+  });
+}
+
+/***
+ * 修改用户状态
+*/
+export function modifyUserState(data: {adminId: string | null;}) {
+  return http.request({
+    url: '/admin/modifyState',
+    method: 'post', 
     data
   });
 }

@@ -53,11 +53,11 @@ import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons
 import TableActions from "@/components/TableActions/TableActions.vue";
 import BasicTable from "@/components/Table/Table.vue";
 import RoleDrawer from "./roleDrawer.vue";
-import { NTag, useMessage } from "naive-ui";
+import { NButton, useMessage } from "naive-ui";
 import { lockOptions } from "@/config/form";
 import { TableItemInter } from "./type";
 import { PaginationInter } from "@/api/type";
-import { getRolesPage, removeRole } from "@/api/system/system";
+import { getRolesPage, removeRole, modifyRoleState } from "@/api/system/system";
 import dayjs from "dayjs";
 export default defineComponent({
   name: "Roles",
@@ -111,9 +111,11 @@ export default defineComponent({
         align: "center",
         render(row: TableItemInter) {
           return h(
-            NTag,
+            NButton,
             {
-              type: row.state === 1 ? "error" : "success",
+              type: row.state === 1 ? "warning" : "success",
+              size: "small",
+              onClick: handleState.bind(null, row.roleId),
             },
             {
               default: () => (row.state === 1 ? "锁定" : "正常"),
@@ -172,6 +174,19 @@ export default defineComponent({
         loading.value = false;
       }
     };
+
+    async function handleState(roleId: string) {
+      try {
+        loading.value = true;
+        let res = await modifyRoleState({ roleId });
+        message.success(window.$tips[res.code]);
+        getData({ pageIndex: 1, pageSize: 10 });
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
 
     function handleEdit(roleId: string) {
       const { openDrawer } = roleDrawerRef.value;

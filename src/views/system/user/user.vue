@@ -64,11 +64,11 @@ import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { TrashOutline as RemoveIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
 import BasicTable from "@/components/Table/Table.vue";
-import { NTag, useMessage } from "naive-ui";
+import { NButton, NTag, useMessage } from "naive-ui";
 import UserDrawer from "./userDrawer.vue";
 import { TableItemInter } from "./type";
 import { lockOptions } from "@/config/form";
-import { getUsersPage, removeUser } from "@/api/system/system";
+import { getUsersPage, removeUser, modifyUserState } from "@/api/system/system";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
 export default defineComponent({
@@ -153,9 +153,11 @@ export default defineComponent({
         align: "center",
         render(row: TableItemInter) {
           return h(
-            NTag,
+            NButton,
             {
-              type: row.state === 1 ? "error" : "success",
+              type: row.state === 1 ? "warning" : "success",
+              size: "small",
+              onClick: handleState.bind(null, row.adminId),
             },
             {
               default: () => (row.state === 1 ? "锁定" : "正常"),
@@ -226,6 +228,19 @@ export default defineComponent({
         loading.value = false;
       }
     };
+
+    async function handleState(adminId: string) {
+      try {
+        loading.value = true;
+        let res = await modifyUserState({ adminId });
+        message.success(window.$tips[res.code]);
+        getData({ pageIndex: 1, pageSize: 10 });
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    }
 
     function handleEdit(adminId: string) {
       const { openDrawer } = userDrawerRef.value;
