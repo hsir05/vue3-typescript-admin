@@ -89,13 +89,14 @@
 </template>
 <script lang="ts">
 import {defineComponent, ref, unref, onMounted} from "vue";
-import {FormInst, useMessage} from "naive-ui";
+import {FormInst, FormItemRule, useMessage} from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
 import {
   customerCouponConsumeRuleDetail,
   customerCouponConsumeRuleList
 } from "@/api/marketing/marketing";
 import {CouponInter} from "@/views/marketing/exchangeCode/type";
+import {positiveInteger} from "@/utils/verify";
 
 export default defineComponent({
   name: "VoucherModal",
@@ -117,8 +118,10 @@ export default defineComponent({
     const isShow = ref(false)
     const formRef = ref<FormInst | null>(null);
     const customerCouponConsumeRuleListData = ref()
-    const handleModal = (value: CouponInter) => {
-     // form.value = value;
+    const handleModal = (value: CouponInter | null) => {
+      if (value !== null){
+        form.value = value
+      }
       console.log(value)
       const {showModal} = ModalRef.value;
       showModal();
@@ -214,8 +217,24 @@ export default defineComponent({
         customerCouponConsumeRuleId: {required: true, trigger: ["blur", "change"], message: "请选择消费规则"},
         couponName: {required: true, trigger: ["blur", "change"], message: "请输入代金券名称"},
         couponDenomination: {required: true, type: "number", trigger: ["blur", "change"], message: "请输入代金券面值"},
-        couponEffectiveDays: {required: true, type: "number", trigger: ["blur", "change"], message: "请输入有效天数"},
-        couponCount: {required: true, type: "number", trigger: ["blur", "change"], message: "请输入数量"},
+        couponEffectiveDays: {
+          required: true,
+          type: "number",
+          trigger: ["blur", "change"],
+          validator: (rule: FormItemRule, value: string) => {
+            return positiveInteger(rule, value)
+          },
+          message: "请输入有效天数"
+        },
+        couponCount: {
+          required: true,
+          type: "number",
+          trigger: ["blur", "change"],
+          validator: (rule: FormItemRule, value: string) => {
+            return positiveInteger(rule, value)
+          },
+          message: "请输入正确数量"
+        },
       },
       detail,
       handleUpdateValue,

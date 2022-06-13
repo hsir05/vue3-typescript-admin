@@ -248,7 +248,7 @@ export default defineComponent({
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData({pageIndex: 1, pageSize: 10});
+      reloadPage()
     }
 
     return {
