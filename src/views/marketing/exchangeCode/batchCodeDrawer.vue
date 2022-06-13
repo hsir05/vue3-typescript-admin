@@ -49,12 +49,11 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { RefreshCircleOutline as RefreshIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import CodeDetailModal from "./codeDetailModal.vue";
 
-import {CouponInter, DataImportTaskITemInter} from "./type";
 import dayjs from "dayjs";
 import {dataImportTaskDetail, dataImportTaskPage} from "@/api/common/common";
 import BasicTable from "@/components/Table/Table.vue";
 import {PaginationInter} from "@/api/type";
-import loading from "naive-ui/lib/_internal/loading";
+import {DataImportTaskITemInter} from "@/views/marketing/exchangeCode/type";
 export default defineComponent({
   name: "BatchCodeDrawer",
   components: { CodeDetailModal, CodeDrawer ,BasicTable},
