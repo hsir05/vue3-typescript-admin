@@ -21,7 +21,7 @@
           filterable
           placeholder="选择兑换类型"
           style="width: 160px"
-          :options="options"
+          :options="stateListData"
         />
       </n-form-item>
 
@@ -42,17 +42,21 @@
       <div class="flex pb-10px">
         <n-button-group>
           <n-dropdown trigger="hover" :options="codeOptions" @select="handleCode">
-            <n-button type="primary"
-              ><template #icon> <n-icon :component="DocumentIcon" /> </template
-              >代金券兑换码</n-button
-            >
+            <n-button type="primary">
+              <template #icon>
+                <n-icon :component="DocumentIcon" />
+              </template>
+              代金券兑换码
+            </n-button>
           </n-dropdown>
 
           <n-dropdown trigger="hover" :options="amoutOptions" @select="handleAmout">
-            <n-button type="primary"
-              ><template #icon> <n-icon :component="AccountBookIcon" /> </template
-              >金额兑换码</n-button
-            >
+            <n-button type="primary">
+              <template #icon>
+                <n-icon :component="AccountBookIcon" />
+              </template>
+              金额兑换码
+            </n-button>
           </n-dropdown>
         </n-button-group>
       </div>
@@ -61,7 +65,7 @@
         ref="table"
         striped
         :columns="columns"
-        min-height="400px"
+        min-height="500px"
         flex-height
         class="box-border"
         :row-key="getRowKeyId"
@@ -81,18 +85,18 @@
         :on-update:page-size="handlePageSize"
         :page-sizes="pageSizes"
       >
-        <template #prefix> 共 {{ itemCount }} 项 </template>
+        <template #prefix> 共 {{ itemCount }} 项</template>
       </n-pagination>
     </div>
 
-    <CodeDetailDrawer ref="codeDetailDrawerRef" :width="500" />
+    <CodeDetailDrawer ref="codeDetailDrawerRef" :width="700" />
     <ExchangeRecordCodeDrawer ref="recordDrawerRef" :width="650" />
     <CodeDrawer ref="codeDrawerRef" :width="650" />
 
-    <BatchCodeDrawer ref="batchCodeDrawerRef" :width="750" />
+    <BatchCodeDrawer ref="batchCodeDrawerRef" />
 
-    <AmountDrawer ref="amountDrawerRef" :width="500" />
-    <BatchAmountDrawer ref="batchAmountDrawerRef" :width="750" />
+    <AmountDrawer ref="amountDrawerRef" :width="500" @on-save-after="handleSaveAfter" />
+    <BatchAmountDrawer ref="batchAmountDrawerRef" />
   </div>
 </template>
 <script lang="ts">
@@ -115,6 +119,8 @@ import dayjs from "dayjs";
 import { pageSizes } from "@/config/table";
 import { PaginationInter } from "@/api/type";
 import { getExchangeCodePage } from "@/api/marketing/marketing";
+import { getDict } from "@/api/common/common";
+
 export default defineComponent({
   name: "ExchangeCode",
   components: {
@@ -137,6 +143,8 @@ export default defineComponent({
       pageIndex: 1,
       pageSize: 10,
     });
+    const stateListData = ref();
+    const stateData: Map<string, string> = new Map();
     const formRef = ref<FormInst | null>(null);
     const codeDetailDrawerRef = ref();
     const recordDrawerRef = ref();
@@ -165,11 +173,20 @@ export default defineComponent({
         title: "兑换类型",
         key: "exchangeCodeExchangeType",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h("span", stateData.get(record.exchangeCodeExchangeType));
+        },
       },
       {
         title: "生效时间",
         key: "exchangeCodeEffectiveTimeBegin",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h(
+            "span",
+            dayjs(record.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
+          );
+        },
       },
       {
         title: "失效时间",
@@ -192,12 +209,12 @@ export default defineComponent({
       },
       {
         title: "可兑换次数",
-        key: "exchangeCodeUsedCount",
+        key: "exchangeCodeUsableCount",
         align: "center",
       },
       {
         title: "已兑换次数",
-        key: "exchangeCodeUsableCount",
+        key: "exchangeCodeUsedCount",
         align: "center",
       },
       {
@@ -237,6 +254,13 @@ export default defineComponent({
     const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
+        let dict = await getDict({ parentEntryCode: "EXT0000" });
+        dict.data.map((item: { entryName: string; entryCode: string }) => {
+          stateData.set(item.entryCode, item.entryName);
+        });
+        stateListData.value = dict.data.map((item: { entryName: string; entryCode: string }) => {
+          return { label: item.entryName, value: item.entryCode };
+        });
         let search = { ...form.value };
         let res = await getExchangeCodePage({ page, search: search });
         data.value = res.data.content;
@@ -255,20 +279,20 @@ export default defineComponent({
     function handleCode(key: string | number) {
       if (key === "codeSingle") {
         const { openDrawer } = codeDrawerRef.value;
-        openDrawer("添加兑换码");
+        openDrawer("添加兑换码", true);
       } else {
         const { openDrawer } = batchCodeDrawerRef.value;
-        openDrawer("批量添加兑换码");
+        openDrawer("批量添加代金券记录");
       }
     }
 
     function handleAmout(key: string | number) {
       if (key === "amoutSingle") {
         const { openDrawer } = amountDrawerRef.value;
-        openDrawer("添加兑换码");
+        openDrawer("添加兑换码", true);
       } else {
         const { openDrawer } = batchAmountDrawerRef.value;
-        openDrawer("批量添加代金券");
+        openDrawer("批量添加金额兑换码记录");
       }
     }
 
@@ -286,9 +310,16 @@ export default defineComponent({
       pagination.pageIndex = pageIndex;
       getData(toRaw(pagination));
     }
+
     function handlePageSize(pageSize: number) {
       pagination.pageSize = pageSize;
       getData(toRaw(pagination));
+    }
+
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+      getData({ pageIndex: 1, pageSize: 10 });
     }
 
     return {
@@ -301,10 +332,12 @@ export default defineComponent({
       batchAmountDrawerRef,
       amountDrawerRef,
       loading,
+      stateListData,
       options: [],
       itemCount,
       columns,
       data,
+      stateData,
       getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
       pagination,
       pageSizes,
@@ -336,6 +369,7 @@ export default defineComponent({
       handleCode,
       handleAmout,
       handlePageSize,
+      handleSaveAfter,
     };
   },
 });

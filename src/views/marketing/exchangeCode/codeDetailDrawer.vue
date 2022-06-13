@@ -3,7 +3,7 @@
     <n-descriptions label-placement="left" bordered :column="2">
       <n-descriptions-item label="兑换码">{{ detail?.exchangeCode }}</n-descriptions-item>
       <n-descriptions-item label="兑换类型">{{
-        detail?.exchangeCodeExchangeType
+        stateData.get(detail?.exchangeCodeExchangeType)
       }}</n-descriptions-item>
       <n-descriptions-item label="生效时间" :span="2">{{
         dayjs(detail?.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
@@ -12,10 +12,10 @@
         dayjs(detail?.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
       }}</n-descriptions-item>
       <n-descriptions-item label="可兑换次数">{{
-        detail?.exchangeCodeUsedCount
+        detail?.exchangeCodeUsableCount
       }}</n-descriptions-item>
       <n-descriptions-item label="已兑换次数">{{
-        detail?.exchangeCodeUsableCount
+        detail?.exchangeCodeUsedCount
       }}</n-descriptions-item>
       <n-descriptions-item label="兑换实充金额">{{
         detail?.exchangeRechargeAmount
@@ -30,6 +30,7 @@
 import { defineComponent, reactive, ref, toRefs } from "vue";
 import { getExchangeCodeDetail } from "@/api/marketing/marketing";
 import dayjs from "dayjs";
+import { getDict } from "@/api/common/common";
 export default defineComponent({
   name: "CodeDetailDrawer",
   setup() {
@@ -38,7 +39,7 @@ export default defineComponent({
       loading: false,
     });
     const detail = ref();
-
+    const stateData: Map<string, string> = new Map();
     function openDrawer(exchangeCodeId: string) {
       if (exchangeCodeId) {
         getDetail(exchangeCodeId);
@@ -49,6 +50,10 @@ export default defineComponent({
     const getDetail = async (exchangeCodeId: string) => {
       try {
         state.loading = true;
+        let dict = await getDict({ parentEntryCode: "EXT0000" });
+        dict.data.map((item: { entryName: string; entryCode: string }) => {
+          stateData.set(item.entryCode, item.entryName);
+        });
         let res = await getExchangeCodeDetail({ exchangeCodeId });
         console.log(res);
         detail.value = res.data;
@@ -70,6 +75,7 @@ export default defineComponent({
       detail,
       openDrawer,
       onCloseAfter,
+      stateData,
     };
   },
 });
