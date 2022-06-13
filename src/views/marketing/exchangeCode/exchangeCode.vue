@@ -11,7 +11,7 @@
       :model="form"
     >
       <n-form-item label="兑换码" path="exchangeCodeLike">
-        <n-input v-model:value="form.exchangeCodeLike" clearable placeholder="输入兑换码" />
+        <n-input v-model:value="form.exchangeCodeLike" clearable placeholder="输入兑换码"/>
       </n-form-item>
 
       <n-form-item label="兑换类型" path="exchangeCodeExchangeTypeEq">
@@ -21,16 +21,16 @@
           filterable
           placeholder="选择兑换类型"
           style="width: 160px"
-          :options="options"
+          :options="stateListData"
         />
       </n-form-item>
 
       <n-form-item label="生成时间(起始)" path="exchangeCodeCreateTimeGe">
-        <n-date-picker v-model:value="form.exchangeCodeCreateTimeGe" type="datetime" clearable />
+        <n-date-picker v-model:value="form.exchangeCodeCreateTimeGe" type="datetime" clearable/>
       </n-form-item>
 
       <n-form-item label="生成时间(结束)" path="exchangeCodeCreateTimeLe">
-        <n-date-picker v-model:value="form.exchangeCodeCreateTimeLe" type="datetime" clearable />
+        <n-date-picker v-model:value="form.exchangeCodeCreateTimeLe" type="datetime" clearable/>
       </n-form-item>
 
       <n-button attr-type="button" type="primary" @click="handleValidate">查询</n-button>
@@ -43,15 +43,25 @@
         <n-button-group>
           <n-dropdown trigger="hover" :options="codeOptions" @select="handleCode">
             <n-button type="primary"
-              ><template #icon> <n-icon :component="DocumentIcon" /> </template
-              >代金券兑换码</n-button
+            >
+              <template #icon>
+                <n-icon :component="DocumentIcon"/>
+              </template
+              >
+              代金券兑换码
+            </n-button
             >
           </n-dropdown>
 
           <n-dropdown trigger="hover" :options="amoutOptions" @select="handleAmout">
             <n-button type="primary"
-              ><template #icon> <n-icon :component="AccountBookIcon" /> </template
-              >金额兑换码</n-button
+            >
+              <template #icon>
+                <n-icon :component="AccountBookIcon"/>
+              </template
+              >
+              金额兑换码
+            </n-button
             >
           </n-dropdown>
         </n-button-group>
@@ -61,7 +71,7 @@
         ref="table"
         striped
         :columns="columns"
-        min-height="400px"
+        min-height="500px"
         flex-height
         class="box-border"
         :row-key="getRowKeyId"
@@ -81,24 +91,24 @@
         :on-update:page-size="handlePageSize"
         :page-sizes="pageSizes"
       >
-        <template #prefix> 共 {{ itemCount }} 项 </template>
+        <template #prefix> 共 {{ itemCount }} 项</template>
       </n-pagination>
     </div>
 
-    <CodeDetailDrawer ref="codeDetailDrawerRef" :width="500" />
-    <ExchangeRecordCodeDrawer ref="recordDrawerRef" :width="650" />
-    <CodeDrawer ref="codeDrawerRef" :width="650" />
+    <CodeDetailDrawer ref="codeDetailDrawerRef" :width="700"/>
+    <ExchangeRecordCodeDrawer ref="recordDrawerRef" :width="650"/>
+    <CodeDrawer ref="codeDrawerRef" :width="650"/>
 
-    <BatchCodeDrawer ref="batchCodeDrawerRef" :width="750" />
+    <BatchCodeDrawer ref="batchCodeDrawerRef"/>
 
-    <AmountDrawer ref="amountDrawerRef" :width="500" />
-    <BatchAmountDrawer ref="batchAmountDrawerRef" :width="750" />
+    <AmountDrawer ref="amountDrawerRef" :width="500" @on-save-after="handleSaveAfter"/>
+    <BatchAmountDrawer ref="batchAmountDrawerRef"/>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, reactive, toRaw, onMounted } from "vue";
-import { FormInst } from "naive-ui";
-import { TableDataItemInter } from "./type";
+import {defineComponent, ref, h, reactive, toRaw, onMounted} from "vue";
+import {FormInst} from "naive-ui";
+import {TableDataItemInter} from "./type";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import CodeDetailDrawer from "./codeDetailDrawer.vue";
 import ExchangeRecordCodeDrawer from "./exchangeRecordDrawer.vue";
@@ -106,15 +116,17 @@ import CodeDrawer from "./codeDrawer.vue";
 import AmountDrawer from "./amountDrawer.vue";
 import BatchCodeDrawer from "./batchCodeDrawer.vue";
 import BatchAmountDrawer from "./batchAmountDrawer.vue";
-import { EyeOutline as EyeIcon, DocumentAttachOutline as DocumentIcon } from "@vicons/ionicons5";
+import {EyeOutline as EyeIcon, DocumentAttachOutline as DocumentIcon} from "@vicons/ionicons5";
 import {
   FileExcelOutlined as FileExceIcon,
   AccountBookOutlined as AccountBookIcon,
 } from "@vicons/antd";
 import dayjs from "dayjs";
-import { pageSizes } from "@/config/table";
-import { PaginationInter } from "@/api/type";
-import { getExchangeCodePage } from "@/api/marketing/marketing";
+import {pageSizes} from "@/config/table";
+import {PaginationInter} from "@/api/type";
+import {getExchangeCodePage} from "@/api/marketing/marketing";
+import {getDict} from "@/api/common/common";
+
 export default defineComponent({
   name: "ExchangeCode",
   components: {
@@ -137,6 +149,8 @@ export default defineComponent({
       pageIndex: 1,
       pageSize: 10,
     });
+    const stateListData = ref();
+    const stateData: Map<string, string> = new Map();
     const formRef = ref<FormInst | null>(null);
     const codeDetailDrawerRef = ref();
     const recordDrawerRef = ref();
@@ -165,11 +179,23 @@ export default defineComponent({
         title: "兑换类型",
         key: "exchangeCodeExchangeType",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h(
+            "span",
+            stateData.get(record.exchangeCodeExchangeType)
+          );
+        },
       },
       {
         title: "生效时间",
         key: "exchangeCodeEffectiveTimeBegin",
         align: "center",
+        render(record: TableDataItemInter) {
+          return h(
+            "span",
+            dayjs(record.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
+          );
+        },
       },
       {
         title: "失效时间",
@@ -192,12 +218,12 @@ export default defineComponent({
       },
       {
         title: "可兑换次数",
-        key: "exchangeCodeUsedCount",
+        key: "exchangeCodeUsableCount",
         align: "center",
       },
       {
         title: "已兑换次数",
-        key: "exchangeCodeUsableCount",
+        key: "exchangeCodeUsedCount",
         align: "center",
       },
       {
@@ -231,14 +257,21 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({pageIndex: 1, pageSize: 10});
     });
 
     const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
-        let search = { ...form.value };
-        let res = await getExchangeCodePage({ page, search: search });
+        let dict = await getDict({parentEntryCode: "EXT0000"});
+        dict.data.map((item: { entryName: string; entryCode: string }) => {
+          stateData.set(item.entryCode, item.entryName);
+        });
+        stateListData.value = dict.data.map((item: { entryName: string; entryCode: string }) => {
+          return {label: item.entryName, value: item.entryCode};
+        });
+        let search = {...form.value};
+        let res = await getExchangeCodePage({page, search: search});
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -249,36 +282,36 @@ export default defineComponent({
     };
 
     async function handleValidate() {
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({pageIndex: 1, pageSize: 10});
     }
 
     function handleCode(key: string | number) {
       if (key === "codeSingle") {
-        const { openDrawer } = codeDrawerRef.value;
-        openDrawer("添加兑换码");
+        const {openDrawer} = codeDrawerRef.value;
+        openDrawer("添加兑换码",true);
       } else {
-        const { openDrawer } = batchCodeDrawerRef.value;
-        openDrawer("批量添加兑换码");
+        const {openDrawer} = batchCodeDrawerRef.value;
+        openDrawer("批量添加代金券记录");
       }
     }
 
     function handleAmout(key: string | number) {
       if (key === "amoutSingle") {
-        const { openDrawer } = amountDrawerRef.value;
-        openDrawer("添加兑换码");
+        const {openDrawer} = amountDrawerRef.value;
+        openDrawer("添加兑换码",true);
       } else {
-        const { openDrawer } = batchAmountDrawerRef.value;
-        openDrawer("批量添加代金券");
+        const {openDrawer} = batchAmountDrawerRef.value;
+        openDrawer("批量添加金额兑换码记录");
       }
     }
 
     function handleDetail(exchangeCodeId: string) {
-      const { openDrawer } = codeDetailDrawerRef.value;
+      const {openDrawer} = codeDetailDrawerRef.value;
       openDrawer(exchangeCodeId);
     }
 
     function handleRecord(exchangeCodeId: string) {
-      const { openDrawer } = recordDrawerRef.value;
+      const {openDrawer} = recordDrawerRef.value;
       openDrawer(exchangeCodeId);
     }
 
@@ -286,9 +319,16 @@ export default defineComponent({
       pagination.pageIndex = pageIndex;
       getData(toRaw(pagination));
     }
+
     function handlePageSize(pageSize: number) {
       pagination.pageSize = pageSize;
       getData(toRaw(pagination));
+    }
+
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+      getData({pageIndex: 1, pageSize: 10});
     }
 
     return {
@@ -301,10 +341,12 @@ export default defineComponent({
       batchAmountDrawerRef,
       amountDrawerRef,
       loading,
+      stateListData,
       options: [],
       itemCount,
       columns,
       data,
+      stateData,
       getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
       pagination,
       pageSizes,
@@ -336,6 +378,7 @@ export default defineComponent({
       handleCode,
       handleAmout,
       handlePageSize,
+      handleSaveAfter
     };
   },
 });

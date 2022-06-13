@@ -3,7 +3,7 @@
     <n-descriptions label-placement="left" bordered :column="2">
       <n-descriptions-item label="兑换码">{{ detail?.exchangeCode }}</n-descriptions-item>
       <n-descriptions-item label="兑换类型">{{
-        detail?.exchangeCodeExchangeType
+         stateData.get(detail?.exchangeCodeExchangeType)
       }}</n-descriptions-item>
       <n-descriptions-item label="生效时间" :span="2">{{
         dayjs(detail?.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
@@ -12,10 +12,10 @@
         dayjs(detail?.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
       }}</n-descriptions-item>
       <n-descriptions-item label="可兑换次数">{{
-        detail?.exchangeCodeUsedCount
+        detail?.exchangeCodeUsableCount
       }}</n-descriptions-item>
       <n-descriptions-item label="已兑换次数">{{
-        detail?.exchangeCodeUsableCount
+        detail?.exchangeCodeUsedCount
       }}</n-descriptions-item>
       <n-descriptions-item label="兑换实充金额">{{
         detail?.exchangeRechargeAmount
@@ -68,6 +68,7 @@ import dayjs from "dayjs";
 import { TableDataItemInter } from "./type";
 import { PaginationInter } from "@/api/type";
 import { getRecordPagePage, getExchangeCodeDetail } from "@/api/marketing/marketing";
+import {getDict} from "@/api/common/common";
 export default defineComponent({
   name: "ExchangeRecordCodeDrawer",
   setup() {
@@ -75,7 +76,9 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
     });
-
+    const stateData: Map<string, string> = new Map();
+    const exchangeCodeAchieveOpportunityData: Map<string, string> = new Map();
+    const exchangeCodeStateData: Map<string, string> = new Map();
     const title = ref("");
     const detail = ref();
     const formRef = ref<FormInst | null>(null);
@@ -109,22 +112,21 @@ export default defineComponent({
         title: "获取途径",
         key: "exchangeCodeAchieveOpportunity",
         align: "center",
+        render(row:TableDataItemInter){
+          return h(
+            "span",
+            exchangeCodeAchieveOpportunityData.get(row.exchangeCodeAchieveOpportunity))
+        }
       },
       {
         title: "状态",
         key: "exchangeCodeState",
         align: "center",
-        // render(row: TableDataItemInter) {
-        //   return h(
-        //     NTag,
-        //     {
-        //       type: row.status === 1 ? "success" : "error",
-        //     },
-        //     {
-        //       default: () => (row.status === 1 ? "正常" : "锁定"),
-        //     }
-        //   );
-        // },
+        render(row: TableDataItemInter) {
+          return h(
+            "span",
+            exchangeCodeAchieveOpportunityData.get(row.exchangeCodeState))
+        },
       },
       {
         title: "获取时间",
@@ -165,6 +167,18 @@ export default defineComponent({
     const getData = async (page: PaginationInter) => {
       try {
         state.loading = true;
+        let dict = await getDict({parentEntryCode: "EXT0000"});
+        dict.data.map((item: { entryName: string; entryCode: string }) => {
+          stateData.set(item.entryCode, item.entryName);
+        });
+        let exchangeCodeAchieveOpportunity = await getDict({parentEntryCode: "EAO0000"});
+        exchangeCodeAchieveOpportunity.data.map((item: { entryName: string; entryCode: string }) => {
+          exchangeCodeAchieveOpportunityData.set(item.entryCode, item.entryName);
+        });
+        let exchangeCodeState = await getDict({parentEntryCode: "ECS0000"});
+        exchangeCodeState.data.map((item: { entryName: string; entryCode: string }) => {
+          exchangeCodeStateData.set(item.entryCode, item.entryName);
+        });
         let search = {
           exchangeCodeIdEq: queryForm.value.exchangeCodeIdEq,
           customerPhoneLike: queryForm.value.customerPhoneLike,
@@ -195,6 +209,7 @@ export default defineComponent({
       detail,
       title,
       data,
+      stateData,
       pagination: {
         pageSize: 10,
       },

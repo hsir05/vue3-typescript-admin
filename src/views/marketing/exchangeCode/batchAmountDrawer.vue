@@ -1,5 +1,5 @@
 <template>
-  <BasicDrawer v-model:show="isDrawer" title="批量添加代金券" @on-close-after="onCloseAfter">
+  <BasicDrawer v-model:show="isDrawer" :title="title" @on-close-after="onCloseAfter" style="width: 900px">
     <n-form
       ref="formRef"
       inline
@@ -9,110 +9,129 @@
       class="pt-15px bg-white mb-5px"
       :model="form"
     >
-      <n-form-item label="开始时间" path="start">
-        <n-date-picker v-model:value="form.start" style="width: 210px" type="date" clearable />
+      <n-form-item label="开始时间" path="beginTimeGe">
+        <n-date-picker v-model:value="form.beginTimeGe" style="width: 210px" type="date" clearable/>
       </n-form-item>
 
-      <n-form-item label="结束时间" path="end">
-        <n-date-picker v-model:value="form.end" type="date" style="width: 210px" clearable />
+      <n-form-item label="结束时间" path="beginTimeLe">
+        <n-date-picker v-model:value="form.beginTimeLe" type="date" style="width: 210px" clearable/>
       </n-form-item>
 
       <n-form-item>
-        <n-button attr-type="button" type="primary" @click="query">提交</n-button>
+        <n-button attr-type="button" type="primary" @click="query">搜索</n-button>
+      </n-form-item>
+      <n-form-item>
+        <n-button attr-type="button" type="primary" class="mr-10px" @click="handleBatch"
+        >批量添加
+        </n-button>
       </n-form-item>
     </n-form>
-
-    <div class="pb-5px text-right">
-      <n-button attr-type="button" type="primary" class="mr-10px" @click="handleBatch"
-        >批量添加</n-button
-      >
-    </div>
-    <n-data-table
-      :loading="loading"
-      ref="table"
-      striped
-      :columns="columns"
-      class="box-border"
-      :row-key="getRowKeyId"
+    <!-- 表格 -->
+    <BasicTable
       :data="data"
-      :pagination="pagination"
+      ref="basicTableRef"
+      :columns="columns"
+      :loading="loading"
+      :itemCount="itemCount"
+      @reload-page="reloadPage"
+      @on-pagination="handlePagSize"
     />
 
-    <CodeDetailModal ref="codeDetailModalRef" />
-    <CodeDrawer ref="codeDrawerRef" :width="650" />
+    <CodeDetailModal ref="codeDetailModalRef"/>
+    <AmountDrawer ref="amountDrawerRef" :width="650" @on-save-after="handleSaveAfter"/>
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, h, ref, toRefs } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import {defineComponent, reactive, h, ref, toRefs, toRaw} from "vue";
+import {FormInst} from "naive-ui";
 import CodeDrawer from "./codeDrawer.vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { RefreshCircleOutline as RefreshIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
+import {RefreshCircleOutline as RefreshIcon, EyeOutline as EyeIcon} from "@vicons/ionicons5";
 import CodeDetailModal from "./codeDetailModal.vue";
 
-import { TableDataItemInter } from "./type";
+import {DataImportTaskITemInter} from "./type";
+import {PaginationInter} from "@/api/type";
+import {dataImportTaskDetail, dataImportTaskPage} from "@/api/common/common";
+import BasicTable from "@/components/Table/Table.vue";
+import dayjs from "dayjs";
+import AmountDrawer from "@/views/marketing/exchangeCode/amountDrawer.vue";
+
 export default defineComponent({
   name: "BatchCodeDrawer",
-  components: { CodeDetailModal, CodeDrawer },
+  components: {AmountDrawer, CodeDetailModal, CodeDrawer, BasicTable},
   emits: ["on-save-after"],
   setup() {
     const state = reactive({
       isDrawer: false,
       loading: false,
     });
-    const message = useMessage();
+    const loading = ref(false);
+    const itemCount = ref(null);
+    const title = ref();
     const codeDetailModalRef = ref();
-    const codeDrawerRef = ref();
+    const amountDrawerRef = ref();
     const formRef = ref<FormInst | null>(null);
     const form = ref({
-      code: null,
-      count: null,
-      start: null,
-      end: null,
+      importType: "",
+      beginTimeLe: null,
+      beginTimeGe: null,
     });
-    const data = ref([
-      {
-        id: "12313",
-      },
-    ]);
+    const pagination = reactive({
+      pageIndex: 1,
+      pageSize: 10,
+    });
+    const basicTableRef = ref();
+    const data = ref<DataImportTaskITemInter[]>([]);
     const columns = [
       {
         title: "序号",
         key: "index",
         align: "center",
         width: 70,
-        render(_: TableDataItemInter, rowIndex: number) {
+        render(_: DataImportTaskITemInter, rowIndex: number) {
           return h("span", `${rowIndex + 1}`);
         },
       },
       {
         title: "任务名称",
-        key: "name",
+        key: "taskName",
         align: "center",
       },
       {
         title: "开始时间",
-        key: "faceValue",
+        key: "beginTime",
         align: "center",
+        render(record: DataImportTaskITemInter) {
+          return h(
+            "span",
+            dayjs(record.beginTime).format("YYYY-MM-DD HH:mm:ss")
+          );
+        },
       },
       {
         title: "总条数",
-        key: "num",
+        key: "importCount",
         align: "center",
       },
       {
         title: "生成条数",
-        key: "count",
+        key: "successCount",
         align: "center",
       },
       {
         title: "任务状态",
-        key: "num",
+        key: "state",
         align: "center",
+        render(record: DataImportTaskITemInter) {
+          return h(
+            "span",
+            record.endTime === null ? "生成中" : "已完成"
+          );
+        },
       },
       {
         title: "操作人",
-        key: "count",
+        key: "operatorName",
         align: "center",
       },
       {
@@ -120,7 +139,7 @@ export default defineComponent({
         key: "action",
         align: "center",
         width: "90px",
-        render(record: TableDataItemInter) {
+        render(record: DataImportTaskITemInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -145,28 +164,38 @@ export default defineComponent({
       },
     ];
 
-    function openDrawer(record?: TableDataItemInter) {
-      if (record) {
-        console.log(record);
-        message.success("验证成功");
-      }
+    function openDrawer(t: string) {
+      title.value = t;
+      console.info(t)
+      //uploadList.value = [];
+      data.value = []
+      getData(pagination);
       state.isDrawer = true;
     }
 
-    function query() {}
+    function query() {
+      getData({pageIndex: 1, pageSize: 10})
+    }
 
     function handleBatch() {
-      const { openDrawer } = codeDrawerRef.value;
-      openDrawer("添加兑换码");
+      const {openDrawer} = amountDrawerRef.value;
+      openDrawer("批量添加兑换码",false);
     }
 
     function handleRefresh(record: Recordable) {
-      console.log(record);
+      const index = data.value?.findIndex((item: { dataImportTaskId: string }) => item.dataImportTaskId === record.dataImportTaskId);
+      if (index != undefined && index >= 0) {
+        let dataImportTask = data.value.at(index)
+        if (dataImportTask != undefined) {
+          getDetail(dataImportTask.dataImportTaskId, index)
+        }
+      }
     }
+
     function handleDetail(record: Recordable) {
       console.log(record);
-      const { handleModal } = codeDetailModalRef.value;
-      handleModal();
+      const {handleModal} = codeDetailModalRef.value;
+      handleModal(record);
     }
 
     function onCloseAfter() {
@@ -174,22 +203,75 @@ export default defineComponent({
       state.loading = false;
     }
 
+    const getDetail = async (dataImportTaskId: string, index: number) => {
+      loading.value = true;
+      try {
+        let res = await dataImportTaskDetail({dataImportTaskId: dataImportTaskId});
+        data.value.forEach(function (item: any) {
+          if (item.dataImportTaskId === dataImportTaskId) {
+            data.value.splice(index, res.data)
+          }
+        })
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    const getData = async (page: PaginationInter) => {
+      loading.value = true;
+      try {
+        form.value.importType = "IMP0004";
+        let search = {...form.value};
+        let res = await dataImportTaskPage({page, search: search});
+        data.value = res.data.content;
+        itemCount.value = res.data.totalElements;
+        loading.value = false;
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
+
+    function reloadPage() {
+      const {resetPagination} = basicTableRef.value;
+      resetPagination();
+      getData({pageIndex: 1, pageSize: 10});
+    }
+
+    function handlePagSize(pagination: PaginationInter) {
+      console.log(toRaw(pagination));
+      getData(toRaw(pagination));
+    }
+
+    // 抽屉组件保存后处理
+    function handleSaveAfter() {
+      console.log("抽屉组件保存后处理");
+      getData({pageIndex: 1, pageSize: 10});
+    }
+
     return {
       form,
       formRef,
       data,
       codeDetailModalRef,
+      basicTableRef,
       columns,
+      title,
       ...toRefs(state),
       pagination: {
         pageSize: 10,
       },
-      getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
+      amountDrawerRef,
+      itemCount,
       query,
       openDrawer,
-      codeDrawerRef,
       onCloseAfter,
       handleBatch,
+      reloadPage,
+      handlePagSize,
+      handleSaveAfter
     };
   },
 });
