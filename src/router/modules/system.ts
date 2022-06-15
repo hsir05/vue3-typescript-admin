@@ -15,22 +15,22 @@ const routes: Array<RouteRecordRaw> = [
       sort: 1,
     },
     children: [
-      {
-        path: "/system/dict",
-         name: `system_dict`,
-        meta: {
-          title: "字典管理",
-        },
-        component: () => import("@/views/system/dict/dict.vue"),
-      },
-      {
-        path: "/system/menus",
-        name: "system_menu",
-        meta: {
-          title: "菜单管理",
-        },
-        component: () => import("@/views/system/menu/menu.vue"),
-      },
+      // {
+      //   path: "/system/dict",
+      //    name: `system_dict`,
+      //   meta: {
+      //     title: "字典管理",
+      //   },
+      //   component: () => import("@/views/system/dict/dict.vue"),
+      // },
+      // {
+      //   path: "/system/menus",
+      //   name: "system_menu",
+      //   meta: {
+      //     title: "菜单管理",
+      //   },
+      //   component: () => import("@/views/system/menu/menu.vue"),
+      // },
       {
         path: "/system/user",
          name: `system_user`,

@@ -341,8 +341,6 @@ export default defineComponent({
             }
           }
 
-          console.log(orderBusData);
-
           getData({ pageIndex: 1, pageSize: 10 });
         })
         .catch((err) => {

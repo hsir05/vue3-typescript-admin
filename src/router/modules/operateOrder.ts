@@ -55,7 +55,8 @@ const routes: Array<RouteRecordRaw> = [
         name: `operate-order_order-detail`,
         meta: {
           title: "订单详情",
-          activeMenu: ""
+          activeMenu: "",
+          activeBreadcrumb:true
         },
         component: () => import("@/views/operateOrder/orderDetail/orderDetail.vue"),
       },

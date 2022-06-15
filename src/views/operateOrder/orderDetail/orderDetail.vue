@@ -117,7 +117,6 @@ export default defineComponent({
             res = await getOrderInvalidDetail({ orderId });
             break;
         }
-        console.log(res.data);
         detail.value = res.data;
 
         if (detail.value.orderPlaceVehicleList) {
