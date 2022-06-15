@@ -141,7 +141,6 @@ export default defineComponent({
     });
 
     const data = ref<CouponInter[]>([]);
-    const editData = ref<CouponInter>();
     const columns = [
       {
         title: "序号",
@@ -221,9 +220,8 @@ export default defineComponent({
 
     function handleEdit(record: CouponInter) {
       console.log(record);
-      editData.value = record;
       const { handleModal } = voucherModalRef.value;
-      handleModal(editData);
+      handleModal(record);
     }
 
     function submit(e: MouseEvent) {
@@ -269,6 +267,7 @@ export default defineComponent({
           } catch (e) {
             console.log(e);
           }
+          state.isDrawer = false;
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -421,7 +420,6 @@ export default defineComponent({
         pageSize: 10,
       },
       codeRules,
-      editData,
       getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
       title,
       openDrawer,

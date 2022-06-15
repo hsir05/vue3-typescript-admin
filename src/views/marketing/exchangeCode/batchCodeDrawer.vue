@@ -53,7 +53,7 @@
     />
 
     <CodeDetailModal ref="codeDetailModalRef" />
-    <CodeDrawer ref="codeDrawerRef" :width="650" />
+    <CodeDrawer ref="codeDrawerRef" :width="650" @on-save-after="handleSaveAfter" />
   </BasicDrawer>
 </template>
 <script lang="ts">
@@ -64,11 +64,11 @@ import TableActions from "@/components/TableActions/TableActions.vue";
 import { RefreshCircleOutline as RefreshIcon, EyeOutline as EyeIcon } from "@vicons/ionicons5";
 import CodeDetailModal from "./codeDetailModal.vue";
 
-import { DataImportTaskITemInter } from "./type";
 import dayjs from "dayjs";
 import { dataImportTaskDetail, dataImportTaskPage } from "@/api/common/common";
 import BasicTable from "@/components/Table/Table.vue";
 import { PaginationInter } from "@/api/type";
+import { DataImportTaskITemInter } from "@/views/marketing/exchangeCode/type";
 export default defineComponent({
   name: "BatchCodeDrawer",
   components: { CodeDetailModal, CodeDrawer, BasicTable },
@@ -252,6 +252,10 @@ export default defineComponent({
       getData(toRaw(pagination));
     }
 
+    function handleSaveAfter() {
+      reloadPage();
+    }
+
     return {
       form,
       formRef,
@@ -272,6 +276,7 @@ export default defineComponent({
       handleBatch,
       reloadPage,
       handlePagSize,
+      handleSaveAfter,
     };
   },
 });
