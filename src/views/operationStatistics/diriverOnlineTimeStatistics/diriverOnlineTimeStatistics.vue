@@ -80,24 +80,22 @@
     <n-empty v-if="!result" />
     <div v-if="result" class="diriver-online-time-line pl-10px pr-10px mt-10px pt-10px pb-10px">
       <n-grid :x-gap="12" :y-gap="8" :cols="4">
-        <template v-for="(item, index) in resultData" :key="index">
-          <n-grid-item>
-            <dayOrder
-              :dayData="item"
-              v-if="type === '1'"
-              :key="item.operation_company_driver_id"
-              @get-is-show="getIsShow"
-              @show-model="showModel"
-            />
-            <monthOrder
-              v-if="type === '0'"
-              :month="month"
-              :dayData="item"
-              :key="item.operation_company_driver_id"
-              @get-is-show="getIsShow"
-            />
-          </n-grid-item>
-        </template>
+        <n-grid-item v-for="(item, index) in resultData" :key="index">
+          <dayOrder
+            :dayData="item"
+            v-if="type === '1'"
+            :key="item.operation_company_driver_id"
+            @get-is-show="getIsShow"
+            @show-model="showModel"
+          />
+          <monthOrder
+            v-if="type === '0'"
+            :month="month"
+            :dayData="item"
+            :key="item.operation_company_driver_id"
+            @get-is-show="getIsShow"
+          />
+        </n-grid-item>
       </n-grid>
     </div>
   </div>

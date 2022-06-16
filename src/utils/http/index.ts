@@ -38,9 +38,9 @@ function onRrefreshed(token: string) {
   refreshSubscribers.map(cb => cb(token));
 }
 // push所有请求到数组中
-function subscribeTokenRefresh(cb:Fn) {
-  refreshSubscribers.push(cb);
-}
+// function subscribeTokenRefresh(cb:Fn) {
+//   refreshSubscribers.push(cb);
+// }
 
 /**
  * @description: 数据处理，方便区分多种处理方式
