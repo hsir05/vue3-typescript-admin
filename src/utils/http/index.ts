@@ -347,9 +347,18 @@ export const http = createAxios();
 // 项目，多个不同 api 地址，直接在这里导出多个
 // src/api ts 里面接口，就可以单独使用这个请求，
 // import { httpTwo } from '@/utils/http/axios'
+// export const otherHttp = createAxios({
+//   requestOptions: {
+//     apiUrl: otherUrl,
+//     urlPrefix: '',
+//   },
+// });
+
 export const otherHttp = createAxios({
   requestOptions: {
-    apiUrl: otherUrl,
-    urlPrefix: '',
+    apiUrl: otherUrl
   },
+  headers:{
+    Origin:"http://test-ngcxpm-web.yiminyueche.com"
+  }
 });
