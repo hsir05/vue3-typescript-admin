@@ -304,7 +304,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         authenticationScheme: "",
         // 接口前缀
         prefixUrl: urlPrefix,
-        headers: { Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON },
+        headers: { Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON,Origin: "http://test-ngcxpm-web.yiminyueche.com/", },
         // 数据处理方式
         transform,
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
@@ -346,9 +346,9 @@ export const http = createAxios();
 // src/api ts 里面接口，就可以单独使用这个请求，
 // import { httpTwo } from '@/utils/http/axios'
 export const otherHttp = createAxios({
+  headers: { Origin: "http://test-ngcxpm-web.yiminyueche.com/", },
   requestOptions: {
     apiUrl: otherUrl,
     urlPrefix: '',
-    Origin: "http://test-ngcxpm-web.yiminyueche.com/",
   },
 });

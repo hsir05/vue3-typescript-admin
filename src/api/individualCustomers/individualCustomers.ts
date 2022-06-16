@@ -343,8 +343,8 @@ export function repeatSendMail(data:{customerInvoiceApplicationId: string | null
   return otherHttp.request({
     url: `/customerInvoiceApplication/platform/invoiceMail`,
     method: 'post',
-    headers:{
-      Origin: "",
+    headers: {
+      Origin: "http://test-ngcxpm-web.yiminyueche.com/",
     },
     data:data
   });
