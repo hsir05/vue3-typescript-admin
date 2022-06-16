@@ -119,12 +119,13 @@
       @on-page="handlePage"
       @on-pagination="handlePageSize"
     />
+
+    <FinishOrderPriceModel ref="adjustFinishOrderPriceRef" @on-save-after="handleSaveAfter" />
+    <AdjustCancelOrderPriceModel
+      ref="adjustCancelOrderPriceModelRef"
+      @on-save-after="handleSaveAfter"
+    />
   </div>
-  <FinishOrderPriceModel ref="adjustFinishOrderPriceRef" @on-save-after="handleSaveAfter" />
-  <AdjustCancelOrderPriceModel
-    ref="adjustCancelOrderPriceModelRef"
-    @on-save-after="handleSaveAfter"
-  />
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
