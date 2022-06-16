@@ -145,6 +145,18 @@ export function findByDriverNoHeaderUnlock(data:{operationCompanyId:string,drive
 }
 
 /**
+ * 通过订单id查询下单车型
+ * @param data
+ */
+export function findVehicleTypeByOrderId(data:{orderId:string}) {
+  return http.request({
+    url:"/order/findVehicleTypeByOrderId",
+    method:"post",
+    data:data
+  })
+}
+
+/**
  * 订单改派
  */
 export function artificialDistributeOrder(data:{orderId:string | null,operationCompanyDriverId:string | null,loginCredentialId:string | null,loginPassword:string | null}){
@@ -174,6 +186,24 @@ interface AdjustFinishOrderPriceInter{
 export function adjustFinishOrderPrice(data:AdjustFinishOrderPriceInter) {
   return http.request({
     url:"/order/adjustFinishOrderPrice",
+    method:"post",
+    data:data,
+  })
+}
+interface AdjustCancelOrderPriceInter{
+  orderId:string | null,
+  orderCancelCost:number | null
+  adjustReason: string | null,
+  password:string
+}
+
+/**
+ * 调整取消待支付的订单价格
+ * @param data
+ */
+export function adjustCancelOrderPrice(data:AdjustCancelOrderPriceInter){
+  return http.request({
+    url:"/order/adjustCancelOrderPrice",
     method:"post",
     data:data,
   })

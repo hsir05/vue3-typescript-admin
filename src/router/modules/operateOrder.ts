@@ -69,7 +69,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/operateOrder/orderComment/orderComment.vue"),
       }, {
         path: "/operate-order/change-dispatch",
-        name: `operate-order_change-dispatch`,
+        name: 'operate-order_change-dispatch',
         meta: {
           title: "订单改派",
           activeMenu: "",
@@ -79,7 +79,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/operate-order/dispatch",
-        name: `operate-order_dispatch`,
+        name: 'operate-order_dispatch',
         meta: {
           title: "人工派单",
           activeMenu: "",

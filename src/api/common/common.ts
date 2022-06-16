@@ -146,3 +146,15 @@ export function refreshDriverPositionByVehicleTypeAndAreaCode(data:RefreshDriver
   });
 }
 
+/**
+ * 通过参数获取司机实时位置
+ * @param data
+ */
+export function refreshDriverPositionByAreaCode(data: { areaCode:string }) {
+  return http.request({
+    url: "/operationCompanyDriver/refreshDriverPositionByAreaCode",
+    method: "post",
+    data: data
+  });
+}
+

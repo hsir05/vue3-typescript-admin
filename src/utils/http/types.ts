@@ -57,6 +57,7 @@ export interface RequestOptions {
   ignoreCancelToken?: boolean;
   // 是否携带token
   withToken?: boolean;
+  Origin?: string;
 }
 
 export interface Result<T = any> {

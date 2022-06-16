@@ -17,17 +17,17 @@
         >
           <n-form-item
             :loading="selectLoading"
-            path="operationCompanyDriverId"
+            path="orderPlaceVehicleId"
             label="选择下单车型">
             <n-select
-              v-model:value="queryForm.operationCompanyDriverId"
+              v-model:value="queryForm.orderPlaceVehicleId"
               remote
               clearable
               filterable
               placeholder="请选择下单车型"
               style="width: 200px"
-              @search="handleSearch"
               :options="vehicleTypeData"
+              @update:value="handleUpdateValue"
             />
           </n-form-item>
           <n-form-item
@@ -82,13 +82,16 @@ import BaiduMap from "@/components/Map/BaiduMap.vue";
 import {FormInst, useMessage} from "naive-ui";
 import {DispatchForm} from "@/views/operateOrder/servingOrder/type";
 import {
-  artificialDistributeOrder, findByDriverNoHeaderUnlock,
+  artificialDistributeOrder, findByDriverNoHeaderUnlock, findVehicleTypeByOrderId,
   getOrderDetail
 } from "@/api/operateOrder/operateOrder";
 import {useRoute, useRouter} from "vue-router";
 import md5 from "blueimp-md5";
 import {getDetailViaLoginer} from "@/api/system/system";
-import {refreshDriverPosition,refreshDriverPositionByVehicleTypeAndAreaCode} from "@/api/common/common";
+import {
+  refreshDriverPositionByAreaCode,
+  refreshDriverPositionByVehicleTypeAndAreaCode
+} from "@/api/common/common";
 import freeIconImg from "@/assets/image/icon_driver_map_idle.png";
 import busyIconImg from "@/assets/image/icon_driver_map_busy.png";
 import restIconImg from "@/assets/image/icon_driver_map_rest.png";
@@ -116,7 +119,7 @@ export default defineComponent({
     const queryForm = ref<DispatchForm>({
       orderId: null,
       operationCompanyDriverId: null,
-      orderPlaceVehicleId:null,
+      orderPlaceVehicleId: null,
       loginPassword: ""
     });
     const driverInfoOpts = ref({
@@ -154,10 +157,12 @@ export default defineComponent({
         let res = await getOrderDetail({orderId: queryForm.value.orderId})
         if (res.success && res.data != null) {
           order.value = res.data;
-          //TODO 下单车型数据填充
-          // vehicleTypeData.value = res.data.orderPlaceVehicleList.map((item: { vehicleTypeName: string; vehicleTypeId: string }) => {
-          //   return {label: item.entryName, value: item.entryCode};
-          // });
+          let vehicleType = await findVehicleTypeByOrderId({orderId:queryForm.value.orderId});
+          if (vehicleType.success){
+            vehicleTypeData.value = vehicleType.data.map((item: { vehicleTypeName: string; vehicleTypeId: string }) => {
+              return {label: item.vehicleTypeName, value: item.vehicleTypeId};
+            });
+          }
           console.log(res.data.orderBeginAddressLatitude);
           initMap(res.data.orderBeginAddressLongitude * 1e-6, res.data.orderBeginAddressLatitude * 1e-6);
         } else {
@@ -188,6 +193,9 @@ export default defineComponent({
     };
 
     const handleSearch = async (query: string) => {
+      if (queryForm.value.orderPlaceVehicleId === null) {
+        return;
+      }
       if (!query.length) {
         driverData.value = [];
         return;
@@ -250,23 +258,26 @@ export default defineComponent({
       driverPositionList.value = []
       let data;
       if (queryForm.value.orderPlaceVehicleId != null) {
-        data = await refreshDriverPositionByVehicleTypeAndAreaCode({areaCode:order.value.areaCode,orderPlaceVehicleId:queryForm.value.orderPlaceVehicleId}) // 从服务端获取下单车型的最新的司机位置信息
+        data = await refreshDriverPositionByVehicleTypeAndAreaCode({
+          areaCode: order.value.areaCode,
+          orderPlaceVehicleId: queryForm.value.orderPlaceVehicleId
+        }) // 从服务端获取下单车型的最新的司机位置信息
       } else {
         // 从服务端获取默认最新的司机位置信息
-        data = await refreshDriverPosition({
-          operationCompanyId: order.value.operationCompanyId
+        data = await refreshDriverPositionByAreaCode({
+          areaCode: order.value.areaCode
         })
       }
       if (data.result) {
         driverPositionList.value = data.result
-        const { removeOverlay,addMarker,updateMarker} = baiduMapRef.value;
+        const {removeOverlay, addMarker, updateMarker} = baiduMapRef.value;
         for (let index in driverPositionList.value) {
           let driverPosition = driverPositionList.value[index]
           if (driverPosition) {
 
             // 添加覆盖物
             if (!driverMarkerMap.get(driverPosition.operationCompanyDriverId)) {
-              let marker = addMarker(driverPosition.longitude,driverPosition.latitude,
+              let marker = addMarker(driverPosition.longitude, driverPosition.latitude,
                 (driverPosition.driverServiceState == 'DSS0001' ? freeIconImg : (driverPosition.driverServiceState == 'DSS0003' ? restIconImg : (driverPosition.driverServiceState == 'DSS0002' ? busyIconImg : offDutyIconImg))));
               marker.addEventListener("click", function (e: any) {
                 openInfo(driverPosition.operationCompanyDriverId, e)
@@ -277,7 +288,7 @@ export default defineComponent({
             //调整覆盖物位置
             if (driverMarkerMap.get(driverPosition.operationCompanyDriverId)) {
               let marker = driverMarkerMap.get(driverPosition.operationCompanyDriverId)
-              marker = updateMarker(marker,driverPosition.longitude,driverPosition.latitude,(driverPosition.driverServiceState == 'DSS0001' ? freeIconImg : (driverPosition.driverServiceState == 'DSS0003' ? restIconImg : (driverPosition.driverServiceState == 'DSS0002' ? busyIconImg : offDutyIconImg))))
+              marker = updateMarker(marker, driverPosition.longitude, driverPosition.latitude, (driverPosition.driverServiceState == 'DSS0001' ? freeIconImg : (driverPosition.driverServiceState == 'DSS0003' ? restIconImg : (driverPosition.driverServiceState == 'DSS0002' ? busyIconImg : offDutyIconImg))))
             }
             //地图上有marker，位置列表中没有的司机要删除marker
             if (driverMarkerMap.size > 0) {
@@ -304,8 +315,7 @@ export default defineComponent({
         }
       }
     }
-
-    const openInfo = async (driverId: string, e:any) => {
+    const openInfo = async (driverId: string, e: any) => {
       let p = e.target;
       const {getPoint} = baiduMapRef.value;
       let point = getPoint(p.getPosition().lng, p.getPosition().lat);
@@ -325,7 +335,7 @@ export default defineComponent({
                 label: data.data.driverNo,
                 value: data.data.operationCompanyDriverId,
               }];
-              const {openInfoWindow,getInfoWindow} = baiduMapRef.value;
+              const {openInfoWindow, getInfoWindow} = baiduMapRef.value;
               let infoWindow = getInfoWindow(content, driverInfoOpts.value);  // 创建信息窗口对象
               openInfoWindow(infoWindow, point); //开启信息窗口
               queryForm.value.operationCompanyDriverId = driverId;
@@ -352,7 +362,12 @@ export default defineComponent({
       rules: {
         operationCompanyDriverId: {required: true, trigger: ["blur", "change"], message: "请选择要改派的司机"},
         loginPassword: {required: true, message: "请输入密码", trigger: "blur"},
-      }
+      },
+      handleUpdateValue (value: string) {
+        if (value){
+          driverData.value = []
+        }
+      },
     };
   },
 });

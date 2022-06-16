@@ -66,3 +66,11 @@ export interface AdjustFinishOrderPriceForm{
   newFloatCost:null | number,
   orderMileageCost:number | null
 }
+
+export interface AdjustCancelOrderPriceForm{
+  orderId: string | null,
+  adjustReason: string | null,
+  password: string,
+  orderCancelCost:number | null,
+  orderTotalCost:number | null
+}

@@ -121,6 +121,7 @@
     />
   </div>
   <FinishOrderPriceModel ref="adjustFinishOrderPriceRef" @on-save-after="handleSaveAfter"/>
+  <AdjustCancelOrderPriceModel ref="adjustCancelOrderPriceModelRef" @on-save-after="handleSaveAfter"/>
 </template>
 <script lang="ts">
 import {defineComponent, ref, h, toRaw, onMounted} from "vue";
@@ -141,16 +142,17 @@ import {objInter} from "@/interface/common/common";
 import {useDialog, useMessage} from "naive-ui";
 import dayjs from "dayjs";
 import FinishOrderPriceModel from "./adjustFinishOrderPrice.vue";
-
+import AdjustCancelOrderPriceModel from "./adjustCancelOrderPrice.vue";
 export default defineComponent({
   name: "ServingOrder",
-  components: {BasicTable, FinishOrderPriceModel},
+  components: {BasicTable, FinishOrderPriceModel,AdjustCancelOrderPriceModel},
   setup() {
     const loading = ref(false);
     const userDrawerRef = ref();
     const basicTableRef = ref();
     const dispatchRef = ref()
     const adjustFinishOrderPriceRef = ref()
+    const adjustCancelOrderPriceModelRef = ref()
     const itemCount = ref(null);
     const router = useRouter();
     const dialog = useDialog();
@@ -446,6 +448,8 @@ export default defineComponent({
 
     //取消待支付订单价格调整
     function adjustCancelOrderPrice(record: Recordable) {
+      const {handleModal} = adjustCancelOrderPriceModelRef.value;
+      handleModal("取消订单价格调整", record.orderId);
       console.log(record);
     }
 
@@ -550,6 +554,7 @@ export default defineComponent({
       columns,
       itemCount,
       adjustFinishOrderPriceRef,
+      adjustCancelOrderPriceModelRef,
       disablePreviousDate(ts: number) {
         return ts >= 4102329600000 && ts <= 1451577600000;
       },

@@ -63,8 +63,8 @@ const transform: AxiosTransform = {
       // return '[HTTP] Request has no return value';
       throw new Error("请求出错，请稍候重试");
     }
-  
-    
+
+
     //  这里 code，result，message为 后台统一的字段，需要修改为项目自己的接口返回格式
     const { success, code, message } = data;
     // 请求成功
@@ -100,7 +100,7 @@ const transform: AxiosTransform = {
     if (!success && !code && !message) {
         return data
     }
-    
+
     if (success) {
       return data;
     } else {
@@ -274,7 +274,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 消息提示类型
           errorMessageMode: "none",
           // 接口地址
-          apiUrl: globSetting.apiUrl, 
+          apiUrl: globSetting.apiUrl,
         //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
           // 接口拼接地址
           urlPrefix: urlPrefix,
@@ -301,5 +301,6 @@ export const otherHttp = createAxios({
   requestOptions: {
     apiUrl: otherUrl,
     urlPrefix: '',
+    Origin: "http://test-ngcxpm-web.yiminyueche.com/",
   },
 });
