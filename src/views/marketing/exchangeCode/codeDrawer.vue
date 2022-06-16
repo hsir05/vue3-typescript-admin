@@ -60,6 +60,7 @@
           v-model:value="form.exchangeCodeUsableCount"
           style="width: 260px"
           :min="0"
+          :max="999999999"
           clearable
           placeholder="可兑换次数"
         />

@@ -115,4 +115,18 @@ export function uniqueTaskName(data: { importTaskName:string,importType:string }
     data: data
   });
 }
+interface RefreshDriverPositionInter {
+  operationCompanyId:string
+}
+/**
+ * 通过参数获取司机实时位置
+ * @param data
+ */
+export function refreshDriverPosition(data:RefreshDriverPositionInter) {
+  return http.request({
+    url: "/operationCompanyDriver/refreshDriverPosition",
+    method: "post",
+    data: data
+  });
+}
 

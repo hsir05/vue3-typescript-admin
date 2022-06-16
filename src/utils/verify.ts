@@ -44,8 +44,13 @@ export const verifyCharNumber = (_: FormItemRule, value: string) => {
 };
 //正整数
 export const positiveInteger = (_:FormItemRule,value:string) =>{
-  if (!value){
-    return false
-  }
-  return /^[0-9]*[1-9][0-9]*$/.test(value)
+  return /^[0-9]*[1-9][0-9]*$/.test(value);
+}
+//正小数或0
+export const positiveDecimal =(_:FormItemRule,value:string) =>{
+  let positiveDecimal = /^[1-9]+\d*$/;
+  let positiveDecima2 = /^\d+\.\d{1,2}$/;
+  let positiveDecima3 = /^0$/;
+
+  return  (positiveDecimal.test(value)) || (positiveDecima2.test(value)) || (positiveDecima3.test(value));
 }

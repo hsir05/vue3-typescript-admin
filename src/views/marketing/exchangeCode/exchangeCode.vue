@@ -96,7 +96,7 @@
     </div>
 
     <CodeDetailDrawer ref="codeDetailDrawerRef" :width="700"/>
-    <ExchangeRecordCodeDrawer ref="recordDrawerRef" :width="650"/>
+    <ExchangeRecordCodeDrawer ref="recordDrawerRef" :width="800"/>
     <CodeDrawer ref="codeDrawerRef" :width="650"/>
 
     <BatchCodeDrawer ref="batchCodeDrawerRef"/>

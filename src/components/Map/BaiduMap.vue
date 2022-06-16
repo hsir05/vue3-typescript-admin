@@ -522,6 +522,15 @@ function removeAllOverlay() {
   }
   // currentOpenAreaPoints = [];
 }
+function openInfoWindow(infoWindow,point){
+  map.value.openInfoWindow(infoWindow,point)
+}
+function getInfoWindow(content,info) {
+  return new BMap.InfoWindow(content,info)
+}
+function getPoint(lng,lat){
+  return new BMap.Point(lng, lat)
+}
 // 清除所有覆盖物
 function clearOverlays() {
   // 清除所有覆盖物
@@ -545,7 +554,16 @@ function addMarker(lng, lat, icon, width = 30) {
   map.value.addOverlay(marker);
   return marker;
 }
-
+// 更新单个点覆盖物
+function updateMarker(marker,lng, lat, icon, width = 30) {
+  if (icon) {
+    marker.setPosition(new BMap.Point(lng, lat))
+    marker.setIcon(icon)
+  } else {
+    marker.setPosition(new BMap.Point(lng, lat))
+  }
+  return marker;
+}
 function createMarker() {
   let marker = new BMap.Marker(point.value, {
     enableDragging: true,
@@ -598,6 +616,12 @@ defineExpose({
   mapMode,
   drawingManager,
   currentOpenAreaPoints,
+  openInfoWindow,
+  addOverlay,
+  updateMarker,
+  getPoint,
+  getInfoWindow,
+  removeOverlay
 });
 </script>
 <style scoped></style>

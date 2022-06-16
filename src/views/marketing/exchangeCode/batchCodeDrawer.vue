@@ -34,7 +34,8 @@
       :loading="loading"
       :itemCount="itemCount"
       @reload-page="reloadPage"
-      @on-pagination="handlePagSize"
+      @on-pagSize="handlePagSize"
+      @on-page="handlePage"
     />
 
     <CodeDetailModal ref="codeDetailModalRef" />
@@ -245,6 +246,10 @@ export default defineComponent({
       reloadPage()
     }
 
+    function handlePage(pagination: PaginationInter) {
+      getData(toRaw(pagination));
+    }
+
     return {
       form,
       formRef,
@@ -265,7 +270,8 @@ export default defineComponent({
       handleBatch,
       reloadPage,
       handlePagSize,
-      handleSaveAfter
+      handleSaveAfter,
+      handlePage
     };
   },
 });
