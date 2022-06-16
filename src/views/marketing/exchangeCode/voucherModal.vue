@@ -34,7 +34,7 @@
           clearable
           placeholder="输入代金券名称"
           style="width: 380px"
-          maxlength=10
+          maxlength="10"
         />
       </n-form-item>
 
@@ -44,8 +44,8 @@
           clearable
           placeholder="输入代金券面值(元)"
           style="width: 380px"
-          :min=1
-          :max=999
+          :min="1"
+          :max="999"
         />
       </n-form-item>
 
@@ -55,8 +55,8 @@
           clearable
           placeholder="输入有效天数"
           style="width: 380px"
-          :min=1
-          :max=99999999
+          :min="1"
+          :max="99999999"
         />
       </n-form-item>
 
@@ -66,43 +66,62 @@
           clearable
           placeholder="输入数量"
           style="width: 380px"
-          :min=1
-          :max=20
+          :min="1"
+          :max="20"
         />
       </n-form-item>
       <div cass="text-center">
         <n-button attr-type="button" type="primary" @click="submit">保存</n-button>
       </div>
     </n-form>
-    <BasicDrawer v-model:show="isShow" title="代金券消费规则" @on-close-after="onCloseAfter" style="width: 700px">
+    <BasicDrawer
+      v-model:show="isShow"
+      title="代金券消费规则"
+      @on-close-after="onCloseAfter"
+      style="width: 700px"
+    >
       <n-descriptions v-if="isShow" label-placement="left" bordered :column="1">
-        <n-descriptions-item label="消费规则名称">{{ detail?.customerCouponConsumeRuleName }}</n-descriptions-item>
-        <n-descriptions-item label="使用金额限制">{{ detail?.couponLimitedAmount }}</n-descriptions-item>
-        <n-descriptions-item label="可使用的城市" :span="2">{{ detail?.couponUsedCityNames }}</n-descriptions-item>
-        <n-descriptions-item label="可使用的订单类型" :span="2">{{ detail?.couponUsedOrderTypeNames }}</n-descriptions-item>
-        <n-descriptions-item label="可使用的车型">{{ detail?.couponUsedVehicleTypeNames }}</n-descriptions-item>
-        <n-descriptions-item label="可使用的时间">{{ detail?.couponUsedDayTimeSectionDesc }}</n-descriptions-item>
-        <n-descriptions-item label="可使用的星期">{{ detail?.couponUsedWeekSectionDesc }}</n-descriptions-item>
+        <n-descriptions-item label="消费规则名称">{{
+          detail?.customerCouponConsumeRuleName
+        }}</n-descriptions-item>
+        <n-descriptions-item label="使用金额限制">{{
+          detail?.couponLimitedAmount
+        }}</n-descriptions-item>
+        <n-descriptions-item label="可使用的城市" :span="2">{{
+          detail?.couponUsedCityNames
+        }}</n-descriptions-item>
+        <n-descriptions-item label="可使用的订单类型" :span="2">{{
+          detail?.couponUsedOrderTypeNames
+        }}</n-descriptions-item>
+        <n-descriptions-item label="可使用的车型">{{
+          detail?.couponUsedVehicleTypeNames
+        }}</n-descriptions-item>
+        <n-descriptions-item label="可使用的时间">{{
+          detail?.couponUsedDayTimeSectionDesc
+        }}</n-descriptions-item>
+        <n-descriptions-item label="可使用的星期">{{
+          detail?.couponUsedWeekSectionDesc
+        }}</n-descriptions-item>
       </n-descriptions>
     </BasicDrawer>
   </BasicModal>
 </template>
 <script lang="ts">
-import {defineComponent, ref, unref, onMounted} from "vue";
-import {FormInst, FormItemRule, useMessage} from "naive-ui";
+import { defineComponent, ref, unref, onMounted } from "vue";
+import { FormInst, FormItemRule, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
 import {
   customerCouponConsumeRuleDetail,
-  customerCouponConsumeRuleList
+  customerCouponConsumeRuleList,
 } from "@/api/marketing/marketing";
-import {CouponInter} from "@/views/marketing/exchangeCode/type";
-import {positiveInteger} from "@/utils/verify";
+import { CouponInter } from "@/views/marketing/exchangeCode/type";
+import { positiveInteger } from "@/utils/verify";
 
 export default defineComponent({
   name: "VoucherModal",
-  components: {BasicModal},
+  components: { BasicModal },
   emits: ["on-save-after"],
-  setup: function (_, {emit}) {
+  setup: function (_, { emit }) {
     const ModalRef = ref();
     const message = useMessage();
     const loading = ref(true);
@@ -115,22 +134,22 @@ export default defineComponent({
       couponCount: null,
     });
     const detail = ref();
-    const isShow = ref(false)
+    const isShow = ref(false);
     const formRef = ref<FormInst | null>(null);
-    const customerCouponConsumeRuleListData = ref()
+    const customerCouponConsumeRuleListData = ref();
     const handleModal = (value: CouponInter | null) => {
-      if (value !== null){
-        form.value = value
+      if (value !== null) {
+        form.value = value;
       }
-      console.log(value)
-      const {showModal} = ModalRef.value;
+      console.log(value);
+      const { showModal } = ModalRef.value;
       showModal();
     };
 
     const cancelModal = () => {
-      const {cancel} = ModalRef.value;
-      cancel()
-    }
+      const { cancel } = ModalRef.value;
+      cancel();
+    };
 
     function handleValidate() {
       formRef.value?.validate((errors) => {
@@ -156,28 +175,36 @@ export default defineComponent({
     }
 
     function handleUpdateValue(value: string) {
-      console.info(value)
-      form.value.customerCouponConsumeRuleId = value
-      handleDetail(value)
+      console.info(value);
+      form.value.customerCouponConsumeRuleId = value;
+      handleDetail(value);
     }
 
     const handleDetail = async (value: string) => {
       try {
-        let data = await customerCouponConsumeRuleDetail({customerCouponConsumeRuleId: value});
-        detail.value = data.data
+        let data = await customerCouponConsumeRuleDetail({ customerCouponConsumeRuleId: value });
+        detail.value = data.data;
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-      isShow.value = true
-    }
+      isShow.value = true;
+    };
 
     const getData = async () => {
       loading.value = true;
       try {
         let list = await customerCouponConsumeRuleList();
-        customerCouponConsumeRuleListData.value = list.data.map((item: { customerCouponConsumeRuleId: string; customerCouponConsumeRuleName: string }) => {
-          return {label: item.customerCouponConsumeRuleName, value: item.customerCouponConsumeRuleId};
-        });
+        customerCouponConsumeRuleListData.value = list.data.map(
+          (item: {
+            customerCouponConsumeRuleId: string;
+            customerCouponConsumeRuleName: string;
+          }) => {
+            return {
+              label: item.customerCouponConsumeRuleName,
+              value: item.customerCouponConsumeRuleId,
+            };
+          }
+        );
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -186,8 +213,8 @@ export default defineComponent({
     };
 
     function onCloseAfter() {
-      isShow.value = false
-      loading.value = false
+      isShow.value = false;
+      loading.value = false;
     }
 
     function submit(e: MouseEvent) {
@@ -195,7 +222,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors) => {
         if (!errors) {
           emit("on-save-after", form.value);
-          cancelModal()
+          cancelModal();
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -205,7 +232,7 @@ export default defineComponent({
 
     onMounted(() => {
       getData();
-    })
+    });
     return {
       ModalRef,
       formRef,
@@ -214,26 +241,35 @@ export default defineComponent({
       loading,
       isShow,
       rules: {
-        customerCouponConsumeRuleId: {required: true, trigger: ["blur", "change"], message: "请选择消费规则"},
-        couponName: {required: true, trigger: ["blur", "change"], message: "请输入代金券名称"},
-        couponDenomination: {required: true, type: "number", trigger: ["blur", "change"], message: "请输入代金券面值"},
+        customerCouponConsumeRuleId: {
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请选择消费规则",
+        },
+        couponName: { required: true, trigger: ["blur", "change"], message: "请输入代金券名称" },
+        couponDenomination: {
+          required: true,
+          type: "number",
+          trigger: ["blur", "change"],
+          message: "请输入代金券面值",
+        },
         couponEffectiveDays: {
           required: true,
           type: "number",
           trigger: ["blur", "change"],
           validator: (rule: FormItemRule, value: string) => {
-            return positiveInteger(rule, value)
+            return positiveInteger(rule, value);
           },
-          message: "请输入有效天数"
+          message: "请输入有效天数",
         },
         couponCount: {
           required: true,
           type: "number",
           trigger: ["blur", "change"],
           validator: (rule: FormItemRule, value: string) => {
-            return positiveInteger(rule, value)
+            return positiveInteger(rule, value);
           },
-          message: "请输入正确数量"
+          message: "请输入正确数量",
         },
       },
       detail,
@@ -243,7 +279,7 @@ export default defineComponent({
       handleValidate,
       handleReset,
       onCloseAfter,
-      submit
+      submit,
     };
   },
 });

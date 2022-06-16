@@ -3,7 +3,7 @@
     <n-descriptions label-placement="left" bordered :column="2">
       <n-descriptions-item label="兑换码">{{ detail?.exchangeCode }}</n-descriptions-item>
       <n-descriptions-item label="兑换类型">{{
-          stateData.get(detail?.exchangeCodeExchangeType)
+        stateData.get(detail?.exchangeCodeExchangeType)
       }}</n-descriptions-item>
       <n-descriptions-item label="生效时间" :span="2">{{
         dayjs(detail?.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
@@ -43,7 +43,7 @@
 import { defineComponent, reactive, ref, toRefs } from "vue";
 import { getExchangeCodeDetail } from "@/api/marketing/marketing";
 import dayjs from "dayjs";
-import {getDict} from "@/api/common/common";
+import { getDict } from "@/api/common/common";
 export default defineComponent({
   name: "CodeDetailDrawer",
   setup() {
@@ -65,7 +65,7 @@ export default defineComponent({
     const getDetail = async (exchangeCodeId: string) => {
       try {
         state.loading = true;
-        let dict = await getDict({parentEntryCode: "EXT0000"});
+        let dict = await getDict({ parentEntryCode: "EXT0000" });
         dict.data.map((item: { entryName: string; entryCode: string }) => {
           stateData.set(item.entryCode, item.entryName);
         });

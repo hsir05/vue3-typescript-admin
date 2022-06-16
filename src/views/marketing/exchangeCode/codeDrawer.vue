@@ -24,35 +24,47 @@
       </n-form-item>
 
       <n-form-item v-if="!isBatch" label="批量生成兑换码任务名称" path="taskName">
-        <n-input style="width: 260px"
-                 v-model:value="form.taskName"
-                 clearable
-                 :maxlength="50"
-                 @blur="uniqueTaskNameValue"
-                 placeholder="请输入任务名称"
-                 :style="{ width: '80%' }"
+        <n-input
+          style="width: 260px"
+          v-model:value="form.taskName"
+          clearable
+          :maxlength="50"
+          @blur="uniqueTaskNameValue"
+          placeholder="请输入任务名称"
+          :style="{ width: '80%' }"
         />
       </n-form-item>
 
       <n-form-item v-if="!isBatch" label="批量生成兑换码个数" path="exchangeCodeCount">
-        <n-input-number style="width: 260px"
-                        v-model:value="form.exchangeCodeCount"
-                        clearable
-                        :min=1
-                        :max=99999
-                        placeholder="请输入兑换码个数"
-                        :style="{ width: '80%' }"
+        <n-input-number
+          style="width: 260px"
+          v-model:value="form.exchangeCodeCount"
+          clearable
+          :min="1"
+          :max="99999"
+          placeholder="请输入兑换码个数"
+          :style="{ width: '80%' }"
         />
       </n-form-item>
 
       <n-form-item label="生效时间" path="exchangeCodeEffectiveTimeBegin">
-        <n-date-picker v-model:value="form.exchangeCodeEffectiveTimeBegin" style="width: 260px" type="datetime"
-                       clearable :is-date-disabled="disablePreviousDate"/>
+        <n-date-picker
+          v-model:value="form.exchangeCodeEffectiveTimeBegin"
+          style="width: 260px"
+          type="datetime"
+          clearable
+          :is-date-disabled="disablePreviousDate"
+        />
       </n-form-item>
 
       <n-form-item label="失效时间" path="exchangeCodeEffectiveTimeEnd">
-        <n-date-picker v-model:value="form.exchangeCodeEffectiveTimeEnd" type="datetime" style="width: 260px" clearable
-                       :is-date-disabled="disablePreviousDate"/>
+        <n-date-picker
+          v-model:value="form.exchangeCodeEffectiveTimeEnd"
+          type="datetime"
+          style="width: 260px"
+          clearable
+          :is-date-disabled="disablePreviousDate"
+        />
       </n-form-item>
 
       <n-form-item label="可兑换次数" path="exchangeCodeUsableCount">
@@ -84,31 +96,35 @@
       :pagination="pagination"
     />
 
-    <VoucherModal ref="voucherModalRef" @on-save-after="handleSaveAfter"/>
+    <VoucherModal ref="voucherModalRef" @on-save-after="handleSaveAfter" />
   </BasicDrawer>
 </template>
 <script lang="ts">
-import {defineComponent, reactive, h, ref, toRefs} from "vue";
-import {FormInst, useMessage} from "naive-ui";
+import { defineComponent, reactive, h, ref, toRefs } from "vue";
+import { FormInst, useMessage } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import {CreateOutline as CreateIcon, TrashOutline as RemoveIcon} from "@vicons/ionicons5";
+import { CreateOutline as CreateIcon, TrashOutline as RemoveIcon } from "@vicons/ionicons5";
 import VoucherModal from "./voucherModal.vue";
-import {ExchangeCodeCouponInter, TableDataItemInter, CouponInter} from "./type";
-import {addExchangeCodeCoupon, addExchangeCodeCouponBatch, uniqueExchangeCode} from "@/api/marketing/marketing";
+import { ExchangeCodeCouponInter, TableDataItemInter, CouponInter } from "./type";
+import {
+  addExchangeCodeCoupon,
+  addExchangeCodeCouponBatch,
+  uniqueExchangeCode,
+} from "@/api/marketing/marketing";
 import loading from "naive-ui/lib/_internal/loading";
-import {codeRules} from "./data";
+import { codeRules } from "./data";
 import dayjs from "dayjs";
-import {uniqueTaskName} from "@/api/common/common";
+import { uniqueTaskName } from "@/api/common/common";
 
 export default defineComponent({
   name: "CodeDrawer",
-  components: {VoucherModal},
+  components: { VoucherModal },
   emits: ["on-save-after"],
-  setup: function (_, {emit}) {
+  setup: function (_, { emit }) {
     const state = reactive({
       isDrawer: false,
       loading: false,
-      isBatch: true
+      isBatch: true,
     });
 
     const title = ref("");
@@ -122,7 +138,7 @@ export default defineComponent({
       exchangeCodeEffectiveTimeEnd: null,
       exchangeCodeUsableCount: null,
       taskName: null,
-      exchangeCodeCount: null
+      exchangeCodeCount: null,
     });
 
     const data = ref<CouponInter[]>([]);
@@ -187,7 +203,7 @@ export default defineComponent({
     ];
 
     function openDrawer(t: string, batch: boolean) {
-      state.isBatch = batch
+      state.isBatch = batch;
       title.value = t;
       state.isDrawer = true;
     }
@@ -205,7 +221,7 @@ export default defineComponent({
 
     function handleEdit(record: CouponInter) {
       console.log(record);
-      const {handleModal} = voucherModalRef.value;
+      const { handleModal } = voucherModalRef.value;
       handleModal(record);
     }
 
@@ -214,7 +230,7 @@ export default defineComponent({
       formRef.value?.validate(async (errors) => {
         if (!errors) {
           if (data.value.length === 0) {
-            message.error("请先添加代金券")
+            message.error("请先添加代金券");
             return;
           }
           try {
@@ -222,29 +238,37 @@ export default defineComponent({
             if (state.isBatch) {
               let option = {
                 exchangeCode: form.value.exchangeCode,
-                exchangeCodeEffectiveTimeBegin: dayjs(form.value.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss") as string,
-                exchangeCodeEffectiveTimeEnd: dayjs(form.value.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss") as string,
+                exchangeCodeEffectiveTimeBegin: dayjs(
+                  form.value.exchangeCodeEffectiveTimeBegin
+                ).format("YYYY-MM-DD HH:mm:ss") as string,
+                exchangeCodeEffectiveTimeEnd: dayjs(form.value.exchangeCodeEffectiveTimeEnd).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                ) as string,
                 exchangeCodeUsableCount: form.value.exchangeCodeUsableCount,
                 couponList: data.value,
-              }
+              };
               res = await addExchangeCodeCoupon(option);
               message.success(res.message);
             } else {
               let option = {
                 taskName: form.value.taskName,
                 exchangeCodeCount: form.value.exchangeCodeCount,
-                exchangeCodeEffectiveTimeBegin: dayjs(form.value.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss") as string,
-                exchangeCodeEffectiveTimeEnd: dayjs(form.value.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss") as string,
+                exchangeCodeEffectiveTimeBegin: dayjs(
+                  form.value.exchangeCodeEffectiveTimeBegin
+                ).format("YYYY-MM-DD HH:mm:ss") as string,
+                exchangeCodeEffectiveTimeEnd: dayjs(form.value.exchangeCodeEffectiveTimeEnd).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                ) as string,
                 exchangeCodeUsableCount: form.value.exchangeCodeUsableCount,
                 couponList: data.value,
-              }
-              res = await addExchangeCodeCouponBatch(option)
-              message.success(res.message)
+              };
+              res = await addExchangeCodeCouponBatch(option);
+              message.success(res.message);
             }
           } catch (e) {
-            console.log(e)
+            console.log(e);
           }
-          state.isDrawer = false
+          state.isDrawer = false;
         } else {
           console.log(errors);
           message.error("验证失败");
@@ -254,7 +278,7 @@ export default defineComponent({
 
     function handleAddVoucher() {
       console.log("添加代金券");
-      const {handleModal} = voucherModalRef.value;
+      const { handleModal } = voucherModalRef.value;
       handleModal(null);
     }
 
@@ -267,15 +291,70 @@ export default defineComponent({
         exchangeCodeEffectiveTimeEnd: null,
         exchangeCodeUsableCount: null,
         taskName: null,
-        exchangeCodeCount: null
+        exchangeCodeCount: null,
       };
-      data.value = []
+      data.value = [];
     }
 
     //生成随机数字字符（不包含0,1,o,O,i,I,l,L不容易区分字符）
     const randomWord = (range: number) => {
       let str = "",
-        arr = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        arr = [
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+          "j",
+          "k",
+          "m",
+          "n",
+          "p",
+          "q",
+          "r",
+          "s",
+          "t",
+          "u",
+          "v",
+          "w",
+          "x",
+          "y",
+          "z",
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K",
+          "M",
+          "N",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+          "W",
+          "X",
+          "Y",
+          "Z",
+        ];
       for (let i = 0; i < range; i++) {
         let pos = Math.round(Math.random() * (arr.length - 1));
         str += arr[pos];
@@ -306,10 +385,10 @@ export default defineComponent({
     };
 
     function handleSaveAfter(value: CouponInter) {
-      loading.value = true
-      data.value.push(value)
-      loading.value = false
-      console.info(data)
+      loading.value = true;
+      data.value.push(value);
+      loading.value = false;
+      console.info(data);
       emit("on-save-after");
     }
 
@@ -319,7 +398,7 @@ export default defineComponent({
       }
       try {
         let res = await uniqueTaskName({
-          importTaskName:form.value.taskName,
+          importTaskName: form.value.taskName,
           importType: "",
         });
         if (res.data.UniqueBooleanResult) {
@@ -352,7 +431,7 @@ export default defineComponent({
       uniqueExchangeCodeValue,
       disablePreviousDate,
       handleSaveAfter,
-      uniqueTaskNameValue
+      uniqueTaskNameValue,
     };
   },
 });
