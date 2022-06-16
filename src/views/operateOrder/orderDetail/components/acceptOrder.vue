@@ -69,6 +69,7 @@ interface DetailInter {
   agencyDivideRate: number;
   companyDivideRate: number;
   driverDivideRate: number;
+  orderDispatchRecordList: [];
 }
 const props = defineProps({
   detail: {

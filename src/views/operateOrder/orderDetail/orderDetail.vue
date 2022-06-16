@@ -44,6 +44,7 @@ import DriverSubmissionCost from "./components/driverSubmissionCost.vue";
 import OrderCostCreate from "./components/orderCostCreate.vue";
 import InvalidOrder from "./components/invalidOrder.vue";
 import CancelOrder from "./components/cancelOrder.vue";
+import OrderPriceAdjust from "./components/orderPriceAdjust.vue";
 import { objInter } from "@/interface/common/common";
 import {
   getOrderDetail,
@@ -77,6 +78,7 @@ export default defineComponent({
     OrderCostCreate,
     InvalidOrder,
     CancelOrder,
+    OrderPriceAdjust,
   },
   setup() {
     const route = useRoute();
@@ -295,6 +297,31 @@ export default defineComponent({
           isDate: !isSameDay(new Date(driverEndServiceTime), new Date(driverSubmissionCostTime)),
         });
 
+        if (
+          detail.value.orderPriceAdjustRecordList &&
+          detail.value.orderPriceAdjustRecordList.length > 0
+        ) {
+          for (let i = 0; i < detail.value.orderPriceAdjustRecordList.length; i++) {
+            let item = detail.value.orderPriceAdjustRecordList[i];
+            if (i === 0) {
+              step.value.push({
+                orderState: OrderDataEnum.ORDERPRICEADJUST,
+                date: item.adjustTime,
+                isDate: !isSameDay(new Date(driverSubmissionCostTime), new Date(item.adjustTime)),
+              });
+            } else {
+              step.value.push({
+                orderState: OrderDataEnum.ORDERPRICEADJUST,
+                date: item.adjustTime,
+                isDate: !isSameDay(
+                  new Date(detail.value.orderPriceAdjustRecordList[i - 1].adjustTime),
+                  new Date(item.adjustTime)
+                ),
+              });
+            }
+          }
+        }
+
         // 支付
         if (!orderCostCreateTime) {
           step.value.push({ orderState: OrderDataEnum.ORDEREND });
@@ -358,6 +385,7 @@ export default defineComponent({
         driverEndServiceState: "DriverEndService",
         driverSubmissionCostState: "DriverSubmissionCost",
         orderCostCreateState: "OrderCostCreate",
+        orderPriceAdjust: "orderPriceAdjust",
         cancelOrderState: "CancelOrder",
       };
       state.componentId = componentsObj[orderState];
