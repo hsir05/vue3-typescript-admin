@@ -123,23 +123,28 @@
   <FinishOrderPriceModel ref="adjustFinishOrderPriceRef" @on-save-after="handleSaveAfter"/>
 </template>
 <script lang="ts">
-import { defineComponent, ref, h, toRaw, onMounted } from "vue";
+import {defineComponent, ref, h, toRaw, onMounted} from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { useRouter } from "vue-router";
-import { EyeOutline as EyeIcon} from "@vicons/ionicons5";
-import { IssuesCloseOutlined as IssuesCloseIcon,ForkOutlined as ForkOutlinedIcon,MoneyCollectFilled as MoneyCollectFilledIcon } from "@vicons/antd";
+import {useRouter} from "vue-router";
+import {EyeOutline as EyeIcon} from "@vicons/ionicons5";
+import {
+  IssuesCloseOutlined as IssuesCloseIcon,
+  ForkOutlined as ForkOutlinedIcon,
+  MoneyCollectFilled as MoneyCollectFilledIcon
+} from "@vicons/antd";
 import BasicTable from "@/components/Table/Table.vue";
-import { TableDataItemInter, QueryForm } from "./type";
-import { getOrderPage, singleFinishOrder } from "@/api/operateOrder/operateOrder";
-import { getDict, getInfluxList, getAllOperateCompany } from "@/api/common/common";
-import { PaginationInter } from "@/api/type";
-import { objInter } from "@/interface/common/common";
-import { useDialog, useMessage } from "naive-ui";
+import {TableDataItemInter, QueryForm} from "./type";
+import {getOrderPage, singleFinishOrder} from "@/api/operateOrder/operateOrder";
+import {getDict, getInfluxList, getAllOperateCompany} from "@/api/common/common";
+import {PaginationInter} from "@/api/type";
+import {objInter} from "@/interface/common/common";
+import {useDialog, useMessage} from "naive-ui";
 import dayjs from "dayjs";
 import FinishOrderPriceModel from "./adjustFinishOrderPrice.vue";
+
 export default defineComponent({
   name: "ServingOrder",
-  components: {BasicTable,FinishOrderPriceModel },
+  components: {BasicTable, FinishOrderPriceModel},
   setup() {
     const loading = ref(false);
     const userDrawerRef = ref();
@@ -353,8 +358,8 @@ export default defineComponent({
     const getAllData = async () => {
       Promise.all([
         getAllOperateCompany(),
-        getDict({ parentEntryCode: "OT00000" }),
-        getDict({ parentEntryCode: "OS00000" }),
+        getDict({parentEntryCode: "OT00000"}),
+        getDict({parentEntryCode: "OS00000"}),
         getInfluxList(),
       ])
         .then((res) => {
@@ -404,7 +409,7 @@ export default defineComponent({
             }
           }
 
-          getData({ pageIndex: 1, pageSize: 10 });
+          getData({pageIndex: 1, pageSize: 10});
         })
         .catch((err) => {
           console.log(err);
@@ -414,8 +419,8 @@ export default defineComponent({
     const getData = async (page: PaginationInter) => {
       loading.value = true;
       try {
-        let search = { ...queryValue.value };
-        let res = await getOrderPage({ page, search: search });
+        let search = {...queryValue.value};
+        let res = await getOrderPage({page, search: search});
         data.value = res.data.content;
         itemCount.value = res.data.totalElements;
         loading.value = false;
@@ -428,24 +433,31 @@ export default defineComponent({
     function handleDetail(orderId: string) {
       router.push({
         path: "/operate-order/order-detail",
-        query: { id: orderId, orderState: "serving" },
+        query: {id: orderId, orderState: "serving"},
       });
     }
+
     // 完成待支付订单价格调整
     function adjustFinishOrderPrice(record: Recordable) {
       const {handleModal} = adjustFinishOrderPriceRef.value;
-      handleModal("完成订单价格调整",record.orderId);
+      handleModal("完成订单价格调整", record.orderId);
       console.log(record);
     }
+
     //取消待支付订单价格调整
-    function adjustCancelOrderPrice(record:Recordable){
+    function adjustCancelOrderPrice(record: Recordable) {
       console.log(record);
     }
+
     // 人工派单
-    function handleManualDispatch(record:string) {
+    function handleManualDispatch(record: string) {
       console.log("人工派单")
-      console.log(record)
+      router.push({
+        path: "/operate-order/dispatch",
+        query: {id: record},
+      });
     }
+
     // 单个结单
     function finishOrder(influxOrderNo: string) {
       console.log(influxOrderNo);
@@ -457,7 +469,7 @@ export default defineComponent({
         onPositiveClick: async () => {
           try {
             loading.value = true;
-            let res = await singleFinishOrder({ influxOrderNo });
+            let res = await singleFinishOrder({influxOrderNo});
             console.log(res);
             message.success(window.$tips(res.code));
             loading.value = false;
@@ -466,21 +478,24 @@ export default defineComponent({
             loading.value = false;
           }
         },
-        onNegativeClick: () => {},
+        onNegativeClick: () => {
+        },
       });
     }
+
     //订单改派
-    function handleReassignment(record:Recordable) {
+    function handleReassignment(record: Recordable) {
       router.push({
         path: "/operate-order/change-dispatch",
-        query: { id: record.orderId},
+        query: {id: record.orderId},
       });
     }
+
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
-      const { resetPagination } = basicTableRef.value;
+      const {resetPagination} = basicTableRef.value;
       resetPagination();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({pageIndex: 1, pageSize: 10});
     };
     const reset = () => {
       queryValue.value = {
@@ -495,29 +510,31 @@ export default defineComponent({
         driverNoEq: null,
         customerPhoneEq: null,
       };
-      const { resetPagination } = basicTableRef.value;
+      const {resetPagination} = basicTableRef.value;
       resetPagination();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({pageIndex: 1, pageSize: 10});
     };
 
     function reloadPage() {
-      const { resetPagination } = basicTableRef.value;
+      const {resetPagination} = basicTableRef.value;
       resetPagination();
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({pageIndex: 1, pageSize: 10});
     }
 
     function handlePage(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
+
     function handlePageSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
+
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
-      getData({ pageIndex: 1, pageSize: 10 });
+      getData({pageIndex: 1, pageSize: 10});
     }
 
     return {

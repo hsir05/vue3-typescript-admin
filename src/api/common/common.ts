@@ -130,3 +130,19 @@ export function refreshDriverPosition(data:RefreshDriverPositionInter) {
   });
 }
 
+interface RefreshDriverPositionByVehicleTypeAndAreaCodeInter {
+  areaCode: string | null,
+  orderPlaceVehicleId: string | null
+}
+/**
+ * 通过参数获取司机实时位置
+ * @param data
+ */
+export function refreshDriverPositionByVehicleTypeAndAreaCode(data:RefreshDriverPositionByVehicleTypeAndAreaCodeInter) {
+  return http.request({
+    url: "/driverRealTimeInfo/refreshDriverPositionByVehicleTypeAndAreaCode",
+    method: "post",
+    data: data
+  });
+}
+

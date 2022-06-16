@@ -39,6 +39,13 @@ export interface DispatchQueryForm {
   loginPassword: string
 }
 
+export interface DispatchForm {
+  orderId: string | null
+  operationCompanyDriverId: string | null
+  orderPlaceVehicleId:string | null
+  loginPassword: string
+}
+
 export interface AdjustFinishOrderPriceForm{
   orderId: string | null,
   orderFixedCost: number | null,

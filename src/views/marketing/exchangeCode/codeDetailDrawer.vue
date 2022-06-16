@@ -26,16 +26,16 @@
     </n-descriptions>
 
     <n-descriptions label-placement="left" bordered :column="2" title="代金券" v-for="item in coupon">
-      <n-descriptions-item label="代金券名称">{{ item.couponName}}</n-descriptions-item>
-      <n-descriptions-item label="代金券面值(元)">{{ item.couponDenomination}}</n-descriptions-item>
-      <n-descriptions-item label="代金券数量">{{ item.couponCount}}</n-descriptions-item>
-      <n-descriptions-item label="代金券有效天数">{{ item.couponEffectiveDays}}</n-descriptions-item>
-      <n-descriptions-item label="使用限制金额(元)">{{ item.customerCouponConsumeRule.couponLimitedAmount}}</n-descriptions-item>
-      <n-descriptions-item label="可使用的城市">{{ item.customerCouponConsumeRule.couponUsedCityNames}}</n-descriptions-item>
-      <n-descriptions-item label="可使用的车型" :span="2">{{ item.customerCouponConsumeRule.couponUsedVehicleTypeNames}}</n-descriptions-item>
-      <n-descriptions-item label="可使用的时间">{{ item.customerCouponConsumeRule.couponUsedDayTimeSectionDesc}}</n-descriptions-item>
-      <n-descriptions-item label="可使用的星期">{{ item.customerCouponConsumeRule.couponUsedWeekSectionDesc}}</n-descriptions-item>
-      <n-descriptions-item label="可使用的订单类型" :span="2">{{ item.customerCouponConsumeRule.couponUsedOrderTypeNames}}</n-descriptions-item>
+      <n-descriptions-item label="代金券名称">{{ item?.couponName}}</n-descriptions-item>
+      <n-descriptions-item label="代金券面值(元)">{{ item?.couponDenomination}}</n-descriptions-item>
+      <n-descriptions-item label="代金券数量">{{ item?.couponCount}}</n-descriptions-item>
+      <n-descriptions-item label="代金券有效天数">{{ item?.couponEffectiveDays}}</n-descriptions-item>
+      <n-descriptions-item label="使用限制金额(元)">{{ item?.customerCouponConsumeRule?.couponLimitedAmount}}</n-descriptions-item>
+      <n-descriptions-item label="可使用的城市">{{ item?.customerCouponConsumeRule?.couponUsedCityNames}}</n-descriptions-item>
+      <n-descriptions-item label="可使用的车型" :span="2">{{ item?.customerCouponConsumeRule?.couponUsedVehicleTypeNames}}</n-descriptions-item>
+      <n-descriptions-item label="可使用的时间">{{ item?.customerCouponConsumeRule?.couponUsedDayTimeSectionDesc}}</n-descriptions-item>
+      <n-descriptions-item label="可使用的星期">{{ item?.customerCouponConsumeRule?.couponUsedWeekSectionDesc}}</n-descriptions-item>
+      <n-descriptions-item label="可使用的订单类型" :span="2">{{ item?.customerCouponConsumeRule?.couponUsedOrderTypeNames}}</n-descriptions-item>
     </n-descriptions>
   </BasicDrawer>
 </template>
@@ -44,6 +44,7 @@ import { defineComponent, reactive, ref, toRefs } from "vue";
 import { getExchangeCodeDetail } from "@/api/marketing/marketing";
 import dayjs from "dayjs";
 import { getDict } from "@/api/common/common";
+import {CouponListInter} from "@/views/marketing/exchangeCode/type";
 export default defineComponent({
   name: "CodeDetailDrawer",
   setup() {
@@ -52,7 +53,7 @@ export default defineComponent({
       loading: false,
     });
     const detail = ref();
-    const coupon = ref([])
+    const coupon = ref<CouponListInter[]>([])
     const isShow = ref(false)
     const stateData: Map<string, string> = new Map();
     function openDrawer(exchangeCodeId: string) {
