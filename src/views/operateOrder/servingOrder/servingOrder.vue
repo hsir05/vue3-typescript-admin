@@ -117,17 +117,25 @@
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-page="handlePage"
-      @on-pagination="handlepagSize"
+      @on-pagination="handlePageSize"
     />
-    <!-- <UserDrawer ref="userDrawerRef" :width="500" @on-save-after="handleSaveAfter" /> -->
   </div>
+  <FinishOrderPriceModel ref="adjustFinishOrderPriceRef" @on-save-after="handleSaveAfter" />
+  <AdjustCancelOrderPriceModel
+    ref="adjustCancelOrderPriceModelRef"
+    @on-save-after="handleSaveAfter"
+  />
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, toRaw, onMounted } from "vue";
 import TableActions from "@/components/TableActions/TableActions.vue";
 import { useRouter } from "vue-router";
-import { EyeOutline as EyeIcon, GitBranchOutline as GitBranchIcon } from "@vicons/ionicons5";
-import { IssuesCloseOutlined as IssuesCloseIcon } from "@vicons/antd";
+import { EyeOutline as EyeIcon } from "@vicons/ionicons5";
+import {
+  IssuesCloseOutlined as IssuesCloseIcon,
+  ForkOutlined as ForkOutlinedIcon,
+  MoneyCollectFilled as MoneyCollectFilledIcon,
+} from "@vicons/antd";
 import BasicTable from "@/components/Table/Table.vue";
 import { TableDataItemInter, QueryForm } from "./type";
 import { getOrderPage, singleFinishOrder } from "@/api/operateOrder/operateOrder";
@@ -136,13 +144,18 @@ import { PaginationInter } from "@/api/type";
 import { objInter } from "@/interface/common/common";
 import { useDialog, useMessage } from "naive-ui";
 import dayjs from "dayjs";
+import FinishOrderPriceModel from "./adjustFinishOrderPrice.vue";
+import AdjustCancelOrderPriceModel from "./adjustCancelOrderPrice.vue";
 export default defineComponent({
   name: "ServingOrder",
-  components: { BasicTable },
+  components: { BasicTable, FinishOrderPriceModel, AdjustCancelOrderPriceModel },
   setup() {
     const loading = ref(false);
     const userDrawerRef = ref();
     const basicTableRef = ref();
+    const dispatchRef = ref();
+    const adjustFinishOrderPriceRef = ref();
+    const adjustCancelOrderPriceModelRef = ref();
     const itemCount = ref(null);
     const router = useRouter();
     const dialog = useDialog();
@@ -168,7 +181,6 @@ export default defineComponent({
     const orderData = ref([]);
     const orderStateData = ref([]);
     const companyData = ref([]);
-
     const columns = [
       {
         title: "序号",
@@ -292,37 +304,46 @@ export default defineComponent({
                 label: "人工派单",
                 type: "primary",
                 isIconBtn: true,
-                icon: GitBranchIcon,
-                isShow: record.orderState === "OS00001" ? false : true,
-                onClick: handleManualDispatcht.bind(null, record.orderId),
+                icon: ForkOutlinedIcon,
+                isShow: !(record.orderState === "OS00001"),
+                onClick: handleManualDispatch.bind(null, record.orderId),
                 auth: ["dict001"],
               },
               {
                 label: "价格调整",
                 type: "primary",
                 isIconBtn: true,
-                icon: GitBranchIcon,
+                icon: MoneyCollectFilledIcon,
                 isShow: !(
                   record.orderState === "OS00007" &&
                   (record.influxCode === "IFT0001" ||
                     record.influxCode === "IFT0005" ||
                     record.influxCode === "IFT0009")
                 ),
-                onClick: handlePriceAdjustment.bind(null, record),
+                onClick: adjustFinishOrderPrice.bind(null, record),
+                auth: ["dict001"],
+              },
+              {
+                label: "价格调整",
+                type: "primary",
+                isIconBtn: true,
+                icon: MoneyCollectFilledIcon,
+                isShow: !(record.orderState === "OS00008" && record.influxCode === "IFT0001"),
+                onClick: adjustCancelOrderPrice.bind(null, record),
                 auth: ["dict001"],
               },
               {
                 label: "订单改派",
                 type: "primary",
                 isIconBtn: true,
-                icon: GitBranchIcon,
+                icon: ForkOutlinedIcon,
                 isShow: !(
                   record.orderState === "OS00002" ||
                   record.orderState === "OS00003" ||
                   record.orderState === "OS00004" ||
                   record.orderState === "OS00005"
                 ),
-                onClick: handleReassignment.bind(null, record.orderId),
+                onClick: handleReassignment.bind(null, record),
                 auth: ["dict001"],
               },
               {
@@ -331,7 +352,7 @@ export default defineComponent({
                 isIconBtn: true,
                 icon: IssuesCloseIcon,
                 isShow: !(record.orderState === "OS00007" || record.orderState === "OS00008"),
-                onClick: handleClosureOrder.bind(null, record.influxOrderNo),
+                onClick: finishOrder.bind(null, record.influxOrderNo),
                 auth: ["dict001"],
               },
             ],
@@ -425,14 +446,32 @@ export default defineComponent({
         query: { id: orderId, orderState: "serving" },
       });
     }
-    // 价格调整
-    function handlePriceAdjustment(record: Recordable) {
+
+    // 完成待支付订单价格调整
+    function adjustFinishOrderPrice(record: Recordable) {
+      const { handleModal } = adjustFinishOrderPriceRef.value;
+      handleModal("完成订单价格调整", record.orderId);
       console.log(record);
     }
+
+    //取消待支付订单价格调整
+    function adjustCancelOrderPrice(record: Recordable) {
+      const { handleModal } = adjustCancelOrderPriceModelRef.value;
+      handleModal("取消订单价格调整", record.orderId);
+      console.log(record);
+    }
+
     // 人工派单
-    function handleManualDispatcht() {}
+    function handleManualDispatch(record: string) {
+      console.log("人工派单");
+      router.push({
+        path: "/operate-order/dispatch",
+        query: { id: record },
+      });
+    }
+
     // 单个结单
-    function handleClosureOrder(influxOrderNo: string) {
+    function finishOrder(influxOrderNo: string) {
       console.log(influxOrderNo);
       dialog.warning({
         title: "提示",
@@ -454,10 +493,15 @@ export default defineComponent({
         onNegativeClick: () => {},
       });
     }
+
     //订单改派
-    function handleReassignment(orderId: string) {
-      console.log(orderId);
+    function handleReassignment(record: Recordable) {
+      router.push({
+        path: "/operate-order/change-dispatch",
+        query: { id: record.orderId },
+      });
     }
+
     const searchHandle = (e: MouseEvent) => {
       e.preventDefault();
       const { resetPagination } = basicTableRef.value;
@@ -492,10 +536,12 @@ export default defineComponent({
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
-    function handlepagSize(pagination: PaginationInter) {
+
+    function handlePageSize(pagination: PaginationInter) {
       console.log(toRaw(pagination));
       getData(toRaw(pagination));
     }
+
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
@@ -514,6 +560,8 @@ export default defineComponent({
       orderData,
       columns,
       itemCount,
+      adjustFinishOrderPriceRef,
+      adjustCancelOrderPriceModelRef,
       disablePreviousDate(ts: number) {
         return ts >= 4102329600000 && ts <= 1451577600000;
       },
@@ -523,7 +571,8 @@ export default defineComponent({
       searchHandle,
       reset,
       handlePage,
-      handlepagSize,
+      handlePageSize,
+      dispatchRef,
       handleSaveAfter,
     };
   },

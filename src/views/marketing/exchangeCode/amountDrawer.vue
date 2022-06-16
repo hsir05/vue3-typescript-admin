@@ -76,7 +76,7 @@
           :min="1"
           clearable
           placeholder="可兑换次数"
-          :max="9999999999"
+          :max="999999999"
         />
       </n-form-item>
 

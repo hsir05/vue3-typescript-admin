@@ -323,7 +323,11 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           errorMessageMode: "none",
           // 接口地址
           apiUrl: globSetting.apiUrl,
+<<<<<<< HEAD
           //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
+=======
+        //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
+>>>>>>> 61471b9b0d4cb7d3d10d938896ef4311ddda3740
           // 接口拼接地址
           urlPrefix: urlPrefix,
           //  是否加入时间戳
@@ -349,5 +353,6 @@ export const otherHttp = createAxios({
   requestOptions: {
     apiUrl: otherUrl,
     urlPrefix: '',
+    Origin: "http://test-ngcxpm-web.yiminyueche.com/",
   },
 });

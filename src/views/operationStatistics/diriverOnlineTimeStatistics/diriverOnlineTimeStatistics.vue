@@ -178,7 +178,7 @@ import { TimeOutline as TimeIcon, TimeOutline, Cafe, CarSharp } from "@vicons/io
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 
 export default defineComponent({
-  name: "DiriverOnlineTimeStatistics",
+  name: "DriverOnlineTimeStatistics",
   components: {
     dayOrder,
     monthOrder,

@@ -3,14 +3,14 @@ export interface TableDataItemInter {
   exchangeCodeUseTime: number
   exchangeCodeEffectiveTimeEnd: number
   exchangeCodeCreateTime: number
-  exchangeCodeExchangeType:string
-  exchangeCodeEffectiveTimeBegin:number,
-  exchangeCodeAchieveOpportunity:string,
-  exchangeCodeState:string
+  exchangeCodeExchangeType: string
+  exchangeCodeEffectiveTimeBegin: number,
+  exchangeCodeAchieveOpportunity: string,
+  exchangeCodeState: string
 }
 
 export interface QueryFormInter {
-  taskName:string | null
+  taskName: string | null
   exchangeCodeCount: number | null
   exchangeCode: string | null
   exchangeCodeEffectiveTimeBegin: number | null
@@ -23,7 +23,7 @@ export interface QueryFormInter {
 }
 
 export interface ExchangeCodeCouponInter {
-  taskName:string | null
+  taskName: string | null
   exchangeCodeCount: number | null
   exchangeCode: string | null,
   exchangeCodeEffectiveTimeBegin: number | null,
@@ -31,7 +31,7 @@ export interface ExchangeCodeCouponInter {
   exchangeCodeUsableCount: number | null
 }
 
-export interface CouponInter{
+export interface CouponInter {
   couponName: string | null
   couponDenomination: number | null
   couponEffectiveDays: number | null
@@ -50,4 +50,26 @@ export interface DataImportTaskITemInter {
   failureCount: number
   importLog: string
   operatorName: string
+}
+
+export interface CouponListInter{
+  couponName: string | null
+  couponCount: number | null,
+  couponDenomination: number | null,
+  couponEffectiveDays: number | null,
+  customerCouponConsumeRule: {
+    customerCouponConsumeRuleId: string | null,
+    customerCouponConsumeRuleName: string | null,
+    couponLimitedAmount: number | null,
+    couponUsedCityCodes: string | null,
+    couponUsedCityNames: string | null,
+    couponUsedOrderTypes: string | null,
+    couponUsedOrderTypeNames: string | null,
+    couponUsedVehicleTypeIds: string | null,
+    couponUsedVehicleTypeNames: string | null,
+    couponUsedDayTimeSection: string | null,
+    couponUsedDayTimeSectionDesc: string | null,
+    couponUsedWeekSection: string | null,
+    couponUsedWeekSectionDesc: string | null
+  } | null
 }

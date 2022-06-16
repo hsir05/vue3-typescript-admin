@@ -50,6 +50,7 @@
       :itemCount="itemCount"
       @reload-page="reloadPage"
       @on-pagination="handlePagSize"
+      @on-page="handlePage"
     />
 
     <CodeDetailModal ref="codeDetailModalRef" />
@@ -255,6 +256,10 @@ export default defineComponent({
       getData(toRaw(pagination));
     }
 
+    function handlePage(pagination: PaginationInter) {
+      getData(toRaw(pagination));
+    }
+
     // 抽屉组件保存后处理
     function handleSaveAfter() {
       console.log("抽屉组件保存后处理");
@@ -282,6 +287,7 @@ export default defineComponent({
       reloadPage,
       handlePagSize,
       handleSaveAfter,
+      handlePage,
     };
   },
 });

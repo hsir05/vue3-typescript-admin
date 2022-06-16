@@ -115,4 +115,46 @@ export function uniqueTaskName(data: { importTaskName:string,importType:string }
     data: data
   });
 }
+interface RefreshDriverPositionInter {
+  operationCompanyId:string
+}
+/**
+ * 通过参数获取司机实时位置
+ * @param data
+ */
+export function refreshDriverPosition(data:RefreshDriverPositionInter) {
+  return http.request({
+    url: "/operationCompanyDriver/refreshDriverPosition",
+    method: "post",
+    data: data
+  });
+}
+
+interface RefreshDriverPositionByVehicleTypeAndAreaCodeInter {
+  areaCode: string | null,
+  orderPlaceVehicleId: string | null
+}
+/**
+ * 通过参数获取司机实时位置
+ * @param data
+ */
+export function refreshDriverPositionByVehicleTypeAndAreaCode(data:RefreshDriverPositionByVehicleTypeAndAreaCodeInter) {
+  return http.request({
+    url: "/driverRealTimeInfo/refreshDriverPositionByVehicleTypeAndAreaCode",
+    method: "post",
+    data: data
+  });
+}
+
+/**
+ * 通过参数获取司机实时位置
+ * @param data
+ */
+export function refreshDriverPositionByAreaCode(data: { areaCode:string }) {
+  return http.request({
+    url: "/operationCompanyDriver/refreshDriverPositionByAreaCode",
+    method: "post",
+    data: data
+  });
+}
 

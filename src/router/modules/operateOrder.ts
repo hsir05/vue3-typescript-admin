@@ -1,7 +1,7 @@
-import { RouteRecordRaw } from "vue-router";
-import { PARENTLAYOUT } from "@/router/constant";
-import { FileTrayFullOutline } from "@vicons/ionicons5";
-import { renderIcon } from "@/utils/index";
+import {RouteRecordRaw} from "vue-router";
+import {PARENTLAYOUT} from "@/router/constant";
+import {FileTrayFullOutline} from "@vicons/ionicons5";
+import {renderIcon} from "@/utils/index";
 
 
 //activeMenu: "" 用于没有菜单,有页面的功能
@@ -33,8 +33,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operateOrder/finishedOrder/finishedOrder.vue"),
       },
-       
-       {
+
+      {
         path: "/operate-order/channel",
         name: `operate-order_channel`,
         meta: {
@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operateOrder/channelOrder/channelOrder.vue"),
       },
-       {
+      {
         path: "/operate-order/invalid",
         name: `operate-order_invalid`,
         meta: {
@@ -60,13 +60,32 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/operateOrder/orderDetail/orderDetail.vue"),
       },
-       {
+      {
         path: "/operate-order/order-comment",
         name: `operate-order_order-comment`,
         meta: {
           title: "评论订单",
         },
         component: () => import("@/views/operateOrder/orderComment/orderComment.vue"),
+      }, {
+        path: "/operate-order/change-dispatch",
+        name: 'operate-order_change-dispatch',
+        meta: {
+          title: "订单改派",
+          activeMenu: "",
+          activeBreadcrumb:true
+        },
+        component: () => import("@/views/operateOrder/servingOrder/changeDispatch.vue"),
+      },
+      {
+        path: "/operate-order/dispatch",
+        name: 'operate-order_dispatch',
+        meta: {
+          title: "人工派单",
+          activeMenu: "",
+          activeBreadcrumb:true
+        },
+        component: () => import("@/views/operateOrder/servingOrder/dispatch.vue"),
       },
     ],
   },

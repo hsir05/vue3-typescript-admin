@@ -17,10 +17,10 @@
       <n-descriptions-item label="已兑换次数">{{
         detail?.exchangeCodeUsedCount
       }}</n-descriptions-item>
-      <n-descriptions-item label="兑换实充金额">{{
+      <n-descriptions-item v-if="isShow" label="兑换实充金额">{{
         detail?.exchangeRechargeAmount
       }}</n-descriptions-item>
-      <n-descriptions-item label="兑换赠送金额">{{
+      <n-descriptions-item v-if="isShow" label="兑换赠送金额">{{
         detail?.exchangeGiftAmount
       }}</n-descriptions-item>
     </n-descriptions>
@@ -57,7 +57,19 @@
       class="box-border"
       :row-key="getRowKeyId"
       :data="data"
-      :pagination="pagination"
+      :pagination="false"
+    />
+    <n-pagination
+      v-model:page="pagination.page"
+      v-model:page-size="pagination.pageSize"
+      v-model:item-count="pagination.itemCount"
+      :page-slot="5"
+      show-size-picker
+      show-quick-jumper
+      class="mt-10px justify-end"
+      :on-update:page="handlePage"
+      :on-update:page-size="handlePageSize"
+      :page-sizes="pageSizes"
     />
   </BasicDrawer>
 </template>
@@ -69,6 +81,7 @@ import { TableDataItemInter } from "./type";
 import { PaginationInter } from "@/api/type";
 import { getRecordPagePage, getExchangeCodeDetail } from "@/api/marketing/marketing";
 import { getDict } from "@/api/common/common";
+import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "ExchangeRecordCodeDrawer",
   setup() {
@@ -92,7 +105,7 @@ export default defineComponent({
     });
 
     const data = ref([]);
-
+    const isShow = ref(false);
     const columns = [
       {
         title: "序号",
@@ -142,6 +155,12 @@ export default defineComponent({
       },
     ];
 
+    const paginationReactive = reactive({
+      page: 1,
+      pageSize: 10,
+      itemCount: 0,
+    });
+
     function openDrawer(exchangeCodeId: string) {
       if (exchangeCodeId) {
         queryForm.value.exchangeCodeIdEq = exchangeCodeId;
@@ -157,6 +176,11 @@ export default defineComponent({
         let res = await getExchangeCodeDetail({ exchangeCodeId });
         detail.value = res.data;
         state.loading = false;
+        if (res.data.exchangeCodeExchangeType === "EXT0002") {
+          isShow.value = true;
+        } else {
+          isShow.value = false;
+        }
       } catch (err) {
         console.log(err);
         state.loading = false;
@@ -187,6 +211,7 @@ export default defineComponent({
         let res = await getRecordPagePage({ page: page, search: search });
         console.log(res.data.content);
         data.value = res.data.content;
+        paginationReactive.itemCount = res.data.totalElements;
         state.loading = false;
       } catch (err) {
         console.log(err);
@@ -203,6 +228,16 @@ export default defineComponent({
       state.loading = false;
     }
 
+    function handlePage(pageIndex: number) {
+      paginationReactive.page = pageIndex;
+      getData({ pageIndex: paginationReactive.page, pageSize: paginationReactive.pageSize });
+    }
+
+    function handlePageSize(pageSize: number) {
+      paginationReactive.pageSize = pageSize;
+      getData({ pageIndex: paginationReactive.page, pageSize: paginationReactive.pageSize });
+    }
+
     return {
       queryForm,
       formRef,
@@ -211,13 +246,14 @@ export default defineComponent({
       title,
       data,
       stateData,
-      pagination: {
-        pageSize: 10,
-      },
+      pageSizes,
+      isShow,
+      pagination: paginationReactive,
       dayjs,
       ...toRefs(state),
       getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
-
+      handlePage,
+      handlePageSize,
       query,
       openDrawer,
       onCloseAfter,
