@@ -343,6 +343,9 @@ export function repeatSendMail(data:{customerInvoiceApplicationId: string | null
   return otherHttp.request({
     url: `/customerInvoiceApplication/platform/invoiceMail`,
     method: 'post',
+    headers:{
+      Origin: "",
+    },
     data:data
   });
 }

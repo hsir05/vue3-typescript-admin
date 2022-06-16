@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 import { locStorage } from "@/utils/storage";
 import router from "@/router/index"
 // import { ACCESS_TOKEN_KEY, USER_INFO_KEY, PERMISSIONS_KEY } from "@/config/constant";
-import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
-import { login, getDetailViaLoginer, getLoginerAuth } from "@/api/system/system";
+import { ACCESS_TOKEN_KEY, USER_INFO_KEY, EXP_KEY } from "@/config/constant";
+import { login, getDetailViaLoginer, getLoginerAuth, refreshToken } from "@/api/system/system";
 import { loginInter } from "@/api/type";
 import Avatar from "@/assets/image/default-avatar.png";
 
@@ -80,21 +80,22 @@ export const useAppUserStore = defineStore({
     login(form: loginInter) {
       return new Promise(async (resolve, reject) => {
         try {
-          let res = await login(form);
+          let res = await login(form); 
           const { token, iat, exp } = res.data;
           console.log(iat);
+          console.log(exp);
+          
+          // locStorage.set(EXP_KEY, exp);
+          locStorage.set(EXP_KEY, 1000);
           locStorage.set(ACCESS_TOKEN_KEY, token, exp);
           
           this.setToken(token);
           let userData = await getDetailViaLoginer();
-          console.log(userData);
           const { adminId, account, email, name, roles, sex } = userData.data;
           locStorage.set(USER_INFO_KEY,{ adminId, account, email, name, roles, sex, }, exp);
           this.setUserInfo({ adminId, account, email, name, roles, sex });
 
           let resAuthData = await getLoginerAuth()
-
-          console.log(resAuthData);
           let authData = resAuthData.data.authorityList.map((item: {code: string}) => item.code)
           console.log(authData);
         //   this.setPermissions(authData)
@@ -104,6 +105,21 @@ export const useAppUserStore = defineStore({
           reject(err);
         }
       });
+    },
+    refreshTokenData():Promise<string>{
+      return new Promise(async (resolve, reject) => {
+        try {
+          let res = await refreshToken()
+          console.log(res);
+          const {token, exp } = res.data
+          locStorage.set(EXP_KEY, exp);
+          locStorage.set(ACCESS_TOKEN_KEY, token, exp);
+          this.setToken(token);
+          resolve(token)
+        } catch (err) {
+          reject(err)
+        }
+      })
     },
     logout() {
       this.setUserInfo({

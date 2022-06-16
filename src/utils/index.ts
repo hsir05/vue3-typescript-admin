@@ -1,6 +1,8 @@
 import { h, RendererElement } from 'vue';
 import { NIcon, NTag } from 'naive-ui';
 import { isObject } from './is';
+import { EXP_KEY } from "@/config/constant";
+import { locStorage } from "@/utils/storage";
 
 /**
  * render 图标
@@ -89,4 +91,13 @@ export function calculateKey(num: number, gridPrecision: number) {
     return Number(
         (Math.round(num * gridPrecision * 10) / 10 / gridPrecision).toFixed(2)
     );
+}
+
+// 判断token是否过期
+export function isTokenExpired(){
+  let exp = locStorage.get(EXP_KEY);
+  if ((new Date().getTime() + 2000) > exp) {
+    return true
+  }
+  return false
 }

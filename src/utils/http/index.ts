@@ -10,24 +10,37 @@ import { PageEnum } from "@/enums/pageEnum";
 import { useGlobSetting } from "@/hooks/setting/index";
 
 import { isString } from "@/utils/is";
-import { deepMerge, isUrl } from "@/utils";
-import { setObjToUrlParams } from "@/utils";
+import { setObjToUrlParams, deepMerge, isUrl, isTokenExpired } from "@/utils";
 import { RequestOptions, Result, CreateAxiosOptions } from "./types";
 
 import { useAppUserStore } from "@/store/modules/useUserStore";
 import { useMessage, useDialog } from "naive-ui";
 import { otherUrl } from "@/config/config";
+import router from "@/router";
+import { locStorage } from "@/utils/storage";
 
 const globSetting = useGlobSetting();
 const urlPrefix = globSetting.urlPrefix || "";
 
-import router from "@/router";
-import { locStorage } from "@/utils/storage";
+
 const naiMessage = useMessage();
 const naiDialog = useDialog();
 
 //@ts-ignore
 let $message = window.$message;
+
+// 是否有请求正在刷新token
+window.isRefreshing = false;
+// 被挂起的请求数组
+let refreshSubscribers:Fn[] = [];
+// 刷新请求（refreshSubscribers数组中的请求得到新的token之后会自执行，用新的token去请求数据）
+function onRrefreshed(token: string) {
+  refreshSubscribers.map(cb => cb(token));
+}
+// push所有请求到数组中
+function subscribeTokenRefresh(cb:Fn) {
+  refreshSubscribers.push(cb);
+}
 
 /**
  * @description: 数据处理，方便区分多种处理方式
@@ -63,8 +76,8 @@ const transform: AxiosTransform = {
       // return '[HTTP] Request has no return value';
       throw new Error("请求出错，请稍候重试");
     }
-  
-    
+
+
     //  这里 code，result，message为 后台统一的字段，需要修改为项目自己的接口返回格式
     const { success, code, message } = data;
     // 请求成功
@@ -88,7 +101,7 @@ const transform: AxiosTransform = {
           title: "提示",
           content: message,
           positiveText: "确定",
-          onPositiveClick: () => {},
+          onPositiveClick: () => { },
         });
       }
     }
@@ -98,9 +111,9 @@ const transform: AxiosTransform = {
     //   return result;
     // }
     if (!success && !code && !message) {
-        return data
+      return data
     }
-    
+
     if (success) {
       return data;
     } else {
@@ -132,7 +145,7 @@ const transform: AxiosTransform = {
             locStorage.clear();
             window.location.href = LoginPath;
           },
-          onNegativeClick: () => {},
+          onNegativeClick: () => { },
         });
         break;
     }
@@ -196,12 +209,47 @@ const transform: AxiosTransform = {
     // 请求之前处理config
     /// token
     const userStore = useAppUserStore();
+    const { refreshTokenData } = useAppUserStore();
     const token = userStore.getToken;
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
       (config as Recordable).headers.Authorization = options.authenticationScheme
         ? `${options.authenticationScheme} ${token}`
         : token;
+    }
+
+    // 判断token是否将要过期
+    if (isTokenExpired()) {
+      // 判断是否正在刷新
+      if (!window.isRefreshing) {
+        // 将刷新token的标志置为true
+        window.isRefreshing = true;
+        // 发起刷新token的请求
+        refreshTokenData().then((token: string) => {
+          // 将标志置为false
+            window.isRefreshing = false;
+            // 执行数组里的函数,重新发起被挂起的请求
+            onRrefreshed(token);
+            /*执行onRefreshed函数后清空数组中保存的请求*/
+            refreshSubscribers = [];
+        }).catch(() => {
+            /*将标志置为false*/
+            window.isRefreshing = false;
+        })
+      }
+      // /*把请求(token)=>{....}都push到一个数组中*/
+      // let retry = new Promise((resolve) => {
+      //   /*(token) => {...}这个函数就是回调函数*/
+      //   subscribeTokenRefresh(() => {
+      //     // config.headers.Authorization = "Bearer " + getToken();
+      //     (config as Recordable).headers.Authorization = options.authenticationScheme
+      //   ? `${options.authenticationScheme} ${token}`
+      //   : token;
+      //     /*将请求挂起*/
+      //     resolve(config);
+      //   });
+      // });
+      // return retry;
     }
     return config;
   },
@@ -228,8 +276,8 @@ const transform: AxiosTransform = {
           //negativeText: '取消',
           closable: false,
           maskClosable: false,
-          onPositiveClick: () => {},
-          onNegativeClick: () => {},
+          onPositiveClick: () => { },
+          onNegativeClick: () => { },
         });
         return Promise.reject(error);
       }
@@ -274,8 +322,8 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 消息提示类型
           errorMessageMode: "none",
           // 接口地址
-          apiUrl: globSetting.apiUrl, 
-        //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
+          apiUrl: globSetting.apiUrl,
+          //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
           // 接口拼接地址
           urlPrefix: urlPrefix,
           //  是否加入时间戳
