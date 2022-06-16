@@ -97,12 +97,14 @@ const transform: AxiosTransform = {
         naiMessage.error(message || errorMessageText || "操作失败！");
       } else if (!success && options.errorMessageMode === "modal") {
         // errorMessageMode=‘custom-modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
-        naiDialog.info({
-          title: "提示",
-          content: message,
-          positiveText: "确定",
-          onPositiveClick: () => { },
-        });
+        console.log(naiDialog);
+        
+        // naiDialog.info({
+        //   title: "提示",
+        //   content: message,
+        //   positiveText: "确定",
+        //   onPositiveClick: () => { },
+        // });
       }
     }
 
@@ -304,7 +306,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         authenticationScheme: "",
         // 接口前缀
         prefixUrl: urlPrefix,
-        headers: { Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON,Origin: "http://test-ngcxpm-web.yiminyueche.com/", },
+        headers: { Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON },
         // 数据处理方式
         transform,
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
@@ -346,7 +348,6 @@ export const http = createAxios();
 // src/api ts 里面接口，就可以单独使用这个请求，
 // import { httpTwo } from '@/utils/http/axios'
 export const otherHttp = createAxios({
-  headers: { Origin: "http://test-ngcxpm-web.yiminyueche.com/", },
   requestOptions: {
     apiUrl: otherUrl,
     urlPrefix: '',
