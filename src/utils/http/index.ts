@@ -359,6 +359,6 @@ export const otherHttp = createAxios({
     apiUrl: otherUrl
   },
   headers:{
-     Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON,
+     Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.FORM_URLENCODED,
   }
 });
