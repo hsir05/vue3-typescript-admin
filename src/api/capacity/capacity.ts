@@ -692,6 +692,17 @@ export function editEmeContact(data: editorState) {
     data: data,
   });
 }
+
+/**
+ * 新增紧急联系人
+ */
+export function getConactDetail(data: {operationCompanyEmergencyContactId: string}) {
+  return http.request({
+    url: "/operationCompanyEmergencyContact/detail",
+    method: "post",
+    data: data,
+  });
+}
 /**
  * 新增紧急联系人
  */

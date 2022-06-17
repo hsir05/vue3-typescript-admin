@@ -168,7 +168,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: CreateIcon,
-                onClick: handleEdit.bind(null, record),
+                onClick: handleEdit.bind(null, record.operationCompanyEmergencyContactId),
                 auth: ["dict001"],
               },
               {
@@ -219,10 +219,9 @@ export default defineComponent({
       console.log("选择了", rowKeys);
     }
 
-    function handleEdit(record: Recordable) {
-      console.log("点击了编辑", record);
+    function handleEdit(operationCompanyEmergencyContactId: string) {
       const { openDrawer } = enteEmeContactDrawerRef.value;
-      openDrawer("编辑企业紧急联系人", record);
+      openDrawer("编辑企业紧急联系人", operationCompanyEmergencyContactId);
     }
     function handleBatch() {
       console.log("点击了批量删除");

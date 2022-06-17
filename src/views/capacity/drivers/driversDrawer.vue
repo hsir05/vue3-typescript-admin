@@ -202,6 +202,7 @@ export default defineComponent({
           try {
             let res = await editDriver(form.value);
             console.log(res);
+            message.success(window.$tips[res.code]);
             handleSaveAfter();
             state.loading = false;
           } catch (err) {
@@ -210,7 +211,6 @@ export default defineComponent({
           }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }

@@ -191,7 +191,6 @@ export default defineComponent({
           }
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }

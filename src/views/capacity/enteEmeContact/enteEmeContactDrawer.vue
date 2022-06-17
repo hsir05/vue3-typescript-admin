@@ -3,7 +3,6 @@
     <n-form
       ref="formRef"
       :rules="rules"
-      size="large"
       :disabled="disabled"
       label-placement="left"
       :style="{ maxWidth: '440px' }"
@@ -17,7 +16,7 @@
           filterable
           v-model:value="form.operationCompanyId"
           placeholder="选择所在企业名称"
-          :options="options"
+          :options="companyData"
         />
       </n-form-item>
 
@@ -46,27 +45,17 @@
       </n-form-item>
 
       <n-form-item label="值班开始时间" path="dutyTimeBegin">
-        <n-time-picker v-model:value="form.dutyTimeBegin" />
+        <n-time-picker value-format="HH:mm:ss" v-model:formatted-value="form.dutyTimeBegin" />
       </n-form-item>
       <n-form-item label="值班结束时间" path="dutyTimeEnd">
-        <n-time-picker v-model:value="form.dutyTimeEnd" />
+        <n-time-picker value-format="HH:mm:ss" v-model:formatted-value="form.dutyTimeEnd" />
       </n-form-item>
 
       <div class="text-center flex-center">
-        <n-button
-          attr-type="button"
-          :loading="loading"
-          size="large"
-          type="primary"
-          @click="handleValidate"
+        <n-button attr-type="button" :loading="loading" type="primary" @click="handleValidate"
           >保存
         </n-button>
-        <n-button
-          attr-type="button"
-          type="warning"
-          size="large"
-          class="ml-10px"
-          @click="handleReset"
+        <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
           >重置
         </n-button>
       </div>
@@ -74,9 +63,9 @@
   </BasicDrawer>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref, unref, onMounted } from "vue";
+import { defineComponent, reactive, toRefs, ref, onMounted } from "vue";
 import { FormInst, FormItemRule, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { FormInter } from "./type";
 import { getAllOperateCompany } from "@/api/common/common";
 import {
   editEmeContact,
@@ -84,6 +73,7 @@ import {
   uniqueContactPhone,
   uniqueContactEmail,
   getTimeRange,
+  getConactDetail,
 } from "@/api/capacity/capacity";
 import loading from "naive-ui/lib/_internal/loading";
 // import dayjs from 'dayjs'
@@ -100,7 +90,7 @@ export default defineComponent({
     const title = ref("企业紧急联系人");
     const message = useMessage();
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
+    const form = ref<FormInter>({
       operationCompanyEmergencyContactName: null,
       operationCompanyEmergencyContactPhone: null,
       operationCompanyEmergencyContactEmail: null,
@@ -118,7 +108,14 @@ export default defineComponent({
         loading.value = true;
         let res = await getAllOperateCompany();
         console.log(res);
-        state.companyData = res.data;
+        state.companyData = res.data.map(
+          (item: { operationCompanyId: string; operationCompanyName: string }) => {
+            return {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+          }
+        );
         loading.value = false;
       } catch (err) {
         console.log(err);
@@ -126,35 +123,51 @@ export default defineComponent({
       }
     };
 
-    function openDrawer(t: string, record?: tableDataItem) {
-      console.log(record);
-      if (record) {
-        // form.value = { ...record };
-        // console.log(new Date(record.dutyTimeBegin).getTime());
-        // form.value.dutyTimeBegin = 1183135260000
-        // form.value.dutyTimeBegin = new Date(record.dutyTimeBegin).getTime() ;
-        // form.value.dutyTimeEnd = dayjs(record.dutyTimeEnd).format('MM-DD:ss') ;
+    function openDrawer(t: string, operationCompanyEmergencyContactId: string) {
+      if (operationCompanyEmergencyContactId) {
+        getData(operationCompanyEmergencyContactId);
       }
       title.value = t;
       state.isDrawer = true;
     }
+
+    const getData = async (operationCompanyEmergencyContactId: string) => {
+      try {
+        let res = await getConactDetail({ operationCompanyEmergencyContactId });
+        const {
+          operationCompanyId,
+          operationCompanyEmergencyContactName,
+          operationCompanyEmergencyContactPhone,
+          operationCompanyEmergencyContactEmail,
+          dutyTimeBegin,
+          dutyTimeEnd,
+        } = res.data;
+
+        form.value = {
+          operationCompanyId,
+          operationCompanyEmergencyContactName,
+          operationCompanyEmergencyContactPhone,
+          operationCompanyEmergencyContactEmail,
+          dutyTimeBegin,
+          dutyTimeEnd,
+        };
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     function handleValidate(e: MouseEvent) {
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
           state.loading = true;
-          state.disabled = true;
-          console.log(unref(form));
           if (form.value.operationCompanyEmergencyContactId) {
             editData();
           } else {
             addData();
           }
-          message.success("验证成功");
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -164,6 +177,7 @@ export default defineComponent({
         state.loading = true;
         let res = await editEmeContact(form.value);
         console.log(res);
+        message.success(window.$tips[res.code]);
         handleSaveAfter();
         state.loading = false;
       } catch (err) {
@@ -176,6 +190,7 @@ export default defineComponent({
         state.loading = true;
         let res = await addEmeContact(form.value);
         console.log(res);
+        message.success(window.$tips[res.code]);
         handleSaveAfter();
         state.loading = false;
       } catch (err) {
@@ -258,7 +273,6 @@ export default defineComponent({
       title,
       form,
       formRef,
-      options: [],
       rules: {
         operationCompanyId: {
           required: true,
