@@ -5,8 +5,8 @@
     }}</n-descriptions-item>
     <n-descriptions-item label="派单类型">{{ detailItem?.orderDispatchType }}</n-descriptions-item>
     <n-descriptions-item label="司机姓名[工号]"
-      >{{ detailItem?.driverFullName }}{{ detailItem?.driverNo }}</n-descriptions-item
-    >
+      >{{ detailItem?.driverFullName }}{{ detailItem?.driverNo }}
+    </n-descriptions-item>
     <n-descriptions-item label="司机手机号">{{ detailItem?.driverPhone }}</n-descriptions-item>
     <n-descriptions-item label="所属运营企业" :span="2">{{
       detailItem?.operationCompanyName
@@ -28,26 +28,33 @@
       >
         流量方抽成比率:{{ detailItem?.influxDivideRate * 100 }}%
       </n-tag>
-      <n-tag type="success" class="ml-10px"
-        >平台抽成比率:{{ detailItem?.platformDivideRate * 100 }}%</n-tag
+      <n-tag
+        type="success"
+        class="ml-10px"
+        v-if="detailItem?.platformDivideRate && detailItem?.platformDivideRate !== 0"
+      >
+        平台抽成比率:{{ detailItem?.platformDivideRate * 100 }}%</n-tag
       >
       <n-tag
         type="success"
         class="ml-10px"
         v-if="detailItem?.agencyDivideRate && detailItem?.agencyDivideRate !== 0"
-        >代理商抽成比率:{{ detailItem?.agencyDivideRate * 100 }}%
+      >
+        代理商抽成比率:{{ detailItem?.agencyDivideRate * 100 }}%
       </n-tag>
       <n-tag
         type="success"
         class="ml-10px"
         v-if="detailItem?.companyDivideRate && detailItem?.companyDivideRate !== 0"
-        >企业抽成比率:{{ detailItem?.companyDivideRate * 100 }}%</n-tag
+      >
+        企业抽成比率:{{ detailItem?.companyDivideRate * 100 }}%</n-tag
       >
       <n-tag
         type="success"
         class="ml-10px"
         v-if="detailItem?.driverDivideRate && detailItem?.driverDivideRate !== 0"
-        >司机抽成比率:{{ detailItem?.driverDivideRate * 100 }}%</n-tag
+      >
+        司机抽成比率:{{ detailItem?.driverDivideRate * 100 }}%</n-tag
       >
     </n-descriptions-item>
   </n-descriptions>
@@ -92,8 +99,9 @@ const { detail, currentActiveDate } = toRefs(props);
 interface ItemInter extends DetailInter {
   dispatchOrderTime: number;
 }
-const dispatchItem = ref<ItemInter | undefined>();
+
 const detailItem = ref<DetailInter>();
+const dispatchItem = ref<ItemInter | undefined>();
 
 detailItem.value = detail.value;
 
@@ -103,7 +111,6 @@ watch(currentActiveDate, () => {
   );
   if (dispatchItem.value) {
     detailItem.value = Object.assign(detail.value, dispatchItem.value);
-    // detailItem.value = dispatchItem.value
   }
 });
 

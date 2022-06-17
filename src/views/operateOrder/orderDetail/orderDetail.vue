@@ -213,7 +213,7 @@ export default defineComponent({
                 orderState: OrderDataEnum.ACCEPTORDER,
                 date: item.dispatchOrderTime,
                 isDate: !isSameDay(
-                  new Date(detail.value.orderDispatchRecordList[i - 1]),
+                  new Date(detail.value.orderDispatchRecordList[i - 1].dispatchOrderTime),
                   new Date(item.dispatchOrderTime)
                 ),
               });
