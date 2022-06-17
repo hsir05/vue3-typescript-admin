@@ -359,6 +359,7 @@ export const otherHttp = createAxios({
     apiUrl: otherUrl
   },
   headers: {
+    crossDomain: false,
     Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.FORM_URLENCODED,
   },
   withCredentials: false,
