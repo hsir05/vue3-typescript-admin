@@ -365,6 +365,7 @@ export const otherHttp = createAxios({
   headers: {
     Accept: ContentTypeEnum.JSON,
     "Content-Type": ContentTypeEnum.FORM_URLENCODED,
+    'Access-Control-Allow-Credentials': true,
     'Access-Control-Allow-Origin':"access-control-allow-origin"
   },
   withCredentials: true,
