@@ -367,6 +367,8 @@ export const otherHttp = createAxios({
   headers: {
     Accept: ContentTypeEnum.JSON,
     "Content-Type": ContentTypeEnum.FORM_URLENCODED,
+    'Access-Control-Allow-Credentials': true,
+    'Access-Control-Allow-Origin': "http://test-ngcxpm-web.yiminyueche.com"
   },
   withCredentials: true,
   // crossDomain: false,
