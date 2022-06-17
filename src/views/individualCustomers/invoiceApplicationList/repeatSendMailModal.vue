@@ -88,6 +88,7 @@ export default defineComponent({
         contactMail: null,
         customerInvoiceApplicationId: null,
       };
+      loading.value = false;
       formRef.value?.restoreValidation();
     }
 

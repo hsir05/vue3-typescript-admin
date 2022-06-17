@@ -87,6 +87,8 @@ export default defineComponent({
         invoiceApplicationReturnReason: null,
         customerInvoiceApplicationId: null,
       };
+      loading.value = false;
+
       formRef.value?.restoreValidation();
     }
 

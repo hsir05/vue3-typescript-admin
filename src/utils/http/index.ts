@@ -6,7 +6,7 @@ import { checkStatus } from "./checkStatus";
 import { joinTimestamp, formatRequestDate } from "./helper";
 import { RequestEnum, ResultEnum, ContentTypeEnum } from "@/enums/httpEnum";
 import { PageEnum } from "@/enums/pageEnum";
-
+import qs from 'qs'
 import { useGlobSetting } from "@/hooks/setting/index";
 
 import { isString } from "@/utils/is";
@@ -180,10 +180,16 @@ const transform: AxiosTransform = {
         config.params = undefined;
       }
     } else {
+      console.log(config);
+
       if (!isString(params)) {
         formatDate && formatRequestDate(params);
         if (Reflect.has(config, "data") && config.data && Object.keys(config.data).length > 0) {
           config.params = params;
+
+          if ((config.url as string).indexOf(otherUrl) !== -1) {
+            config.data = qs.stringify(data);
+          }
           // 传参数方式修改
         } else {
           config.data = data;
@@ -359,8 +365,9 @@ export const otherHttp = createAxios({
     apiUrl: otherUrl
   },
   headers: {
-    Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.FORM_URLENCODED,
+    Accept: ContentTypeEnum.JSON,
+    "Content-Type": ContentTypeEnum.FORM_URLENCODED,
   },
-  withCredentials: false,
+  withCredentials: true,
   // crossDomain: false,
 });
