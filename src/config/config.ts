@@ -2,4 +2,4 @@
 
 export const uploadUrl = '/attachFile/upload'
 
-export const otherUrl = "https://testcxcustomer.yiminyueche.com"
+export const otherUrl = "http://testcxcustomer.yiminyueche.com"
