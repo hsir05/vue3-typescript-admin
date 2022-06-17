@@ -17,16 +17,7 @@
       :model="form"
     >
       <n-form-item label="电子邮箱" path="contactMail">
-        <n-input
-          v-model:value="form.contactMail"
-          maxlength="25"
-          show-count
-          style="width: 380px"
-          type="textarea"
-          placeholder="输入电子邮箱"
-          round
-          clearable
-        />
+        <n-input v-model:value="form.contactMail" style="width: 380px" placeholder="输入电子邮箱" />
       </n-form-item>
 
       <div class="text-center flex-center">
@@ -41,7 +32,7 @@
 import { defineComponent, ref } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import BasicModal from "@/components/Modal/Modal.vue";
-import { repeatSendMail } from "@/api/individualCustomers/individualCustomers";
+import { repeatSendMail, getIndInvoiceDetail } from "@/api/individualCustomers/individualCustomers";
 import { RepeatFormInter } from "./type";
 export default defineComponent({
   name: "RepeatSendMailModal",
@@ -61,7 +52,17 @@ export default defineComponent({
     const handleModal = (customerInvoiceApplicationId: string) => {
       const { showModal } = ModalRef.value;
       form.value.customerInvoiceApplicationId = customerInvoiceApplicationId;
+      getDetail(customerInvoiceApplicationId);
       showModal();
+    };
+
+    const getDetail = async (customerInvoiceApplicationId: string) => {
+      try {
+        let res = await getIndInvoiceDetail({ customerInvoiceApplicationId });
+        form.value.contactMail = res.data.contactMail;
+      } catch (err) {
+        console.log(err);
+      }
     };
     function handleValidate() {
       formRef.value?.validate(async (errors) => {
@@ -96,7 +97,7 @@ export default defineComponent({
       form,
       loading,
       rules: {
-        contactMail: { required: true, trigger: ["blur", "input"], message: "请输入申请退回理由" },
+        contactMail: { required: true, trigger: ["blur", "input"], message: "请输入电子邮箱" },
       },
 
       handleModal,
