@@ -180,8 +180,6 @@ const transform: AxiosTransform = {
         config.params = undefined;
       }
     } else {
-      console.log(config);
-
       if (!isString(params)) {
         formatDate && formatRequestDate(params);
         if (Reflect.has(config, "data") && config.data && Object.keys(config.data).length > 0) {
@@ -367,8 +365,6 @@ export const otherHttp = createAxios({
   headers: {
     Accept: ContentTypeEnum.JSON,
     "Content-Type": ContentTypeEnum.FORM_URLENCODED,
-    'Access-Control-Allow-Credentials': true,
-    'Access-Control-Allow-Origin': "http://test-ngcxpm-web.yiminyueche.com"
   },
   withCredentials: true,
   // crossDomain: false,
