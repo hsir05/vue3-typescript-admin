@@ -359,6 +359,6 @@ export const otherHttp = createAxios({
     apiUrl: otherUrl
   },
   headers:{
-    Origin:"http://test-ngcxpm-web.yiminyueche.com"
+     Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.JSON,
   }
 });
