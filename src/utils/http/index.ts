@@ -32,7 +32,7 @@ let $message = window.$message;
 // 是否有请求正在刷新token
 window.isRefreshing = false;
 // 被挂起的请求数组
-let refreshSubscribers:Fn[] = [];
+let refreshSubscribers: Fn[] = [];
 // 刷新请求（refreshSubscribers数组中的请求得到新的token之后会自执行，用新的token去请求数据）
 function onRrefreshed(token: string) {
   refreshSubscribers.map(cb => cb(token));
@@ -98,7 +98,7 @@ const transform: AxiosTransform = {
       } else if (!success && options.errorMessageMode === "modal") {
         // errorMessageMode=‘custom-modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
         console.log(naiDialog);
-        
+
         // naiDialog.info({
         //   title: "提示",
         //   content: message,
@@ -229,14 +229,14 @@ const transform: AxiosTransform = {
         // 发起刷新token的请求
         refreshTokenData().then((token: string) => {
           // 将标志置为false
-            window.isRefreshing = false;
-            // 执行数组里的函数,重新发起被挂起的请求
-            onRrefreshed(token);
-            /*执行onRefreshed函数后清空数组中保存的请求*/
-            refreshSubscribers = [];
+          window.isRefreshing = false;
+          // 执行数组里的函数,重新发起被挂起的请求
+          onRrefreshed(token);
+          /*执行onRefreshed函数后清空数组中保存的请求*/
+          refreshSubscribers = [];
         }).catch(() => {
-            /*将标志置为false*/
-            window.isRefreshing = false;
+          /*将标志置为false*/
+          window.isRefreshing = false;
         })
       }
       // /*把请求(token)=>{....}都push到一个数组中*/
@@ -325,7 +325,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           errorMessageMode: "none",
           // 接口地址
           apiUrl: globSetting.apiUrl,
-        //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
+          //   apiUrl: "http://test-ngcxpm-api.yiminyueche.com",
           // 接口拼接地址
           urlPrefix: urlPrefix,
           //  是否加入时间戳
@@ -352,13 +352,15 @@ export const http = createAxios();
 //     apiUrl: otherUrl,
 //     urlPrefix: '',
 //   },
-// });
+// });\
 
 export const otherHttp = createAxios({
   requestOptions: {
     apiUrl: otherUrl
   },
-  headers:{
-     Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.FORM_URLENCODED,
-  }
+  headers: {
+    Accept: ContentTypeEnum.JSON, "Content-Type": ContentTypeEnum.FORM_URLENCODED,
+  },
+  withCredentials: false,
+  // crossDomain: false,
 });
