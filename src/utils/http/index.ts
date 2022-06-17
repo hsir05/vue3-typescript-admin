@@ -302,7 +302,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
   return new VAxios(
     deepMerge(
       {
-        timeout: 10 * 1000,
+        timeout: 50000,
         authenticationScheme: "",
         // 接口前缀
         prefixUrl: urlPrefix,
