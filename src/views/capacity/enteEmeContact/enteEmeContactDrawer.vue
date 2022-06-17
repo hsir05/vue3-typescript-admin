@@ -30,7 +30,7 @@
       <n-form-item label="紧急联系人手机号" path="operationCompanyEmergencyContactPhone">
         <n-input
           v-model:value="form.operationCompanyEmergencyContactPhone"
-          :maxlengn="11"
+          :maxlength="11"
           clearable
           placeholder="输入紧急联系人手机号"
         />

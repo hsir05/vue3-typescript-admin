@@ -24,7 +24,7 @@
           :loading="loading"
           class="ml-10px"
           type="primary"
-          @click="handleValidate"
+          @click="queryData"
         >
           查找</n-button
         >
@@ -33,59 +33,61 @@
       <!-- 表格 -->
       <n-data-table
         ref="table"
+        :loading="loading"
         :data="data"
         :columns="columns"
         class="box-border"
-        min-height="400px"
+        min-height="calc(100vh - 285px)"
         flex-height
         :row-key="getRowKeyId"
         :pagination="false"
       />
     </div>
 
-    <div class="map">
-      <Map ref="baiduMapRef" />
+    <div class="right">
+      <n-data-table
+        ref="table"
+        v-if="isSee"
+        :data="orderLimitData"
+        :columns="orderColumns"
+        class="box-border"
+        :row-key="getRowKeyId"
+        :pagination="false"
+      />
 
-      <div class="map-edit-area">
-        <OrderItem />
-        <OrderEdit />
-      </div>
+      <OrderEdit v-if="isEdit" :orderLimitData="orderLimitData" />
     </div>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, h, onMounted } from "vue";
-import Map from "@/components/Map/BaiduMap.vue";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst } from "naive-ui";
 import TableActions from "@/components/TableActions/TableActions.vue";
-import { tableDataItem } from "./type";
+import { TableDataInter, AreaInter } from "./type";
 import { statusOptions } from "@/config/form";
-import OrderItem from "./orderTableItem.vue";
 import OrderEdit from "./orderEditItem.vue";
 import { EyeOutline as EyeIcon, CreateOutline as CreateIcon } from "@vicons/ionicons5";
+// import { getOpenCity, getOpenCityArea, getOrderLimit, realTimeOrderTopLimit } from "@/api/capacity/capacity"
+import { getOpenCity, getOpenCityArea, getOrderLimit } from "@/api/capacity/capacity";
+import { getVehicleType } from "@/api/operate/operate";
+import { objInter } from "@/interface/common/common";
 export default defineComponent({
   name: "OrderLimit",
   components: {
-    Map,
-    OrderItem,
     OrderEdit,
   },
   setup() {
-    const cityCode = ref("620100");
+    const cityCode = ref("110000");
     const loading = ref(false);
     const openCityData = ref([]);
+    const vehicleTypeData = ref([]);
     const formRef = ref<FormInst | null>(null);
-    const baiduMapRef = ref();
-    const message = useMessage();
+    const isSee = ref(false);
+    const isEdit = ref(false);
 
-    const data = ref([
-      {
-        areaCode: "620100A01",
-        areaLock: 0,
-        areaName: "主城区",
-        cityCode: "620100",
-      },
-    ]);
+    const data = ref([]);
+    const orderLimitData = ref([]);
+    const vehicleTypeObj: objInter = {};
 
     const columns = [
       {
@@ -103,7 +105,7 @@ export default defineComponent({
         key: "actions",
         align: "center",
         width: 100,
-        render(record: tableDataItem, index: number) {
+        render(record: AreaInter) {
           return h(TableActions as any, {
             actions: [
               {
@@ -111,7 +113,7 @@ export default defineComponent({
                 type: "primary",
                 isIconBtn: true,
                 icon: EyeIcon,
-                onClick: hanldleSee.bind(null, record),
+                onClick: handle.bind(null, record, "isSee"),
                 auth: ["dict001"],
               },
               {
@@ -119,7 +121,7 @@ export default defineComponent({
                 type: "primary",
                 icon: CreateIcon,
                 isIconBtn: true,
-                onClick: handleEdit.bind(null, record, index),
+                onClick: handle.bind(null, record, "isEdit"),
                 auth: ["dict001"],
               },
             ],
@@ -127,30 +129,93 @@ export default defineComponent({
         },
       },
     ];
+    const orderColumns = [
+      {
+        title: "车型",
+        key: "vehicleType",
+        align: "center",
+        render(row: TableDataInter) {
+          return h("span", vehicleTypeObj[row.vehicleType]);
+        },
+      },
+      {
+        title: "单量上限",
+        key: "orderTopLimit",
+        align: "center",
+      },
+      {
+        title: "用车前占用时间",
+        key: "beforeUseVehicleMinute",
+        align: "center",
+      },
+      {
+        title: "用车后占用时间",
+        key: "afterUseVehicleMinute",
+        align: "center",
+      },
+    ];
 
-    async function handleValidate() {
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
       try {
-        await formRef.value?.validate();
-        console.log(cityCode.value);
+        let result = await getVehicleType({ operationCompanyId: "" });
+        vehicleTypeData.value = result.data;
+
+        for (let key of result.data) {
+          vehicleTypeObj[key.vehicleTypeId] = key.vehicleTypeName;
+        }
+
+        let res = await getOpenCity();
+        openCityData.value = res.data.map((item: { cityName: string; cityCode: string }) => {
+          return {
+            label: item.cityName,
+            value: item.cityCode,
+          };
+        });
       } catch (err) {
         console.log(err);
-        message.error("验证失败");
+      }
+    };
+    async function queryData() {
+      try {
+        await formRef.value?.validate();
+        try {
+          loading.value = true;
+          let res = await getOpenCityArea({ cityCode: cityCode.value });
+          data.value = res.data;
+          loading.value = false;
+        } catch (err) {
+          console.log(err);
+          loading.value = false;
+        }
+      } catch (err) {
+        console.log(err);
       }
     }
 
-    onMounted(async () => {
-      const { renderBaiduMap } = baiduMapRef.value;
-      await renderBaiduMap(103.841521, 36.067212);
-      //   addBoundary()
-    });
-
-    function handleEdit(record: tableDataItem) {
-      console.log(record);
-      const { renderBaiduMap } = baiduMapRef.value;
-      renderBaiduMap(103.841521, 36.067212);
+    async function handle(record: AreaInter, type: string) {
+      let result = await getOrderLimit({ areaCode: record.areaCode as string });
+      console.log(result.data);
+      orderLimitData.value = result.data;
+      if (type === "isSee") {
+        isSee.value = true;
+        isEdit.value = false;
+      } else {
+        isEdit.value = true;
+        isSee.value = false;
+      }
     }
-    function hanldleSee(record: Recordable) {
-      console.log(record);
+
+    async function submit() {
+      try {
+        // let res = await realTimeOrderTopLimit()
+        // console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     function handleEditArea() {}
@@ -160,11 +225,15 @@ export default defineComponent({
       cityCode,
       formRef,
       openCityData,
-      baiduMapRef,
       data,
+      isEdit,
+      isSee,
+      orderLimitData,
+      orderColumns,
       columns,
       statusOptions,
-      getRowKeyId: (row: tableDataItem) => row.id,
+      submit,
+      getRowKeyId: (row: TableDataInter) => row.realTimeOrderTopLimitId,
       rule: {
         trigger: ["input", "blur"],
         validator() {
@@ -176,7 +245,7 @@ export default defineComponent({
       editRules: {
         areaName: { required: true, trigger: ["blur", "change"], message: "请输入区域名称" },
       },
-      handleValidate,
+      queryData,
       handleEditArea,
     };
   },
@@ -186,15 +255,15 @@ export default defineComponent({
 .open-area {
   display: flex;
   align-content: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
 
   .open-area-left {
-    width: 300px;
+    width: 37%;
     background-color: $white;
   }
 
-  .map {
-    width: calc(100% - 300px - 10px);
+  .right {
+    width: 50%;
     height: auto;
     overflow: scroll;
     background-color: $white;
@@ -202,17 +271,7 @@ export default defineComponent({
     padding-top: 5px;
     padding-left: 5px;
     position: relative;
-
-    .map-edit-area {
-      position: absolute;
-      padding: 10px;
-      left: 10px;
-      top: 10px;
-      width: 470px;
-      height: auto;
-      background-color: $white;
-      border-radius: 2px;
-    }
+    margin-left: 15px;
   }
 }
 </style>

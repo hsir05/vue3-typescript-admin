@@ -16,7 +16,7 @@
         style="width: 140px"
         v-model:value="formItem.vehicleType"
         placeholder="选择车型"
-        :options="options"
+        :options="vehicleTypeData"
       />
     </n-form-item>
     <n-form-item path="orderLimit">
@@ -30,23 +30,46 @@
   </n-form>
 </template>
 <script lang="ts">
-import { defineComponent, ref, unref } from "vue";
+import { defineComponent, ref, unref, onMounted } from "vue";
 import { FormInst } from "naive-ui";
-import { vhchileDataState } from "./type";
-
+import { LimitItemInter } from "./type";
+import { getVehicleType } from "@/api/operate/operate";
 export default defineComponent({
   name: "FormItem",
   props: {
     item: {
-      type: Object as PropType<vhchileDataState>,
+      type: Object as PropType<LimitItemInter>,
     },
   },
   setup() {
     const formItemRef = ref<FormInst | null>(null);
-    const formItem = ref<vhchileDataState>({
+    const formItem = ref<LimitItemInter>({
+      beforeUseVehicleMinute: null,
+      afterUseVehicleMinute: null,
       vehicleType: null,
-      orderLimit: null,
+      orderTopLimit: null,
     });
+    const vehicleTypeData = ref([]);
+
+    onMounted(() => {
+      getData();
+    });
+
+    const getData = async () => {
+      try {
+        let result = await getVehicleType({ operationCompanyId: "" });
+        vehicleTypeData.value = result.data.map(
+          (item: { vehicleTypeName: string; vehicleTypeId: string }) => {
+            return {
+              label: item.vehicleTypeName,
+              value: item.vehicleTypeId,
+            };
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     function formItemSubmit() {
       formItemRef.value?.validate((errors) => {
@@ -62,7 +85,7 @@ export default defineComponent({
       formItemRef,
       formItem,
       formItemSubmit,
-      options: [],
+      vehicleTypeData,
       rules: {
         vehicleType: { required: true, trigger: ["blur", "input"], message: "请选择车型" },
         orderLimit: { required: true, trigger: ["blur", "input"], message: "请输入单量上限" },

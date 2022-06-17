@@ -11,11 +11,12 @@
       :model="queryValue"
     >
       <n-form-item label="所在企业名称" path="operationCompanyId">
-        <n-input
-          v-model:value="queryValue.operationCompanyId"
+        <n-select
           clearable
-          placeholder="输入所在企业名称"
-          style="width: 150px"
+          filterable
+          v-model:value="queryValue.operationCompanyId"
+          placeholder="选择所在企业名称"
+          :options="companyData"
         />
       </n-form-item>
       <n-form-item label="紧急联系人姓名" path="operationCompanyEmergencyContactName">
@@ -76,6 +77,8 @@ import { statusOptions } from "@/config/form";
 import { getEmeConactPage, removeEmeContact } from "@/api/capacity/capacity";
 import { PaginationInter } from "@/api/type";
 import dayjs from "dayjs";
+import { getAllOperateCompany } from "@/api/common/common";
+
 export default defineComponent({
   name: "EnteEmeContact",
   components: { BasicTable, EnteEmeContactDrawer },
@@ -89,6 +92,7 @@ export default defineComponent({
       operationCompanyId: null,
       operationCompanyEmergencyContactPhone: null,
     });
+    const companyData = ref([]);
 
     const message = useMessage();
 
@@ -190,8 +194,25 @@ export default defineComponent({
     ];
 
     onMounted(() => {
+      getAllCompanyData();
       getData({ pageIndex: 1, pageSize: 10 });
     });
+
+    const getAllCompanyData = async () => {
+      try {
+        let res = await getAllOperateCompany();
+        companyData.value = res.data.map(
+          (item: { operationCompanyId: string; operationCompanyName: string }) => {
+            return {
+              label: item.operationCompanyName,
+              value: item.operationCompanyId,
+            };
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
     const getData = async (page: PaginationInter) => {
       loading.value = true;
@@ -290,6 +311,7 @@ export default defineComponent({
       queryValue,
       data,
       loading,
+      companyData,
       enteEmeContactDrawerRef,
       basicTableRef,
       getRowKeyId: (row: tableDataItem) => row.operationCompanyEmergencyContactId,

@@ -676,8 +676,6 @@ export function getEmeConactPage(data: emeContactSate) {
 interface editorState {
   operationCompanyEmergencyContactId?: string | null;
   operationCompanyId: string | null;
-  // oldOperationCompanyEmergencyContactPhone: string | null
-  // oldOperationCompanyEmergencyContactEmail: string | null
   operationCompanyEmergencyContactName: string | null;
   operationCompanyEmergencyContactPhone: string | null;
   operationCompanyEmergencyContactEmail: string | null;
@@ -869,6 +867,58 @@ export function getDriverRegisterPage(data: DriverRegisterInter) {
     data: data,
   });
 }
+
+//----------------------实时单量上限-----------------------
+/**
+ *获取开通城市
+ */
+export function getOpenCity() {
+  return http.request({
+    url: "/openCity/openCityList",
+    method: "post",
+  });
+}
+/**
+ *获取开通城市对应的开通区域
+ */
+export function getOpenCityArea(data:{ cityCode:string}) {
+  return http.request({
+    url: "/openArea/openAreaListByCityCode",
+    method: "post",
+    data
+  });
+}
+/**
+ *获取单量上限配置列表
+ */
+export function getOrderLimit(data:{areaCode: string}) {
+  return http.request({
+    url: "/realTimeOrderTopLimit/getRealTimeOrderTopLimitList",
+    method: "post",
+    data
+  });
+}
+/**
+ *保存区域下单量上限配置
+ */
+interface LimitItemInter{
+  beforeUseVehicleMinute: string
+  afterUseVehicleMinute: string
+  vehicleType: string
+  orderTopLimit: string
+}
+interface LimitOrderInter {
+  realTimeOrderTopLimitList: LimitItemInter[];
+  areaCode: string
+}
+export function realTimeOrderTopLimit(data:LimitOrderInter) {
+  return http.request({
+    url: "/realTimeOrderTopLimit/save",
+    method: "post",
+    data
+  });
+}
+
 //----------------------司机会员产品管理-----------------------
 /**
  *有司机会员产品的企业分页

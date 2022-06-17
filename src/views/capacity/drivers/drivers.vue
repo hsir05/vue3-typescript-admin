@@ -292,8 +292,6 @@ export default defineComponent({
     const getDriverSrtate = async () => {
       try {
         let res = await getDict({ parentEntryCode: "DS00000" });
-        console.log(res);
-
         driverStateData.value = res.data.map((item: { entryName: string; entryCode: string }) => {
           return { label: item.entryName, value: item.entryCode };
         });
