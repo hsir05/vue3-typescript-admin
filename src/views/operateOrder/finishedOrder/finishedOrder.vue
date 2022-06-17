@@ -340,6 +340,7 @@ export default defineComponent({
               orderBusObj[key.entryCode] = key.entryName;
             }
           }
+
           getData({ pageIndex: 1, pageSize: 10 });
         })
         .catch((err) => {

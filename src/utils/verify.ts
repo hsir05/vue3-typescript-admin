@@ -35,3 +35,22 @@ export const verifyEN = (_: FormItemRule, value: string) => {
     }
   return /^[0-9a-zA-Z_]{1,}$/.test(value);
 };
+// 英文帐号
+export const verifyCharNumber = (_: FormItemRule, value: string) => {
+  if (!value) {
+    return false
+  }
+  return /^([a-zA-Z0-9]+)$/.test(value);
+};
+//正整数
+export const positiveInteger = (_:FormItemRule,value:string) =>{
+  return /^[0-9]*[1-9][0-9]*$/.test(value);
+}
+//正小数或0
+export const positiveDecimal =(_:FormItemRule,value:string) =>{
+  let positiveDecimal = /^[1-9]+\d*$/;
+  let positiveDecima2 = /^\d+\.\d{1,2}$/;
+  let positiveDecima3 = /^0$/;
+
+  return  (positiveDecimal.test(value)) || (positiveDecima2.test(value)) || (positiveDecima3.test(value));
+}

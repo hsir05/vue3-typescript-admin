@@ -74,76 +74,90 @@
       </n-form-item>
 
       <n-button attr-type="button" :loading="loading" class="ml-10px" type="primary" @click="query"
-      >查找
-      </n-button
-      >
+        >查找
+      </n-button>
     </n-form>
-    <n-empty v-if="!result"></n-empty>
+    <n-empty v-if="!result" />
     <div v-if="result" class="diriver-online-time-line pl-10px pr-10px mt-10px pt-10px pb-10px">
-
       <n-grid :x-gap="12" :y-gap="8" :cols="4">
-        <template v-for="item in resultData">
-          <n-grid-item>
-            <dayOrder
-              :dayData="item"
-              v-if="type === '1'"
-              :key="item.operation_company_driver_id"
-              @get-is-show="getIsShow"
-              @show-model="showModel"
-            />
-            <monthOrder v-if="type === '0'" :month="month" :dayData="item" :key="item.operation_company_driver_id"
-                        @get-is-show="getIsShow"/>
-          </n-grid-item>
-        </template>
+        <n-grid-item v-for="(item, index) in resultData" :key="index">
+          <dayOrder
+            :dayData="item"
+            v-if="type === '1'"
+            :key="item.operation_company_driver_id"
+            @get-is-show="getIsShow"
+            @show-model="showModel"
+          />
+          <monthOrder
+            v-if="type === '0'"
+            :month="month"
+            :dayData="item"
+            :key="item.operation_company_driver_id"
+            @get-is-show="getIsShow"
+          />
+        </n-grid-item>
       </n-grid>
     </div>
   </div>
   <n-modal v-model:show="isShowModal">
-    <n-grid x-gap="12" :cols="2" class="p-30px mt-10px bg-white step"
-            style="width: 800px;height: 600px">
+    <n-grid
+      x-gap="12"
+      :cols="2"
+      class="p-30px mt-10px bg-white step"
+      style="width: 800px; height: 600px"
+    >
       <n-gi class="left">
         <div class="step pb-10px">
-          <div class="date mb-10px" v-if="queryForm.day!=null"><span>{{ dayjs(queryForm.day).format("YYYY-MM-DD") }}</span></div>
-          <div class="step-content" @click="handleEvent(item.driverWorkRestRecordId)" v-for="(item,index) in step">
-            <div :class="['step-icon-box', isActive === index? 'active' : '']">
-              <n-icon v-if="item.type ==='司机上班'" size="20">
-                <CarSharp/>
+          <div class="date mb-10px" v-if="queryForm.day != null">
+            <span>{{ dayjs(queryForm.day).format("YYYY-MM-DD") }}</span>
+          </div>
+          <div
+            class="step-content"
+            @click="handleEvent(item.driverWorkRestRecordId)"
+            v-for="(item, index) in step"
+            :key="index"
+          >
+            <div :class="['step-icon-box', isActive === index ? 'active' : '']">
+              <n-icon v-if="item.type === '司机上班'" size="20">
+                <CarSharp />
               </n-icon>
-              <n-icon v-if="item.type ==='司机下班'" size="20">
-                <CarSharp/>
+              <n-icon v-if="item.type === '司机下班'" size="20">
+                <CarSharp />
               </n-icon>
-              <n-icon v-if="item.type ==='开始小休'" size="20">
-                <Cafe/>
+              <n-icon v-if="item.type === '开始小休'" size="20">
+                <Cafe />
               </n-icon>
-              <n-icon v-if="item.type ==='结束小休'" size="20">
-                <Cafe/>
+              <n-icon v-if="item.type === '结束小休'" size="20">
+                <Cafe />
               </n-icon>
             </div>
             <div class="step-item-text pl-15px">
               <p class="step-text mt-5px">{{ item.type }}</p>
-              <span class="time"><n-icon size="14" class="icon-item mr-5px"> <TimeIcon/> </n-icon>{{ item.date }}</span>
+              <span class="time">
+                <n-icon size="14" class="icon-item mr-5px"> <TimeIcon /> </n-icon>{{ item.date }}
+              </span>
             </div>
           </div>
 
           <div class="step-content-end">
             <div class="step-icon-box step-end">
               <n-icon size="20">
-                <TimeOutline/>
+                <TimeOutline />
               </n-icon>
             </div>
           </div>
         </div>
       </n-gi>
       <n-gi>
-        <Map ref="baiduMapRef" class="map"/>
+        <Map ref="baiduMapRef" class="map" />
       </n-gi>
     </n-grid>
   </n-modal>
 </template>
 <script lang="ts">
-import {defineComponent, ref, onMounted} from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import dayjs from "dayjs";
-import {getAllOperateCompany} from "@/api/common/common";
+import { getAllOperateCompany } from "@/api/common/common";
 import {
   getDriverClazzs,
   findDriverDayOnlineTimeInfo,
@@ -152,23 +166,25 @@ import {
 } from "@/api/operationStatistics/operationStatistics";
 import dayOrder from "./dayOrder.vue";
 import monthOrder from "./monthOrder.vue";
-import {SelectOption, FormRules, FormInst, useMessage} from "naive-ui";
-import {ItemInter} from "../enterpriseStatistics/type";
-import {findNoDriver} from "@/api/capacity/capacity";
-import {QueryFormInter} from "./type";
-import NavItem from "@/layout/Header/projectSetting/navItem.vue";
+import { SelectOption, FormRules, FormInst, useMessage } from "naive-ui";
+import { ItemInter } from "../enterpriseStatistics/type";
+import { findNoDriver } from "@/api/capacity/capacity";
+import { QueryFormInter } from "./type";
 import Map from "@/components/Map/BaiduMap.vue";
-import {TableDataItemInter} from "@/views/operateOrder/orderDetail/type";
-import {TimeOutline as TimeIcon, TimeOutline, Cafe, CarSharp} from "@vicons/ionicons5";
-import {useProjectSetting} from "@/hooks/setting/useProjectSetting";
+import { TableDataItemInter } from "@/views/operateOrder/orderDetail/type";
+import { TimeOutline as TimeIcon, TimeOutline, Cafe, CarSharp } from "@vicons/ionicons5";
+import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 
 export default defineComponent({
-  name: "DiriverOnlineTimeStatistics",
+  name: "DriverOnlineTimeStatistics",
   components: {
     dayOrder,
     monthOrder,
-    NavItem,
-    Map, TimeIcon, TimeOutline, Cafe, CarSharp
+    Map,
+    TimeIcon,
+    TimeOutline,
+    Cafe,
+    CarSharp,
   },
   setup: function () {
     const baiduMapRef = ref();
@@ -184,8 +200,8 @@ export default defineComponent({
       driverClazzId: null,
       driverId: null,
     });
-    const isActive = ref(0)
-    const isShowModal = ref(false)
+    const isActive = ref(0);
+    const isShowModal = ref(false);
     const clazzs = ref([]);
     const companyData = ref<ItemInter[]>([]);
     const result = ref(false);
@@ -195,11 +211,11 @@ export default defineComponent({
     const month = ref<string>();
     const { appTheme } = useProjectSetting();
     interface StepInter {
-      driverWorkRestRecordId: string,
-      type: string,
-      date?: string | null,
-      lng: number,
-      lat: number
+      driverWorkRestRecordId: string;
+      type: string;
+      date?: string | null;
+      lng: number;
+      lat: number;
     }
 
     const step = ref<StepInter[]>([]);
@@ -262,7 +278,7 @@ export default defineComponent({
             operationCompanyId: queryForm.value.operationCompanyId,
           });
           clazzs.value = res.data.map((item: { id: string; name: string }) => {
-            return {label: item.name, value: item.id};
+            return { label: item.name, value: item.id };
           });
         }
         loading.value = false;
@@ -274,7 +290,7 @@ export default defineComponent({
 
     const getResult = async () => {
       loading.value = true;
-      resultData.value = null
+      resultData.value = null;
       try {
         let res;
         let option;
@@ -319,7 +335,7 @@ export default defineComponent({
           res = await findDriverMonthOnlineTimeInfo(option);
         }
         if (res.success) {
-          month.value = dayjs(queryForm.value.day).format("YYYY-MM") as string
+          month.value = dayjs(queryForm.value.day).format("YYYY-MM") as string;
           result.value = true;
           resultData.value = res.data;
         }
@@ -389,16 +405,21 @@ export default defineComponent({
     }
 
     function getIsShow(value: string) {
-      const index = resultData.value?.findIndex((item: { driver_no: string; }) => item.driver_no === value);
+      const index = resultData.value?.findIndex(
+        (item: { driver_no: string }) => item.driver_no === value
+      );
       if (index !== undefined && index >= 0) {
         resultData.value?.splice(index, 1);
       }
     }
 
     function showModel(value: string) {
-      const index = resultData.value?.findIndex((item: { operation_company_driver_id: string; }) => item.operation_company_driver_id === value);
+      const index = resultData.value?.findIndex(
+        (item: { operation_company_driver_id: string }) =>
+          item.operation_company_driver_id === value
+      );
       if (index !== undefined && index >= 0) {
-        getDriverWorkRestRecordDateData(value)
+        getDriverWorkRestRecordDateData(value);
       }
     }
 
@@ -406,13 +427,13 @@ export default defineComponent({
       let option = {
         operationCompanyId: queryForm.value.operationCompanyId,
         day: dayjs(queryForm.value.day).format("YYYY-MM-DD") as string,
-        driverId: driverId
-      }
+        driverId: driverId,
+      };
       try {
-        step.value = []
+        step.value = [];
         let res = await getDriverWorkRestRecord(option);
-        res.data
-        console.log(res.message)
+        res.data;
+        console.log(res.message);
         if (res.success) {
           res.data.forEach(function (item: any) {
             step.value.push({
@@ -420,27 +441,29 @@ export default defineComponent({
               type: item.workRestType,
               date: dayjs(item.recordTime).format("hh:mm:ss") as string,
               lng: item.driverOperationLongitude * 1e-6,
-              lat: item.driverOperationLatitude * 1e-6
+              lat: item.driverOperationLatitude * 1e-6,
             });
-          })
-          isShowModal.value = true
-          console.log(baiduMapRef.value)
+          });
+          isShowModal.value = true;
+          console.log(baiduMapRef.value);
           setTimeout(() => {
-            initMap(step.value[0].lng,step.value[0].lat)
-            handleEvent(step.value[0].driverWorkRestRecordId)
+            initMap(step.value[0].lng, step.value[0].lat);
+            handleEvent(step.value[0].driverWorkRestRecordId);
           }, 500);
         }
       } catch (e) {
         console.log(e);
       }
-    }
+    };
 
     const handleEvent = (driverWorkRestRecordId: string) => {
       console.log(baiduMapRef.value);
-      const index = step.value.findIndex((item) => item.driverWorkRestRecordId === driverWorkRestRecordId);
+      const index = step.value.findIndex(
+        (item) => item.driverWorkRestRecordId === driverWorkRestRecordId
+      );
       if (undefined !== index && index >= 0) {
-        isActive.value = index
-        handleMap(step.value[index].lng, step.value[index].lat)
+        isActive.value = index;
+        handleMap(step.value[index].lng, step.value[index].lat);
       }
     };
 
@@ -449,7 +472,7 @@ export default defineComponent({
         const beginLng = lng;
         const beginEnd = lat;
 
-        const {renderBaiduMap} = baiduMapRef.value;
+        const { renderBaiduMap } = baiduMapRef.value;
         renderBaiduMap(beginLng, beginEnd);
         resolve(true);
       });
@@ -460,9 +483,9 @@ export default defineComponent({
         const beginLng = lng;
         const beginEnd = lat;
 
-        const { addMarker,clearOverlays,resetCenter} = baiduMapRef.value;
+        const { addMarker, clearOverlays, resetCenter } = baiduMapRef.value;
         clearOverlays();
-        resetCenter(beginLng,beginEnd)
+        resetCenter(beginLng, beginEnd);
         addMarker(beginLng, beginEnd);
         resolve(true);
       });
@@ -497,7 +520,7 @@ export default defineComponent({
       showModel,
       handleEvent,
       handleMap,
-      dayjs
+      dayjs,
     };
   },
 });
@@ -530,9 +553,9 @@ export default defineComponent({
   .date {
     font-size: 14px;
   }
-  .date>span{
+  .date > span {
     padding: 5px;
-    border-radius:4px;
+    border-radius: 4px;
     font-weight: 600;
     color: white;
     background-color: #0073b7 !important;

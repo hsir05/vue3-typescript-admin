@@ -10,6 +10,7 @@ const routes: Array<RouteRecordRaw> = [
     component: PARENTLAYOUT, 
     meta: {
       sort: 10,
+      title: '主页',
       icon: renderIcon(HomeOutline),
     },
     children: [

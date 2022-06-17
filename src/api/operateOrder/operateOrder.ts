@@ -73,7 +73,7 @@ export function getOrderPage(data: OrderPageInter) {
 /**
  * 服务中订单详情
  */
-export function getOrderDetail(data: { orderId: string }) {
+export function getOrderDetail(data: { orderId: string | null }) {
     return http.request({
         url: "/order/detail",
         method: "post",
@@ -96,11 +96,117 @@ export function batchFinishOrder(data: { orderId: string }) {
  * 单个结单
  */
 export function singleFinishOrder(data: { influxOrderNo: string }) {
-    return http.request({
-        url: "/order/batchFinishOrder",
+    return otherHttp.request({
+        url: "/orderWaitPay/platform/finishOrder",
         method: "post",
         data: data,
     });
+}
+interface calculateOrderPriceInterface {
+  orderId: string | null,
+  orderFixedCost: number  | null,
+  orderServiceMileage: number  | null,
+  orderServiceDuration: number  | null,
+  roadCost: number  | null,
+  parkingCost: number  | null,
+  cleaningCost: number  | null,
+  otherCost: number  | null,
+  driverWaitPassengerDuration: number  | null
+}
+export function calculateOrderPrice(data:calculateOrderPriceInterface) {
+  return http.request({
+    url: "/order/calculateOrderPrice",
+    method: "post",
+    data: data,
+  });
+}
+/**
+ * 根据区域编码，司机工号头，下单车型和订单类型查询
+ * @param data
+ */
+export function findByDriverNoHeaderAndOrderPlaceVehicleAndOrderTypeAndAreaCode(data:{areaCode:string,driverNoHeader:string,orderPlaceVehicleId:string,orderType:string}) {
+  return http.request({
+    url:"/operationCompanyDriver/findByDriverNoHeaderAndOrderPlaceVehicleAndOrderTypeAndAreaCode",
+    method:"post",
+    data:data
+  })
+}
+
+/**
+ * 通过企业id和司机工号头来模糊查找司机
+ * @param data
+ */
+export function findByDriverNoHeaderUnlock(data:{operationCompanyId:string,driverNoHeader:string}) {
+  return http.request({
+    url:"/operationCompanyDriver/findByDriverNoHeaderUnlock",
+    method:"post",
+    data:data
+  })
+}
+
+/**
+ * 通过订单id查询下单车型
+ * @param data
+ */
+export function findVehicleTypeByOrderId(data:{orderId:string}) {
+  return http.request({
+    url:"/order/findVehicleTypeByOrderId",
+    method:"post",
+    data:data
+  })
+}
+
+/**
+ * 订单改派
+ */
+export function artificialDistributeOrder(data:{orderId:string | null,operationCompanyDriverId:string | null,loginCredentialId:string | null,loginPassword:string | null}){
+
+  return otherHttp.request({
+    url:"/orderInService/platform/artificialDistributeOrder",
+    method:"post",
+    data:data,
+  })
+}
+interface AdjustFinishOrderPriceInter{
+  orderId:string | null,
+  orderFixedCost: number | null,
+  orderServiceMileage: number | null,
+  orderServiceDuration: number | null,
+  roadCost: number | null,
+  parkingCost: number | null,
+  cleaningCost: number | null,
+  otherCost: number | null,
+  driverWaitPassengerDuration: number | null,
+  adjustReason: string | null,
+  password:string
+}
+/**
+ * 调整完成待支付的订单价格
+ */
+export function adjustFinishOrderPrice(data:AdjustFinishOrderPriceInter) {
+  return http.request({
+    url:"/order/adjustFinishOrderPrice",
+    method:"post",
+    data:data,
+  })
+}
+interface AdjustCancelOrderPriceInter{
+  orderId:string | null,
+  orderCancelCost:number | null
+  adjustReason: string | null,
+  password:string
+}
+
+/**
+ * 调整取消待支付的订单价格
+ * @param data
+ */
+export function adjustCancelOrderPrice(data:AdjustCancelOrderPriceInter){
+  return http.request({
+    url:"/order/adjustCancelOrderPrice",
+    method:"post",
+    data:data,
+  })
 }
 //-----------------已完成订单-------------------------
 
@@ -182,7 +288,7 @@ interface OrderChannelInter {
         orderTypeEq: string | null
         driverNoEq: string | null
         customerPhoneEq: string | null
-        orderBusinessType: string | null 
+        orderBusinessType: string | null
     };
 }
 
@@ -218,7 +324,7 @@ interface OrderCancelledInter {
         orderTypeEq: string | null
         driverNoEq: string | null
         customerPhoneEq: string | null
-        orderBusinessType: string | null 
+        orderBusinessType: string | null
     }
 }
 export function downloadOrderCancelled(data: OrderCancelledInter) {
@@ -243,7 +349,7 @@ interface StatementInter {
         orderTypeEq: string | null
         driverNoEq: string | null
         customerPhoneEq: string | null
-        orderBusinessType: string | null 
+        orderBusinessType: string | null
     }
 }
 export function downloadStatement(data: StatementInter) {

@@ -34,7 +34,7 @@ export function refreshToken() {
     method: 'post'
   });   
 }
-// 当前登录管理员详情查询
+// 当前登录管理员详情查询 
 export function getDetailViaLoginer() {
   return http.request({
     url: '/admin/detailViaLoginer',
@@ -141,14 +141,6 @@ export function modifyRoleState(data: {roleId: string}) {
     url: '/role/modifyState',
     method: 'post',
     data
-  });
-}
-//---------------------菜单管理-----------------------
-//获取路由菜单
-export function getMenus() {
-  return http.request({ 
-    url: '/menus',
-    method: 'post',
   });
 }
 

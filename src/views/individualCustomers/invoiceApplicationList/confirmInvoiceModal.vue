@@ -72,6 +72,8 @@ export default defineComponent({
     }
 
     function handleReset() {
+      loading.value = false;
+
       form.value = { contactMail: null, customerInvoiceApplicationId: null };
       formRef.value?.restoreValidation();
     }

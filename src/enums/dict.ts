@@ -24,6 +24,7 @@ export enum OrderDataEnum {
     DRIVERBEGINSERVICES = 'driverBeginServiceState', //开始服务 
     DRIVERENDSERVICES = 'driverEndServiceState', // 结束服务 
     DRIVERSUBMISSIONCOST = 'driverSubmissionCostState', // 提交费用
+    ORDERPRICEADJUST = 'orderPriceAdjust', // 价格调整
     ORDERCOSTCREATE = 'orderCostCreateState', // 支付
     ORDEREND = 'orderEndState', // 结束
 }

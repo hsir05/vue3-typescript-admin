@@ -2,7 +2,6 @@ import type { UserConfig, ConfigEnv } from "vite";
 import { wrapperEnv } from "./build/utils";
 import { createVitePlugins } from "./build/vite/plugin";
 import { resolve } from "path";
-import { OUTPUT_DIR } from "./build/constant";
 import { loadEnv } from "vite";
 import pkg from "./package.json";
 import { format } from "date-fns";
@@ -80,7 +79,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     build: {
       target: "es2015",
-      outDir: OUTPUT_DIR, //指定输出路径
+      outDir: "dist", //指定输出路径
       terserOptions: {
         compress: {
           // 通过false以完全跳过压缩。传递一个对象以指定自定义压缩选项。

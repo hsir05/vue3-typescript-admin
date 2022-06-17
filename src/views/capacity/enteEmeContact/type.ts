@@ -1,6 +1,6 @@
 
 export interface tableDataItem {
-    operationCompanyEmergencyContactId?: string | null;
+    operationCompanyEmergencyContactId: string;
     operationCompanyEmergencyContactName: string | null;
     operationCompanyEmergencyContactPhone: null| string;
     operationCompanyEmergencyContactEmail: string | null;
@@ -10,3 +10,13 @@ export interface tableDataItem {
     createTime?: string | null;
 }
 
+export interface FormInter {
+   operationCompanyEmergencyContactId?: string | null;
+  operationCompanyId: string | null;
+  operationCompanyEmergencyContactName: string | null;
+  operationCompanyEmergencyContactPhone: string | null;
+  operationCompanyEmergencyContactEmail: string | null;
+  createTime?: string | null;
+  dutyTimeBegin: string | null;
+  dutyTimeEnd: string | null;
+}

@@ -22,7 +22,7 @@
       <Map ref="baiduMapRef" class="map" />
 
       <transition name="fade-slide" mode="out-in" appear>
-        <component :is="componentId" :detail="detail" />
+        <component :is="componentId" :detail="detail" :currentActiveDate="currentActiveDate" />
       </transition>
     </div>
   </div>
@@ -44,6 +44,7 @@ import DriverSubmissionCost from "./components/driverSubmissionCost.vue";
 import OrderCostCreate from "./components/orderCostCreate.vue";
 import InvalidOrder from "./components/invalidOrder.vue";
 import CancelOrder from "./components/cancelOrder.vue";
+import OrderPriceAdjust from "./components/orderPriceAdjust.vue";
 import { objInter } from "@/interface/common/common";
 import {
   getOrderDetail,
@@ -77,6 +78,7 @@ export default defineComponent({
     OrderCostCreate,
     InvalidOrder,
     CancelOrder,
+    OrderPriceAdjust,
   },
   setup() {
     const route = useRoute();
@@ -86,6 +88,7 @@ export default defineComponent({
     const step = ref<StepInter[]>([]);
     const detail = ref();
     const activeIndex = ref(0);
+    const currentActiveDate = ref();
 
     const state = reactive({
       componentId: "CreateOrder",
@@ -117,7 +120,6 @@ export default defineComponent({
             res = await getOrderInvalidDetail({ orderId });
             break;
         }
-        console.log(res.data);
         detail.value = res.data;
 
         if (detail.value.orderPlaceVehicleList) {
@@ -193,7 +195,7 @@ export default defineComponent({
           resolve(true);
           return;
         }
-
+        // 订单改派
         if (
           detail.value.orderDispatchRecordList &&
           detail.value.orderDispatchRecordList.length > 0
@@ -211,7 +213,7 @@ export default defineComponent({
                 orderState: OrderDataEnum.ACCEPTORDER,
                 date: item.dispatchOrderTime,
                 isDate: !isSameDay(
-                  new Date(detail.value.orderDispatchRecordList[i - 1]),
+                  new Date(detail.value.orderDispatchRecordList[i - 1].dispatchOrderTime),
                   new Date(item.dispatchOrderTime)
                 ),
               });
@@ -295,6 +297,31 @@ export default defineComponent({
           date: driverSubmissionCostTime,
           isDate: !isSameDay(new Date(driverEndServiceTime), new Date(driverSubmissionCostTime)),
         });
+        // 价格调整
+        if (
+          detail.value.orderPriceAdjustRecordList &&
+          detail.value.orderPriceAdjustRecordList.length > 0
+        ) {
+          for (let i = 0; i < detail.value.orderPriceAdjustRecordList.length; i++) {
+            let item = detail.value.orderPriceAdjustRecordList[i];
+            if (i === 0) {
+              step.value.push({
+                orderState: OrderDataEnum.ORDERPRICEADJUST,
+                date: item.adjustTime,
+                isDate: !isSameDay(new Date(driverSubmissionCostTime), new Date(item.adjustTime)),
+              });
+            } else {
+              step.value.push({
+                orderState: OrderDataEnum.ORDERPRICEADJUST,
+                date: item.adjustTime,
+                isDate: !isSameDay(
+                  new Date(detail.value.orderPriceAdjustRecordList[i - 1].adjustTime),
+                  new Date(item.adjustTime)
+                ),
+              });
+            }
+          }
+        }
 
         // 支付
         if (!orderCostCreateTime) {
@@ -347,8 +374,9 @@ export default defineComponent({
       });
     };
 
-    const handleEvent = async (orderState: string, index: number) => {
+    const handleEvent = async (orderState: string, index: number, date: number) => {
       activeIndex.value = index;
+      currentActiveDate.value = date;
       let componentsObj: objInter = {
         createOrderState: "CreateOrder",
         invalidOrder: "InvalidOrder",
@@ -359,6 +387,7 @@ export default defineComponent({
         driverEndServiceState: "DriverEndService",
         driverSubmissionCostState: "DriverSubmissionCost",
         orderCostCreateState: "OrderCostCreate",
+        orderPriceAdjust: "orderPriceAdjust",
         cancelOrderState: "CancelOrder",
       };
       state.componentId = componentsObj[orderState];
@@ -468,6 +497,17 @@ export default defineComponent({
           acceptLat: detail.value.driverSubmissionCostAddressLatitude * 1e-6,
           otherIcon: submissionIcon,
         },
+        orderPriceAdjust: {
+          beginLng: detail.value.driverEndServiceAddressLongitude * 1e-6,
+          beginLat: detail.value.driverEndServiceAddressLatitude * 1e-6,
+          endLng: detail.value.driverSubmissionCostAddressLongitude * 1e-6,
+          endLat: detail.value.driverSubmissionCostAddressLatitude * 1e-6,
+          startIcon: serviceIcon,
+          endIcon: serviceIcon,
+          acceptLng: detail.value.driverSubmissionCostAddressLongitude * 1e-6,
+          acceptLat: detail.value.driverSubmissionCostAddressLatitude * 1e-6,
+          otherIcon: submissionIcon,
+        },
         orderCostCreateState: {
           beginLng: detail.value.driverBeginServiceAddressLongitude * 1e-6,
           beginLat: detail.value.driverBeginServiceAddressLatitude * 1e-6,
@@ -477,6 +517,7 @@ export default defineComponent({
           endIcon: null,
         },
       };
+
       await handleMap({ ...optionObj[orderState] });
     };
 
@@ -489,6 +530,7 @@ export default defineComponent({
       detail,
       step,
       handleEvent,
+      currentActiveDate,
     };
   },
 });

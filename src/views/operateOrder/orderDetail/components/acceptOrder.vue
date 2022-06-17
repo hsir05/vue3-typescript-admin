@@ -1,54 +1,66 @@
 <template>
   <n-descriptions label-placement="left" bordered :column="3" class="mt-15px">
     <n-descriptions-item label="接单地点">{{
-      detail?.driverAcceptOrderAddress
+      detailItem?.driverAcceptOrderAddress
     }}</n-descriptions-item>
-    <n-descriptions-item label="派单类型">{{ detail?.orderDispatchType }}</n-descriptions-item>
+    <n-descriptions-item label="派单类型">{{ detailItem?.orderDispatchType }}</n-descriptions-item>
     <n-descriptions-item label="司机姓名[工号]"
-      >{{ detail?.driverFullName }}{{ detail?.driverNo }}</n-descriptions-item
-    >
-    <n-descriptions-item label="司机手机号">{{ detail?.driverPhone }}</n-descriptions-item>
+      >{{ detailItem?.driverFullName }}{{ detailItem?.driverNo }}
+    </n-descriptions-item>
+    <n-descriptions-item label="司机手机号">{{ detailItem?.driverPhone }}</n-descriptions-item>
     <n-descriptions-item label="所属运营企业" :span="2">{{
-      detail?.operationCompanyName
+      detailItem?.operationCompanyName
     }}</n-descriptions-item>
     <n-descriptions-item label="所属班级">{{
-      detail?.operationCompanyDriverClazzName || "暂无"
+      detailItem?.operationCompanyDriverClazzName || "暂无"
     }}</n-descriptions-item>
-    <n-descriptions-item label="车牌号">{{ detail?.plateNumber }}</n-descriptions-item>
-    <n-descriptions-item label="车辆类型">{{ detail?.vehicleTypeName }}</n-descriptions-item>
+    <n-descriptions-item label="车牌号">{{ detailItem?.plateNumber }}</n-descriptions-item>
+    <n-descriptions-item label="车辆类型">{{ detailItem?.vehicleTypeName }}</n-descriptions-item>
 
-    <n-descriptions-item label="车辆品牌/车系">{{ detail?.vehicleBrand }}</n-descriptions-item>
-    <n-descriptions-item label="车辆颜色" :span="2">{{ detail?.vehicleColor }}</n-descriptions-item>
+    <n-descriptions-item label="车辆品牌/车系">{{ detailItem?.vehicleBrand }}</n-descriptions-item>
+    <n-descriptions-item label="车辆颜色" :span="2">{{
+      detailItem?.vehicleColor
+    }}</n-descriptions-item>
     <n-descriptions-item label="抽成比率">
-      <n-tag type="success" v-if="detail?.influxDivideRate && detail?.influxDivideRate !== 0">
-        流量方抽成比率:{{ detail?.influxDivideRate * 100 }}%
-      </n-tag>
-      <n-tag type="success" class="ml-10px"
-        >平台抽成比率:{{ detail?.platformDivideRate * 100 }}%</n-tag
-      >
       <n-tag
         type="success"
-        class="ml-10px"
-        v-if="detail?.agencyDivideRate && detail?.agencyDivideRate !== 0"
-        >代理商抽成比率:{{ detail?.agencyDivideRate * 100 }}%
+        v-if="detailItem?.influxDivideRate && detailItem?.influxDivideRate !== 0"
+      >
+        流量方抽成比率:{{ detailItem?.influxDivideRate * 100 }}%
       </n-tag>
       <n-tag
         type="success"
         class="ml-10px"
-        v-if="detail?.companyDivideRate && detail?.companyDivideRate !== 0"
-        >企业抽成比率:{{ detail?.companyDivideRate * 100 }}%</n-tag
+        v-if="detailItem?.platformDivideRate && detailItem?.platformDivideRate !== 0"
+      >
+        平台抽成比率:{{ detailItem?.platformDivideRate * 100 }}%</n-tag
       >
       <n-tag
         type="success"
         class="ml-10px"
-        v-if="detail?.driverDivideRate && detail?.driverDivideRate !== 0"
-        >司机抽成比率:{{ detail?.driverDivideRate * 100 }}%</n-tag
+        v-if="detailItem?.agencyDivideRate && detailItem?.agencyDivideRate !== 0"
+      >
+        代理商抽成比率:{{ detailItem?.agencyDivideRate * 100 }}%
+      </n-tag>
+      <n-tag
+        type="success"
+        class="ml-10px"
+        v-if="detailItem?.companyDivideRate && detailItem?.companyDivideRate !== 0"
+      >
+        企业抽成比率:{{ detailItem?.companyDivideRate * 100 }}%</n-tag
+      >
+      <n-tag
+        type="success"
+        class="ml-10px"
+        v-if="detailItem?.driverDivideRate && detailItem?.driverDivideRate !== 0"
+      >
+        司机抽成比率:{{ detailItem?.driverDivideRate * 100 }}%</n-tag
       >
     </n-descriptions-item>
   </n-descriptions>
 </template>
 <script lang="ts" setup>
-import { toRefs } from "vue";
+import { toRefs, ref, watch } from "vue";
 interface DetailInter {
   driverAcceptOrderAddress: string | null;
   orderDispatchType: string | null;
@@ -69,13 +81,45 @@ interface DetailInter {
   agencyDivideRate: number;
   companyDivideRate: number;
   driverDivideRate: number;
+  orderDispatchRecordList: [];
 }
 const props = defineProps({
   detail: {
     type: Object as PropType<DetailInter>,
     default: () => {},
   },
+  currentActiveDate: {
+    type: Number,
+    default: () => 1,
+  },
 });
 
-const { detail } = toRefs(props);
+const { detail, currentActiveDate } = toRefs(props);
+
+interface ItemInter extends DetailInter {
+  dispatchOrderTime: number;
+}
+
+const detailItem = ref<DetailInter>();
+const dispatchItem = ref<ItemInter | undefined>();
+
+detailItem.value = detail.value;
+
+watch(currentActiveDate, () => {
+  dispatchItem.value = detail.value.orderDispatchRecordList.find(
+    (item: ItemInter) => item.dispatchOrderTime === currentActiveDate.value
+  );
+  if (dispatchItem.value) {
+    detailItem.value = Object.assign(detail.value, dispatchItem.value);
+  }
+});
+
+if (detail.value.orderDispatchRecordList && detail.value.orderDispatchRecordList.length > 0) {
+  dispatchItem.value = detail.value.orderDispatchRecordList.find(
+    (item: ItemInter) => item.dispatchOrderTime === currentActiveDate.value
+  );
+  if (dispatchItem.value) {
+    detailItem.value = Object.assign(detail.value, dispatchItem.value);
+  }
+}
 </script>

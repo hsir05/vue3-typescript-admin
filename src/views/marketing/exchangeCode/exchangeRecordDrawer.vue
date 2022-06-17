@@ -3,7 +3,7 @@
     <n-descriptions label-placement="left" bordered :column="2">
       <n-descriptions-item label="兑换码">{{ detail?.exchangeCode }}</n-descriptions-item>
       <n-descriptions-item label="兑换类型">{{
-        detail?.exchangeCodeExchangeType
+        stateData.get(detail?.exchangeCodeExchangeType)
       }}</n-descriptions-item>
       <n-descriptions-item label="生效时间" :span="2">{{
         dayjs(detail?.exchangeCodeEffectiveTimeBegin).format("YYYY-MM-DD HH:mm:ss")
@@ -12,15 +12,15 @@
         dayjs(detail?.exchangeCodeEffectiveTimeEnd).format("YYYY-MM-DD HH:mm:ss")
       }}</n-descriptions-item>
       <n-descriptions-item label="可兑换次数">{{
-        detail?.exchangeCodeUsedCount
-      }}</n-descriptions-item>
-      <n-descriptions-item label="已兑换次数">{{
         detail?.exchangeCodeUsableCount
       }}</n-descriptions-item>
-      <n-descriptions-item label="兑换实充金额">{{
+      <n-descriptions-item label="已兑换次数">{{
+        detail?.exchangeCodeUsedCount
+      }}</n-descriptions-item>
+      <n-descriptions-item v-if="isShow" label="兑换实充金额">{{
         detail?.exchangeRechargeAmount
       }}</n-descriptions-item>
-      <n-descriptions-item label="兑换赠送金额">{{
+      <n-descriptions-item v-if="isShow" label="兑换赠送金额">{{
         detail?.exchangeGiftAmount
       }}</n-descriptions-item>
     </n-descriptions>
@@ -57,7 +57,19 @@
       class="box-border"
       :row-key="getRowKeyId"
       :data="data"
-      :pagination="pagination"
+      :pagination="false"
+    />
+    <n-pagination
+      v-model:page="pagination.page"
+      v-model:page-size="pagination.pageSize"
+      v-model:item-count="pagination.itemCount"
+      :page-slot="5"
+      show-size-picker
+      show-quick-jumper
+      class="mt-10px justify-end"
+      :on-update:page="handlePage"
+      :on-update:page-size="handlePageSize"
+      :page-sizes="pageSizes"
     />
   </BasicDrawer>
 </template>
@@ -68,6 +80,8 @@ import dayjs from "dayjs";
 import { TableDataItemInter } from "./type";
 import { PaginationInter } from "@/api/type";
 import { getRecordPagePage, getExchangeCodeDetail } from "@/api/marketing/marketing";
+import { getDict } from "@/api/common/common";
+import { pageSizes } from "@/config/table";
 export default defineComponent({
   name: "ExchangeRecordCodeDrawer",
   setup() {
@@ -75,7 +89,9 @@ export default defineComponent({
       isDrawer: false,
       loading: false,
     });
-
+    const stateData: Map<string, string> = new Map();
+    const exchangeCodeAchieveOpportunityData: Map<string, string> = new Map();
+    const exchangeCodeStateData: Map<string, string> = new Map();
     const title = ref("");
     const detail = ref();
     const formRef = ref<FormInst | null>(null);
@@ -89,7 +105,7 @@ export default defineComponent({
     });
 
     const data = ref([]);
-
+    const isShow = ref(false);
     const columns = [
       {
         title: "序号",
@@ -109,22 +125,20 @@ export default defineComponent({
         title: "获取途径",
         key: "exchangeCodeAchieveOpportunity",
         align: "center",
+        render(row: TableDataItemInter) {
+          return h(
+            "span",
+            exchangeCodeAchieveOpportunityData.get(row.exchangeCodeAchieveOpportunity)
+          );
+        },
       },
       {
         title: "状态",
         key: "exchangeCodeState",
         align: "center",
-        // render(row: TableDataItemInter) {
-        //   return h(
-        //     NTag,
-        //     {
-        //       type: row.status === 1 ? "success" : "error",
-        //     },
-        //     {
-        //       default: () => (row.status === 1 ? "正常" : "锁定"),
-        //     }
-        //   );
-        // },
+        render(row: TableDataItemInter) {
+          return h("span", exchangeCodeAchieveOpportunityData.get(row.exchangeCodeState));
+        },
       },
       {
         title: "获取时间",
@@ -141,6 +155,12 @@ export default defineComponent({
       },
     ];
 
+    const paginationReactive = reactive({
+      page: 1,
+      pageSize: 10,
+      itemCount: 0,
+    });
+
     function openDrawer(exchangeCodeId: string) {
       if (exchangeCodeId) {
         queryForm.value.exchangeCodeIdEq = exchangeCodeId;
@@ -156,6 +176,11 @@ export default defineComponent({
         let res = await getExchangeCodeDetail({ exchangeCodeId });
         detail.value = res.data;
         state.loading = false;
+        if (res.data.exchangeCodeExchangeType === "EXT0002") {
+          isShow.value = true;
+        } else {
+          isShow.value = false;
+        }
       } catch (err) {
         console.log(err);
         state.loading = false;
@@ -165,6 +190,20 @@ export default defineComponent({
     const getData = async (page: PaginationInter) => {
       try {
         state.loading = true;
+        let dict = await getDict({ parentEntryCode: "EXT0000" });
+        dict.data.map((item: { entryName: string; entryCode: string }) => {
+          stateData.set(item.entryCode, item.entryName);
+        });
+        let exchangeCodeAchieveOpportunity = await getDict({ parentEntryCode: "EAO0000" });
+        exchangeCodeAchieveOpportunity.data.map(
+          (item: { entryName: string; entryCode: string }) => {
+            exchangeCodeAchieveOpportunityData.set(item.entryCode, item.entryName);
+          }
+        );
+        let exchangeCodeState = await getDict({ parentEntryCode: "ECS0000" });
+        exchangeCodeState.data.map((item: { entryName: string; entryCode: string }) => {
+          exchangeCodeStateData.set(item.entryCode, item.entryName);
+        });
         let search = {
           exchangeCodeIdEq: queryForm.value.exchangeCodeIdEq,
           customerPhoneLike: queryForm.value.customerPhoneLike,
@@ -172,6 +211,7 @@ export default defineComponent({
         let res = await getRecordPagePage({ page: page, search: search });
         console.log(res.data.content);
         data.value = res.data.content;
+        paginationReactive.itemCount = res.data.totalElements;
         state.loading = false;
       } catch (err) {
         console.log(err);
@@ -188,6 +228,16 @@ export default defineComponent({
       state.loading = false;
     }
 
+    function handlePage(pageIndex: number) {
+      paginationReactive.page = pageIndex;
+      getData({ pageIndex: paginationReactive.page, pageSize: paginationReactive.pageSize });
+    }
+
+    function handlePageSize(pageSize: number) {
+      paginationReactive.pageSize = pageSize;
+      getData({ pageIndex: paginationReactive.page, pageSize: paginationReactive.pageSize });
+    }
+
     return {
       queryForm,
       formRef,
@@ -195,13 +245,15 @@ export default defineComponent({
       detail,
       title,
       data,
-      pagination: {
-        pageSize: 10,
-      },
+      stateData,
+      pageSizes,
+      isShow,
+      pagination: paginationReactive,
       dayjs,
       ...toRefs(state),
       getRowKeyId: (row: TableDataItemInter) => row.exchangeCodeId,
-
+      handlePage,
+      handlePageSize,
       query,
       openDrawer,
       onCloseAfter,

@@ -17,7 +17,6 @@
     >
       <n-form-item label="会员类型" path="customerMemberId">
         <n-select
-          clearable
           filterable
           v-model:value="form.customerMemberId"
           placeholder="选择会员类型"

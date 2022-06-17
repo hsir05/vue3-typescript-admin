@@ -57,7 +57,7 @@ const { orderState, date, isDate, isActive, index } = toRefs(props);
 const emit = defineEmits(["update-event"]);
 
 const handle = () => {
-  emit("update-event", orderState.value, index.value);
+  emit("update-event", orderState.value, index.value, date.value);
 };
 
 const { appTheme } = useProjectSetting();

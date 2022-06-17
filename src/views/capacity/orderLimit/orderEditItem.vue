@@ -3,12 +3,11 @@
     ref="formRef"
     :rules="rules"
     label-placement="left"
-    class="p-10px"
+    class="p-10px mt-25px"
     require-mark-placement="right-hanging"
     label-width="140"
     :model="form"
   >
-    <n-divider title-placement="left" style="padding: 5px 0; margin: 5px 0">编辑</n-divider>
     <n-form-item label="用车前占用时间" path="beforTime">
       <n-input
         v-model:value="form.beforTime"
@@ -27,7 +26,11 @@
       />
     </n-form-item>
 
-    <div class="form-item ml-25px" v-for="(item, index) in form.vhchileData" :key="index">
+    <div
+      class="form-item ml-25px"
+      v-for="(item, index) in form.realTimeOrderTopLimitList"
+      :key="index"
+    >
       <FormItem :item="item" />
       <n-button
         attr-type="button"
@@ -47,7 +50,8 @@
         size="small"
         @click="handleRemove(index)"
         class="ml-12px mt-4px"
-        ><template #icon>
+      >
+        <template #icon>
           <n-icon>
             <RemoveIcon />
           </n-icon>
@@ -56,46 +60,69 @@
     </div>
 
     <div class="text-center mt-15px">
-      <n-button attr-type="button" type="primary" size="small" @click="submit">查询</n-button>
-      <n-button attr-type="button" type="warning" size="small" class="ml-10px" @click="reset"
-        >重置</n-button
-      >
+      <n-button attr-type="button" type="primary" @click="submit">查询</n-button>
+      <n-button attr-type="button" type="warning" class="ml-10px" @click="reset">重置</n-button>
     </div>
   </n-form>
 </template>
 <script lang="ts">
 import { defineComponent, ref, onBeforeUpdate } from "vue";
 import { FormInst, useMessage } from "naive-ui";
-import { tableDataItem } from "./type";
+import { LimitOrderInter, RemoteForm } from "./type";
 import { Add as AddIcon } from "@vicons/ionicons5";
 import { TrashOutline as RemoveIcon } from "@vicons/ionicons5";
 import FormItem from "./formItem.vue";
 export default defineComponent({
   name: "OrderEditItem",
   components: { RemoveIcon, AddIcon, FormItem },
-  setup() {
+  props: {
+    orderLimitData: {
+      type: Object as PropType<RemoteForm[]>,
+      default: () => {},
+    },
+  },
+  setup(props) {
     const message = useMessage();
     const formItemRef = ref([]);
     const formRef = ref<FormInst | null>(null);
-    const form = ref<tableDataItem>({
-      afterTime: null,
-      beforTime: null,
-      vhchileData: [
+    const form = ref<LimitOrderInter>({
+      areaCode: null,
+      beforeUseVehicleMinute: null,
+      afterUseVehicleMinute: null,
+      realTimeOrderTopLimitList: [
         {
+          beforeUseVehicleMinute: null,
+          afterUseVehicleMinute: null,
           vehicleType: null,
-          orderLimit: null,
+          orderTopLimit: null,
         },
       ],
     });
+    console.log(props.orderLimitData);
+    if (props.orderLimitData.length > 0) {
+      // const {
+      //     areaCode,
+      //     beforeUseVehicleMinute,
+      //     afterUseVehicleMinute,
+      // } = props.orderLimitData[0]
+      // form.value = {
+      //     areaCode,
+      //     beforeUseVehicleMinute,
+      //     afterUseVehicleMinute,
+      //     // realTimeOrderTopLimitList: props.orderLimitData
+      // }
+    }
 
     onBeforeUpdate(() => {
       formItemRef.value = [];
     });
 
     function handleAdd() {
-      form.value.vhchileData.push({
+      form.value.realTimeOrderTopLimitList.push({
+        beforeUseVehicleMinute: null,
+        afterUseVehicleMinute: null,
         vehicleType: null,
-        orderLimit: null,
+        orderTopLimit: null,
       });
     }
 
@@ -108,12 +135,10 @@ export default defineComponent({
         formItemSubmit();
       }
 
-      formRef.value?.validate((errors) => {
+      formRef.value?.validate(async (errors) => {
         if (!errors) {
-          message.success("验证成功");
         } else {
           console.log(errors);
-          message.error("验证失败");
         }
       });
     }
@@ -121,7 +146,7 @@ export default defineComponent({
     function handleRemove(index: number) {
       !index && message.warning("已经是最后一个了!");
       if (index > 0) {
-        form.value.vhchileData.pop();
+        form.value.realTimeOrderTopLimitList.pop();
       }
     }
 

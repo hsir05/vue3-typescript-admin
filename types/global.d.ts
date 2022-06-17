@@ -25,6 +25,7 @@ declare global {
   interface Window {
     $tips: any;
     $message: any;
+    isRefreshing: boolean
   }
 
   declare const BMap: any
