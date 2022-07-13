@@ -358,17 +358,3 @@ export const http = createAxios();
 //   },
 // });\
 
-export const otherHttp = createAxios({
-  requestOptions: {
-    apiUrl: otherUrl
-  },
-  headers: {
-    Accept: ContentTypeEnum.JSON,
-    "Content-Type": ContentTypeEnum.FORM_URLENCODED,
-
-    'Access-Control-Allow-Credentials': true,
-    'Access-Control-Allow-Origin': "http://test-ngcxpm-web.yiminyueche.com/"
-  },
-  withCredentials: true,
-  // crossDomain: false,
-});

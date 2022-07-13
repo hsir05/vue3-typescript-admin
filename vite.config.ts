@@ -50,27 +50,15 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     server: {
       host: true,
       port: VITE_PORT,
-      proxy: {
-        "/api": {
-          target: "http://test-ngcxpm-api.yiminyueche.com",
-          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
-          rewrite: (path) => {
-              return path.replace("/api", "")
-          },
-        },
-        "/customerInvoiceApplication/platform": {
-          target: "http://testcxcustomer.yiminyueche.com",
-          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
-        },
-         "/order/batchFinishOrder": {
-          target: "http://testcxcustomer.yiminyueche.com",
-          changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
-        },
-        "/attachFile/upload": {
-          target: "http://test-ngcxpm-api.yiminyueche.com",
-          changeOrigin: true,
-        },
-      },
+    //   proxy: {
+    //     "/api": {
+    //       target: "xxxx",
+    //       changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
+    //       rewrite: (path) => {
+    //           return path.replace("/api", "")
+    //       },
+    //     },
+    //   },
     },
     optimizeDeps: {
       //在预构建中强制排除的依赖项。

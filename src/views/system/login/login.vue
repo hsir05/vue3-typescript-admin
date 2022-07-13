@@ -14,13 +14,12 @@
           <img src="../../../assets/image/login-middle.png" style="width: 100%" alt="" />
         </div>
         <div class="login-info">
-          <p>兰州益民出行汽车服务有限公司</p>
-          <p>甘肃省兰州市城关区庆阳路488号万盛商务大厦28楼</p>
-          <p>Copyright © 2022 甘肃诚诚网络技术有限公司 · 技术支持</p>
+          <p>xxxxxx服务有限公司</p>
+          <p>Copyright © 2022 xxx有限公司 · 技术支持</p>
         </div>
       </div>
       <div class="login-form">
-        <span class="login-form-title">益民出行综合管理平台</span>
+        <span class="login-form-title">综合管理平台</span>
         <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
           <n-form-item path="account">
             <n-input
