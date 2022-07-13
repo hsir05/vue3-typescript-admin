@@ -105,7 +105,7 @@ export default defineComponent({
     const autoLogin = ref(true);
 
     const formValue = reactive({
-      account: "chenke",
+      account: "h",
       password: "password",
       captcha: "123456",
     });

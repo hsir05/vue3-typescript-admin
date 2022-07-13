@@ -38,18 +38,4 @@ export enum ContentTypeEnum {
 export enum UploadTypeEnum {
     // 头像存储文件夹
     AVATAR = 'YIMIN_ADMIN_IMAGES',
-     // 车辆运输证存储文件夹
-    LICENSE = 'VEHICLE_TRANSPORT_LICENSE',
-     // 车辆类型存储文件夹
-    VEHICLETYPE = 'VEHICLE_TYPE',
-     // 车辆照片存储文件夹
-    VEHICLEPHOTO = 'VEHICLE_PHOTO',
-    // 司机证件照存储文件夹
-    DRIVERIDENTIFICATION = 'DRIVER_IDENTIFICATION',
-    // 司机身份证照片存储文件夹
-    DIRIVERIDENTITY = 'DRIVER_IDENTITY',
-    // 司机驾驶证照片存储文件夹
-    DRIVERLICENSE = 'DRIVER_LICENSE',
-    // 司机网约车资格证照片存储文件夹
-    CERTIFICATE = 'DRIVER_NETWORK_VEHICLE_CERTIFICATE',
 }

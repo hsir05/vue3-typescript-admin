@@ -91,31 +91,5 @@ a{
     cursor: pointer;
   }
 }
-.striped {
-    background-color: #fafafc;
-  }
 
-.empty {
-    margin-top: 30%;
-    transform: translateY(-50%);
-}
-.busy-type-item {
-    display: flex;
-    align-content: center;
-    border: 1px solid #efeff5;
-    margin-top: -1px;
 
-    .busy-type-content-item {
-        min-width: 22px;
-        padding: 10px;
-        width: 13%;
-        border-left: 1px solid #f2f3f5;
-        justify-content: center;
-        text-align: center;
-        cursor: pointer;
-    }
-
-    .n-tag {
-        cursor: pointer;
-    }
-}
