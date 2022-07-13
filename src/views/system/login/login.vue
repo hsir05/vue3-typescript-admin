@@ -72,13 +72,13 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, unref, onMounted } from "vue";
+import { defineComponent, ref, reactive, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
-import { getCaptcha } from "@/api/system/system";
-import { useAppUserStore } from "@/store/modules/useUserStore";
-import md5 from "blueimp-md5";
+// import { getCaptcha } from "@/api/system/system";
+// import { useAppUserStore } from "@/store/modules/useUserStore";
+// import md5 from "blueimp-md5";
 import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";
 import { locStorage } from "@/utils/storage";
 
@@ -119,64 +119,75 @@ export default defineComponent({
       }
     });
 
-    const getCaptchaData = async () => {
-      try {
-        const expirTime = locStorage.get(CAPTCHA_EXPIRATION_TIME_KEY);
-        const currentDate = new Date().getTime();
-        if (expirTime && currentDate < expirTime) {
-          isCaptcha.value = true;
-          return false;
-        }
-        loading.value = true;
-        let res = await getCaptcha({
-          account: unref(formValue).account,
-          password: md5(unref(formValue).password),
-        });
+    // const getCaptchaData = async () => {
+    //   try {
+    //     const expirTime = locStorage.get(CAPTCHA_EXPIRATION_TIME_KEY);
+    //     const currentDate = new Date().getTime();
+    //     if (expirTime && currentDate < expirTime) {
+    //       isCaptcha.value = true;
+    //       return false;
+    //     }
+    //     loading.value = true;
+    //     let res = await getCaptcha({
+    //       account: unref(formValue).account,
+    //       password: md5(unref(formValue).password),
+    //     });
 
-        if (res.data.expirationTime) {
-          locStorage.set(CAPTCHA_EXPIRATION_TIME_KEY, res.data.expirationTime, 180);
-        }
+    //     if (res.data.expirationTime) {
+    //       locStorage.set(CAPTCHA_EXPIRATION_TIME_KEY, res.data.expirationTime, 180);
+    //     }
 
-        isCaptcha.value = true;
-        loading.value = false;
-      } catch (err) {
-        isCaptcha.value = false;
-        console.log(err);
-        loading.value = false;
-      }
-    };
+    //     isCaptcha.value = true;
+    //     loading.value = false;
+    //   } catch (err) {
+    //     isCaptcha.value = false;
+    //     console.log(err);
+    //     loading.value = false;
+    //   }
+    // };
 
-    const { login } = useAppUserStore();
-    const loginUser = async () => {
-      loading.value = true;
-      try {
-        await login({
-          account: unref(formValue).account,
-          password: md5(unref(formValue).password),
-          captcha: unref(formValue).captcha,
-        });
-        message.success("登录成功，即将进入系统");
-        setTimeout(() => {
-          loading.value = false;
-          const { query } = route;
+    // const { login } = useAppUserStore();
+    // const loginUser = async () => {
+    //   loading.value = true;
+    //   try {
+    //     await login({
+    //       account: unref(formValue).account,
+    //       password: md5(unref(formValue).password),
+    //       captcha: unref(formValue).captcha,
+    //     });
+    //     message.success("登录成功，即将进入系统");
+    //     setTimeout(() => {
+    //       loading.value = false;
+    //       const { query } = route;
 
-          if (query.redirect) {
-            router.replace({ path: query.redirect as string });
-          } else {
-            router.replace({ path: "/dashboard" });
-          }
-        }, 1000);
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    };
+    //       if (query.redirect) {
+    //         router.replace({ path: query.redirect as string });
+    //       } else {
+    //         router.replace({ path: "/dashboard" });
+    //       }
+    //     }, 1000);
+    //   } catch (err) {
+    //     console.log(err);
+    //     loading.value = false;
+    //   }
+    // };
 
     const handleSubmit = (e: MouseEvent) => {
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
-          isCaptcha.value ? loginUser() : getCaptchaData();
+          message.success("登录成功，即将进入系统");
+          setTimeout(() => {
+            loading.value = false;
+            const { query } = route;
+
+            if (query.redirect) {
+              router.replace({ path: query.redirect as string });
+            } else {
+              router.replace({ path: "/dashboard" });
+            }
+          }, 1000);
+          //   isCaptcha.value ? loginUser() : getCaptchaData();
         } else {
           console.log(errors);
         }

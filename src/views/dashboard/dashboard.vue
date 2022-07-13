@@ -1,13 +1,5 @@
 <template>
-  <div class="dashboard">
-    <n-result title="益民出行欢迎您" description="" class="mt-90px">
-      <template #icon>
-        <div class="h-130px">
-          <img src="../../assets/image/logo.png" alt="" />
-        </div>
-      </template>
-    </n-result>
-  </div>
+  <div class="dashboard">dashboard</div>
 </template>
 <script lang="ts" setup></script>
 <style lang="scss">

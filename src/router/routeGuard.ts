@@ -25,21 +25,21 @@ export function createRouterGuard(router: Router) {
       return;
     }
 
-    const token = locStorage.get(ACCESS_TOKEN_KEY);
-    if (!token){
-        const redirectData: { path: string; replace: boolean; query?: Recordable<string> } = {
-            path: LOGIN_PATH,
-            replace: true,
-        };
-        if (to.path) {
-            redirectData.query = {
-            ...redirectData.query,
-            redirect: to.path,
-            };
-        }
-        next(redirectData);
-        return;
-    }
+    // const token = locStorage.get(ACCESS_TOKEN_KEY);
+    // if (!token){
+    //     const redirectData: { path: string; replace: boolean; query?: Recordable<string> } = {
+    //         path: LOGIN_PATH,
+    //         replace: true,
+    //     };
+    //     if (to.path) {
+    //         redirectData.query = {
+    //         ...redirectData.query,
+    //         redirect: to.path,
+    //         };
+    //     }
+    //     next(redirectData);
+    //     return;
+    // }
     // const routeStore = useAppRouteStore()
     // const routes = await routeStore.generateRoutes();
 
