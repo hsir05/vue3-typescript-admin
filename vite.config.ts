@@ -3,6 +3,7 @@ import { wrapperEnv } from "./build/utils";
 import { createVitePlugins } from "./build/vite/plugin";
 import { resolve } from "path";
 import { loadEnv } from "vite";
+import { createViteProxy } from './build/proxy'
 import pkg from "./package.json";
 import { format } from "date-fns";
  
@@ -18,6 +19,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   const viteEnv = wrapperEnv(env);
   const { VITE_PUBLIC_PATH, VITE_PORT, VITE_DROP_CONSOLE } = viteEnv;
   const isBuild = command === "build";
+  const isOpenProxy = viteEnv.VITE_HTTP_PROXY === true
 
   return {
     base: VITE_PUBLIC_PATH, //开发或生产环境服务的 公共基础路径
@@ -28,7 +30,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           find: /\/#\//,
           replacement: resolve(process.cwd(), ".", "types") + "/",
         },
-        {
+        { 
           find: "@",
           replacement: resolve(process.cwd(), ".", "src") + "/",
         },
@@ -48,17 +50,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       },
     },
     server: {
-      host: true,
+      host: '0.0.0.0',
       port: VITE_PORT,
-    //   proxy: {
-    //     "/api": {
-    //       target: "xxxx",
-    //       changeOrigin: true, // 默认changeOrigin的值是true,意味着host设置成target
-    //       rewrite: (path) => {
-    //           return path.replace("/api", "")
-    //       },
-    //     },
-    //   },
+      open: true,
+      proxy: createViteProxy(isOpenProxy)
     },
     optimizeDeps: {
       //在预构建中强制排除的依赖项。
