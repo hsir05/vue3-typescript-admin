@@ -1,5 +1,5 @@
 <template>
-  <div>Profile</div>
+  <div class="w-full bg-white h-full">Profile</div>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";

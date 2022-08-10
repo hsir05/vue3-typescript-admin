@@ -14,23 +14,6 @@ export const menuOptions: MenuOption[] = [
     path: "/dashboard",
     icon: renderIcon(SpeedomeIcon),
   },
-  {
-    label: "系统管理",
-    key: "/system",
-    icon: renderIcon(AlbumIcon),
-    children: [
-      {
-        label: "用户管理",
-        path: "/system/user",
-        key: "/system/user",
-      },
-      {
-        label: "角色管理",
-        path: "/system/role",
-        key: "/system/role",
-      },
-    ],
-  },
     {
       label: "设置管理",
       key: "bear-setting",

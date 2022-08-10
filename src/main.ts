@@ -8,15 +8,15 @@ import { setupPinia } from "@/store/index";
 import router from "./router/index"
 
 async function setupApp() {
-  const app = createApp(App);
+    const app = createApp(App);
 
-  setupRouter(app);
+    setupRouter(app);
 
-  setupPinia(app);
+    setupPinia(app);
 
-   await router.isReady();
+    await router.isReady();
 
-  app.mount("#app");
+    app.mount("#app");
 }
 
 setupApp();
