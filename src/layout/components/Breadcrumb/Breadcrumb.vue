@@ -10,13 +10,15 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { useRoute, useRouter, RouteRecordRaw } from "vue-router";
-import routerInstance from "@/router";
+// import routerInstance from "@/router";
+import { routeModuleList } from "@/router/index";
 import { cloneDeep } from "lodash-es";
 
 const currentRoute = useRoute();
 const router = useRouter();
 
-const routerOptions = cloneDeep(routerInstance.options.routes);
+// const routerOptions = cloneDeep(routerInstance.options.routes);
+const routerOptions = cloneDeep(routeModuleList);
 
 interface BreadcrumbInter {
   label: string;
@@ -48,6 +50,7 @@ function getCurrentRoute(arr: RouteRecordRaw[]) {
           key: key.path,
           children: child,
         });
+        break;
       }
     }
   }

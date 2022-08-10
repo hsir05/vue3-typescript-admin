@@ -5,7 +5,7 @@ import { RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute } from "@/router/b
 
 const modules = import.meta.globEager('./modules/**/*.ts');
 
-const routeModuleList: RouteRecordRaw[] = [];
+export const routeModuleList: RouteRecordRaw[] = [];
 
 Object.keys(modules).forEach((key) => {
   const mod = modules[key].default || {};
@@ -19,6 +19,7 @@ function sortRoute(a:any, b:any) {
 }
 
 routeModuleList.sort(sortRoute);
+
 
 //无需验证权限
 export const constantRouter: RouteRecordRaw[] = [ RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute];

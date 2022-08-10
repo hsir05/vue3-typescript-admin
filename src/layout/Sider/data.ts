@@ -1,7 +1,6 @@
 import type { MenuOption } from "naive-ui";
 import {
   SpeedometerOutline as SpeedomeIcon,
-  AlbumsOutline as AlbumIcon,
   SettingsOutline as SettingsIcon,
   ReaderOutline as ReaderOutIcon
 } from "@vicons/ionicons5";

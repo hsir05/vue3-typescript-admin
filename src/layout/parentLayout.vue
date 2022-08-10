@@ -13,32 +13,13 @@
     </n-layout>
   </n-layout>
 </template>
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 import LayoutSider from "./Sider/index.vue";
 import LayoutHeader from "./Header/index.vue";
 import LayoutFooter from "./Footer/index.vue";
 import LayoutContent from "./Content/index.vue";
 import Tabs from "./Tabs/index.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
-export default defineComponent({
-  name: "ParentLayout",
-  components: {
-    LayoutSider,
-    LayoutHeader,
-    LayoutFooter,
-    LayoutContent,
-    Tabs,
-  },
-  setup() {
-    const { isTabs, getCollapsed, navMode, showFooter } = useProjectSetting();
 
-    return {
-      isTabs,
-      getCollapsed,
-      navMode,
-      showFooter,
-    };
-  },
-});
+const { isTabs, getCollapsed, navMode, showFooter } = useProjectSetting();
 </script>
