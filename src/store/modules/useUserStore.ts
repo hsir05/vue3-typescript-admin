@@ -5,6 +5,7 @@ import router from "@/router/index"
 // import { ACCESS_TOKEN_KEY, USER_INFO_KEY, EXP_KEY } from "@/config/constant";
 import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
 // import { login, getDetailViaLoginer, getLoginerAuth, refreshToken } from "@/api/system/system";
+import {login} from "@/api/system/login"
 import { loginInter } from "@/api/type";
 import Avatar from "@/assets/image/default-avatar.png";
 
@@ -82,7 +83,8 @@ export const useAppUserStore = defineStore({
       return new Promise(async (resolve, reject) => {
         try {
             console.log(form);
-            
+            let res = await login()
+            console.log(res);
        
         //   const { token, iat, exp } = res.data;
         //   console.log(iat);

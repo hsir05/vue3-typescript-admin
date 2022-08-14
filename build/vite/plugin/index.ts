@@ -5,9 +5,9 @@ import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import { visualizer } from "rollup-plugin-visualizer";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { configCompressPlugin } from "./compress";
-import WindiCSS from "vite-plugin-windicss";
+import Unocss from 'unocss/vite'
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
-import path from "path";
+import path from "path"; 
 
 export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
   const { VITE_GLOB_APP_SHORT_NAME } = env;
@@ -18,6 +18,7 @@ export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
 
   const vitePlugins: (Plugin | Plugin[] | PluginOption[])[] = [
     vue(),
+    Unocss(),
     Components({
       resolvers: [NaiveUiResolver()],
     }),
@@ -34,11 +35,11 @@ export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
         },
       },
     }),
-    WindiCSS(),
     createSvgIconsPlugin({
       iconDirs: [path.resolve(process.cwd(), "src/assets/icons")],
       symbolId: "icon-[dir]-[name]",
     }),
+    
   ];
 
   if (isBuild) {

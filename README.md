@@ -162,6 +162,4 @@ pnpm dev // 启动
 
     ```
 
-7. css原子化 windicss
 
-   [windi 官网](https://windicss.org/integrations/vite.html)

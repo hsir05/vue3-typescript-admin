@@ -7,7 +7,7 @@
       <div class="login-left">
         <div class="login-title">
           <div class="login-title-img">
-            <img src="../../../assets/image/logo.png" alt="logo" style="width: 100%" />
+            <img src="../../../assets/image/logo.svg" alt="logo" style="width: 100%" />
           </div>
         </div>
         <div class="login-left-img">
@@ -72,12 +72,12 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { FormInst, useMessage } from "naive-ui";
 import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
 // import { getCaptcha } from "@/api/system/system";
-// import { useAppUserStore } from "@/store/modules/useUserStore";
+import { useAppUserStore } from "@/store/modules/useUserStore";
 // import md5 from "blueimp-md5";
 import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";
 import { locStorage } from "@/utils/storage";
@@ -104,7 +104,7 @@ export default defineComponent({
 
     const autoLogin = ref(true);
 
-    const formValue = reactive({
+    const formValue = ref({
       account: "h",
       password: "password",
       captcha: "123456",
@@ -146,48 +146,34 @@ export default defineComponent({
     //   }
     // };
 
-    // const { login } = useAppUserStore();
-    // const loginUser = async () => {
-    //   loading.value = true;
-    //   try {
-    //     await login({
-    //       account: unref(formValue).account,
-    //       password: md5(unref(formValue).password),
-    //       captcha: unref(formValue).captcha,
-    //     });
-    //     message.success("登录成功，即将进入系统");
-    //     setTimeout(() => {
-    //       loading.value = false;
-    //       const { query } = route;
+    const { login } = useAppUserStore();
 
-    //       if (query.redirect) {
-    //         router.replace({ path: query.redirect as string });
-    //       } else {
-    //         router.replace({ path: "/dashboard" });
-    //       }
-    //     }, 1000);
-    //   } catch (err) {
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
+    const loginUser = async () => {
+      loading.value = true;
+      try {
+        await login({ ...formValue.value });
+        message.success("登录成功，即将进入系统");
+        setTimeout(() => {
+          loading.value = false;
+          const { query } = route;
+          if (query.redirect) {
+            router.replace({ path: query.redirect as string });
+          } else {
+            router.replace({ path: "/dashboard" });
+          }
+          loading.value = false;
+        }, 1000);
+      } catch (err) {
+        console.log(err);
+        loading.value = false;
+      }
+    };
 
     const handleSubmit = (e: MouseEvent) => {
       e.preventDefault();
       formRef.value?.validate((errors) => {
         if (!errors) {
-          message.success("登录成功，即将进入系统");
-          setTimeout(() => {
-            loading.value = false;
-            const { query } = route;
-
-            if (query.redirect) {
-              router.replace({ path: query.redirect as string });
-            } else {
-              router.replace({ path: "/dashboard" });
-            }
-          }, 1000);
-          //   isCaptcha.value ? loginUser() : getCaptchaData();
+          loginUser();
         } else {
           console.log(errors);
         }

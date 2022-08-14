@@ -303,7 +303,7 @@ const transform: AxiosTransform = {
 };
 
 function createAxios(opt?: Partial<CreateAxiosOptions>) {
-  return new VAxios(
+  return new VAxios( 
     deepMerge(
       {
         timeout: 50000,

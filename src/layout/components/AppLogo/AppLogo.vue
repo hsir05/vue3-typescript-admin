@@ -1,6 +1,6 @@
 <template>
   <div class="app-logo" :style="`${getCollapsed ? 'width:100%' : 'width:200px'}`">
-    <img src="../../../assets/image/logo.png" class="w-30px mr-10px rounded" alt="logo" />
+    <img src="../../../assets/image/logo.svg" class="w-30px mr-10px rounded" alt="logo" />
     <span :class="['logo-title', getCollapsed ? 'logo-title-no-active' : 'logo-title-active']">{{
       title
     }}</span>
