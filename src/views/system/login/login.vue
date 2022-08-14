@@ -105,7 +105,7 @@ export default defineComponent({
     const autoLogin = ref(true);
 
     const formValue = ref({
-      account: "h",
+      account: "admin",
       password: "password",
       captcha: "123456",
     });
@@ -226,7 +226,7 @@ export default defineComponent({
     width: 45%;
     background: url("../../../assets/image/login-bg2.png") center no-repeat;
     background-size: cover;
-    padding: 64px 70px;
+    padding: 30px 70px;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
   }
