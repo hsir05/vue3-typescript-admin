@@ -1,6 +1,6 @@
 import type { UserConfig, ConfigEnv } from "vite";
 import { wrapperEnv } from "./build/utils";
-import { createVitePlugins } from "./build/vite/plugin";
+import { createVitePlugins } from "./build";
 import { resolve } from "path";
 import { loadEnv } from "vite";
 import { createViteProxy } from './build/proxy'
@@ -17,9 +17,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   const root = process.cwd(); // 项目根目录
   const env = loadEnv(mode, root);
   const viteEnv = wrapperEnv(env);
-  const { VITE_PUBLIC_PATH, VITE_PORT, VITE_DROP_CONSOLE } = viteEnv;
+  const { VITE_PUBLIC_PATH, VITE_PORT, VITE_DROP_CONSOLE, VITE_HTTP_PROXY } = viteEnv;
   const isBuild = command === "build";
-  const isOpenProxy = viteEnv.VITE_HTTP_PROXY === true
+  const isOpenProxy = VITE_HTTP_PROXY === true 
 
   return {
     base: VITE_PUBLIC_PATH, //开发或生产环境服务的 公共基础路径

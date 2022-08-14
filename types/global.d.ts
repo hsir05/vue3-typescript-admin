@@ -61,7 +61,7 @@ declare global {
     path?: EventTarget[];
   }
 
-  interface ImportMetaEnv extends ViteEnv {
+  interface ImportMetaEnv extends ViteEnv { 
     __: unknown;
   }
 
@@ -69,6 +69,7 @@ declare global {
     VITE_PORT: number;
     VITE_USE_MOCK: boolean; 
     VITE_PUBLIC_PATH: string;
+    VITE_HTTP_PROXY: boolean;
     // VITE_GLOB_APP_TITLE: string;
     VITE_GLOB_APP_SHORT_NAME: string;
     VITE_DROP_CONSOLE: boolean;
