@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     redirect:'/dashboard',
     meta: {
       title: '主页',
-       viewType: 'single',
+      viewType: 'single',
       icon: renderIcon(HomeOutline),
     },
     children: [
