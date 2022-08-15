@@ -4,15 +4,7 @@ import { createVitePlugins } from "./build";
 import { resolve } from "path";
 import { loadEnv } from "vite";
 import { createViteProxy } from './build/proxy'
-import pkg from "./package.json";
-import { format } from "date-fns";
  
-const { dependencies, devDependencies, name, version } = pkg;
-const __APP_INFO__ = {
-  pkg: { dependencies, devDependencies, name, version },
-  lastBuildTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
-};
-
 export default ({ command, mode }: ConfigEnv): UserConfig => {
   const root = process.cwd(); // 项目根目录
   const env = loadEnv(mode, root);
@@ -36,10 +28,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         },
       ],
       dedupe: ["vue"],
-    },
-    define: {
-      // 定义全局变量替换方式。每项在开发时会被定义为全局变量，而在构建时则是静态替换
-      __APP_INFO__: JSON.stringify(__APP_INFO__),
     },
     css: {
       preprocessorOptions: {
@@ -68,7 +56,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           // 通过false以完全跳过压缩。传递一个对象以指定自定义压缩选项。
           keep_infinity: true,
           drop_console: VITE_DROP_CONSOLE,
-        //   drop_console: false,
         },
       },
       brotliSize: false, //启用/禁用 brotli 压缩大小报告

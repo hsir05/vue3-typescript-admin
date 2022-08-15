@@ -28,8 +28,6 @@ declare global {
     isRefreshing: boolean
   }
 
-  declare const BMap: any
-
   // vue
   declare type PropType<T> = VuePropType<T>;
   declare type VueNode = VNodeChild | JSX.Element;
