@@ -28,6 +28,7 @@ interface BreadcrumbInter {
 
 function getCurrentRoute(arr: RouteRecordRaw[]) {
   let rotueArr: BreadcrumbInter[] = [];
+
   for (let key of arr) {
     if (key.path === currentRoute.path) {
       rotueArr.push({ key: key.path, label: key.meta?.title as string });
@@ -38,18 +39,26 @@ function getCurrentRoute(arr: RouteRecordRaw[]) {
       );
       if (item) {
         let child: BreadcrumbInter[] = [];
-        if (key.children && key.children.length > 0) {
+        if (key.children && key.children.length > 0 && !key.meta?.viewType) {
           for (let value of key.children) {
             if (!value.meta?.activeBreadcrumb) {
               child.push({ key: value.path, label: value.meta?.title as string });
             }
           }
         }
-        rotueArr.push({
-          label: key.meta?.title as string,
-          key: key.path,
-          children: child,
-        });
+        if (key.meta?.viewType && key.meta?.viewType === "single") {
+          rotueArr.push({
+            label: key.meta?.title as string,
+            key: key.path,
+          });
+        } else {
+          rotueArr.push({
+            label: key.meta?.title as string,
+            key: key.path,
+            children: child,
+          });
+        }
+
         break;
       }
     }
@@ -59,15 +68,17 @@ function getCurrentRoute(arr: RouteRecordRaw[]) {
 
 const options = ref<BreadcrumbInter[]>([]);
 
-options.value = getCurrentRoute(routerOptions);
-options.value.push({ label: currentRoute.meta?.title as string, key: currentRoute.path });
+// options.value = getCurrentRoute(routerOptions);
+// options.value.push({ label: currentRoute.meta?.title as string, key: currentRoute.path });
 
 watch(
   () => router.currentRoute.value.path,
   () => {
     options.value = [];
     options.value = getCurrentRoute(routerOptions);
-    options.value.push({ label: currentRoute.meta?.title as string, key: currentRoute.path });
+    if (!currentRoute.meta?.viewType) {
+      options.value.push({ label: currentRoute.meta?.title as string, key: currentRoute.path });
+    }
   },
   { immediate: true }
 );

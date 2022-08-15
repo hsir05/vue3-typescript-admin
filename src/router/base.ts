@@ -1,15 +1,15 @@
-import { PageEnum } from "@/enums/pageEnum";
+// import { PageEnum } from "@/enums/pageEnum";
 import { RouteRecordRaw } from "vue-router";
 import { PARENTLAYOUT, ERRORPAGE, REDIRECT_NAME } from "./constant";
 
-export const RootRoute: RouteRecordRaw = {
-  path: '/',
-  name: 'Root',
-  redirect: PageEnum.BASE_HOME,
-  meta: {
-    title: 'Root',
-  },
-};
+// export const RootRoute: RouteRecordRaw = {
+//   path: '/',
+//   name: 'Root',
+//   redirect: PageEnum.BASE_HOME,
+//   meta: {
+//     title: 'Root',
+//   },
+// };
 
 export const LoginRoute: RouteRecordRaw = {
   path: '/login',

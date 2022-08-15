@@ -15,35 +15,35 @@ export const menuOptions: MenuOption[] = [
   },
     {
       label: "设置管理",
-      key: "bear-setting",
+      key: "/setting",
       icon: renderIcon(SettingsIcon),
       children: [
         {
           label: "个人设置",
           path: "/setting/profile",
-          key: "bear-setting-setting",
+          key: "/setting/profile",
         },
       ],
     },
     {
       label: '异常页面',
-      key: 'bear-exception',
+      key: '/exception',
       icon: renderIcon(ReaderOutIcon),
       children: [
         {
           label: '403',
           path: "/exception/403",
-          key: 'protect-wild-animals-403'
+          key: '/exception/403'
         },
         {
           label: '404',
           path: "/exception/404",
-          key: 'protect-wild-animals-404'
+          key: '/exception/404'
         },
         {
           label: '500',
           path: "/exception/500",
-          key: 'protect-wild-animals-500'
+          key: '/exception/500'
         },
       ]
     }

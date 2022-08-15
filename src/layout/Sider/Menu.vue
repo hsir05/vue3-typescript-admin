@@ -60,7 +60,7 @@ const state = reactive({
 watch(
   () => currentRoute.fullPath,
   () => {
-    // // updateMenu();
+    // updateMenu();
     const matched = currentRoute.matched;
     state.openKeys = matched.map((item) => item.path);
     const activeMenu: string = (currentRoute.meta?.activeMenu as string) || "";

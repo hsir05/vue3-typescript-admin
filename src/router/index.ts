@@ -1,7 +1,7 @@
 import { App } from "vue";
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import { createRouterGuard } from "./routeGuard";
-import { RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute } from "@/router/base";
+import { LoginRoute, RedirectRoute, ErrorPageRoute } from "@/router/base";
 
 const modules = import.meta.globEager('./modules/**/*.ts');
 
@@ -22,7 +22,8 @@ routeModuleList.sort(sortRoute);
 
 
 //无需验证权限
-export const constantRouter: RouteRecordRaw[] = [ RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute];
+// export const constantRouter: RouteRecordRaw[] = [ RootRoute, LoginRoute, RedirectRoute, ErrorPageRoute];
+export const constantRouter: RouteRecordRaw[] = [  LoginRoute, RedirectRoute, ErrorPageRoute];
 
 const router = createRouter({
   history: createWebHashHistory(''),

@@ -5,11 +5,13 @@ import { renderIcon } from '@/utils/index';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/dashboard',
+    path: '/',
     name: 'dashboard',
     component: PARENTLAYOUT, 
+    redirect:'/dashboard',
     meta: {
       title: '主页',
+       viewType: 'single',
       icon: renderIcon(HomeOutline),
     },
     children: [
@@ -17,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/dashboard',
         name: `dashboard`,
         meta: {
-          title: '主页',
+          title: '主页'
         },
         component: () => import('@/views/dashboard/dashboard.vue'),
       },
