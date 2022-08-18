@@ -51,6 +51,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     build: {
       target: "es2015",
       outDir: "dist", //指定输出路径
+      minify: 'terser',
       terserOptions: {
         compress: {
           // 通过false以完全跳过压缩。传递一个对象以指定自定义压缩选项。
