@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="login-form">
-        <span class="login-form-title">综合管理平台</span>
+        <span class="login-form-title">综合管理系统</span>
         <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
           <n-form-item path="account">
             <n-input
