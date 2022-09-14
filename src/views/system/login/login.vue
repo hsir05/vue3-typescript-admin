@@ -21,7 +21,7 @@
       <div class="login-form">
         <span class="login-form-title">综合管理系统</span>
         <div class="login-type">
-          <span class="login-type-item">密码登录</span>
+          <span class="login-type-item tab-active">密码登录</span>
           <span class="login-type-item">验证码登录</span>
         </div>
         <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
@@ -202,7 +202,13 @@ export default defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
-
+  .tab-active {
+    &:after {
+      width: 100%;
+      height: 2px;
+      background-color: red;
+    }
+  }
   .login-mobile-logo {
     display: none;
   }
