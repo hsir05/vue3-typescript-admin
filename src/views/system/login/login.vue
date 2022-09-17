@@ -19,7 +19,11 @@
         </div>
       </div>
       <div class="login-form">
-        <span class="login-form-title">综合管理平台</span>
+        <span class="login-form-title">综合管理系统</span>
+        <div class="login-type">
+          <span class="login-type-item tab-active">密码登录</span>
+          <span class="login-type-item">验证码登录</span>
+        </div>
         <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
           <n-form-item path="account">
             <n-input
@@ -198,7 +202,13 @@ export default defineComponent({
   position: relative;
   width: 100%;
   height: 100%;
-
+  .tab-active {
+    &:after {
+      width: 100%;
+      height: 2px;
+      background-color: red;
+    }
+  }
   .login-mobile-logo {
     display: none;
   }
@@ -263,7 +273,7 @@ export default defineComponent({
   .login-form {
     width: 55%;
     background-color: #ffffff;
-    padding: 70px 115px;
+    padding: 40px 115px 0;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
@@ -275,9 +285,17 @@ export default defineComponent({
     color: rgba(51, 51, 51, 1);
     line-height: 23px;
     display: inline-block;
-    margin-bottom: 30px;
   }
-
+  .login-type {
+    // padding: 15px 0;
+    font-size: 16px;
+  }
+  .login-type-item {
+    padding: 30px 0;
+    width: 100px;
+    display: inline-block;
+    cursor: pointer;
+  }
   .captcha {
     height: 35px;
     width: 22%;
