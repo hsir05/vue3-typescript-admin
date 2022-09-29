@@ -19,182 +19,32 @@
         </div>
       </div>
       <div class="login-form">
-        <span class="login-form-title">综合管理系统</span>
-        <div class="login-type">
-          <span class="login-type-item tab-active">密码登录</span>
-          <span class="login-type-item">验证码登录</span>
-        </div>
-        <n-form ref="formRef" label-placement="left" size="large" :model="formValue" :rules="rules">
-          <n-form-item path="account">
-            <n-input
-              v-model:value="formValue.account"
-              @keyup.enter="handleSubmit"
-              placeholder="请输入用户名"
-            >
-              <template #prefix>
-                <n-icon size="18" color="#808695">
-                  <PersonOutline />
-                </n-icon>
-              </template>
-            </n-input>
-          </n-form-item>
-          <n-form-item path="password">
-            <n-input
-              @keyup.enter="handleSubmit"
-              v-model:value="formValue.password"
-              type="password"
-              showPasswordOn="click"
-              placeholder="请输入密码"
-            >
-              <template #prefix>
-                <n-icon size="18" color="#808695">
-                  <LockClosedOutline />
-                </n-icon>
-              </template>
-            </n-input>
-          </n-form-item>
+        <span class="login-form-title mb-30px">综合管理系统</span>
 
-          <n-form-item path="captcha" v-show="isCaptcha">
-            <n-input
-              v-model:value="formValue.captcha"
-              @keyup.enter="handleSubmit"
-              maxlength="4"
-              placeholder="请输入验证码"
-            />
-          </n-form-item>
-
-          <n-form-item>
-            <n-button type="primary" class="login-btn" :loading="loading" @click="handleSubmit">
-              {{ isCaptcha ? "登录" : "下一步" }}
-            </n-button>
-          </n-form-item>
-
-          <span class="tips">如果登录遇到问题， 请联系客服</span>
-        </n-form>
+        <n-tabs
+          class="card-tabs"
+          default-value="signin"
+          size="large"
+          animated
+          style="margin: 0 -4px"
+          pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
+        >
+          <n-tab-pane name="signin" tab="密码登录">
+            <Password />
+          </n-tab-pane>
+          <n-tab-pane name="signup" tab="验证码登录" />
+        </n-tabs>
       </div>
     </div>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { FormInst, useMessage } from "naive-ui";
-import { PersonOutline, LockClosedOutline } from "@vicons/ionicons5";
-// import { getCaptcha } from "@/api/system/system";
-import { useAppUserStore } from "@/store/modules/useUserStore";
-// import md5 from "blueimp-md5";
-import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";
-import { locStorage } from "@/utils/storage";
+<script lang="ts" setup>
+// import { ref, onMounted } from "vue";
 
-export default defineComponent({
-  name: "Login",
-  components: {
-    PersonOutline,
-    LockClosedOutline,
-  },
-  setup() {
-    const router = useRouter();
-    const route = useRoute();
-    const formRef = ref<FormInst | null>(null);
-    const message = useMessage();
-    const loading = ref(false);
-    const isCaptcha = ref(false);
-
-    const rules = {
-      account: { required: true, message: "请输入用户名", trigger: "blur" },
-      password: { required: true, message: "请输入密码", trigger: "blur" },
-      captcha: { required: true, message: "请输入验证码", trigger: "blur" },
-    };
-
-    const autoLogin = ref(true);
-
-    const formValue = ref({
-      account: "admin",
-      password: "password",
-      captcha: "123456",
-    });
-
-    onMounted(() => {
-      const expirTime = locStorage.get(CAPTCHA_EXPIRATION_TIME_KEY);
-      const currentDate = new Date().getTime();
-      if (expirTime && currentDate < expirTime) {
-        isCaptcha.value = true;
-        return false;
-      }
-    });
-
-    // const getCaptchaData = async () => {
-    //   try {
-    //     const expirTime = locStorage.get(CAPTCHA_EXPIRATION_TIME_KEY);
-    //     const currentDate = new Date().getTime();
-    //     if (expirTime && currentDate < expirTime) {
-    //       isCaptcha.value = true;
-    //       return false;
-    //     }
-    //     loading.value = true;
-    //     let res = await getCaptcha({
-    //       account: unref(formValue).account,
-    //       password: md5(unref(formValue).password),
-    //     });
-
-    //     if (res.data.expirationTime) {
-    //       locStorage.set(CAPTCHA_EXPIRATION_TIME_KEY, res.data.expirationTime, 180);
-    //     }
-
-    //     isCaptcha.value = true;
-    //     loading.value = false;
-    //   } catch (err) {
-    //     isCaptcha.value = false;
-    //     console.log(err);
-    //     loading.value = false;
-    //   }
-    // };
-
-    const { login } = useAppUserStore();
-
-    const loginUser = async () => {
-      loading.value = true;
-      try {
-        await login({ ...formValue.value });
-        message.success("登录成功，即将进入系统");
-        setTimeout(() => {
-          loading.value = false;
-          const { query } = route;
-          if (query.redirect) {
-            router.replace({ path: query.redirect as string });
-          } else {
-            router.replace({ path: "/dashboard" });
-          }
-          loading.value = false;
-        }, 1000);
-      } catch (err) {
-        console.log(err);
-        loading.value = false;
-      }
-    };
-
-    const handleSubmit = (e: MouseEvent) => {
-      e.preventDefault();
-      formRef.value?.validate((errors) => {
-        if (!errors) {
-          loginUser();
-        } else {
-          console.log(errors);
-        }
-      });
-    };
-    return {
-      formRef,
-      rules,
-      isCaptcha,
-      autoLogin,
-      formValue,
-      loading,
-
-      handleSubmit,
-    };
-  },
-});
+import Password from "./password.vue";
+// // import md5 from "blueimp-md5";
+// import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";
+// import { locStorage } from "@/utils/storage";
 </script>
 <style lang="scss">
 .login-container {
@@ -286,16 +136,7 @@ export default defineComponent({
     line-height: 23px;
     display: inline-block;
   }
-  .login-type {
-    // padding: 15px 0;
-    font-size: 16px;
-  }
-  .login-type-item {
-    padding: 30px 0;
-    width: 100px;
-    display: inline-block;
-    cursor: pointer;
-  }
+
   .captcha {
     height: 35px;
     width: 22%;
