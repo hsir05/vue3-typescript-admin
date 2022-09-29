@@ -1,6 +1,6 @@
 <template>
   <div class="text-center err-page h-full">
-    <div class="w-400px h-400px mt-80px">
+    <div class="w-350px h-350px mt-80px">
       <svg-no-permission v-if="type === '403'" />
       <svg-not-found v-if="type === '404'" />
       <svg-service-error v-if="type === '500'" />
@@ -23,6 +23,7 @@ interface Props {
 }
 
 defineProps<Props>();
+defineExpose({ appTheme });
 </script>
 <style lang="scss" scoped>
 .err-page {
