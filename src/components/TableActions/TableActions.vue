@@ -95,6 +95,7 @@ export default defineComponent({
     const getActions = computed(() => {
       return (toRaw(props.actions) || [])
         .filter((action) => {
+          // 获取权限
           return hasPermission(action.auth);
         })
         .map((action) => {
