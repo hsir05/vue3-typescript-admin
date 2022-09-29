@@ -35,13 +35,22 @@
         </template>
       </n-input>
     </n-form-item>
+    <div class="other mb-5px">
+      <router-link class="resetPWd" to="/resetPwd">忘记密码?</router-link>
+    </div>
+    <n-form-item path="isAgree" class="policy-checkbox h-50px">
+      <span class="privacy-policy">
+        <n-checkbox v-model:checked="formValue.isAgree" class="mr-10px" />已阅读并同意帐号
+        <a href="" class="policy">用户协议</a> 和 <a href="" class="policy">隐私政策</a>
+      </span>
+    </n-form-item>
 
     <n-form-item>
       <n-button type="primary" class="login-btn" :loading="loading" @click="handleSubmit">
         登录
       </n-button>
     </n-form-item>
-    <span class="tips">如果登录遇到问题， 请联系客服</span>
+    <!-- <span class="tips">如果登录遇到问题， 请联系客服</span> -->
   </n-form>
 </template>
 <script lang="ts" setup>
@@ -98,11 +107,21 @@ const handleSubmit = (e: MouseEvent) => {
 const rules = {
   account: { required: true, message: "请输入用户名", trigger: "blur" },
   password: { required: true, message: "请输入密码", trigger: "blur" },
-  captcha: { required: true, message: "请输入验证码", trigger: "blur" },
 };
 </script>
 <style lang="scss" scoped>
 .tips {
   color: #617288;
+}
+.resetPWd {
+  font-size: 12px;
+  color: rgba(51, 51, 51, 1);
+}
+.privacy-policy {
+  font-size: 12px;
+  color: rgba(153, 153, 153, 1);
+}
+.policy {
+  color: #333;
 }
 </style>

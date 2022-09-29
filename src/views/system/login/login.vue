@@ -30,16 +30,19 @@
           pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
         >
           <n-tab-pane name="signin" tab="密码登录">
-            <Password />
+            <PasswordLogin />
           </n-tab-pane>
-          <n-tab-pane name="signup" tab="验证码登录" />
+          <n-tab-pane name="signup" tab="验证码登录">
+            <CodeLogin />
+          </n-tab-pane>
         </n-tabs>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import Password from "./password.vue";
+import PasswordLogin from "./password.vue";
+import CodeLogin from "./code.vue";
 </script>
 <style lang="scss">
 .login-container {
@@ -47,6 +50,7 @@ import Password from "./password.vue";
   position: relative;
   width: 100%;
   height: 100%;
+
   .tab-active {
     &:after {
       width: 100%;
@@ -54,6 +58,7 @@ import Password from "./password.vue";
       background-color: red;
     }
   }
+
   .login-mobile-logo {
     display: none;
   }
