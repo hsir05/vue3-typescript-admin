@@ -39,12 +39,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-// import { ref, onMounted } from "vue";
-
 import Password from "./password.vue";
-// // import md5 from "blueimp-md5";
-// import { CAPTCHA_EXPIRATION_TIME_KEY } from "@/config/constant";
-// import { locStorage } from "@/utils/storage";
 </script>
 <style lang="scss">
 .login-container {
