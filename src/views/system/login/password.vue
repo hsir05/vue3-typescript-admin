@@ -9,8 +9,10 @@
   >
     <n-form-item path="account">
       <n-input
+        clearable
         v-model:value="formValue.account"
         @keyup.enter="handleSubmit"
+        :maxlength="20"
         placeholder="请输入用户名"
       >
         <template #prefix>
@@ -22,6 +24,7 @@
     </n-form-item>
     <n-form-item path="password">
       <n-input
+        clearable
         @keyup.enter="handleSubmit"
         v-model:value="formValue.password"
         type="password"
@@ -68,9 +71,8 @@ const route = useRoute();
 const router = useRouter();
 const { login } = useAppUserStore();
 const formValue = ref({
-  account: "admin",
-  password: "password",
-  captcha: "123456",
+  account: null,
+  password: null,
 });
 
 const loginUser = async () => {

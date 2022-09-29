@@ -38,5 +38,6 @@ const getHeight = computed(() => {
 .n-layout-content {
   padding: 5px;
   background-color: #f2f3f5;
+  box-sizing: border-box;
 }
 </style>

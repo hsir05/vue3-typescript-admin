@@ -41,6 +41,7 @@ a{
 ::-webkit-scrollbar {
   width: 8px;
   height: 10px;
+  box-sizing: border-box;
 }
 /*---滚动框背景样式--*/
 ::-webkit-scrollbar-track-piece {
