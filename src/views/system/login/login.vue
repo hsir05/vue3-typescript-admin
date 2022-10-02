@@ -5,11 +5,11 @@
     </div>
     <div class="login">
       <div class="login-left">
-        <div class="login-title">
+        <!-- <div class="login-title">
           <div class="login-title-img">
             <img src="../../../assets/image/logo.svg" alt="logo" style="width: 100%" />
           </div>
-        </div>
+        </div> -->
         <div class="login-left-img">
           <img src="../../../assets/image/login-middle.png" style="width: 100%" alt="" />
         </div>
@@ -87,6 +87,7 @@ import CodeLogin from "./code.vue";
     background: url("../../../assets/image/login-bg2.png") center no-repeat;
     background-size: cover;
     padding: 30px 70px;
+    padding-top: 130px;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
   }
