@@ -47,13 +47,11 @@
         <a href="" class="policy">用户协议</a> 和 <a href="" class="policy">隐私政策</a>
       </span>
     </n-form-item>
-
     <n-form-item>
       <n-button type="primary" class="login-btn" :loading="loading" @click="handleSubmit">
         登录
       </n-button>
     </n-form-item>
-    <!-- <span class="tips">如果登录遇到问题， 请联系客服</span> -->
   </n-form>
 </template>
 <script lang="ts" setup>
@@ -73,6 +71,7 @@ const { login } = useAppUserStore();
 const formValue = ref({
   account: null,
   password: null,
+  isAgree: false,
 });
 
 const loginUser = async () => {
@@ -109,20 +108,43 @@ const handleSubmit = (e: MouseEvent) => {
 const rules = {
   account: { required: true, message: "请输入用户名", trigger: "blur" },
   password: { required: true, message: "请输入密码", trigger: "blur" },
+  isAgree: {
+    type: "boolean",
+    required: true,
+    validator() {
+      if (!formValue.value.isAgree) {
+        return new Error("请点击同意帐号用户协议和隐私政策");
+      }
+    },
+    message: "请点击同意帐号用户协议和隐私政策",
+    trigger: ["blur", "change"],
+  },
 };
 </script>
 <style lang="scss" scoped>
+:deep(.policy-checkbox .n-form-item-feedback-wrapper) {
+  font-size: 10px;
+  margin-top: -9px;
+}
+
+:deep(.policy-checkbox n-checkbox__label) {
+  font-size: 12px;
+}
+
 .tips {
   color: #617288;
 }
+
 .resetPWd {
   font-size: 12px;
   color: rgba(51, 51, 51, 1);
 }
+
 .privacy-policy {
   font-size: 12px;
   color: rgba(153, 153, 153, 1);
 }
+
 .policy {
   color: #333;
 }
