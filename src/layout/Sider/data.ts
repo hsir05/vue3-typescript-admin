@@ -2,7 +2,8 @@ import type { MenuOption } from "naive-ui";
 import {
   SpeedometerOutline as SpeedomeIcon,
   SettingsOutline as SettingsIcon,
-  ReaderOutline as ReaderOutIcon
+  ReaderOutline as ReaderOutIcon,
+  FileTray as FileIcon
 } from "@vicons/ionicons5";
 import { renderIcon } from "@/utils/index";
 
@@ -13,6 +14,18 @@ export const menuOptions: MenuOption[] = [
     path: "/dashboard",
     icon: renderIcon(SpeedomeIcon),
   },
+   {
+      label: "插件示例",
+      key: "/plugin",
+      icon: renderIcon(FileIcon),
+      children: [
+        {
+          label: "剪切板",
+          path: "/plugin/copy",
+          key: "/plugin/copy",
+        },
+      ],
+    },
     {
       label: "设置管理",
       key: "/setting",
