@@ -1,12 +1,7 @@
 <template>
-  <div class="w-full bg-white h-full">Profile</div>
+  <div class="profile h-full">
+    <div class="w-full bg-white h-full">Profile</div>
+  </div>
 </template>
-<script lang="ts">
-import { defineComponent } from "vue";
-export default defineComponent({
-  name: "Profile",
-  setup() {
-    return {};
-  },
-});
-</script>
+<script lang="ts" setup></script>
+<style lang="scss" scoped></style>
