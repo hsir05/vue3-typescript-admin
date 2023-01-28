@@ -118,23 +118,6 @@ const reloadPage = () => {
     path: "/redirect" + unref(route).fullPath,
   });
 };
-
-// return {
-//   ...toRefs(state),
-//   drawerSetting,
-//   getCollapsed,
-//   isBreadcrumb,
-//   navMode,
-//   isRefresh,
-//   inverted,
-
-//   openSetting,
-//   reloadPage,
-//   handleCollapsed,
-//   toggleFullScreen,
-// };
-//   },
-// });
 </script>
 <style lang="scss">
 .flex {
