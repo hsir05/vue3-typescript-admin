@@ -20,9 +20,12 @@ import { MenuOption } from "naive-ui";
 import { useRoute, useRouter } from "vue-router";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
 import { menuOptions } from "./data";
+
+type ModeInter = "vertical" | "horizontal";
+
 const props = defineProps({
   mode: {
-    type: String,
+    type: String as PropType<ModeInter>,
     default: "vertical",
   },
   collapsed: {
