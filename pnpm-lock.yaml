@@ -34,7 +34,7 @@ specifiers:
   mrm: ^3.0.10
   naive-ui: ^2.34.3
   nprogress: ^0.2.0
-  pinia: ^2.0.0-rc.10
+  pinia: ^2.0.29
   prettier: ^2.5.1
   qs: ^6.10.3
   rollup-plugin-visualizer: ^5.5.4
@@ -62,7 +62,7 @@ dependencies:
   element-resize-detector: 1.2.4
   lodash-es: 4.17.21
   nprogress: 0.2.0
-  pinia: 2.0.18_typescript@4.7.4+vue@3.2.37
+  pinia: 2.0.29_typescript@4.7.4+vue@3.2.37
   qs: 6.11.0
   vfonts: 0.0.3
   vue: 3.2.37
@@ -1239,6 +1239,10 @@ packages:
 
   /@vue/devtools-api/6.2.1:
     resolution: {integrity: sha512-OEgAMeQXvCoJ+1x8WyQuVZzFo0wcyCmUR3baRVLmKBo1LmYZWMlRiXlux5jd0fqVJu6PfDbOrZItVqUEzLobeQ==}
+    dev: false
+
+  /@vue/devtools-api/6.5.0:
+    resolution: {integrity: sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==}
     dev: false
 
   /@vue/reactivity-transform/3.2.37:
@@ -4839,8 +4843,8 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /pinia/2.0.18_typescript@4.7.4+vue@3.2.37:
-    resolution: {integrity: sha512-I5MW05UVX6a5Djka136oH3VzYFiZUgeOApBwFjMx6pL91eHtGVlE3adjNUKLgtwGnrxiBRuJ8+4R3LKJKwnyZg==}
+  /pinia/2.0.29_typescript@4.7.4+vue@3.2.37:
+    resolution: {integrity: sha512-5z/KpFecq/cIgfeTnulJXldiLcTITRkTe3N58RKYSj0Pc1EdR6oyCdnf5A9jLoVwBqX5LtHhd0kGlpzWvk9oiQ==}
     peerDependencies:
       '@vue/composition-api': ^1.4.0
       typescript: '>=4.4.4'
@@ -4851,7 +4855,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@vue/devtools-api': 6.2.1
+      '@vue/devtools-api': 6.5.0
       typescript: 4.7.4
       vue: 3.2.37
       vue-demi: 0.13.7_vue@3.2.37
