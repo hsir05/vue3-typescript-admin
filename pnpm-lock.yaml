@@ -32,7 +32,7 @@ specifiers:
   lint-staged: '>=10'
   lodash-es: ^4.17.21
   mrm: ^3.0.10
-  naive-ui: ^2.25.2
+  naive-ui: ^2.34.3
   nprogress: ^0.2.0
   pinia: ^2.0.0-rc.10
   prettier: ^2.5.1
@@ -92,7 +92,7 @@ devDependencies:
   husky: 8.0.1
   lint-staged: 13.0.3
   mrm: 3.0.10
-  naive-ui: 2.32.1_vue@3.2.37
+  naive-ui: 2.34.3_vue@3.2.37
   prettier: 2.7.1
   rollup-plugin-visualizer: 5.7.1
   sass: 1.54.4
@@ -717,6 +717,10 @@ packages:
 
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
+    dev: true
+
+  /@types/katex/0.14.0:
+    resolution: {integrity: sha512-+2FW2CcT0K3P+JMR8YG846bmDwplKUTsWgT2ENwdQ1UdVfRk3GQrh6Mi4sTopy30gI8Uau5CEqHTDZ6YvWIUPA==}
     dev: true
 
   /@types/keyv/3.1.4:
@@ -4386,13 +4390,14 @@ packages:
     resolution: {integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==}
     dev: true
 
-  /naive-ui/2.32.1_vue@3.2.37:
-    resolution: {integrity: sha512-4zRHAn9d273qKWHs2ZQ+9xZmGTfxhL/CI1tj8bJkE313zjwyGRaiPbCeh3hQgrNdZWiRXdqmA442EVKHizGWeg==}
+  /naive-ui/2.34.3_vue@3.2.37:
+    resolution: {integrity: sha512-fUMr0dzb/iGsOTWgoblPVobY5X5dihQ1eam5dA+H74oyLYAvgX4pL96xQFPBLIYqvyRFBAsN85kHN5pLqdtpxA==}
     peerDependencies:
       vue: ^3.0.0
     dependencies:
       '@css-render/plugin-bem': 0.15.10_css-render@0.15.10
       '@css-render/vue3-ssr': 0.15.10_vue@3.2.37
+      '@types/katex': 0.14.0
       '@types/lodash': 4.14.182
       '@types/lodash-es': 4.17.6
       async-validator: 4.2.5

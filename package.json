@@ -57,7 +57,7 @@
     "husky": ">=6",
     "lint-staged": ">=10",
     "mrm": "^3.0.10",
-    "naive-ui": "^2.25.2",
+    "naive-ui": "^2.34.3",
     "prettier": "^2.5.1",
     "rollup-plugin-visualizer": "^5.5.4",
     "sass": "^1.49.8",
