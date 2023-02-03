@@ -6,7 +6,7 @@ import router from "@/router/index"
 import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
 // import { login, getDetailViaLoginer, getLoginerAuth, refreshToken } from "@/api/system/system";
 import {login} from "@/api/system/login"
-import { loginInter } from "@/api/type";
+import { ILoginForm } from '@/interface/common/common'
 import Avatar from "@/assets/image/default-avatar.png";
 
 interface RoleInter {
@@ -79,11 +79,11 @@ export const useAppUserStore = defineStore({
     setPermissions(permissions: string[]) {
       this.permissions = permissions;
     },
-    login(form: loginInter) {
+      login(form: ILoginForm) {
       return new Promise(async (resolve, reject) => {
         try {
             console.log(form);
-            let res = await login()
+            let res = await login(form)
             console.log(res);
        
         //   const { token, iat, exp } = res.data;
