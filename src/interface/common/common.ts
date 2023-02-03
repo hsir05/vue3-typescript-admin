@@ -1,15 +1,12 @@
-export interface objInter { 
+export interface IObj { 
   [symbol: string]: string;
 }
 // 登录
-export interface LoginFormInter {
+export interface ILoginForm {
   principal: string
   credentials: string
 }
-interface ItemInter {
-    text: string | null
-    icon: Object
-}
-export interface OrderDataIner {
-    [symbol: string]: ItemInter;
+export interface IPagination {
+    pageIndex?: number
+    pageSize?: number
 }
