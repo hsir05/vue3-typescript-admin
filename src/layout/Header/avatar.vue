@@ -29,7 +29,7 @@ const closeHandleSelect = async (key: string) => {
       negativeText: "不确定",
       onPositiveClick: async () => {
         await userStore.logout();
-        router.push({ path: "/login" });
+        router.replace({ path: "/login" });
       },
       onNegativeClick: () => {},
     });
