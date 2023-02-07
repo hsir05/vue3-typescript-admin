@@ -59,7 +59,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           drop_console: VITE_DROP_CONSOLE,
         },
       },
-      brotliSize: false, //启用/禁用 brotli 压缩大小报告
+     // brotliSize: false, //启用/禁用 brotli 压缩大小报告
       chunkSizeWarningLimit: 2000, // 可以通过合并来对您的块进行后处理。
     },
   };

@@ -27,7 +27,7 @@
         <n-tooltip placement="bottom">
           <template #trigger>
             <n-icon size="18" class="setting-icon">
-              <component :is="fullscreenIcon" @click="toggleFullScreen" />
+              <component :is="state.fullscreenIcon" @click="toggleFullScreen" />
             </n-icon>
           </template>
           <span>全屏</span>
@@ -57,8 +57,8 @@
   </div>
   <ProjectSetting ref="drawerSetting" />
 </template>
-<script lang="ts">
-import { defineComponent, ref, unref, computed, reactive, toRefs } from "vue";
+<script lang="ts" setup>
+import { ref, unref, computed, reactive, markRaw } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import ProjectSetting from "./projectSetting/projectSetting.vue";
 import { useProjectSetting } from "@/hooks/setting/useProjectSetting";
@@ -76,79 +76,48 @@ import {
   ReloadOutlined as ReloadIcon,
 } from "@vicons/antd";
 
-export default defineComponent({
-  name: "Header",
-  components: {
-    Menu,
-    Avatar,
-    AppLogo,
-    Breadcrumb,
-    ReloadIcon,
-    FullScreenExitIcon,
-    FullscreenOutIcon,
-    setttingIcon,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-    ProjectSetting,
-  },
-  setup() {
-    const router = useRouter();
-    const route = useRoute();
-    const state = reactive({
-      fullscreenIcon: "FullscreenOutIcon",
-    });
-    const { getCollapsed, isBreadcrumb, isRefresh, navMode, navStyle, setProject } =
-      useProjectSetting();
-    const drawerSetting = ref();
-
-    const inverted = computed(() => unref(navStyle) === "header-dark");
-
-    const handleCollapsed = () => {
-      setProject({ collapsed: !unref(getCollapsed) });
-    };
-    const openSetting = () => {
-      const { openDrawer } = drawerSetting.value;
-      openDrawer();
-    };
-
-    const toggleFullscreenIcon = () =>
-      (state.fullscreenIcon =
-        document.fullscreenElement !== null ? "FullScreenExitIcon" : "FullScreenExitIcon");
-
-    document.addEventListener("fullscreenchange", toggleFullscreenIcon);
-
-    const toggleFullScreen = () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    };
-
-    const reloadPage = () => {
-      router.push({
-        path: "/redirect" + unref(route).fullPath,
-      });
-    };
-
-    return {
-      ...toRefs(state),
-      drawerSetting,
-      getCollapsed,
-      isBreadcrumb,
-      navMode,
-      isRefresh,
-      inverted,
-
-      openSetting,
-      reloadPage,
-      handleCollapsed,
-      toggleFullScreen,
-    };
-  },
+const router = useRouter();
+const route = useRoute();
+const state = reactive({
+  fullscreenIcon: markRaw(FullscreenOutIcon),
 });
+const { getCollapsed, isBreadcrumb, isRefresh, navMode, navStyle, setProject } =
+  useProjectSetting();
+const drawerSetting = ref();
+
+const inverted = computed(() => unref(navStyle) === "header-dark");
+
+const handleCollapsed = () => {
+  setProject({ collapsed: !unref(getCollapsed) });
+};
+const openSetting = () => {
+  const { openDrawer } = drawerSetting.value;
+  openDrawer();
+};
+
+const toggleFullscreenIcon = () =>
+  (state.fullscreenIcon =
+    document.fullscreenElement !== null
+      ? markRaw(FullScreenExitIcon)
+      : markRaw(FullScreenExitIcon));
+
+document.addEventListener("fullscreenchange", toggleFullscreenIcon);
+
+const toggleFullScreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+};
+
+const reloadPage = () => {
+  router.push({
+    path: "/redirect" + unref(route).fullPath,
+  });
+};
 </script>
 <style lang="scss">
 .flex {

@@ -1,6 +1,7 @@
 import type { Plugin, PluginOption } from "vite";
 import Components from "unplugin-vue-components/vite";
 import vue from "@vitejs/plugin-vue";
+import vueJsx from "@vitejs/plugin-vue-jsx";
 import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import { visualizer } from "rollup-plugin-visualizer";
 import { createHtmlPlugin } from "vite-plugin-html";
@@ -20,6 +21,7 @@ export function createVitePlugins(env: ViteEnv, isBuild: boolean) {
 
     const vitePlugins: (Plugin | Plugin[] | PluginOption[])[] = [
         vue(),
+        vueJsx(),
         Components({
             resolvers: [NaiveUiResolver()],
         }),
