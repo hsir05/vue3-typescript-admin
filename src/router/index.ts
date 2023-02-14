@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import { createRouterGuard } from "./routeGuard";
 import { LoginRoute, RedirectRoute, ErrorPageRoute } from "@/router/base";
 
-const modules = import.meta.globEager('./modules/**/*.ts');
+const modules = import.meta.glob('./**/*.ts', { eager: true });
 
 export const routeModuleList: RouteRecordRaw[] = [];
 
