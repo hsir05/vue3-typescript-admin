@@ -1,17 +1,24 @@
 import { App } from "vue";
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw, } from "vue-router";
 import { createRouterGuard } from "./routeGuard";
 import { LoginRoute, RedirectRoute, ErrorPageRoute } from "@/router/base";
 
-const modules = import.meta.glob('./**/*.ts', { eager: true });
+const modules = import.meta.glob('./modules/**/*.ts', { eager: true }) ;
 
 export const routeModuleList: RouteRecordRaw[] = [];
 
-Object.keys(modules).forEach((key) => {
-  const mod = modules[key].default || {};
-  const modList = Array.isArray(mod) ? [...mod] : [mod];
-  routeModuleList.push(...modList);
+Object.keys(modules).forEach(key => {
+    /* @ts-ignore */
+    const item = modules[key].default;
+    if (item) {
+        console.log(item);
+        
+        routeModuleList.push(...item);
+    } else {
+        window.console.error(`路由模块解析出错: key = ${key}`);
+    }
 });
+
 
 // any 需要优化
 function sortRoute(a:any, b:any) {
