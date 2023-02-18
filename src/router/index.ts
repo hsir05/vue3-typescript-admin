@@ -11,8 +11,6 @@ Object.keys(modules).forEach(key => {
     /* @ts-ignore */
     const item = modules[key].default;
     if (item) {
-        console.log(item);
-        
         routeModuleList.push(...item);
     } else {
         window.console.error(`路由模块解析出错: key = ${key}`);

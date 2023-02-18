@@ -2,11 +2,16 @@
   <n-modal v-model:show="showModal">
     <div class="notice-card">
       <div class="notice-tabs">
-        <n-tabs type="line" @update:value="handleUpdateValue">
-          <n-tab name="customerNotice">客户通知</n-tab>
-          <n-tab name="shopNotice">商户通知</n-tab>
-          <n-tab name="orderNotice">订单通知</n-tab>
-          <n-tab name="afterNotice">售后通知</n-tab>
+        <n-tabs
+          type="line"
+          @update:value="handleUpdateValue"
+          :bar-width="120"
+          justify-content="center"
+          :tab-style="{ width: '100px', justifyContent: 'center' }"
+        >
+          <n-tab name="customerNotice" :bar-width="160">消息</n-tab>
+          <n-tab name="shopNotice">通知</n-tab>
+          <n-tab name="orderNotice">待办</n-tab>
         </n-tabs>
       </div>
       <component :is="tabs[currentCom]" />

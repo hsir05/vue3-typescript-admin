@@ -85,6 +85,7 @@ import {
   FullscreenExitOutlined as FullScreenExitIcon,
   FullscreenOutlined as FullscreenOutIcon,
   ReloadOutlined as ReloadIcon,
+  BellOutlined as BellIcon,
 } from "@vicons/antd";
 
 const noticeModalRef = ref();

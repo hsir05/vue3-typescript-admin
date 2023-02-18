@@ -64,7 +64,6 @@ const handleRead = (id: string, index: number) => {
     }
   }
   .notice-content {
-    @include ellipses;
   }
   .active {
     opacity: 0.7;
