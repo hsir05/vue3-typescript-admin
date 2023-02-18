@@ -41,6 +41,15 @@
           </template>
           刷新当前页面
         </n-tooltip>
+        <!--通知/消息-->
+        <n-tooltip trigger="hover" v-if="isRefresh">
+          <template #trigger>
+            <n-icon size="18" class="setting-icon" @click="notice">
+              <BellIcon />
+            </n-icon>
+          </template>
+          通知/消息
+        </n-tooltip>
         <!--用户头像-->
         <Avatar />
         <!--项目配置-->
@@ -55,6 +64,8 @@
       </div>
     </n-layout-header>
   </div>
+
+  <NoticeModal ref="noticeModalRef" />
   <ProjectSetting ref="drawerSetting" />
 </template>
 <script lang="ts" setup>
@@ -66,7 +77,7 @@ import Breadcrumb from "../components/Breadcrumb/Breadcrumb.vue";
 import Menu from "@/layout/Sider/Menu.vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
 import Avatar from "./avatar.vue";
-
+import NoticeModal from "./noticeModal.vue";
 import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import {
   MenuUnfoldOutlined,
@@ -76,6 +87,7 @@ import {
   ReloadOutlined as ReloadIcon,
 } from "@vicons/antd";
 
+const noticeModalRef = ref();
 const router = useRouter();
 const route = useRoute();
 const state = reactive({
@@ -112,7 +124,9 @@ const toggleFullScreen = () => {
     }
   }
 };
-
+const notice = () => {
+  noticeModalRef.value.showModal = true;
+};
 const reloadPage = () => {
   router.push({
     path: "/redirect" + unref(route).fullPath,

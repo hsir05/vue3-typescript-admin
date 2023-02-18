@@ -5,7 +5,7 @@ import { renderIcon } from '@/utils/index';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+        path: '/dashboard',
     name: 'dashboard',
     component: PARENTLAYOUT, 
     redirect:'/dashboard',
