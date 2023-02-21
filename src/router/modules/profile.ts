@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "个人设置",
         },
-        component: () => import("@/views/profile/profile.vue"),
+        component: () => import("@/views/system/profile/profile.vue"),
       }
     ],
   },

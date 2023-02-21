@@ -33,7 +33,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       preprocessorOptions: {
         scss: {
           charset: false, // 解决scss编译报警告问题
-          additionalData: '@import "@/assets/styles/var.scss";',
+          additionalData: '@import "@/assets/styles/global.scss";',
         },
       },
     },
