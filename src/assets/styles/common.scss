@@ -12,7 +12,21 @@ body {
   background-color: rgb(255, 255, 255);
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+font-family: -apple-system,
+        system-ui,
+        Segoe UI,
+        Roboto,
+        Ubuntu,
+        Cantarell,
+        Noto Sans,
+        sans-serif,
+        BlinkMacSystemFont,
+        Helvetica Neue,
+        PingFang SC,
+        Hiragino Sans GB,
+        Microsoft YaHei,
+        Arial !important;
+    -webkit-font-smoothing: unset !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
