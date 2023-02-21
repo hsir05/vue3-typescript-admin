@@ -8,29 +8,12 @@ import { ACCESS_TOKEN_KEY, USER_INFO_KEY } from "@/config/constant";
 import {login} from "@/api/system/login"
 import { ILoginForm } from '@/interface/common/common'
 import Avatar from "@/assets/image/default-avatar.png";
+import { IUser, IUserInfo, IRole } from "./type"
 
-interface RoleInter {
-  roleId: string;
-  roleName: string;
-}
-interface userInfoInter {
-  account: string;
-  adminId: string;
-  name: string;
-  sex: number | null;
-  email: string;
-  avatar?: string;
-  roles: RoleInter[];
-}
-interface UserInter {
-  token: string;
-  userInfo: userInfoInter;
-  permissions: string[];
-}
 
 export const useAppUserStore = defineStore({
   id: "app-user",
-  state: (): UserInter => ({
+    state: (): IUser => ({
     token: locStorage.get(ACCESS_TOKEN_KEY),
     userInfo: locStorage.get(USER_INFO_KEY) || {
       account: "",
@@ -47,7 +30,7 @@ export const useAppUserStore = defineStore({
     getToken(): string {
       return this.token;
     },
-    getUserInfo(): userInfoInter {
+      getUserInfo(): IUserInfo {
       return this.userInfo;
     },
     getAccount(): string {
@@ -62,7 +45,7 @@ export const useAppUserStore = defineStore({
     getAvatar(): string {
       return this.userInfo.avatar as string;
     },
-    getRoles(): RoleInter[] {
+      getRoles(): IRole[] {
       return this.userInfo.roles;
     },
     getPermissions(): string[] {
@@ -73,7 +56,7 @@ export const useAppUserStore = defineStore({
     setToken(token: string) {
       this.token = token;
     },
-    setUserInfo(userInfo: userInfoInter) {
+      setUserInfo(userInfo: IUserInfo) {
       this.userInfo = userInfo;
     },
     setPermissions(permissions: string[]) {
