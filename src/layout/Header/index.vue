@@ -44,9 +44,13 @@
         <!--通知/消息-->
         <n-tooltip trigger="hover" v-if="isRefresh">
           <template #trigger>
-            <n-icon size="18" class="setting-icon" @click="notice">
-              <BellIcon />
-            </n-icon>
+            <span class="setting-icon" @click="notice">
+              <n-badge dot processing :show="badge" :value="0">
+                <n-icon size="18" color="#333639">
+                  <BellIcon />
+                </n-icon>
+              </n-badge>
+            </span>
           </template>
           通知/消息
         </n-tooltip>
@@ -89,6 +93,7 @@ import {
 } from "@vicons/antd";
 
 const noticeModalRef = ref();
+const badge = ref(true);
 const router = useRouter();
 const route = useRoute();
 const state = reactive({
