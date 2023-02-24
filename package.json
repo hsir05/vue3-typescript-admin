@@ -20,6 +20,8 @@
   "dependencies": {
     "@vicons/antd": "^0.12.0",
     "@vueuse/core": "^7.6.2",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^0.26.0",
     "blueimp-md5": "^2.19.0",
     "dayjs": "^1.11.1",

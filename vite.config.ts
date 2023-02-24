@@ -46,7 +46,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     optimizeDeps: {
       //在预构建中强制排除的依赖项。
       include: [],
-      exclude: ["vue-demi"], // vue-demi同时支持Vue2和3的通用Vue库的开发工具
+        exclude:[]
+        // 注释此行,解决富文本编辑器报错问题
+    //   exclude: ["vue-demi"], // vue-demi同时支持Vue2和3的通用Vue库的开发工具
     },
     build: {
       target: "es2015",
