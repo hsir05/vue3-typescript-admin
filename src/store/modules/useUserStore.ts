@@ -13,7 +13,7 @@ import { IUser, IUserInfo, IRole } from "./type"
 
 export const useAppUserStore = defineStore({
   id: "app-user",
-    state: (): IUser => ({
+    state: (): IUser => ({ 
     token: locStorage.get(ACCESS_TOKEN_KEY),
     userInfo: locStorage.get(USER_INFO_KEY) || {
       account: "",

@@ -35,7 +35,6 @@
               @before-upload="beforeUpload"
               @finish="finish"
               @error="handleErr"
-              @remove="remove"
             >
               <div class="flex flex-col justify-center">
                 <n-icon size="18" class="m-auto">
