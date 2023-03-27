@@ -1,4 +1,4 @@
-export const STORAGE_KEY = "YMCX_ADMIN"; // 本地存储前缀
+export const STORAGE_KEY = "VALET_ADMIN"; // 本地存储前缀
 export const PROJECT_CONFIG_KEY = "PROJECT_CONFIG";  
 export const ACCESS_TOKEN_KEY = "ACCESS_TOKEN" //token
 export const EXP_KEY = "ACCESS_TOKEN" //token 过期时间
