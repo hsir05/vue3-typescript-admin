@@ -15,14 +15,14 @@ export const menuOptions: MenuOption[] = [
     icon: renderIcon(SpeedomeIcon),
   },
    {
-      label: "插件示例",
-      key: "/plugin",
+      label: "订单管理",
+      key: "/order",
       icon: renderIcon(FileIcon),
       children: [
         {
-          label: "剪切板",
-          path: "/plugin/copy",
-          key: "/plugin/copy",
+        label: "订单管理",
+              path: "/order/list",
+              key: "/order/list",
         },
       ],
     },

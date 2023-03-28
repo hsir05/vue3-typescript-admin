@@ -10,3 +10,10 @@ export interface IPagination {
     pageIndex?: number
     pageSize?: number
 }
+
+export interface IState {
+    [Symbol: string | number]: {
+        text: string
+        color: string
+    }
+}

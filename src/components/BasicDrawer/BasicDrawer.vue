@@ -32,14 +32,6 @@ const props = defineProps({
 const isDrawer = ref(false);
 // 响应式的引用
 const { title, width, placement } = toRefs(props);
-// @ts-ignore
-// function openDrawer(){
-//   isDrawer.value = true;
-// };
-//@ts-ignore
-// function closeDrawer() {
-//   isDrawer.value = false;
-// };
 const emit = defineEmits(["handleMaskClick", "onCloseAfter"]);
 const onMaskClick = () => {
   isDrawer.value = false;
