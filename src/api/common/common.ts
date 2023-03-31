@@ -14,7 +14,6 @@ export function frontUpload(data: { storageObjectType: string; fileSuffix: strin
 }
 
 // 下载
-
 export function downloadFile(
     data: string,
     filename = '文件',
