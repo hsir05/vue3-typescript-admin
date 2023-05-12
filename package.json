@@ -22,7 +22,7 @@
     "@vueuse/core": "^7.6.2",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
-    "axios": "^0.26.0",
+    "axios": "1.4",
     "blueimp-md5": "^2.19.0",
     "dayjs": "^1.11.1",
     "echarts": "^5.3.2",
