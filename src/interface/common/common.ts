@@ -3,10 +3,17 @@ export interface IObj {
 }
 // 登录
 export interface ILoginForm {
-  principal: string
-  credentials: string
+  principal: string | null
+  credentials: string | null
 }
 export interface IPagination {
     pageIndex?: number
     pageSize?: number
+}
+
+export interface IState {
+    [Symbol: string | number]: {
+        text: string
+        color: string
+    }
 }

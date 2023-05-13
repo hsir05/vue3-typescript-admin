@@ -22,14 +22,3 @@ export const lockOptions = [
 ];
 
 
-// 可使用的时间
-export const withdrawalHourOptions = (() => {
-    let hourArr = []
-    for (let i = 1; i <= 24; i++) {
-        hourArr.push({ label: `${i}时`, value: 1 })
-    }
-    // hourArr.push({ label: `${0}时`, value: 1, })
-
-    return hourArr
-})()
-

@@ -26,7 +26,7 @@ const getTransitionName = computed(() => {
 
 const getHeight = computed(() => {
   if (unref(showFooter) && unref(isTabs)) {
-    return "height: calc(100vh - 155px)";
+    return "height: calc(100vh - 115px)";
   } else if ((unref(showFooter) && !unref(isTabs)) || (!unref(showFooter) && unref(isTabs))) {
     return "height: calc(100vh - 115px)";
   } else {
