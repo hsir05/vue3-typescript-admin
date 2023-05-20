@@ -1,4 +1,4 @@
-import type { AxiosRequestConfig, AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosRequestConfig, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
 import axios from 'axios'
 import { AxiosCanceler } from './axiosCancel'
@@ -153,7 +153,7 @@ export class VAxios {
       return
     }
     const {
-      requestInterceptors,
+    //   requestInterceptors,
       requestInterceptorsCatch,
       responseInterceptors,
       responseInterceptorsCatch
@@ -162,7 +162,8 @@ export class VAxios {
     const axiosCanceler = new AxiosCanceler()
 
     // 请求拦截器配置处理
-    this.axiosInstance.interceptors.request.use((config: AxiosRequestConfig) => {
+    //   this.axiosInstance.interceptors.request.use((config: AxiosRequestConfig) => {
+      this.axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig<any>) => {
       const {
         // @ts-ignore
         headers: { ignoreCancelToken }
@@ -173,9 +174,9 @@ export class VAxios {
           : this.options.requestOptions?.ignoreCancelToken
 
       !ignoreCancel && axiosCanceler.addPending(config)
-      if (requestInterceptors && isFunction(requestInterceptors)) {
-        config = requestInterceptors(config, this.options)
-      }
+    //   if (requestInterceptors && isFunction(requestInterceptors)) {
+    //     config = requestInterceptors(config, this.options)
+    //   }
       return config
     }, undefined)
 
@@ -199,3 +200,15 @@ export class VAxios {
       this.axiosInstance.interceptors.response.use(undefined, responseInterceptorsCatch)
   }
 }
+
+// Argument of type '(config: AxiosRequestConfig) => AxiosRequestConfig<any>' 
+// is not assignable to parameter of type 
+// '(value: InternalAxiosRequestConfig<any>) => InternalAxiosRequestConfig<any> | Promise<InternalAxiosRequestConfig<any>>'.
+
+
+//     Type 'AxiosRequestConfig<any>' is not assignable to type 'InternalAxiosRequestConfig<any> | Promise<InternalAxiosRequestConfig<any>>'.
+//     Type 'AxiosRequestConfig<any>' is not assignable to type 'InternalAxiosRequestConfig<any>'.
+//     Types of property 'headers' are incompatible.
+//     Type 'AxiosHeaders | (Partial<RawAxiosHeaders & { "Content-Length": AxiosHeaderValue; "Content-Encoding": AxiosHeaderValue; Accept: AxiosHeaderValue; "User-Agent": AxiosHeaderValue; Authorization: AxiosHeaderValue; } & { ...; }> & Partial<...>) | undefined' is not assignable to type 'AxiosRequestHeaders'.
+//     Type 'undefined' is not assignable to type 'AxiosRequestHeaders'.
+//         Type 'undefined' is not assignable to type 'Partial<RawAxiosHeaders & { "Content-Length": AxiosHeaderValue; "Content-Encoding": AxiosHeaderValue; Accept: AxiosHeaderValue; "User-Agent": AxiosHeaderValue; Authorization: AxiosHeaderValue; } & { ...; }>'
