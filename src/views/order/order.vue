@@ -32,7 +32,7 @@
     </n-form>
 
     <!-- 表格 -->
-    <div class="p-15px box-border bg-white" style="height: calc(100vh - 180px)">
+    <div class="p-5px box-border bg-white" style="height: calc(100vh - 180px)">
       <n-data-table
         :columns="columns"
         :row-key="getRowKeyId"
