@@ -57,14 +57,14 @@
         <!--用户头像-->
         <Avatar />
         <!--项目配置-->
-        <!-- <n-tooltip trigger="hover">
+        <n-tooltip trigger="hover">
           <template #trigger>
             <n-icon size="18" class="setting-icon" style="padding-right: 20px" @click="openSetting">
               <setttingIcon />
             </n-icon>
           </template>
           项目配置
-        </n-tooltip> -->
+        </n-tooltip>
       </div>
     </n-layout-header>
   </div>
@@ -82,7 +82,7 @@ import Menu from "@/layout/Sider/Menu.vue";
 import AppLogo from "../components/AppLogo/AppLogo.vue";
 import Avatar from "./avatar.vue";
 import NoticeModal from "./noticeModal.vue";
-// import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
+import { SettingsOutline as setttingIcon } from "@vicons/ionicons5";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -108,10 +108,10 @@ const inverted = computed(() => unref(navStyle) === "header-dark");
 const handleCollapsed = () => {
   setProject({ collapsed: !unref(getCollapsed) });
 };
-// const openSetting = () => {
-//   const { openDrawer } = drawerSetting.value;
-//   openDrawer();
-// };
+const openSetting = () => {
+  const { openDrawer } = drawerSetting.value;
+  openDrawer();
+};
 
 const toggleFullscreenIcon = () =>
   (state.fullscreenIcon =

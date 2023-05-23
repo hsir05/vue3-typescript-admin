@@ -39,7 +39,7 @@ const getHeight = computed(() => {
   padding: 5px;
   background-color: #f2f3f5;
   box-sizing: border-box;
-  min-width: 1200px;
-  overflow-y: scroll;
+  //   min-width: 1000px;
+  //   overflow-y: scroll;
 }
 </style>

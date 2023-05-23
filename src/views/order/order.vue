@@ -7,10 +7,10 @@
       label-placement="left"
       label-width="80"
       :show-feedback="false"
-      class="form-box pb-10px bg-white pt-10px mb-5px"
+      class="form-box pb-5px bg-white pt-5px"
       :model="queryValue"
     >
-      <n-form-item label="订单号" path="orderIdEq">
+      <n-form-item label="订单号" path="orderIdEq" label-width="65">
         <n-input
           v-model:value="queryValue.orderIdEq"
           clearable
@@ -23,7 +23,7 @@
         <n-select v-model:value="queryValue.orderStateEq" :options="options" style="width: 150px" />
       </n-form-item>
 
-      <div class="ml-10px">
+      <div class="">
         <n-button attr-type="button" type="primary" @click="handleQuery">查询</n-button>
         <n-button attr-type="button" type="warning" class="ml-10px" @click="handleReset"
           >重置</n-button
@@ -32,13 +32,13 @@
     </n-form>
 
     <!-- 表格 -->
-    <div class="p-5px box-border bg-white" style="height: calc(100vh - 180px)">
+    <div class="p-5px box-border bg-white mt-5px">
       <n-data-table
         :columns="columns"
         :row-key="getRowKeyId"
-        min-height="calc(100vh - 300px)"
+        min-height="calc(100vh - 260px)"
         flex-height
-        :scroll-x="1000"
+        :scroll-x="1200"
         :data="data"
         bordered
         :loading="loading"
@@ -47,14 +47,13 @@
 
       <!-- 分页 -->
       <n-pagination
-        v-if="itemCount"
         v-model:page="pagination.pageIndex"
         v-model:page-size="pagination.pageSize"
         v-model:item-count="itemCount"
         :page-slot="5"
         :show-size-picker="true"
         :show-quick-jumper="true"
-        class="mt-10px justify-end mr-10px"
+        class="mt-5px justify-end"
         :on-update:page="handlePage"
         :on-update:page-size="handlePageSize"
         :page-sizes="pageSizes"
@@ -94,7 +93,7 @@ const orderState: IState = {
   OS00006: { text: "已完成", color: "rgba(165, 214, 63, 1)" },
 };
 const getRowKeyId = (row: ITableData) => row.id;
-const itemCount = ref(null);
+const itemCount = ref(0);
 const options = ref([
   {
     label: "待付款",
@@ -251,18 +250,5 @@ function handlePageSize(pageSize: number) {
 </script>
 <style lang="scss" scoped>
 .box {
-  font-size: 18px;
-  font-weight: 400;
-  box-sizing: border-box;
-  height: calc(100vh - 115px);
-
-  .price-range {
-    @include flex(center, flex-start);
-  }
-
-  .form-box {
-    @include flex(center, flex-start);
-    flex-wrap: wrap;
-  }
 }
 </style>
