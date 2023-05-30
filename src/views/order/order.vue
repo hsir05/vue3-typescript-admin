@@ -13,7 +13,6 @@
       <n-form-item label="订单号" path="orderIdEq" label-width="65">
         <n-input
           v-model:value="queryValue.orderIdEq"
-          clearable
           placeholder="输入订单号"
           style="width: 150px"
         />
