@@ -12,6 +12,7 @@
         clearable
         v-model:value="formValue.principal"
         :maxlength="20"
+        @keydown.enter="handleSubmit"
         placeholder="请输入用户名"
       >
         <template #prefix>
@@ -26,6 +27,7 @@
         clearable
         v-model:value="formValue.credentials"
         type="password"
+        @keydown.enter="handleSubmit"
         showPasswordOn="click"
         placeholder="请输入密码"
       >
@@ -91,7 +93,7 @@ const loginUser = async () => {
     loading.value = false;
   }
 };
-const handleSubmit = (e: MouseEvent) => {
+const handleSubmit = (e: MouseEvent | KeyboardEvent) => {
   e.preventDefault();
   formRef.value?.validate((errors) => {
     if (!errors) {
